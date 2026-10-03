@@ -1,0 +1,27 @@
+name: Verify SCULP Demo
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare browser check
+        run: npm install --no-save --package-lock=false playwright
+      - name: Verify interactions and responsive layouts
+        run: |
+          python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
+          node scripts/smoke.cjs
+      - name: Save visual checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sculp-visual-checks
+          path: qa-screens/
