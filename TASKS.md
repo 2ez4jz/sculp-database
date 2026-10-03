@@ -10,11 +10,16 @@
 - [x] Booking photos, category filters and image preview
 - [x] Browser-local portfolio selection and order changes
 - [x] Admin and Artist interface simulation
-- [x] Preset Sculpy input, review and browser-local note saving
+- [x] Embedded Sculpy input, review and browser-local note saving
+- [x] Browser microphone capture and Mock/API transcription adapter
+- [x] Mock/API AI extraction and database search adapters
+- [x] Eight real public employee profiles; business records remain fictional
+- [x] Production database schema, audit log and row-level permission policies
+- [x] Demo/Production configuration boundary and installable web-app manifest
 - [x] Insights calculated from the same linked seed data
 - [x] Eight-step product meeting presentation mode
 - [ ] Real backend authentication and access control — V2
-- [ ] Real database, shared note and media storage — V2
-- [ ] Voice transcription and reviewed AI extraction — V2
+- [ ] Connect private Supabase project and migrate from local storage — launch phase
+- [ ] Deploy server-side OpenAI transcription/extraction/search endpoints — launch phase
 - [ ] Real image upload and tagging — V2
 - [ ] Client interaction history and follow-up — V2

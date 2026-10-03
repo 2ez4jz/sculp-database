@@ -1,9 +1,12 @@
 export const artists = [
- {id:'miranda',name:'Miranda',level:'Signature Artist / Founder',since:'2016-05-01',bio:'以细腻的观察和克制的造型语言，陪伴每一个重要时刻。'},
- {id:'yuki',name:'Yuki',level:'Director Artist',since:'2018-04-12',bio:'从自然妆感到完整造型，让每个细节与本人气质相连。'},
- {id:'mira',name:'Mira',level:'Director Artist',since:'2019-06-20',bio:'关注光线、肤感与舒适度，创造温柔而有力量的造型。'},
- {id:'michelle',name:'Michelle',level:'Senior Artist',since:'2023-03-15',bio:'认真倾听每一个偏好，让服务过程和最终造型都更自在。'},
- {id:'emily',name:'Emily',level:'Senior Artist',since:'2024-02-01',bio:'在发型和妆容之间寻找平衡，把每次工作变成新的积累。'}
+ {id:'miranda',name:'Miranda',level:'Signature Artist / Founder',systemRole:'owner',accountStatus:'pilot',image:'assets/miranda-portrait.jpg',specialties:['Editorial','Luxury Bridal','Destination'],bio:'十年以上时尚、名人造型与高端婚礼经验，以编辑视角完成现代新娘造型。'},
+ {id:'yuki',name:'Yuki',level:'Director Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/yuki-portrait.jpg',specialties:['Bridal','Education','Technical'],bio:'拥有十年以上婚礼造型经验，结合专业技术、教学背景与精致的艺术表达。'},
+ {id:'mira',name:'Mira',level:'Director Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/mira-portrait.jpg',specialties:['Modern Bridal','New Chinese Style'],bio:'专注现代婚礼与新中式造型，把东方审美与当代技术结合。'},
+ {id:'michelle',name:'Michelle',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/michelle-portrait.jpg',specialties:['Refined','Balanced','Personalized'],bio:'以平衡、细致的方式围绕客户本身的五官、风格与场合完成造型。'},
+ {id:'emily',name:'Emily',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/emily-portrait.jpg',specialties:['Fresh','Polished','Personalized'],bio:'以清新、精致和个性化为重点，细致回应客户的五官与场合。'},
+ {id:'angelina',name:'Angelina',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/angelina-portrait.webp',specialties:['Korean-inspired','Bridal','Editorial'],bio:'擅长现代韩系婚礼、编辑与商业造型，妆感清新并适合镜头呈现。'},
+ {id:'elaine',name:'Elaine',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/elaine-portrait.webp',specialties:['Bridal','Portrait','Event'],bio:'以柔和、现代的方式完成婚礼、人像与活动造型，保留客户自身特点。'},
+ {id:'giselle',name:'Giselle',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/giselle-portrait.webp',specialties:['Soft Glam','Western','Thai-inspired'],bio:'擅长 Soft Glam、现代西式与泰式灵感妆面，强调光泽肌肤与立体轮廓。'}
 ];
 export const venues=[
  {id:'graydon',name:'Graydon Hall Manor',address:'185 Graydon Hall Dr, Toronto',website:'https://www.graydonhall.com',note:'新娘准备房自然光充足；预留设备布置时间。'},
@@ -28,7 +31,7 @@ export const clients=names.map((name,i)=>({id:'c'+i,name,city:i%3?'Toronto':'Mar
 const types=['Wedding','Trial','Event','Photoshoot','Commercial','Education'];
 const pricing={Wedding:1990,Trial:350,Event:280,Photoshoot:490,Commercial:850,Education:450};
 export const bookings=Array.from({length:24},(_,i)=>{
- const service=i===0?'Wedding':types[i%6],clientId='c'+(i%12),staff=[artists[i%5].id];if(service==='Wedding')staff.push(artists[(i+3)%5].id);
+ const service=i===0?'Wedding':types[i%6],clientId='c'+(i%12),staff=[artists[i%artists.length].id];if(service==='Wedding')staff.push(artists[(i+3)%artists.length].id);
  const date=i===0?'2026-10-02':i<6?'2026-10-'+String(3+Math.floor(i/2)).padStart(2,'0'): '2026-09-'+String(30-(i-6)).padStart(2,'0');
  const venueId=service==='Trial'||service==='Education'?'studio':venues[i%6].id;
  return {id:'b'+i,date,startTime:service==='Wedding'?'07:00':'10:00',endTime:service==='Wedding'?'17:00':'12:00',clientId,artistIds:staff,venueId,partnerIds:service==='Trial'||service==='Education'?[]:i%2?['lumi','ever']:['mango','rebecca','bloom'],service,price:pricing[service],status:i===0||i>=6?'Completed':i===5?'Inquiry':'Confirmed',createdAt:date+'T08:00:00-04:00'};

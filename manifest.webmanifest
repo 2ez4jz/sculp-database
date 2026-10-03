@@ -1,0 +1,13 @@
+{
+  "name": "Sculpy · SCULP Studio",
+  "short_name": "Sculpy",
+  "description": "SCULP Studio internal memory and decision companion.",
+  "start_url": "./#bookings",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#435647",
+  "icons": [
+    {"src": "assets/sculpy-app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
