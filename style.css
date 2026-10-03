@@ -31,3 +31,16 @@ nav a[href="#sculpy"].active{background:linear-gradient(135deg,#5c7065dd,#344b40
 @keyframes sculpy-glass{0%,65%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
 @keyframes sculpy-reveal{0%{filter:blur(18px);opacity:0;transform:scale(.985)}35%{opacity:.42}100%{filter:blur(0);opacity:1;transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.sculpy-reveal{animation:none}nav a[href="#sculpy"]::after{animation:none}}
+
+/* Portraits keep each artist's face visible while using the full-resolution source. */
+.profile-card img{width:92px;height:116px;border-radius:6px;object-fit:cover;object-position:center 18%;filter:none;margin-bottom:18px;background:#e9e9e3}
+.profile-title img{width:128px;height:160px;border-radius:7px;object-fit:cover;object-position:center 18%;filter:none;background:#e9e9e3;box-shadow:0 8px 24px #303a3314}
+
+/* Keep Sculpy reachable, but conceal it behind a deliberately heavy glass layer. */
+nav a[href="#sculpy"]{isolation:isolate;color:transparent!important;background:linear-gradient(135deg,#e5e8e1f5,#f3f4eff0)!important;border-color:#ffffffd9!important;box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #cfd5ca88,0 8px 24px #33423812!important;backdrop-filter:blur(28px) saturate(.7)!important;-webkit-backdrop-filter:blur(28px) saturate(.7)!important}
+nav a[href="#sculpy"]::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(120deg,#eef0eacc,#dfe4dcda 52%,#f7f8f4d9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+nav a[href="#sculpy"]::after{z-index:3;opacity:.4}
+nav a[href="#sculpy"] .sculpy-nav-avatar{opacity:.16;filter:blur(4px)}
+nav a[href="#sculpy"]:hover::before,nav a[href="#sculpy"]:focus-visible::before{background:linear-gradient(120deg,#e9ede6bd,#d8ded5c8 52%,#f2f4efc9)}
+
+@media(max-width:500px){.profile-card img{width:84px;height:106px}.profile-title img{width:96px;height:120px}.profile-title{align-items:flex-start}}
