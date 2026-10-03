@@ -1,4 +1,4 @@
-import {artists,clients,venues,partners,bookings,notes,media,portfolioMedia} from './data/demo.js?v=20261003-portfolios';
+import {artists,clients,venues,partners,bookings,notes,media,portfolioMedia} from './data/demo.js?v=20261003-portraits';
 import {loadState,saveState,resetState} from './services/storage.js';
 import {config} from './config.js';
 import {transcribeAudio,extractMemory,searchMemory,sculpyExample} from './services/sculpy.js';
