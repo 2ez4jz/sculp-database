@@ -7,6 +7,14 @@ const assert=require('node:assert/strict');
  await page.goto('http://localhost:4173/#artists');
  assert.equal(await page.locator('.profile-card').count(),9);
  assert.equal(await page.getByText('Jz',{exact:true}).count(),1);
+ await page.goto('http://localhost:4173/#artists/yuki');
+ assert.equal(await page.locator('[data-official="true"]').count(),13);
+ await page.goto('http://localhost:4173/#artists/michelle');
+ assert.equal(await page.locator('[data-official="true"]').count(),1);
+ await page.goto('http://localhost:4173/#artists/miranda');
+ assert((await page.locator('[data-official="true"]').count())>80);
+ const officialSources=await page.locator('[data-official="true"] img').evaluateAll(images=>images.map(image=>image.getAttribute('src')));
+ assert(officialSources.every(source=>!source.includes('studio-')&&!source.includes('garden-room')));
 
  await page.goto('http://localhost:4173/#insights');
  assert.equal(await page.locator('.technical-panel').count(),1);

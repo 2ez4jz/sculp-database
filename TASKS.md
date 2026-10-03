@@ -8,6 +8,7 @@
 - [x] Venue and partner collaboration history
 - [x] Original notes, separately prepared summaries and source metadata
 - [x] Booking photos, category filters and image preview
+- [x] Official portfolio galleries mapped by artist; non-artist site work assigned to Miranda; studio interiors excluded
 - [x] Browser-local portfolio selection and order changes
 - [x] Admin and Artist interface simulation
 - [x] Embedded Sculpy input, review and browser-local note saving

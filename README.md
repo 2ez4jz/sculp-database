@@ -13,6 +13,7 @@ No build or dependencies required. Run `python -m http.server 4173` in this fold
 - Client, artist, venue and partner profiles with calculated collaboration history.
 - Booking notes with original text, prepared demo summaries and structured preferences.
 - Galleries, category filters, full-size image previews and personal portfolio selection/reordering.
+- Official artist galleries read directly from each member's public SCULP Studio portfolio. Remaining public site work is assigned to Miranda; studio interior/location images are excluded.
 - Admin/Artist interface simulation. Artist view only shows assigned bookings, service details and own statistics; CRM/contact details and marketing opportunities are hidden in the interface.
 - Sculpy voice capture, mock transcription, reviewed AI extraction, database search and browser-local note persistence.
 - Installable web-app manifest, Demo/Production configuration boundary and formal Supabase schema with row-level policies.
