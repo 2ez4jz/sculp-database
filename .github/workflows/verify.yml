@@ -21,6 +21,7 @@ jobs:
         run: |
           python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
           node scripts/smoke.cjs
+          node scripts/permissions.cjs
       - name: Save visual checks
         if: always()
         uses: actions/upload-artifact@v4

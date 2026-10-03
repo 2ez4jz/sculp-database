@@ -13,7 +13,8 @@
 - [x] Embedded Sculpy input, review and browser-local note saving
 - [x] Browser microphone capture and Mock/API transcription adapter
 - [x] Mock/API AI extraction and database search adapters
-- [x] Eight real public employee profiles; business records remain fictional
+- [x] Eight artist profiles plus Jz operations profile; business records remain fictional
+- [x] Jz system admin / Miranda business owner / assigned employee permission views
 - [x] Production database schema, audit log and row-level permission policies
 - [x] Demo/Production configuration boundary and installable web-app manifest
 - [x] Insights calculated from the same linked seed data

@@ -24,6 +24,7 @@ create table public.artists (
  bio text,
  specialties text[] not null default '{}',
  portrait_url text,
+ member_type text not null default 'artist' check (member_type in ('artist','operations')),
  employment_status text not null default 'active' check (employment_status in ('active','inactive','profile_only')),
  created_at timestamptz not null default now(),
  updated_at timestamptz not null default now()
@@ -232,6 +233,10 @@ create or replace function public.is_staff_manager() returns boolean
 language sql stable security definer set search_path=public
 as $$ select coalesce(public.current_app_role() in ('owner','admin','operations'),false) $$;
 
+create or replace function public.is_system_admin() returns boolean
+language sql stable security definer set search_path=public
+as $$ select coalesce(public.current_app_role() in ('admin','operations'),false) $$;
+
 create or replace function public.is_assigned_to_booking(target_booking uuid) returns boolean
 language sql stable security definer set search_path=public
 as $$ select exists(select 1 from public.booking_artists where booking_id=target_booking and artist_id=public.current_artist_id()) $$;
@@ -288,5 +293,4 @@ create policy reminders_manage_assigned on public.reminders for all using (publi
 create policy ai_drafts_read_own_or_manager on public.ai_drafts for select using (public.is_staff_manager() or created_by=auth.uid());
 create policy ai_drafts_create_own on public.ai_drafts for insert with check (created_by=auth.uid());
 create policy ai_drafts_update_own_or_manager on public.ai_drafts for update using (public.is_staff_manager() or created_by=auth.uid()) with check (public.is_staff_manager() or created_by=auth.uid());
-create policy audit_read_manager on public.audit_events for select using (public.is_staff_manager());
-
+create policy audit_read_system_admin on public.audit_events for select using (public.is_system_admin());

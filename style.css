@@ -20,3 +20,14 @@
 @media(max-width:850px){.sculpy-welcome{max-height:340px}.sculpy-greeting .sculpy-intro{font-size:32px}}
 @media(max-width:850px){.sculpy-search-panel{grid-template-columns:1fr}.sculpy-search-panel>*{grid-column:1}.sculpy-fab{right:16px;bottom:16px}}
 @media(max-width:500px){.sculpy-welcome{margin:-6px -6px 21px}.sculpy-greeting{top:14%;width:48%}.sculpy-greeting .eyebrow{font-size:8px;letter-spacing:.07em;margin-bottom:8px}.sculpy-greeting .sculpy-intro{font-size:24px;margin-bottom:9px}.sculpy-greeting p{font-size:12px;line-height:1.65}.sculpy-search{align-items:stretch}.sculpy-search input{width:100%}.search-result-list{grid-template-columns:1fr}.sculpy-fab span:last-child{display:none}.sculpy-fab{padding:7px}}
+.member-monogram{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--green);color:white;font-family:var(--serif);font-size:30px;margin-bottom:20px}
+.technical-panel{border-color:#aab7a4;background:linear-gradient(135deg,#fff 0%,#f2f5ef 100%)}
+.ops-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.ops-grid div{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px}.ops-grid strong{display:block;font-family:var(--serif);font-size:30px;font-weight:400}.ops-grid span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+@media(max-width:700px){.ops-grid{grid-template-columns:repeat(2,1fr)}}
+nav a[href="#sculpy"]{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffffff80,#dfe5db88);border:1px solid #ffffffaa;box-shadow:inset 0 1px 0 #fff9,0 5px 18px #33423812;color:#59675b;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+nav a[href="#sculpy"]::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 20%,#fff9 48%,transparent 72%);transform:translateX(-120%);animation:sculpy-glass 4.5s ease-in-out infinite}
+nav a[href="#sculpy"].active{background:linear-gradient(135deg,#5c7065dd,#344b40ee);color:white;border-color:#ffffff55}
+.sculpy-reveal{animation:sculpy-reveal 1.65s cubic-bezier(.2,.72,.2,1) both;transform-origin:50% 12%}
+@keyframes sculpy-glass{0%,65%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+@keyframes sculpy-reveal{0%{filter:blur(18px);opacity:0;transform:scale(.985)}35%{opacity:.42}100%{filter:blur(0);opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.sculpy-reveal{animation:none}nav a[href="#sculpy"]::after{animation:none}}

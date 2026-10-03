@@ -6,7 +6,8 @@ export const artists = [
  {id:'emily',name:'Emily',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/emily-portrait.jpg',specialties:['Fresh','Polished','Personalized'],bio:'以清新、精致和个性化为重点，细致回应客户的五官与场合。'},
  {id:'angelina',name:'Angelina',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/angelina-portrait.webp',specialties:['Korean-inspired','Bridal','Editorial'],bio:'擅长现代韩系婚礼、编辑与商业造型，妆感清新并适合镜头呈现。'},
  {id:'elaine',name:'Elaine',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/elaine-portrait.webp',specialties:['Bridal','Portrait','Event'],bio:'以柔和、现代的方式完成婚礼、人像与活动造型，保留客户自身特点。'},
- {id:'giselle',name:'Giselle',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/giselle-portrait.webp',specialties:['Soft Glam','Western','Thai-inspired'],bio:'擅长 Soft Glam、现代西式与泰式灵感妆面，强调光泽肌肤与立体轮廓。'}
+ {id:'giselle',name:'Giselle',level:'Senior Artist',systemRole:'artist',accountStatus:'profile_only',image:'assets/giselle-portrait.webp',specialties:['Soft Glam','Western','Thai-inspired'],bio:'擅长 Soft Glam、现代西式与泰式灵感妆面，强调光泽肌肤与立体轮廓。'},
+ {id:'jz',name:'Jz',level:'Operations & Product / Administrator',systemRole:'operations',accountStatus:'pilot',image:null,bookingEligible:false,specialties:['Operations','Product','Data'],bio:'负责工作室运营系统、数据结构、流程设计与产品迭代，帮助团队把经验转化为可持续积累。'}
 ];
 export const venues=[
  {id:'graydon',name:'Graydon Hall Manor',address:'185 Graydon Hall Dr, Toronto',website:'https://www.graydonhall.com',note:'新娘准备房自然光充足；预留设备布置时间。'},
@@ -30,8 +31,9 @@ const names=['Sarah Chen','Amy Wong','Jessica Li','Lisa Park','Chloe Zhang','Oli
 export const clients=names.map((name,i)=>({id:'c'+i,name,city:i%3?'Toronto':'Markham',email:name.toLowerCase().replace(' ','.')+'@example.com',phone:'+1 (416) 555-01'+String(i).padStart(2,'0'),wechat:'demo_'+name.split(' ')[0].toLowerCase(),instagram:'demo_'+name.replace(' ','_').toLowerCase(),birthday:'1993-'+String(i%12+1).padStart(2,'0')+'-15',weddingDate:i%2?'2026-09-12':'2026-10-02',referral:i%2?'朋友推荐':'合作摄影师推荐',preferences:i%2?['偏爱干净、轻盈的妆感','发型希望有自然蓬松感']:['喜欢自然轻薄底妆','不喜欢过重的睫毛'],opportunity:i%2?'来年周年纪念照，可在本人同意后跟进。':'提到十二月公司晚宴，待确认日期。'}));
 const types=['Wedding','Trial','Event','Photoshoot','Commercial','Education'];
 const pricing={Wedding:1990,Trial:350,Event:280,Photoshoot:490,Commercial:850,Education:450};
+const bookingArtists=artists.filter(a=>a.bookingEligible!==false);
 export const bookings=Array.from({length:24},(_,i)=>{
- const service=i===0?'Wedding':types[i%6],clientId='c'+(i%12),staff=[artists[i%artists.length].id];if(service==='Wedding')staff.push(artists[(i+3)%artists.length].id);
+ const service=i===0?'Wedding':types[i%6],clientId='c'+(i%12),staff=[bookingArtists[i%bookingArtists.length].id];if(service==='Wedding')staff.push(bookingArtists[(i+3)%bookingArtists.length].id);
  const date=i===0?'2026-10-02':i<6?'2026-10-'+String(3+Math.floor(i/2)).padStart(2,'0'): '2026-09-'+String(30-(i-6)).padStart(2,'0');
  const venueId=service==='Trial'||service==='Education'?'studio':venues[i%6].id;
  return {id:'b'+i,date,startTime:service==='Wedding'?'07:00':'10:00',endTime:service==='Wedding'?'17:00':'12:00',clientId,artistIds:staff,venueId,partnerIds:service==='Trial'||service==='Education'?[]:i%2?['lumi','ever']:['mango','rebecca','bloom'],service,price:pricing[service],status:i===0||i>=6?'Completed':i===5?'Inquiry':'Confirmed',createdAt:date+'T08:00:00-04:00'};

@@ -8,7 +8,7 @@ No build or dependencies required. Run `python -m http.server 4173` in this fold
 
 ## Included
 
-- 24 linked bookings, 12 fictional clients, 8 real public employee profiles, 6 venues and 8 partners.
+- 24 linked bookings, 12 fictional clients, 9 team profiles, 6 venues and 8 partners.
 - Booking list and month calendar, global booking search, artist/service/status/date/venue filters.
 - Client, artist, venue and partner profiles with calculated collaboration history.
 - Booking notes with original text, prepared demo summaries and structured preferences.
@@ -23,6 +23,8 @@ No build or dependencies required. Run `python -m http.server 4173` in this fold
 This repository is public and contains only fictional business records. Existing SCULP portfolio images are associated with mock bookings solely to demonstrate navigation; those associations do not describe real clients or services.
 
 Identity switching is an interface simulation, not authentication or data protection. All seed data is shipped to the browser. Do not add real client information until server-side access controls exist.
+
+The intended production access model has two global business viewers only: Jz (`operations`) and Miranda (`owner`). Jz additionally sees system health, data quality, AI configuration and audit events. Miranda sees the full business view without technical administration. Artists see only assigned work and their own portfolio.
 
 Sculpy currently runs in `mock` mode: microphone capture is real, but transcription, extraction and search responses are local controlled samples. The three API contracts are documented in `docs/API_CONTRACT.md`; no OpenAI key is shipped to the browser. Added notes and portfolio choices persist only in the current browser via localStorage.
 
