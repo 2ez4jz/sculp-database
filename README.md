@@ -15,7 +15,7 @@ No build or dependencies required. Run `python -m http.server 4173` in this fold
 - Galleries, category filters, full-size image previews and personal portfolio selection/reordering.
 - Official artist galleries read directly from each member's public SCULP Studio portfolio. Remaining public site work is assigned to Miranda; studio interior/location images are excluded.
 - Admin/Artist interface simulation. Artist view only shows assigned bookings, service details and own statistics; CRM/contact details and marketing opportunities are hidden in the interface.
-- Sculpy voice capture, mock transcription, reviewed AI extraction, database search and browser-local note persistence.
+- Sculpy voice capture, deploy-ready OpenAI transcription, reviewed AI extraction, semantic demo-database search and browser-local note persistence.
 - Installable web-app manifest, Demo/Production configuration boundary and formal Supabase schema with row-level policies.
 - Eight-step presentation mode and responsive layouts.
 
@@ -27,7 +27,7 @@ Identity switching is an interface simulation, not authentication or data protec
 
 The intended production access model has two global business viewers only: Jz (`operations`) and Miranda (`owner`). Jz additionally sees system health, data quality, AI configuration and audit events. Miranda sees the full business view without technical administration. Artists see only assigned work and their own portfolio.
 
-Sculpy currently runs in `mock` mode: microphone capture is real, but transcription, extraction and search responses are local controlled samples. The three API contracts are documented in `docs/API_CONTRACT.md`; no OpenAI key is shipped to the browser. Added notes and portfolio choices persist only in the current browser via localStorage.
+Sculpy's online mode runs through one Supabase Edge Function. OpenAI credentials remain in Supabase Secrets and are never shipped to the browser. Search receives only the repository's fictional demo catalog; no real client records are present. Until that function is deployed, the public page safely remains in `mock` mode. Added notes and portfolio choices still persist only in the current browser via localStorage.
 
 ## Presentation path
 
