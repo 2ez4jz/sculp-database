@@ -1,8 +1,8 @@
 # Sculpy API contract
 
-The static preview runs with `aiMode: "mock"`. Production switches the same client to `aiMode: "openai"` and sets a server-side API base URL. The OpenAI API key must never be included in browser code.
+The static preview switches from `aiMode: "mock"` to `aiMode: "openai"` after the `sculpy-ai` Supabase Edge Function is deployed. The function uses an action query parameter (`transcribe`, `extract`, or `search`). The OpenAI API key exists only in Supabase Secrets and must never be included in browser code.
 
-## `POST /api/transcribe`
+## `POST /functions/v1/sculpy-ai?action=transcribe`
 
 Multipart field: `audio` (`webm`, `m4a`, `wav`, or `mp3`).
 
@@ -12,7 +12,7 @@ Response:
 {"text":"...","provider":"openai","requestId":"..."}
 ```
 
-## `POST /api/sculpy/extract`
+## `POST /functions/v1/sculpy-ai?action=extract`
 
 Request:
 
@@ -35,9 +35,9 @@ Response must conform to a server-validated schema:
 
 The endpoint creates an `ai_drafts` row. It does not update clients or work logs. Confirmation uses a separate authenticated transaction.
 
-## `POST /api/sculpy/search`
+## `POST /functions/v1/sculpy-ai?action=search`
 
-Request: `{"query":"..."}`. The server derives user identity and role from the session. It executes allow-listed database tools and returns only rows the user can access.
+Demo request: `{"query":"...","catalog":{...}}`. Only the fictional catalog already visible in the public preview is sent. Production will derive user identity and role from the session, query Supabase under row-level security and return only rows the user can access.
 
 Response:
 
@@ -55,4 +55,3 @@ Response:
 - Development/Demo: dedicated Supabase project, fictional clients and bookings, real public team profiles.
 - Production: separate Supabase project, invite-only accounts, no demo rows.
 - Preview deployments never receive production service-role credentials.
-
