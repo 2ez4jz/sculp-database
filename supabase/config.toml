@@ -1,0 +1,3 @@
+[functions.sculpy-ai]
+verify_jwt = false
+
