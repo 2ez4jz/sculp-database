@@ -44,3 +44,9 @@ nav a[href="#sculpy"] .sculpy-nav-avatar{opacity:.16;filter:blur(4px)}
 nav a[href="#sculpy"]:hover::before,nav a[href="#sculpy"]:focus-visible::before{background:linear-gradient(120deg,#e9ede6bd,#d8ded5c8 52%,#f2f4efc9)}
 
 @media(max-width:500px){.profile-card img{width:84px;height:106px}.profile-title img{width:96px;height:120px}.profile-title{align-items:flex-start}}
+
+/* Sculpy's own portrait and direct-on-chart labels. */
+.assistant-avatar{width:48px;height:48px;flex-basis:48px;overflow:hidden;background-color:#f4e8d8;background-image:url('assets/sculpy.webp');background-repeat:no-repeat;background-size:365% auto;background-position:78% 34%;color:transparent;font-size:0;border:2px solid #fffaf2;box-shadow:0 9px 22px #6d5a442b,0 0 0 5px #edf1e9}
+.pie-chart{position:relative}
+.slice-label{position:absolute;z-index:3;transform:translate(-50%,-50%);color:#fff;font-size:11px;font-weight:600;line-height:1;letter-spacing:-.02em;text-shadow:0 1px 4px #18231dcc;pointer-events:none}
+@media(max-width:500px){.slice-label{font-size:9px}.assistant-avatar{width:43px;height:43px;flex-basis:43px}}
