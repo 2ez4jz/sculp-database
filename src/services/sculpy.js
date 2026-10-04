@@ -3,9 +3,9 @@ import {config,apiUrl} from '../config.js';
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const example='今天 Sarah 整体挺满意的，她最喜欢轻薄底妆，不过第一次睫毛有点重，后来换轻了。她说十二月份公司有晚宴。摄影是 Mango。';
 
-async function request(path,options={}){
- const response=await fetch(apiUrl(path),options);
- if(!response.ok){const body=await response.text();throw new Error(body||`Request failed: ${response.status}`)}
+async function request(action,options={}){
+ const response=await fetch(apiUrl(action),options);
+ if(!response.ok){const body=await response.json().catch(()=>null);throw new Error(body?.error||`Request failed: ${response.status}`)}
  return response.json();
 }
 
@@ -16,7 +16,7 @@ export async function transcribeAudio(blob){
  }
  const form=new FormData();
  form.append('audio',blob,`sculpy-${Date.now()}.webm`);
- return request('/api/transcribe',{method:'POST',body:form});
+ return request('transcribe',{method:'POST',body:form});
 }
 
 export async function extractMemory(payload){
@@ -32,11 +32,11 @@ export async function extractMemory(payload){
    provider:'mock'
   };
  }
- return request('/api/sculpy/extract',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+ return request('extract',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
 }
 
 export async function searchMemory(query,catalog){
- if(config.aiMode!=='mock')return request('/api/sculpy/search',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({query})});
+ if(config.aiMode!=='mock')return request('search',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({query,catalog})});
  await wait(250);
  const terms=query.toLowerCase().split(/\s+/).filter(Boolean);
  const results=[];
