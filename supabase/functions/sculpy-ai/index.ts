@@ -1,3 +1,7 @@
+// Setup type definitions for built-in Supabase Runtime APIs.
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { withSupabase } from "jsr:@supabase/server@^1";
+
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY') || '';
 const ALLOWED_ORIGINS = new Set(
   (Deno.env.get('SCULPY_ALLOWED_ORIGINS') ||
@@ -178,7 +182,7 @@ async function search(request: Request, origin: string) {
   return json(origin, { ...result, results, evidenceIds, provider: 'openai' });
 }
 
-Deno.serve(async (request) => {
+const handleRequest = async (request: Request) => {
   const origin = request.headers.get('origin') || '';
   if (!ALLOWED_ORIGINS.has(origin)) return json(origin || 'null', { error: 'Origin is not allowed.' }, 403);
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origin) });
@@ -196,4 +200,15 @@ Deno.serve(async (request) => {
     console.error(error);
     return json(origin, { error: error instanceof Error ? error.message : 'Unexpected server error.' }, 500);
   }
-});
+};
+
+export default {
+  fetch: withSupabase(
+    {
+      auth: 'none',
+      // This function has a strict origin allow-list below.
+      cors: 'disabled',
+    },
+    async (request) => handleRequest(request),
+  ),
+};
