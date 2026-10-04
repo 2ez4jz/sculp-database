@@ -1,6 +1,6 @@
 const defaults={
  environment:'demo',
- aiMode:'mock',
+ aiMode:'openai',
  apiBaseUrl:'https://lztzzdhqghwubygpzcbq.supabase.co/functions/v1/sculpy-ai',
  appName:'Sculpy',
  studioName:'SCULP Studio',
