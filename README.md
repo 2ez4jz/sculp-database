@@ -27,7 +27,7 @@ Identity switching is an interface simulation, not authentication or data protec
 
 The intended production access model has two global business viewers only: Jz (`operations`) and Miranda (`owner`). Jz additionally sees system health, data quality, AI configuration and audit events. Miranda sees the full business view without technical administration. Artists see only assigned work and their own portfolio.
 
-Sculpy's online mode runs through one Supabase Edge Function. OpenAI credentials remain in Supabase Secrets and are never shipped to the browser. Search receives only the repository's fictional demo catalog; no real client records are present. Until that function is deployed, the public page safely remains in `mock` mode. Added notes and portfolio choices still persist only in the current browser via localStorage.
+Sculpy's online mode runs through one Supabase Edge Function. OpenAI credentials remain in Supabase Secrets and are never shipped to the browser. Search receives only the repository's fictional demo catalog; no real client records are present. The checked-in config currently selects `openai` mode; `mock` is an explicit configuration override, not an automatic fallback. Added notes and portfolio choices still persist only in the current browser via localStorage.
 
 ## Presentation path
 
