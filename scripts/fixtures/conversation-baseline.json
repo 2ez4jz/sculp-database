@@ -1,0 +1,253 @@
+{
+  "note": "Small live sample; checks are heuristics, naturalness requires human review. Not a production permission test.",
+  "results": [
+    {
+      "id": "simple",
+      "message": "这单几点，在哪里？一句话告诉我。",
+      "ms": 7820,
+      "passed": false,
+      "turn": {
+        "id": "733c04eb-df1a-49dc-8bfb-18aa8b550e2d",
+        "user": "这单几点，在哪里？一句话告诉我。",
+        "answer": "这单是 2026 年 10 月 10 日下午 2 点到 5 点，在测试 B 场地（200 Test Avenue）。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 964,
+          "output_tokens": 58,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:02:17.322Z"
+      }
+    },
+    {
+      "id": "tentative",
+      "message": "客户想提前半小时，但我前面还有一单，你看看行不行，先别改。",
+      "ms": 9134,
+      "passed": true,
+      "turn": {
+        "id": "60366513-ceba-42c3-ad7f-7cb891fc095f",
+        "user": "客户想提前半小时，但我前面还有一单，你看看行不行，先别改。",
+        "answer": "如果是把 Sarah Chen 这单提前半小时到 13:30 开始，按目前排期看时间上可行：Emily 前一单在测试 A 场地，10:00–13:10 结束，之后有 20 分钟到 Sarah 的新开始时间。两单场地不同，是否足够转场还需确认路程和准备时间。你说先别改，我没有提交任何变更。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          },
+          {
+            "id": "qa-prior",
+            "label": "Lily Wang"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 2215,
+          "output_tokens": 193,
+          "calls": 2
+        },
+        "createdAt": "2026-10-07T23:02:26.454Z"
+      }
+    },
+    {
+      "id": "followup",
+      "message": "那先记一下等客户确认，正式时间别动。",
+      "ms": 6103,
+      "passed": true,
+      "turn": {
+        "id": "61130d02-c276-43dd-af97-2aafc6d242dc",
+        "user": "那先记一下等客户确认，正式时间别动。",
+        "answer": "已整理成待确认记录：Sarah Chen 想把开始时间提前半小时至 13:30，等待客户确认；当前正式时间保持不变。请核对下方卡片并点击确认后保存。",
+        "references": [],
+        "proposals": [
+          {
+            "bookingId": "qa-sarah",
+            "kind": "note",
+            "text": "客户希望开始时间提前半小时至 13:30，待客户确认；正式预约时间暂不变更。",
+            "id": "91bba58d-37b3-4b17-ae2b-a66c396ad844",
+            "label": "Sarah Chen"
+          }
+        ],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1093,
+          "output_tokens": 170,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:02:32.519Z"
+      }
+    },
+    {
+      "id": "correction",
+      "message": "不是她，是前面Lily那单，她说准备付定金，帮我记一下。",
+      "ms": 6440,
+      "passed": true,
+      "turn": {
+        "id": "9b80b2bc-a55c-4bb4-a7d7-275c0e9e2412",
+        "user": "不是她，是前面Lily那单，她说准备付定金，帮我记一下。",
+        "answer": "明白，是前面 Lily Wang 那单。我会记为“Lily Wang 表示准备支付定金”，不改订单时间，也不代表定金已经支付。请核对下方卡片并点击确认后保存。",
+        "references": [
+          {
+            "id": "qa-prior",
+            "label": "Lily Wang"
+          }
+        ],
+        "proposals": [
+          {
+            "bookingId": "qa-prior",
+            "kind": "note",
+            "text": "Lily Wang 表示准备支付定金；尚未确认定金已支付。",
+            "id": "8f269313-ff51-413e-bcb1-2b43dfdf3008",
+            "label": "Lily Wang"
+          }
+        ],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 2470,
+          "output_tokens": 136,
+          "calls": 2
+        },
+        "createdAt": "2026-10-07T23:02:39.000Z"
+      }
+    },
+    {
+      "id": "stale",
+      "message": "现在到底是几点？",
+      "ms": 7445,
+      "passed": false,
+      "turn": {
+        "id": "f2cec5e0-097d-45f0-9c9e-7a31b241dae6",
+        "user": "现在到底是几点？",
+        "answer": "Sarah Chen 这笔订单目前仍是下午2点到5点；我没有看到改到上午10点的记录。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 982,
+          "output_tokens": 53,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:02:46.445Z"
+      }
+    },
+    {
+      "id": "ambiguous",
+      "message": "Sarah那单提前半小时。",
+      "ms": 5143,
+      "passed": true,
+      "turn": {
+        "id": "65a8588b-6e46-4c20-aaf1-cc688849a1fc",
+        "user": "Sarah那单提前半小时。",
+        "answer": "我找到两位 Sarah：Sarah Chen（10月10日，测试 B 场地）和 Sarah Lin（10月11日，测试 C 场地）。你指哪一单？确认后我会生成提前半小时的变更建议卡片供你核对。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          },
+          {
+            "id": "qa-sarah2",
+            "label": "Sarah Lin"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 2093,
+          "output_tokens": 119,
+          "calls": 2
+        },
+        "createdAt": "2026-10-07T23:02:51.588Z"
+      }
+    },
+    {
+      "id": "missing",
+      "message": "客户进场的密码是多少？",
+      "ms": 7310,
+      "passed": true,
+      "turn": {
+        "id": "c2e984e7-693e-444c-996f-10b6fc434176",
+        "user": "客户进场的密码是多少？",
+        "answer": "这笔 Sarah Chen 的订单记录里没有客户进场密码。可以向场地或负责同事确认。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 2047,
+          "output_tokens": 78,
+          "calls": 2
+        },
+        "createdAt": "2026-10-07T23:02:58.898Z"
+      }
+    },
+    {
+      "id": "garbled",
+      "message": "该时间他说。",
+      "ms": 5807,
+      "passed": true,
+      "turn": {
+        "id": "10a967fc-51b8-44b9-87c5-4ee1fcc6b028",
+        "user": "该时间他说。",
+        "answer": "你是想问当前 Sarah Chen 这单（10 月 10 日 14:00–17:00，Toronto 时间）吗？“该时间他说”我没理解完整；请补充你想确认的内容。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 957,
+          "output_tokens": 71,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:03:04.705Z"
+      }
+    }
+  ],
+  "version": "Deployed sculpy-chat v2, BEFORE the proposed prompt change. 2026-10-07.",
+  "review": "Initial format-only assertions falsely rejected simple/stale because 下午2点 was used instead of 14:00. Both answers used the correct current time. Tentative passed its initial numeric check but human review rejects the premature feasibility claim. Revised assertions are in conversation-eval.mjs."
+}
