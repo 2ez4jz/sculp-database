@@ -37,7 +37,7 @@ The endpoint creates an `ai_drafts` row. It does not update clients or work logs
 
 ## `POST /functions/v1/sculpy-ai?action=search`
 
-Demo request: `{"query":"...","catalog":{...}}`. Only the fictional catalog already visible in the public preview is sent. Production will derive user identity and role from the session, query Supabase under row-level security and return only rows the user can access.
+Demo request: `{"query":"...","catalog":{...}}`. Only the fictional catalog already visible in the public preview is sent. Production derives user identity and role from the session, queries Supabase under row-level security and returns only rows the user can access. The browser never sends an unrestricted catalog in production.
 
 Response:
 
@@ -49,6 +49,8 @@ Response:
   "provider":"openai"
 }
 ```
+
+For numeric answers and charts, the server calls approved reporting views such as `booking_financials` and `service_revenue_monthly`. OpenAI explains the returned data but does not calculate authoritative totals. Each production request creates an `ai_runs` record containing its purpose, source/output record IDs, model usage and estimated cost; the service role writes this log and clients cannot forge it.
 
 ## Environment separation
 
