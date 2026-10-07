@@ -4,6 +4,7 @@ export function createVoiceCapture({ $, transcribeAudio, config }) {
   let stream = null;
   let version = 0;
   let busy = false;
+  let initialLabel = null, initialStatus = null;
 
   function dispose() {
     version++;
@@ -16,16 +17,21 @@ export function createVoiceCapture({ $, transcribeAudio, config }) {
     }
     stream?.getTracks().forEach((track) => track.stop());
     stream = null;
+    const button = $("#voice-button"), status = $("#voice-status");
+    if (button && initialLabel) button.textContent = initialLabel;
+    if (status && initialStatus !== null) status.textContent = initialStatus;
   }
 
   async function toggle() {
     const button = $("#voice-button"),
       status = $("#voice-status");
     if (!button || !status) return;
+    initialLabel ||= button.textContent;
+    initialStatus ??= status.textContent;
     if (recorder?.state === "recording") {
       busy = true;
       recorder.stop();
-      button.textContent = "开始语音记录";
+      button.textContent = initialLabel;
       status.textContent = "正在转写……";
       return;
     }

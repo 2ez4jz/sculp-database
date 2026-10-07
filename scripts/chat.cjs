@@ -86,7 +86,7 @@ fs.mkdirSync("qa-screens", { recursive: true });
   await page.selectOption("#role", "artist");
   await page.selectOption("#artistIdentity", "michelle");
   await page.goto("http://localhost:4173/?demo=1#sculpy");
-  await page.locator("[data-open-chat]").click();
+  await page.locator(".chat-inline .chat-welcome").waitFor();
   await page.locator(".chat-welcome").waitFor();
   assert.equal(await page.locator(".chat-assistant").count(), 0);
   assert.equal(await page.locator("[data-verbosity]").inputValue(), "detailed");
