@@ -57,7 +57,7 @@ const fs = require("node:fs");
         },
       });
     });
-    await page.goto("http://localhost:4173/#bookings/b0");
+    await page.goto("http://localhost:4173/?demo=1#bookings/b0");
     await page.locator(".memory-launcher").click();
     const dialog = page.locator(".memory-dialog");
     assert.equal(
@@ -90,7 +90,7 @@ const fs = require("node:fs");
         "跟进晚宴",
       ),
     );
-    await page.goto("http://localhost:4173/#clients/c0");
+    await page.goto("http://localhost:4173/?demo=1#clients/c0");
     assert(
       (await page.locator("#context-memories").innerText()).includes(
         "轻薄底妆",
@@ -101,7 +101,7 @@ const fs = require("node:fs");
       "venues/graydon",
       "partners/mango",
     ]) {
-      await page.goto("http://localhost:4173/#" + route);
+      await page.goto("http://localhost:4173/?demo=1#" + route);
       await page.locator(".memory-launcher").click();
       assert.equal(
         await page.locator("#memory-target").inputValue(),
@@ -123,7 +123,7 @@ const fs = require("node:fs");
       );
     }
     // List pages demand explicit attribution; closing preserves unsaved text for that target.
-    await page.goto("http://localhost:4173/#bookings");
+    await page.goto("http://localhost:4173/?demo=1#bookings");
     await page.locator(".memory-launcher").click();
     assert.equal(await page.locator("#memory-target").inputValue(), "");
     await page.locator("#memory-text").fill("未选择对象");
@@ -134,13 +134,13 @@ const fs = require("node:fs");
     await page.locator("#memory-target").selectOption("booking:b0");
     await page.locator("#memory-text").fill("未保存草稿");
     await page.getByRole("button", { name: "关闭记录面板" }).click();
-    await page.goto("http://localhost:4173/#bookings/b0");
+    await page.goto("http://localhost:4173/?demo=1#bookings/b0");
     await page.locator(".memory-launcher").click();
     assert.equal(await page.locator("#memory-text").inputValue(), "未保存草稿");
     await page.getByRole("button", { name: "关闭记录面板" }).click();
     // Employee gets own bookings, no customer profile access, and review-only preferences.
     await page.selectOption("#role", "artist");
-    await page.goto("http://localhost:4173/#bookings/b0");
+    await page.goto("http://localhost:4173/?demo=1#bookings/b0");
     await page.locator(".memory-launcher").click();
     assert.equal(
       await page.locator('#memory-target option[value="booking:b1"]').count(),
@@ -165,7 +165,7 @@ const fs = require("node:fs");
     await page.locator("[data-memory-save]").click();
     await page.locator(".memory-success").waitFor();
     await page.getByRole("button", { name: "完成", exact: true }).click();
-    await page.goto("http://localhost:4173/#bookings/b1");
+    await page.goto("http://localhost:4173/?demo=1#bookings/b1");
     assert.equal(await page.locator(".memory-launcher").isVisible(), false);
     assert.deepEqual(errors, []);
     console.log(
