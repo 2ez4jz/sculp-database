@@ -163,3 +163,57 @@ test("transcription preserves multipart model and response, rejects empty files"
     globalThis.fetch = old;
   }
 });
+
+test("context extraction passes an explicit target and filters hallucinated destinations", async () => {
+  const old = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    const payload = JSON.parse(options.body);
+    assert.equal(payload.text.format.name, "sculpy_context_memory");
+    assert.equal(JSON.parse(payload.input).selected.id, "b0");
+    return Response.json({
+      output_text: JSON.stringify({
+        summary: "note",
+        items: [
+          {
+            kind: "preference",
+            entityType: "client",
+            entityId: "c0",
+            text: "light",
+          },
+          {
+            kind: "task",
+            entityType: "booking",
+            entityId: "wrong",
+            text: "wrong",
+          },
+          {
+            kind: "preference",
+            entityType: "booking",
+            entityId: "b0",
+            text: "wrong type",
+          },
+        ],
+        warnings: [],
+        confidence: 0.8,
+      }),
+    });
+  };
+  try {
+    const result = await (
+      await handleRequest(
+        request("extract", {
+          rawText: "note",
+          pageContext: {
+            mode: "context_memory",
+            entity: { type: "booking", id: "b0", label: "Sarah" },
+            related: [{ type: "client", id: "c0", label: "Sarah" }],
+          },
+        }),
+      )
+    ).json();
+    assert.equal(result.items.length, 1);
+    assert.equal(result.items[0].entityId, "c0");
+  } finally {
+    globalThis.fetch = old;
+  }
+});

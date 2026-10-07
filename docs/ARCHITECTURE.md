@@ -175,3 +175,10 @@ used Chromium 153 through `CHROME_PATH`; provider calls were intercepted.
 Mobile overflow assertions passed. Local screenshots lack Chinese font glyphs,
 so full typography QA remains with the existing font-equipped CI environment.
 No live Supabase migration, Edge Function deployment or OpenAI request was run.
+
+## Contextual input extension
+
+`src/components/memory/` owns the shared input dialog and record feed. Pure target
+validation lives in `src/domain/memory.js`; persistence lives in
+`src/services/memory.js`. See `CONTEXT_MEMORY.md` for the delivered Demo behavior,
+the new annotation transaction and the remaining cloud integration work.

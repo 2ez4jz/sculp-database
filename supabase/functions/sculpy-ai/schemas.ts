@@ -53,3 +53,35 @@ export const searchSchema = {
   required: ["answer", "results", "evidenceIds"],
   additionalProperties: false,
 };
+
+export const contextMemorySchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    summary: { type: "string" },
+    items: {
+      type: "array",
+      maxItems: 12,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          kind: {
+            type: "string",
+            enum: ["preference", "experience", "task", "change"],
+          },
+          entityType: {
+            type: "string",
+            enum: ["booking", "client", "artist", "venue", "partner"],
+          },
+          entityId: { type: "string" },
+          text: { type: "string" },
+        },
+        required: ["kind", "entityType", "entityId", "text"],
+      },
+    },
+    warnings: { type: "array", items: { type: "string" } },
+    confidence: { type: "number" },
+  },
+  required: ["summary", "items", "warnings", "confidence"],
+};

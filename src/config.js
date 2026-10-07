@@ -1,5 +1,7 @@
 const defaults={
  environment:'demo',
+ supabaseUrl:'https://lztzzdhqghwubygpzcbq.supabase.co',
+ supabasePublishableKey:'',
  aiMode:'openai',
  apiBaseUrl:'https://lztzzdhqghwubygpzcbq.supabase.co/functions/v1/sculpy-ai',
  appName:'Sculpy',

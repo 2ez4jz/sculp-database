@@ -61,7 +61,7 @@ const assert = require("node:assert/strict");
       for (let i = 0; i < 100 && !pending; i++) await tick();
       assert(pending, "Expected delayed AI request within 10 seconds");
     };
-    await page.goto("http://localhost:4173/#sculpy/b0");
+    await page.goto("http://localhost:4173/?demo=1#sculpy/b0");
     // A late extraction cannot populate a different booking page.
     delayAction = "extract";
     await page.locator("#sculpy-text").fill("工作记录");
