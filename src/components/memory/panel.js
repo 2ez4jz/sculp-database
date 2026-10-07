@@ -27,8 +27,7 @@ export function createMemoryPanel({
   const host = document.createElement("div");
   host.id = "memory-host";
   document.body.append(host);
-  host.innerHTML = `<button class="memory-launcher" aria-label="告诉 Sculpy，补充记录" data-memory-open><img src="assets/sculpy.webp" alt=""><span>记一下<small>告诉 Sculpy</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></button>
- <dialog class="memory-dialog" aria-labelledby="memory-title"><header class="memory-header"><div class="memory-brand"><img src="assets/sculpy.webp" alt=""><div><span class="eyebrow">SCULPY / A LITTLE MEMORY</span><h2 id="memory-title">把这件事记下来</h2></div></div><button data-memory-close aria-label="关闭记录面板">✕</button></header><div class="memory-body"></div><footer class="memory-footer"></footer></dialog>`;
+  host.innerHTML = `<dialog class="memory-dialog" aria-labelledby="memory-title"><header class="memory-header"><div class="memory-brand"><img src="assets/sculpy.webp" alt=""><div><span class="eyebrow">SCULPY / A LITTLE MEMORY</span><h2 id="memory-title">把这件事记下来</h2></div></div><button data-memory-close aria-label="关闭记录面板">✕</button></header><div class="memory-body"></div><footer class="memory-footer"></footer></dialog>`;
   const dialog = host.querySelector("dialog"),
     body = host.querySelector(".memory-body"),
     footer = host.querySelector(".memory-footer");
@@ -286,11 +285,7 @@ export function createMemoryPanel({
     identityKey = nextIdentity;
     // Repainting after a save keeps the success receipt. Navigation invalidates work.
     if (dialog.open && !success && !saving) close({ restore: false });
-    const [route, id] = location.hash.slice(1).split("/");
     const target = routeTarget(location.hash, targets());
-    const restricted = id && Object.values(routes).includes(route) && !target;
-    host.querySelector("[data-memory-open]").hidden =
-      !!restricted || route === "sculpy";
     renderRecords(target);
   }
   function renderRecords(target) {
