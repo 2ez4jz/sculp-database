@@ -76,10 +76,10 @@ async function transcribe(request: Request, origin: string) {
 
   const form = new FormData();
   form.append('file', audio, audio.name || 'sculpy.webm');
-  form.append('model', 'gpt-4o-mini-transcribe');
+  form.append('model', 'gpt-transcribe');
   form.append(
     'prompt',
-    'SCULP Studio wedding beauty work note. Names may include Sculpy, Miranda, Mira, Yuki, Angelina, Elaine, Emily, Michelle, Giselle and Jz. Preserve Chinese and English code-switching accurately.',
+    'SCULP Studio premium bridal beauty work note. Names may include Sculpy, Miranda, Mira, Yuki, Angelina, Elaine, Emily, Michelle, Giselle and Jz. Common terms include bridal trial, wedding-day styling, half-day, full-day, makeup, hairstyling, touch-up, ceremony, reception, photographer, planner and venue. Preserve Chinese and English code-switching, names, prices, dates and times accurately. Do not summarize; return the complete spoken transcript.',
   );
 
   const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
