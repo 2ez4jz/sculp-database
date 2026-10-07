@@ -1,0 +1,53 @@
+{
+  "note": "Small live sample; checks are heuristics, naturalness requires human review. Not a production permission test.",
+  "results": [
+    {
+      "id": "identity",
+      "message": "你可以做什么？",
+      "ms": 7709,
+      "passed": true,
+      "turn": {
+        "id": "c801a343-b4a1-4a85-a4cc-72d44bc6b219",
+        "user": "你可以做什么？",
+        "answer": "我是 Sculpy，SCULP Studio 的工作助手。可以帮你查询权限内的订单，整理客户需求、化妆师安排、场地信息和工作记录，也能为备注或待办生成待确认卡片。时间、价格和付款状态只能提出待审核建议；卡片需要你核对并点击确认后才会保存。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1353,
+          "output_tokens": 99,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:29:27.595Z"
+      }
+    },
+    {
+      "id": "limits",
+      "message": "你能直接修改正式订单时间吗？以后你都会自动记住吗？",
+      "ms": 6896,
+      "passed": true,
+      "turn": {
+        "id": "28dc2dbf-72ae-4279-9695-8128cc284cda",
+        "user": "你能直接修改正式订单时间吗？以后你都会自动记住吗？",
+        "answer": "不能直接修改正式订单时间；我只能提出待审核的变更建议，等你核对并确认后由程序处理。也不会自动长期记住聊天内容；个人偏好可以在“我的偏好”里设置。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1365,
+          "output_tokens": 72,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:29:34.449Z"
+      }
+    }
+  ]
+}

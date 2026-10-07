@@ -1,157 +1,40 @@
-const { chromium } = require("playwright");
-const assert = require("node:assert/strict");
-(async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome",
-    args: [
-      "--no-sandbox",
-      "--use-fake-ui-for-media-stream",
-      "--use-fake-device-for-media-stream",
-    ],
-  });
-  try {
-    const page = await browser.newPage({ permissions: ["microphone"] });
-    const errors = [];
-    page.on("pageerror", (e) => errors.push(e.message));
-    await page.addInitScript(() => {
-      window.__streams = [];
-      const original = navigator.mediaDevices.getUserMedia.bind(
-        navigator.mediaDevices,
-      );
-      navigator.mediaDevices.getUserMedia = async (options) => {
-        const stream = await original(options);
-        window.__streams.push(stream);
-        return stream;
-      };
-    });
-    let pending = null,
-      delayAction = null,
-      lastCatalog = null,
-      requests = 0;
-    await page.route("**/functions/v1/sculpy-ai*", async (route) => {
-      const action = new URL(route.request().url()).searchParams.get("action");
-      requests++;
-      if (action === "search")
-        lastCatalog = route.request().postDataJSON().catalog;
-      const body =
-        action === "transcribe"
-          ? { text: "OLD TRANSCRIPT", provider: "openai" }
-          : action === "extract"
-            ? {
-                summary: "OLD DRAFT",
-                preferences: [],
-                opportunities: [],
-                confidence: 0.9,
-                provider: "openai",
-              }
-            : { answer: "回答", results: [], provider: "openai" };
-      if (action === delayAction)
-        await new Promise((resolve) => {
-          pending = resolve;
-        });
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(body),
-      });
-    });
-    const tick = () => page.waitForTimeout(100);
-    const waitPending = async () => {
-      for (let i = 0; i < 100 && !pending; i++) await tick();
-      assert(pending, "Expected delayed AI request within 10 seconds");
-    };
-    await page.goto("http://localhost:4173/?demo=1#sculpy/b0");
-    // A late extraction cannot populate a different booking page.
-    delayAction = "extract";
-    await page.locator("#sculpy-text").fill("工作记录");
-    await page.locator('[data-action="prepare"]').click();
-    await waitPending();
-    await page.evaluate(() => (location.hash = "sculpy/b1"));
-    await tick();
-    pending();
-    pending = null;
-    await tick();
-    assert.equal(await page.locator("#draft-summary").count(), 0);
-    // Editing the target invalidates the draft even without navigation.
-    delayAction = null;
-    await page.locator("#sculpy-text").fill("新的记录");
-    await page.locator('[data-action="prepare"]').click();
-    await page.locator("#draft-summary").waitFor();
-    await page.locator("#sculpy-booking").selectOption("b0");
-    assert.equal(await page.locator("#draft-summary").count(), 0);
-    // A pending transcript cannot land in a newly mounted input.
-    delayAction = "transcribe";
-    await page.locator("#voice-button").click();
-    await page.getByRole("button", { name: "结束录音" }).waitFor();
-    await page.locator("#voice-button").click();
-    await waitPending();
-    await page.evaluate(() => (location.hash = "sculpy/b2"));
-    await tick();
-    pending();
-    pending = null;
-    await tick();
-    assert.equal(await page.locator("#sculpy-text").inputValue(), "");
-    assert(
-      await page.evaluate(() =>
-        window.__streams.every((s) =>
-          s.getTracks().every((t) => t.readyState === "ended"),
-        ),
-      ),
-    );
-    // Leaving while actively recording stops tracks without another AI request.
-    delayAction = null;
-    const before = requests;
-    await page.locator("#voice-button").click();
-    await page.getByRole("button", { name: "结束录音" }).waitFor();
-    await page.evaluate(() => (location.hash = "bookings"));
-    await tick();
-    assert.equal(requests, before);
-    assert(
-      await page.evaluate(() =>
-        window.__streams.every((s) =>
-          s.getTracks().every((t) => t.readyState === "ended"),
-        ),
-      ),
-    );
-    // Reporting still renders crisp DOM values and labels.
-    await page.evaluate(() => (location.hash = "sculpy"));
-    await page.locator('[data-sculpy-query*="饼图"]').click();
-    await page.locator(".pie-chart").waitFor();
-    assert((await page.locator(".slice-label").count()) > 0);
-    assert(
-      (await page.locator(".chart-legend small").allTextContents()).every((x) =>
-        /^\d+%$/.test(x),
-      ),
-    );
-    // Employee requests are scoped; repeated navigation does not duplicate handlers.
-    await page.selectOption("#role", "artist");
-    await page.evaluate(() => (location.hash = "sculpy"));
-    await tick();
-    const employeeBefore = requests;
-    await page.locator("#sculpy-search").fill("Mango");
-    await page.locator('[data-action="sculpy-search"]').click();
-    await page.locator(".search-answer").waitFor();
-    assert.equal(requests, employeeBefore + 1);
-    assert(
-      lastCatalog.bookings.every(
-        (b) => b.artistIds.includes("michelle") && !("price" in b),
-      ),
-    );
-    assert(
-      lastCatalog.notes.every((n) =>
-        lastCatalog.bookings.some((b) => b.id === n.entityId),
-      ),
-    );
-    assert(lastCatalog.artists.every((a) => a.id === "michelle"));
-    assert.deepEqual(errors, []);
-    console.log(
-      "Sculpy stale requests, draft invalidation, recording cleanup, chart and scoped search verified",
-    );
-  } finally {
-    await browser.close();
-  }
-})().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+(async()=>{
+ const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox','--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream']});
+ try {
+ const page=await browser.newPage({permissions:['microphone'],reducedMotion:'reduce',viewport:{width:1440,height:1000}});
+ const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+ await page.addInitScript(()=>{ window.__streams=[]; const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices); navigator.mediaDevices.getUserMedia=async opts=>{const s=await original(opts);window.__streams.push(s);return s;}; });
+ let pending, delayChat=false, delayVoice=false, calls=[];
+ await page.route('**/functions/v1/sculpy-chat',async route=>{
+ const b=route.request().postDataJSON();calls.push(b);
+ if(delayChat)await new Promise(r=>pending=r);
+ await route.fulfill({json:{turn:{id:b.requestId,user:b.message,answer:'已查看当前记录。',references:[],proposals:[],sourceIds:[]}}});
+ });
+ await page.route('**/functions/v1/sculpy-ai*',async route=>{assert.equal(new URL(route.request().url()).searchParams.get('action'),'transcribe');if(delayVoice)await new Promise(r=>pending=r);await route.fulfill({json:{text:'语音测试内容',provider:'openai'}});});
+ const ready=async route=>{await page.evaluate(r=>location.hash=r,route);await page.waitForFunction(()=>document.querySelector('#main')?.dataset.route===location.hash);await page.locator('.chat-inline #chat-input:not(:disabled)').waitFor();};
+ const waitPending=async()=>{await page.waitForFunction(()=>true);for(let i=0;i<100&&!pending;i++)await page.waitForTimeout(50);assert(pending);};
+ await page.goto('http://localhost:4173/?demo=1#sculpy/b0');await page.locator('#chat-input:not(:disabled)').waitFor();
+ assert.equal(await page.locator('#sculpy-search, #sculpy-text, [data-open-chat]').count(),0);
+ assert.equal(await page.locator('.chat-launcher:visible, .memory-launcher:visible').count(),0);
+ // Enter sends; shift-enter and IME confirmation never accidentally send.
+ await page.locator('#chat-input').fill('第一行');await page.locator('#chat-input').press('Shift+Enter');assert.equal(calls.length,0);
+ await page.locator('#chat-input').evaluate(el=>el.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',isComposing:true,bubbles:true})));assert.equal(calls.length,0);
+ await page.locator('#chat-input').fill('这单要注意什么');await page.locator('#chat-input').press('Enter');await page.locator('.chat-assistant').waitFor();
+ await page.locator('#chat-input').fill('接着上面说');await page.locator('#chat-input').press('Enter');await page.waitForFunction(()=>document.querySelectorAll('.chat-assistant').length===2&&!document.querySelector('#chat-input').disabled);assert.equal(calls[1].turns.length,1);
+ await page.reload();await page.locator('#chat-input:not(:disabled)').waitFor();assert.equal(await page.locator('.chat-assistant').count(),2);
+ // Changing order while a response is in flight must not display it in the new order.
+ delayChat=true;await page.locator('#chat-input').fill('旧订单问题');await page.locator('#chat-input').press('Enter');await waitPending();await ready('sculpy/b1');pending();pending=null;delayChat=false;await page.waitForTimeout(150);assert.equal(await page.locator('.chat-assistant').count(),0);
+ // Voice input uses the same composer and never auto-sends.
+ let before=calls.length;await page.locator('#chat-voice').click();await page.getByRole('button',{name:'结束录音',exact:true}).waitFor();await page.locator('#chat-voice').click();await page.waitForFunction(()=>document.querySelector('#chat-input').value.includes('语音测试内容'));assert.equal(calls.length,before);
+ await page.locator('#chat-input').fill('');delayVoice=true;await page.locator('#chat-voice').click();await page.getByRole('button',{name:'结束录音',exact:true}).waitFor();await page.locator('#chat-voice').click();await waitPending();await ready('sculpy/b2');pending();pending=null;delayVoice=false;await page.waitForTimeout(150);assert.equal(await page.locator('#chat-input').inputValue(),'');
+ await page.locator('#chat-voice').click();await page.getByRole('button',{name:'结束录音',exact:true}).waitFor();await page.evaluate(()=>location.hash='bookings');await page.waitForTimeout(150);assert(await page.evaluate(()=>__streams.every(s=>s.getTracks().every(t=>t.readyState==='ended'))));
+ // Existing deterministic demo chart stays in the same conversation.
+ await ready('sculpy');await page.locator('#chat-input').fill('过去一个月服务收入饼图');await page.locator('#chat-input').press('Enter');await page.locator('.pie-chart').waitFor();assert((await page.locator('.slice-label').count())>0);
+ await page.screenshot({path:'qa-screens/unified-chat-desktop.png'});
+ await page.selectOption('#role','artist');await ready('sculpy');before=calls.length;await page.locator('#chat-input').fill('Mango');await page.locator('#chat-input').press('Enter');await page.locator('.chat-assistant:not(.chat-thinking)').waitFor();await page.locator('#chat-input:not(:disabled)').waitFor();assert.equal(calls.length,before+1);const catalog=calls.at(-1).catalog;assert(catalog.bookings.every(b=>b.artistIds.includes('michelle')&&!('price'in b)));
+ await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);await page.screenshot({path:'qa-screens/unified-chat-mobile.png'});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));const box=await page.locator('[data-send]').boundingBox();assert(box.y+box.height<=844);
+ assert.deepEqual(errors,[]);console.log('Unified chat: keyboard, IME, history, scoped requests, voice lifecycle, chart and mobile passed');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exit(1)});

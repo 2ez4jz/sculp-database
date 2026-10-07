@@ -27,6 +27,7 @@ export function demoChatAdapter({
   getCatalog,
   getContext,
   saveBatch,
+  resolveLocal = () => null,
 }) {
   const key = () => `sculpy-chat-v1:${getIdentity()}`;
   const read = (storageKey = key()) => {
@@ -61,7 +62,9 @@ export function demoChatAdapter({
         state = read(storageKey),
         history = state[scope] || [];
       let result;
-      if (config.aiMode === "mock")
+      const local = resolveLocal(body.message);
+      if (local) result = { turn: { ...local, id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };
+      else if (config.aiMode === "mock")
         result = {
           turn: {
             id: body.requestId,

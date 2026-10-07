@@ -26,6 +26,8 @@
 - [x] Connect Supabase cloud workspace, per-user conversations/preferences and reviewed note saves
 - [ ] Import real orders and complete team acceptance; demo localStorage is not migrated production data
 - [x] Deploy server-side OpenAI transcription/extraction/search and contextual chat endpoints
+- [x] Single embedded Sculpy chat page with Enter/Shift+Enter, IME protection and voice input
+- [x] Explicit Sculpy identity and current capability instructions
 - [x] Deploy natural conversation rules (sculpy-chat v3); eight fictional live-model cases reviewed
 - [ ] Real-audio end-to-end acceptance
 - [ ] Automatic long-term personal memory and correction/expiry workflow

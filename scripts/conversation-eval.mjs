@@ -9,6 +9,8 @@ const bookings = [
  {id:'qa-sarah2',client:'Sarah Lin',starts_at:'2026-10-11T11:00:00-04:00',venue:'测试 C 场地',artists:['Mira'],status:'confirmed'}
 ];
 const cases = [
+ {id:"identity",message:"你可以做什么？",check:t=>/Sculpy|SCULP/.test(t.answer)&&t.references.length===0&&t.proposals.length===0&&!/目录没有|根据目录/.test(t.answer)},
+ {id:"limits",message:"你能直接修改正式订单时间吗？以后你都会自动记住吗？",check:t=>t.proposals.length===0&&/不能|无法|不支持|不会/.test(t.answer)&&/记忆|记住/.test(t.answer)},
  {id:'simple',message:'这单几点，在哪里？一句话告诉我。',check:t=>/14:00|下午\s*[2两二]\s*点/.test(t.answer)&&t.answer.includes('测试 B')&&t.answer.length<220},
  {id:'tentative',message:'客户想提前半小时，但我前面还有一单，你看看行不行，先别改。',check:t=>t.proposals.length===0&&/20\s*分钟/.test(t.answer)&&!/时间上可行|可以赶上|肯定来得及/.test(t.answer)},
  {id:'followup',message:'那先记一下等客户确认，正式时间别动。',follow:true,check:t=>t.proposals.length>0&&t.proposals.every(p=>p.bookingId==='qa-sarah'&&/确认/.test(p.text))},
@@ -19,7 +21,7 @@ const cases = [
  {id:'garbled',message:'该时间他说。',check:t=>t.proposals.length===0&&/[？?]/.test(t.answer)}
 ];
 let history=[]; const results=[];
-for(const c of cases){
+for(const c of cases.filter(c=>!process.env.EVAL_CASES||process.env.EVAL_CASES.split(",").includes(c.id))){
  if(!c.follow) history=c.turns||[];
  const body={mode:'demo',requestId:crypto.randomUUID(),bookingId:c.bookingId===null?null:'qa-sarah',message:c.message,turns:history,preferences:{verbosity:'balanced'},catalog:{bookings,notes:[]}};
  const start=Date.now();

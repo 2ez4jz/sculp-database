@@ -334,3 +334,53 @@
 }
 .chat-dialog p { text-align: left; }
 .chat-dialog .chat-header p { text-align: left; }
+
+/* The Sculpy route is the conversation itself, not a launcher for a dialog. */
+body.sculpy-chat-page .shell > footer { display: none; }
+body.sculpy-chat-page #main { padding: 0 24px; }
+body.sculpy-chat-page .tour-banner { margin: 12px 0; }
+.chat-inline .chat-launcher, .chat-inline [data-close] { display: none; }
+.chat-inline .chat-dialog {
+  position: static;
+  width: 100%; max-width: 1040px;
+  height: calc(100dvh - 90px); max-height: none;
+  margin: 0 auto; border: 0; border-radius: 0;
+  background: transparent; box-shadow: none;
+}
+.chat-inline .chat-header { padding: 18px 16px 10px; border: 0; }
+.chat-inline .chat-header img { width: 40px; height: 40px; margin: 0; }
+.chat-inline .chat-header span { display: none; }
+.chat-inline .chat-header h2 { font-family: var(--serif); font-size: 28px; font-weight: 400; }
+.chat-inline .chat-header p { text-align: left; }
+.chat-inline .chat-preferences { border: 0; padding: 0 16px 10px; }
+.chat-inline .chat-messages { padding: 24px clamp(12px, 4vw, 64px); }
+.chat-inline .chat-assistant { font-size: 16px; line-height: 1.9; }
+.chat-inline .chat-welcome { text-align: center; padding: clamp(20px, 6vh, 70px) 8px; }
+.chat-welcome-avatar { width: 84px; height: 84px; object-fit: cover; border-radius: 50%; margin: 0 auto 24px; display: block; }
+.chat-inline .chat-welcome h3 { font-size: clamp(23px, 3vw, 32px); font-weight: 400; }
+.chat-inline .chat-welcome p { text-align: center; }
+.chat-inline .chat-welcome button { border-radius: 20px; }
+.chat-inline .chat-composer { width: calc(100% - 32px); max-width: 850px; margin: 8px auto 16px; border-radius: 22px; padding: 16px; box-shadow: 0 4px 22px #263c3008; }
+.chat-inline .chat-composer textarea { font-size: 16px; min-height: 58px; max-height: 160px; }
+.chat-inline .chat-composer button { border-radius: 12px; }
+.chat-inline .chat-status { max-width: 850px; width: 100%; margin: 0 auto; }
+.chat-inline .chat-answer, .chat-inline .chat-proposal p { text-align: left; }
+.chat-thinking { color: #74816b; }
+.chat-inline .chat-preferences[open] { background: #eef0e8; border-radius: 14px; flex-shrink: 0; }
+@media(max-width:850px) {
+  body.sculpy-chat-page #main { padding: 0 8px; }
+  .chat-inline .chat-dialog { height: calc(100dvh - 70px); }
+  .chat-inline .chat-header { padding: 8px 12px; }
+  .chat-inline .chat-header h2 { font-size: 24px; }
+  .chat-inline .chat-messages { padding: 16px 12px; }
+  .chat-inline .chat-composer { width: calc(100% - 8px); margin-bottom: max(8px, env(safe-area-inset-bottom)); padding: 12px; }
+  .chat-inline .chat-composer .chat-storage { font-size: 9px; }
+  .chat-inline .chat-welcome { padding: 16px 4px; }
+  .chat-inline .chat-welcome-avatar { width: 64px; height: 64px; margin-bottom: 12px; }
+}
+body.sculpy-chat-page #main.sculpy-reveal { animation: none; }
+.chat-inline .chat-dialog p { text-align: left; }
+.chat-inline .chat-welcome p { text-align: center; }
+.chat-header img, .chat-launcher img, .chat-welcome-avatar { object-position: 90% center; }
+.chat-inline .chat-composer textarea:focus-visible { outline: none; }
+.chat-inline .chat-composer:focus-within { border-color: #8eaa99; box-shadow: 0 0 0 3px #dfe8dd77; }
