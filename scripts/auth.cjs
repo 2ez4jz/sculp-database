@@ -7,6 +7,7 @@ const assert = require("node:assert/strict");
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
+  await page.addInitScript(() => { globalThis.SCULPY_CONFIG = {supabasePublishableKey: ""}; });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("http://localhost:4173/#bookings/b0");

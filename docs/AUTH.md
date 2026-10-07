@@ -16,7 +16,11 @@ Profile updates remain authenticated SQL RPCs. Self-demotion/deactivation is blo
 4. Deploy account-admin. Set ACCOUNT_ALLOWED_ORIGINS to an exact comma-separated allowlist of website origins. Supabase provides SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY inside the function. Its gateway JWT check is disabled because the handler explicitly verifies the token with getUser before any privileged operation. Missing origins fail closed.
 5. Deploy the static site. Jz then creates employee accounts and sets passwords in the UI. No email is sent. Business orders remain a connection-status screen pending the production data adapter. Demo remains explicitly separate at ?demo=1 and is allowed only in demo configuration.
 
-No live provisioning, migration, credential-setting or deployment was performed by this source change.
+## Deployment status — 2026-10-07
+
+Migrations 001–005 and the two account-table grant migrations have been applied to the existing sculpy database project. The account-admin function is deployed with an exact GitHub Pages origin default. The frontend publishable key is configured. sculp_jz is provisioned as operations; its random initial password is delivered privately to the owner, never committed. Real password login, active profile read, account listing, password reset, and rejection of unauthenticated admin requests were verified.
+
+The temporary token-protected bootstrap function has been replaced with a permanent 410 response and JWT checking enabled. There is no active bootstrap path. Broad legacy business-table permissions were not changed; business data integration remains pending. Public signup settings still need project-owner review; accounts without an active profile cannot enter the workspace.
 
 SDK: bundled @supabase/supabase-js 2.117.3. Rebuild with esbuild (browser platform, ESM, bundle and minify); license accompanies the bundle.
 References: https://supabase.com/docs/reference/javascript/auth-admin-createuser and https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid

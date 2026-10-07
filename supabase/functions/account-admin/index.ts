@@ -12,7 +12,7 @@ Deno.serve(
   accountHandler({
     admin,
     allowedOrigins: new Set(
-      (Deno.env.get("ACCOUNT_ALLOWED_ORIGINS") || "")
+      (Deno.env.get("ACCOUNT_ALLOWED_ORIGINS") || "https://2ez4jz.github.io")
         .split(",")
         .map((x) => x.trim())
         .filter(Boolean),

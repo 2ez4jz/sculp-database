@@ -17,6 +17,8 @@ test("account RPCs enforce server roles, self-protection, revocation and audit",
       "003_context_memory",
       "004_account_management",
       "005_username_accounts",
+      "20261007201057_account_api_grants",
+      "20261007201258_protect_account_tables",
     ])
       await db.exec(
         (
@@ -91,6 +93,9 @@ test("account RPCs enforce server roles, self-protection, revocation and audit",
       /permission denied/,
     );
     await db.exec("reset role");
+    assert.equal((await db.query("select has_table_privilege('authenticated','public.profiles','TRUNCATE') as allowed")).rows[0].allowed,false);
+    assert.equal((await db.query("select has_table_privilege('authenticated','public.profiles','SELECT') as allowed")).rows[0].allowed,true);
+
     const created = "00000000-0000-0000-0000-000000000003";
     await db.query("insert into auth.users values($1,$2)", [
       created,
