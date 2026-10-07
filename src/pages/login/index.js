@@ -1,3 +1,4 @@
+import { mountCloudWorkspace } from "./workspace.js";
 import { accountIdentifier, normalizeUsername } from "../../domain/accounts.js";
 import { config } from "../../config.js";
 import {
@@ -21,7 +22,7 @@ const roles = {
   artist: "员工",
   read_only: "只读账户",
 };
-let supabase, subscription;
+let supabase, subscription, workspace;
 function frame(content) {
   root.innerHTML = `<div class="auth-layout"><section class="auth-story"><a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO COMPANION</span></a><div class="auth-story-copy"><span class="auth-eyebrow">YOUR STUDIO, REMEMBERED.</span><h1>每一场工作，<br>都值得被记住。</h1><p>让订单、灵感与每一个细节，<br>在同一个工作空间里相遇。</p><img src="assets/sculpy.webp" alt="Sculpy 工作室助手"></div><small>SCULP STUDIO · 团队工作空间</small></section><section class="auth-content">${content}</section></div>`;
 }
@@ -29,6 +30,8 @@ function message(text) {
   root.querySelector(".auth-status").textContent = text;
 }
 export async function showLogin() {
+  workspace?.destroy();
+  workspace = null;
   document.title = "登录 · Sculpy";
   frame(
     `<div class="auth-card"><span class="auth-eyebrow">WELCOME BACK</span><h2>欢迎回到工作室</h2><p class="auth-muted">使用你的团队账户登录 Sculpy。</p><form id="login-form"><label for="username">账号</label><input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="例如 sculp_jz" required minlength="7" maxlength="32" pattern="[sS][cC][uU][lL][pP]_[a-zA-Z0-9][a-zA-Z0-9_]{0,25}"><label for="password">密码</label><div class="auth-password"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button type="button" id="toggle-password" aria-label="显示密码" aria-pressed="false">显示</button></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-primary" id="login-submit" type="submit">登录工作空间 <span>↗</span></button></form><p class="auth-help">需要开通账户或重置密码？请联系管理员 Jz。</p>${config.environment === "demo" ? '<div class="auth-divider"></div><a class="auth-demo" href="?demo=1#bookings">先浏览演示空间 →</a><p class="auth-muted auth-small">演示使用虚构数据，记录仅保存在当前浏览器。</p>' : ""}</div><small class="auth-footer">SCULP STUDIO · 仅供团队成员使用</small>`,
@@ -79,8 +82,14 @@ async function showWorkspace() {
   }
   document.title = "账户空间 · Sculpy";
   frame(
-    `<div class="auth-card auth-workspace"><span class="auth-eyebrow">STUDIO WORKSPACE</span><h2>你好，${esc(profile.display_name)}</h2><p class="auth-muted">${esc(roles[profile.role] || "团队成员")}</p><div class="auth-notice">账户已验证。订单和客户的正式数据空间仍在接入中。</div>${profile.role === "operations" ? '<button class="auth-primary" id="manage-accounts">账户管理 <span>→</span></button><div id="account-list"></div>' : ""}<p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><span class="auth-eyebrow">STUDIO WORKSPACE</span><h2>你好，${esc(profile.display_name)}</h2><p class="auth-muted">${esc(roles[profile.role] || "团队成员")}</p><div class="auth-notice">账户已验证。通过 Sculpy 查询订单、继续对话并确认工作记录。</div>${profile.role === "operations" ? '<button class="auth-primary" id="manage-accounts">账户管理 <span>→</span></button><div id="account-list"></div>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
+  workspace?.destroy();
+  workspace = mountCloudWorkspace({
+    root: root.querySelector("#cloud-workspace"),
+    supabase,
+    profile,
+  });
   root.querySelector("#logout").onclick = async () => {
     const { error } = await supabase.auth.signOut({ scope: "local" });
     if (error) {

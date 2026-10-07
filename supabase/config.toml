@@ -5,3 +5,8 @@ verify_jwt = false
 [functions.account-admin]
 # The handler verifies getUser + active operations role before privileged access.
 verify_jwt = false
+
+[functions.sculpy-chat]
+# Demo accepts only caller-supplied fictional data. Cloud mode verifies the user
+# with Auth /user and reads/writes through that user's JWT and database checks.
+verify_jwt = false
