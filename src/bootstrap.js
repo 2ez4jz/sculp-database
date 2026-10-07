@@ -11,7 +11,7 @@ if (demo && config.environment === "demo") {
   exit.textContent = "返回登录";
   exit.className = "demo-exit";
   document.querySelector(".top-actions").prepend(exit);
-  await import("./app.js?v=single-chat-1");
+  await import("./app.js?v=single-chat-2");
 } else {
   document.querySelector("#demo-template").remove();
   await import("./pages/login/index.js");

@@ -58,7 +58,7 @@ const fs = require("node:fs");
       });
     });
     await page.goto("http://localhost:4173/?demo=1#bookings/b0");
-    await page.locator(".memory-launcher").click();
+    await page.locator("#context-memories [data-memory-open]").click();
     const dialog = page.locator(".memory-dialog");
     assert.equal(
       await page.locator("#memory-target").inputValue(),
@@ -102,7 +102,7 @@ const fs = require("node:fs");
       "partners/mango",
     ]) {
       await page.goto("http://localhost:4173/?demo=1#" + route);
-      await page.locator(".memory-launcher").click();
+      await page.locator("#context-memories [data-memory-open]").click();
       assert.equal(
         await page.locator("#memory-target").inputValue(),
         route
@@ -122,9 +122,21 @@ const fs = require("node:fs");
         ),
       );
     }
-    // List pages demand explicit attribution; closing preserves unsaved text for that target.
-    await page.goto("http://localhost:4173/?demo=1#bookings");
-    await page.locator(".memory-launcher").click();
+    // Every list page has one floating chat entry on desktop and mobile.
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const route of ["bookings", "clients", "artists", "venues", "partners"]) {
+        await page.goto("http://localhost:4173/?demo=1#" + route);
+        await page.locator(".chat-launcher").waitFor();
+        assert.equal(await page.locator(".chat-launcher:visible, .memory-launcher:visible").count(), 1);
+        assert.equal(await page.locator(".memory-launcher").count(), 0);
+      }
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    // Explicit attribution is required after clearing the detail target; closing preserves drafts.
+    await page.goto("http://localhost:4173/?demo=1#bookings/b0");
+    await page.locator("#context-memories [data-memory-open]").click();
+    await page.locator("#memory-target").selectOption("");
     assert.equal(await page.locator("#memory-target").inputValue(), "");
     await page.locator("#memory-text").fill("未选择对象");
     await page.locator("[data-memory-prepare]").click();
@@ -135,13 +147,13 @@ const fs = require("node:fs");
     await page.locator("#memory-text").fill("未保存草稿");
     await page.getByRole("button", { name: "关闭记录面板" }).click();
     await page.goto("http://localhost:4173/?demo=1#bookings/b0");
-    await page.locator(".memory-launcher").click();
+    await page.locator("#context-memories [data-memory-open]").click();
     assert.equal(await page.locator("#memory-text").inputValue(), "未保存草稿");
     await page.getByRole("button", { name: "关闭记录面板" }).click();
     // Employee gets own bookings, no customer profile access, and review-only preferences.
     await page.selectOption("#role", "artist");
     await page.goto("http://localhost:4173/?demo=1#bookings/b0");
-    await page.locator(".memory-launcher").click();
+    await page.locator("#context-memories [data-memory-open]").click();
     assert.equal(
       await page.locator('#memory-target option[value="booking:b1"]').count(),
       0,
@@ -169,7 +181,7 @@ const fs = require("node:fs");
     assert.equal(await page.locator(".memory-launcher").isVisible(), false);
     assert.deepEqual(errors, []);
     console.log(
-      "Context memory: voice, multi-target persistence, profiles, list attribution, draft retention, employee scope and mobile passed",
+      "Context memory: voice, multi-target persistence, profiles, single launcher, explicit attribution, draft retention, employee scope and mobile passed",
     );
   } finally {
     await browser.close();
