@@ -35,4 +35,4 @@ Use **发布会演示** on Bookings: bookings → wedding detail → client → 
 
 ## Production foundation
 
-`supabase/migrations/001_initial_schema.sql` defines the production data model, audit events and row-level access policies. `supabase/seed_team.sql` contains only public employee profiles and service definitions. Connect a private Supabase project plus server-side OpenAI endpoints before enabling real login or importing client data.
+`supabase/migrations/001_initial_schema.sql` defines the V1 foundation. `supabase/migrations/002_production_core.sql` adds production billing, payments, consent history, strict Jz/Miranda access boundaries, auditable AI conversations and trusted reporting views. See `docs/DATABASE_V2.md` for the full model and rollout order. `supabase/seed_team.sql` contains only public employee profiles and service definitions. Connect a private Supabase project plus server-side OpenAI endpoints before enabling real login or importing client data.
