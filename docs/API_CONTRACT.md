@@ -33,7 +33,9 @@ Response must conform to a server-validated schema:
 }
 ```
 
-The endpoint creates an `ai_drafts` row. It does not update clients or work logs. Confirmation uses a separate authenticated transaction.
+Current Demo: the endpoint returns a draft JSON response only; it does not create an `ai_drafts` row or update clients/work logs. Confirmation currently saves a browser-local note.
+
+Production requirement (not yet implemented): persist the proposal in `ai_drafts`, then validate and confirm it through a separate authenticated transaction with an audit event.
 
 ## `POST /functions/v1/sculpy-ai?action=search`
 
@@ -50,7 +52,9 @@ Response:
 }
 ```
 
-For numeric answers and charts, the server calls approved reporting views such as `booking_financials` and `service_revenue_monthly`. OpenAI explains the returned data but does not calculate authoritative totals. Each production request creates an `ai_runs` record containing its purpose, source/output record IDs, model usage and estimated cost; the service role writes this log and clients cannot forge it.
+Production requirement (not yet implemented): for numeric answers and charts, the server must call approved reporting views such as `booking_financials` and `service_revenue_monthly`. OpenAI explains the returned data but does not calculate authoritative totals. Each production request must create an `ai_runs` record containing its purpose, source/output record IDs, model usage and estimated cost; the service role writes this log and clients cannot forge it.
+
+The current Demo chart uses deterministic browser calculations over fictional bookings; it does not call the production reporting views.
 
 ## Environment separation
 

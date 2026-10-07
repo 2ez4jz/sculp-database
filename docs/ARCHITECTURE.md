@@ -95,3 +95,83 @@ The public V1 demo may use fictional data and a restricted public AI endpoint. B
 - New major-version code follows the boundaries above.
 - `src/app.js` stops growing as the default destination for new cross-cutting capabilities.
 - The production path is explicitly authenticated before real customer data is introduced.
+
+## Implemented module boundaries (2026-10-07)
+
+- `src/app.js` still owns routing, shared UI helpers, the current demo context,
+  and stable booking/directory/media pages. This is an incremental extraction,
+  not a claim that every application responsibility has already moved out.
+- `src/pages/sculpy/index.js` owns Sculpy rendering, reviewed drafts and action
+  handling. It receives live context via `getContext()` and explicit helpers;
+  it never imports the application entrypoint. The application forwards events
+  to the controller instead of installing listeners on every render.
+- `src/pages/sculpy/voice.js` owns microphone capture and track cleanup. Page
+  disposal invalidates pending requests and stops recording without submitting
+  a transcription. Extraction/search responses are also invalidated on remount;
+  editing source text or the target booking invalidates the previous draft.
+- `src/pages/insights/index.js` owns the existing business/technical overview.
+  `chart.js` owns chart markup; `src/domain/analytics.js` calculates revenue
+  deterministically from supplied records. Demo reporting still anchors to the
+  latest completed sample booking; production-mode calculation anchors to today.
+- `src/domain/permissions.js` centralizes reusable demo visibility rules.
+  `src/domain/sculpy.js` projects scoped demo search inputs and validates result
+  links against that input. Neither module replaces server authorization.
+- The Edge Function entrypoint wraps `handler.ts`. `http.ts` contains CORS and
+  the existing in-memory rate limiter; `config.ts` reads server configuration;
+  `openai.ts`, `schemas.ts`, `transcribe.ts`, `extract.ts` and `search.ts` own
+  provider calls and action contracts. Action URLs and response fields remain
+  compatible. No migrations or provider/model changes are part of this refactor.
+
+Add new Sculpy interactions to its page controller, pure reporting rules to
+`domain`, and provider transport to services or backend action modules. Stable
+pages can move out when they need material changes.
+
+## Verified limitations and production blockers
+
+1. `supabase/config.toml` disables gateway JWT verification and `index.ts` uses
+   `auth: 'none'`. CORS is not authentication. The function still trusts a
+   browser-supplied demo catalog; real data must instead be queried server-side
+   under an authenticated identity and RLS.
+2. The rate limiter is per-process memory keyed by a forwarding header. It is
+   not a durable, shared quota or a sufficient abuse/cost control.
+3. Extraction currently returns JSON only. There is no `ai_drafts` insert,
+   confirmation transaction or production audit write in the current handlers.
+   Demo confirmation persists notes to localStorage only.
+4. SQL row policies are not column protection. Migration 001 stores order
+   amounts (`price_cad`, `deposit_cad`, `balance_cad`) on `bookings`, and migration
+   002 still allows assigned artists to select booking rows. With table SELECT
+   grants, that also exposes those columns. Likewise, authenticated venue and
+   partner reads cover rows containing `internal_notes`. Before connecting
+   artist accounts, define safe views/RPCs, column grants or private tables and
+   test direct API access. Browser permission tests do not prove database RLS.
+5. Existing migrations have not been executed or verified against a live
+   Supabase database in this change. No claim of production readiness is made.
+6. No OpenAI key is embedded in the changed browser modules. The server still
+   reads `OPENAI_API_KEY` from the environment. Tests stub provider calls and
+   do not establish live model availability or deployment compatibility.
+
+## Regression checks
+
+Run a static server on port 4173, then use Node 24 and Playwright:
+
+```sh
+node --test scripts/domain.test.mjs scripts/backend.test.mjs
+node scripts/smoke.cjs
+node scripts/permissions.cjs
+node scripts/sculpy-lifecycle.cjs
+```
+
+Set `CHROME_PATH` if Chrome is not at `/usr/bin/google-chrome`. The backend tests
+execute the TypeScript handlers with a minimal Deno environment stub; the
+Supabase runtime wrapper still requires deployment validation. Verification now
+runs on pull requests as well as main, without deploying the PR.
+
+### Local execution evidence
+
+At baseline commit `1f9b975`, the existing smoke and permission scripts passed.
+After extraction, both scripts passed again, along with all 6 domain/backend
+contract tests and the Sculpy lifecycle browser regression. Browser execution
+used Chromium 153 through `CHROME_PATH`; provider calls were intercepted.
+Mobile overflow assertions passed. Local screenshots lack Chinese font glyphs,
+so full typography QA remains with the existing font-equipped CI environment.
+No live Supabase migration, Edge Function deployment or OpenAI request was run.

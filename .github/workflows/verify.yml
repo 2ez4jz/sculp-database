@@ -2,6 +2,8 @@ name: Verify SCULP Demo
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,9 +14,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
       - name: Install Chinese fonts for visual checks
         run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify calculations and AI handler contracts
+        run: node --test scripts/domain.test.mjs scripts/backend.test.mjs
       - name: Prepare browser check
         run: npm install --no-save --package-lock=false playwright
       - name: Verify interactions and responsive layouts
@@ -22,6 +26,7 @@ jobs:
           python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
           node scripts/smoke.cjs
           node scripts/permissions.cjs
+          node scripts/sculpy-lifecycle.cjs
       - name: Save visual checks
         if: always()
         uses: actions/upload-artifact@v4
