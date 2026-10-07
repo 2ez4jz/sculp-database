@@ -1,16 +1,22 @@
-# Login and account administration
+# Username login and Jz account administration
 
-The default entry is an email/password login. `?demo=1` explicitly opens fictional data only while `config.environment === 'demo'`. Demo never receives an authenticated database client. Production does not accept that demo switch. The login uses locally bundled Supabase JS 2.117.3, browser sessionStorage, automatic token refresh, getUser verification and an active profiles row. There is no public signup. Passwords are not stored by application code.
+Login is **sculp_name + password**, e.g. `sculp_jz`, `sculp_miranda`, `sculp_michelle`. Names use 1–26 ASCII letters, digits or underscores; login is case-insensitive and stored in lowercase. The creation form supplies the fixed `sculp_` prefix. Users never provide an email address or receive verification mail. There is no public registration.
 
-Jz is the `operations` role, assigned to the correct Auth user UUID by the project administrator. Names and email strings do not grant privileges. Account management lists email, name, role and active state, and edits name/role/active via authenticated SQL RPCs. Emails are read-only Auth identifiers; creating accounts, resetting passwords and changing login emails remain project-admin operations in this version. Users cannot disable or demote their own operations account. Mutations are serialized and audited. Disabled profiles lose role/assigned-record access even with an existing JWT. This does not revoke the Auth account or fix all legacy broad authenticated-read policies; production business data must remain disabled pending the review in ARCHITECTURE.md.
+Internally Supabase's password provider uses the deterministic reserved identifier `<username>@accounts.sculp.invalid`. This is not a contact address. Auth handles password hashing and verification; plaintext passwords are not written to profiles, logs, audit events, or browser persistence. Session tokens use sessionStorage and automatic refresh. The login verifies getUser and an active profiles row.
+
+The `operations` role is assigned to Jz's real Auth UUID by the project administrator. Display names and usernames grant no privilege by themselves. Jz can list accounts, change display names/roles/active state, create accounts with an initial password, and set a new password for existing accounts. Passwords cannot be retrieved or displayed. Creation/reset uses the `account-admin` Edge Function with server-only service-role credentials; it checks the caller's verified user and current active operations profile. Account creation compensates an unsuccessful profile transaction by removing the Auth user; cleanup failure reports an incomplete account for manual repair. Password-reset audit stores intent/outcome and IDs, never passwords.
+
+Profile updates remain authenticated SQL RPCs. Self-demotion/deactivation is blocked; mutations are serialized and audited. Disabling profiles removes role/assigned-record access, but does not revoke the Auth identity or repair legacy broad authenticated SELECT policies. Password reset is not a promise that every existing access token is immediately revoked. Keep production business data disabled until the review in ARCHITECTURE.md is completed.
 
 ## Activation
 
-1. Configure the public `supabaseUrl` and `supabasePublishableKey` in src/config.js (or SCULPY_CONFIG before bootstrap). Never put a service-role/secret key in browser code.
-2. Apply migrations 001–004 after project review. Provision invite-only Auth users and matching profiles UUIDs. Assign Jz `operations` and Miranda `owner` deliberately. Disable public signup in Auth settings.
-3. Deploy the static site. Real account authentication and account administration then work; business orders remain a connection-status screen until the production data integration is completed.
+1. Configure public supabaseUrl/supabasePublishableKey in src/config.js. Never put a service-role key in frontend code.
+2. Apply migrations 001–005 after project review. Disable public signup in Supabase Auth.
+3. Bootstrap Jz privately through the project administrator: create an Auth user with identifier `sculp_jz@accounts.sculp.invalid`, chosen password and email_confirm=true; insert the matching profiles UUID with username `sculp_jz`, display_name `Jz`, role `operations`, active=true. No default password is supplied in source. Existing email users must have their Auth identifier and profile username explicitly migrated together, preserving UUIDs.
+4. Deploy account-admin. Set ACCOUNT_ALLOWED_ORIGINS to an exact comma-separated allowlist of website origins. Supabase provides SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY inside the function. Its gateway JWT check is disabled because the handler explicitly verifies the token with getUser before any privileged operation. Missing origins fail closed.
+5. Deploy the static site. Jz then creates employee accounts and sets passwords in the UI. No email is sent. Business orders remain a connection-status screen pending the production data adapter. Demo remains explicitly separate at ?demo=1 and is allowed only in demo configuration.
 
-Missing configuration is shown honestly and fails closed. No live migration or account provisioning is performed by this source change.
+No live provisioning, migration, credential-setting or deployment was performed by this source change.
 
-SDK source: https://supabase.com/docs/reference/javascript/auth-signinwithpassword
-Rebuild bundled vendor module with esbuild from exact @supabase/supabase-js@2.117.3, platform=browser, format=esm, bundle/minify enabled. License is included next to the bundle.
+SDK: bundled @supabase/supabase-js 2.117.3. Rebuild with esbuild (browser platform, ESM, bundle and minify); license accompanies the bundle.
+References: https://supabase.com/docs/reference/javascript/auth-admin-createuser and https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid

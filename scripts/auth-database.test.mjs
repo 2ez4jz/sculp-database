@@ -9,13 +9,14 @@ test("account RPCs enforce server roles, self-protection, revocation and audit",
     staff = "00000000-0000-0000-0000-000000000002";
   try {
     await db.exec(
-      `create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key,email text);create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;grant usage on schema public,auth to authenticated;`,
+      `create role anon;create role service_role;create role authenticated;create schema auth;create table auth.users(id uuid primary key,email text);create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;grant usage on schema public,auth to authenticated;`,
     );
     for (const file of [
       "001_initial_schema",
       "002_production_core",
       "003_context_memory",
       "004_account_management",
+      "005_username_accounts",
     ])
       await db.exec(
         (
@@ -79,7 +80,45 @@ test("account RPCs enforce server roles, self-protection, revocation and audit",
       db.query("update profiles set role='operations' where id=$1", [staff]),
       /permission denied/,
     );
+    await assert.rejects(
+      db.query("select provision_managed_account($1,$2,$3,$4,$5)", [
+        jz,
+        staff,
+        "staff",
+        "Staff",
+        "artist",
+      ]),
+      /permission denied/,
+    );
     await db.exec("reset role");
+    const created = "00000000-0000-0000-0000-000000000003";
+    await db.query("insert into auth.users values($1,$2)", [
+      created,
+      "sculp_michelle@accounts.sculp.invalid",
+    ]);
+    await db.query("select provision_managed_account($1,$2,$3,$4,$5)", [
+      jz,
+      created,
+      "sculp_michelle",
+      "Michelle",
+      "artist",
+    ]);
+    assert.equal(
+      (await db.query("select username from profiles where id=$1", [created]))
+        .rows[0].username,
+      "sculp_michelle",
+    );
+    await assert.rejects(
+      db.query("select provision_managed_account($1,$2,$3,$4,$5)", [
+        staff,
+        created,
+        "sculp_michelle",
+        "Michelle",
+        "operations",
+      ]),
+      /Administrator/,
+    );
+
     assert.equal(
       (
         await db.query(

@@ -1,3 +1,7 @@
 [functions.sculpy-ai]
 verify_jwt = false
 
+
+[functions.account-admin]
+# The handler verifies getUser + active operations role before privileged access.
+verify_jwt = false
