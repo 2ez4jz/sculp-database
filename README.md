@@ -17,6 +17,7 @@ No build or dependencies required. Run `python -m http.server 4173` in this fold
 - Admin/Artist interface simulation. Artist view only shows assigned bookings, service details and own statistics; CRM/contact details and marketing opportunities are hidden in the interface.
 - Sculpy voice capture, deploy-ready OpenAI transcription, reviewed AI extraction, semantic demo-database search and browser-local note persistence.
 - Installable web-app manifest, Demo/Production configuration boundary and formal Supabase schema with row-level policies.
+- Context-aware Sculpy voice/text panel on order and profile pages, reviewed multi-destination notes/preferences/follow-ups, and browser-local persistence. See `docs/CONTEXT_MEMORY.md` for cloud integration prerequisites.
 - Eight-step presentation mode and responsive layouts.
 
 ## Demo boundaries
