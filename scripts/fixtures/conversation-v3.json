@@ -1,0 +1,237 @@
+{
+  "note": "Small live sample; checks are heuristics, naturalness requires human review. Not a production permission test.",
+  "results": [
+    {
+      "id": "simple",
+      "message": "这单几点，在哪里？一句话告诉我。",
+      "ms": 7691,
+      "passed": true,
+      "turn": {
+        "id": "0139b5f0-263f-4b4e-b616-5a1b1fc1f784",
+        "user": "这单几点，在哪里？一句话告诉我。",
+        "answer": "Sarah Chen 这单是 10 月 10 日下午 2 点，在测试 B 场地（200 Test Avenue）。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1212,
+          "output_tokens": 53,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:07:57.681Z"
+      }
+    },
+    {
+      "id": "tentative",
+      "message": "客户想提前半小时，但我前面还有一单，你看看行不行，先别改。",
+      "ms": 7944,
+      "passed": true,
+      "turn": {
+        "id": "5ba92295-fb79-47a9-b4f3-a5b6370da452",
+        "user": "客户想提前半小时，但我前面还有一单，你看看行不行，先别改。",
+        "answer": "Sarah 这单现在是 10 月 10 日 14:00 开始，提前半小时就是 13:30；你前一单 Lily 的安排到 13:10。两单时间不重叠，但只隔 20 分钟，而且地点不同、路程和准备时间未知，所以目前不能确认赶得上。我先不做任何修改。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          },
+          {
+            "id": "qa-prior",
+            "label": "Lily Wang"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 4051,
+          "output_tokens": 165,
+          "calls": 3
+        },
+        "createdAt": "2026-10-07T23:08:05.665Z"
+      }
+    },
+    {
+      "id": "followup",
+      "message": "那先记一下等客户确认，正式时间别动。",
+      "ms": 6641,
+      "passed": true,
+      "turn": {
+        "id": "ff99c825-edae-4e21-89ae-3759be56d71e",
+        "user": "那先记一下等客户确认，正式时间别动。",
+        "answer": "我先记为待确认事项，正式时间不变。请核对下方备注卡片并点击确认保存。",
+        "references": [],
+        "proposals": [
+          {
+            "bookingId": "qa-sarah",
+            "kind": "note",
+            "text": "客户提出希望提前半小时，待客户确认；正式预约时间保持不变。",
+            "id": "25f2248c-a74e-4699-8e2b-a40492e8363e",
+            "label": "Sarah Chen"
+          }
+        ],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1325,
+          "output_tokens": 150,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:08:12.306Z"
+      }
+    },
+    {
+      "id": "correction",
+      "message": "不是她，是前面Lily那单，她说准备付定金，帮我记一下。",
+      "ms": 6155,
+      "passed": true,
+      "turn": {
+        "id": "6af71aa7-53e7-4a2e-b774-91af73986a98",
+        "user": "不是她，是前面Lily那单，她说准备付定金，帮我记一下。",
+        "answer": "明白，是前面 Lily 那单。我会记为「Lily 表示准备支付定金」，不代表定金已经支付。请核对备注卡片并点击确认保存。",
+        "references": [],
+        "proposals": [
+          {
+            "bookingId": "qa-prior",
+            "kind": "note",
+            "text": "Lily 表示准备支付定金；尚未确认已支付。",
+            "id": "642d5b08-18c7-4562-8892-78f06c865c26",
+            "label": "Lily Wang"
+          }
+        ],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1382,
+          "output_tokens": 137,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:08:18.463Z"
+      }
+    },
+    {
+      "id": "stale",
+      "message": "现在到底是几点？",
+      "ms": 4962,
+      "passed": true,
+      "turn": {
+        "id": "523bfa79-e743-4bec-a619-96bbbb2280b9",
+        "user": "现在到底是几点？",
+        "answer": "当前订单 Sarah Chen 的预约时间是 2026 年 10 月 10 日下午 2 点（Toronto 时间），不是上午 10 点。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1230,
+          "output_tokens": 58,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:08:23.425Z"
+      }
+    },
+    {
+      "id": "ambiguous",
+      "message": "Sarah那单提前半小时。",
+      "ms": 6458,
+      "passed": true,
+      "turn": {
+        "id": "b97620ef-8a3e-403b-abf9-23856ee93431",
+        "user": "Sarah那单提前半小时。",
+        "answer": "你指哪一单 Sarah：10 月 10 日 Sarah Chen，还是 10 月 11 日 Sarah Lin？",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1206,
+          "output_tokens": 102,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:08:29.886Z"
+      }
+    },
+    {
+      "id": "missing",
+      "message": "客户进场的密码是多少？",
+      "ms": 7338,
+      "passed": true,
+      "turn": {
+        "id": "8d9e13ef-27c3-4142-bdf3-4c4bceb109e5",
+        "user": "客户进场的密码是多少？",
+        "answer": "这条订单记录里没有查到客户进场密码。",
+        "references": [
+          {
+            "id": "qa-sarah",
+            "label": "Sarah Chen"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 2543,
+          "output_tokens": 67,
+          "calls": 2
+        },
+        "createdAt": "2026-10-07T23:08:37.224Z"
+      }
+    },
+    {
+      "id": "garbled",
+      "message": "该时间他说。",
+      "ms": 3866,
+      "passed": true,
+      "turn": {
+        "id": "b79d9d6f-7392-48e4-8122-9b49f34f229c",
+        "user": "该时间他说。",
+        "answer": "你是想说“他/她说了这个时间”，还是想让我把某个订单的时间改成这个时间？我还不确定指的是哪位客户、哪个时间。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "qa-sarah",
+          "qa-prior",
+          "qa-sarah2"
+        ],
+        "usage": {
+          "input_tokens": 1205,
+          "output_tokens": 62,
+          "calls": 1
+        },
+        "createdAt": "2026-10-07T23:08:41.092Z"
+      }
+    }
+  ]
+}
