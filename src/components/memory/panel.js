@@ -84,6 +84,10 @@ export function createMemoryPanel({
   }
   function setBusy(value) {
     busy = value;
+    if (saving || !value)
+      dialog
+        .querySelectorAll("input,textarea,select")
+        .forEach((el) => (el.disabled = value));
     dialog
       .querySelectorAll(
         "[data-memory-prepare],[data-memory-save],#memory-target,#memory-voice,[data-memory-add]",
@@ -327,6 +331,7 @@ export function createMemoryPanel({
         status("一次最多添加 16 项。", true);
         return;
       }
+      draftId = crypto.randomUUID();
       items.push({
         kind,
         target,
@@ -355,6 +360,7 @@ export function createMemoryPanel({
     if (event.target.closest("[data-memory-view]")) close();
   });
   dialog.addEventListener("input", (event) => {
+    if (saving) return;
     const el = event.target;
     if (el.id === "memory-text") {
       rawText = el.value;
@@ -368,6 +374,7 @@ export function createMemoryPanel({
     }
     if (el.dataset.item !== undefined) {
       const item = items[Number(el.dataset.item)];
+      draftId = crypto.randomUUID();
       if (item)
         item[el.dataset.field] = el.type === "checkbox" ? el.checked : el.value;
       updateFooter();
