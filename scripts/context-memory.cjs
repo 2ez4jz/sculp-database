@@ -60,6 +60,7 @@ const fs = require("node:fs");
     await page.goto("http://localhost:4173/?demo=1#bookings/b0");
     await page.locator("#context-memories [data-memory-open]").click();
     const dialog = page.locator(".memory-dialog");
+    assert.match(await page.locator("#memory-recorded-at").innerText(), /\d{4}/);
     assert.equal(
       await page.locator("#memory-target").inputValue(),
       "booking:b0",
@@ -72,6 +73,8 @@ const fs = require("node:fs");
     await page.locator("[data-memory-prepare]").click();
     await page.locator(".memory-card-review").first().waitFor();
     assert.equal(await page.locator(".memory-card-review").count(), 3);
+    assert.equal(await page.locator("#memory-polished").isVisible(), true);
+    assert.match(await page.locator("#memory-polished-text").innerText(), /满意/);
     assert.equal(await page.locator('[data-field="dueDate"]').inputValue(), "");
     await page.locator('[data-field="assigneeId"]').selectOption("michelle");
     await page.screenshot({ path: "qa-screens/context-memory-desktop.png" });
@@ -85,6 +88,8 @@ const fs = require("node:fs");
       ),
     );
     await page.reload();
+    await page.locator("#context-memories details").first().evaluate((el) => (el.open = true));
+    assert.match(await page.locator("#context-memories .memory-source-stamp").first().innerText(), /原始记录时间/);
     assert(
       (await page.locator("#context-memories").innerText()).includes(
         "跟进晚宴",
