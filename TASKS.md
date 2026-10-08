@@ -37,5 +37,6 @@
 - [ ] Client interaction history and follow-up — V2
 
 - [x] Reviewed atomic cloud client/booking intake, source timestamps, retry protection and database-layer acceptance
-- [ ] Enable new AI intake after explicit OpenAI destination authorization; verify full live-model flow
+- [x] Enable new AI intake after explicit OpenAI destination authorization
+- [ ] Verify the full live-model flow with a real authenticated administrator account
 - [ ] Authenticated real-device cloud intake and team acceptance
