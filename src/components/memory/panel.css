@@ -466,3 +466,15 @@
     transition: none;
   }
 }
+
+/* V1 input source provenance and separate AI digest */
+.memory-input-heading { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px; }
+.memory-input-heading label { font-size:12px;font-weight:600; }
+.memory-input-heading time,.memory-input-heading small,.memory-source-stamp { font-size:10px;color:#738174; }
+.memory-input-modes { display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:12px; }
+.memory-input-modes span,.memory-input-modes button { border:1px solid #dce1d5;background:#fff;border-radius:18px;padding:5px 10px;font-size:11px;color:#526857; }
+.memory-input-modes button {cursor:pointer;}
+.memory-polished {padding:14px;margin:14px 0;border:1px solid #d8e1d4;background:#eef2e9;border-radius:10px;}
+.memory-polished p,.memory-organized {font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;}
+.memory-source-stamp {display:block;margin-top:8px;line-height:1.6;}
+.context-memory-meta time {font-size:10px;color:#8b9287;}
