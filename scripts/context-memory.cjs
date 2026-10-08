@@ -184,6 +184,31 @@ const fs = require("node:fs");
     await page.getByRole("button", { name: "完成", exact: true }).click();
     await page.goto("http://localhost:4173/?demo=1#bookings/b1");
     assert.equal(await page.locator(".memory-launcher").isVisible(), false);
+    // Admin can create durable fictional customer and booking from the same input workspace.
+    await page.selectOption("#role", "admin");
+    await page.goto("http://localhost:4173/?demo=1#clients");
+    await page.getByRole("button", { name: "与 Sculpy 连续聊天" }).waitFor();
+    await page.goto("http://localhost:4173/?demo=1#bookings/b0");
+    await page.locator("#context-memories [data-memory-open]").click();
+    await page.locator("[data-memory-create-client]").click();
+    await page.locator("#memory-new-name").fill("Demo Test Visitor");
+    await page.locator("[data-memory-create-submit=client]").click();
+    await page.waitForFunction(() => [...document.querySelectorAll("#memory-target option")].some(x=>x.textContent.includes("Demo Test Visitor")));
+    await page.getByRole("button", { name: "关闭记录面板" }).click();
+    await page.reload();
+    await page.goto("http://localhost:4173/?demo=1#clients");
+    await page.getByText("Demo Test Visitor").first().waitFor();
+    await page.goto("http://localhost:4173/?demo=1#bookings/b0");
+    await page.locator("#context-memories [data-memory-open]").click();
+    await page.locator("[data-memory-create-booking]").click();
+    await page.locator("#memory-new-client").selectOption({label:"Demo Test Visitor"});
+    await page.locator("#memory-new-date").fill("2026-11-20");
+    await page.locator("[data-memory-create-submit=booking]").click();
+    await page.waitForFunction(() => document.querySelector("#memory-target option:checked")?.textContent.includes("2026-11-20"));
+    await page.getByRole("button", { name: "关闭记录面板" }).click();
+    await page.reload();
+    await page.goto("http://localhost:4173/?demo=1#bookings");
+    await page.getByText("Demo Test Visitor").first().waitFor();
     assert.deepEqual(errors, []);
     console.log(
       "Context memory: voice, multi-target persistence, profiles, single launcher, explicit attribution, draft retention, employee scope and mobile passed",
