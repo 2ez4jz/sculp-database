@@ -150,7 +150,7 @@ export function createMemoryPanel({
       )
       .join(
         "",
-      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-upload>▧ 上传图片</button><input id="memory-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><small>也可在输入框粘贴截图或拖入图片</small></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理全文</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
+      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p>${getContext().role === "admin" && repository.mode === "demo" ? '<div class="memory-create-actions"><button type="button" data-memory-create-client>＋ 新建虚拟客户</button><button type="button" data-memory-create-booking>＋ 新建虚拟订单</button></div>' : ""}</section><section id="memory-create-form" class="memory-create-form" hidden></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-upload>▧ 上传图片</button><input id="memory-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><small>也可在输入框粘贴截图或拖入图片</small></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理全文</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
     review();
   }
   function open() {
@@ -177,6 +177,44 @@ export function createMemoryPanel({
     stop();
     dialog.close();
     if (restore && opener?.isConnected) opener.focus();
+  }
+  function entityForm(type) {
+    const zone = $("#memory-create-form");
+    if (!zone) return;
+    if (type === "client") {
+      zone.innerHTML = `<h3>新增虚拟客户</h3><label>客户姓名 <input id="memory-new-name" maxlength="100" required placeholder="例如：Jessica Demo"></label><label>城市 <input id="memory-new-city" maxlength="100" placeholder="Toronto"></label><p>仅添加虚构资料。创建后即可将原文和备注关联到这位客户。</p><button type="button" data-memory-create-submit="client">确认创建客户</button><button type="button" data-memory-create-cancel>取消</button>`;
+    } else {
+      zone.innerHTML = `<h3>新增虚拟订单</h3><label>客户 <select id="memory-new-client">${data.clients.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}</select></label><label>服务日期 <input id="memory-new-date" type="date" required></label><label>服务类型 <select id="memory-new-service"><option value="Wedding">婚礼造型</option><option value="Trial">婚礼试妆</option><option value="Event">活动造型</option><option value="Photoshoot">拍摄造型</option><option value="Commercial">商业造型</option><option value="Education">教学</option></select></label><label>负责人 <select id="memory-new-artist">${data.artists.filter(a=>a.bookingEligible!==false).map(a=>`<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("")}</select></label><label>场地 <select id="memory-new-venue">${data.venues.map(v=>`<option value="${esc(v.id)}">${esc(v.name)}</option>`).join("")}</select></label><p>新订单先创建为「咨询中」，默认 10:00–12:00，金额为 0；这些都是演示占位值，需人工确认后才能用于统计。</p><button type="button" data-memory-create-submit="booking">确认创建订单</button><button type="button" data-memory-create-cancel>取消</button>`;
+    }
+    zone.hidden = false;
+    zone.querySelector("input,select")?.focus();
+  }
+  async function createEntity(type) {
+    if (busy || saving || repository.mode !== "demo" || getContext().role !== "admin") return;
+    try {
+      let record;
+      if(type === "client") {
+        const name = $("#memory-new-name")?.value.trim(), city = $("#memory-new-city")?.value.trim() || "Toronto";
+        if (!name || name.length < 2) throw Error("请输入客户姓名。");
+        const existing = data.clients.filter(c=>c.name.toLocaleLowerCase() === name.toLocaleLowerCase());
+        if (existing.length) throw Error("已有同名客户，请先核对后再创建。");
+        record = {id:"demo-"+crypto.randomUUID(),name,city,email:"",phone:"",wechat:"",instagram:"",birthday:"",weddingDate:"",referral:"",preferences:[],opportunity:""};
+      } else {
+        const clientId = $("#memory-new-client")?.value, date = $("#memory-new-date")?.value;
+        if (!data.clients.some(c=>c.id===clientId) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date||"") || Number.isNaN(Date.parse(date+"T12:00:00Z"))) throw Error("请选择有效客户和服务日期。");
+        const artistId=$("#memory-new-artist")?.value,venueId=$("#memory-new-venue")?.value;
+        if(!data.artists.some(a=>a.id===artistId) || !data.venues.some(v=>v.id===venueId)) throw Error("负责人或场地无效。");
+        const service=$("#memory-new-service")?.value;
+        record={id:"demo-"+crypto.randomUUID(),date,startTime:"10:00",endTime:"12:00",clientId,artistIds:[artistId],venueId,partnerIds:[],service,price:0,status:"Inquiry",createdAt:new Date().toISOString()};
+      }
+      const created = await repository.createEntity(type,record);
+      data[type==="client"?"clients":"bookings"].push(created);
+      rawText = $("#memory-text")?.value || rawText;
+      root = {type,id:created.id,label:type==="client"?created.name:`${data.clients.find(c=>c.id===created.clientId)?.name||"客户"} · ${created.date}`};
+      items=[]; polishedText=""; draftId="";
+      editor();
+      status("虚拟"+(type==="client"?"客户":"订单")+"已创建并写入此浏览器。可继续补充原文，再用 AI 整理保存。");
+    } catch(error) {status("创建失败："+error.message,true);}
   }
   async function ingestImage(file) {
     if (busy || saving || !file) return;
@@ -372,6 +410,10 @@ export function createMemoryPanel({
     if (button.hasAttribute("data-memory-open")) open();
     if (button.hasAttribute("data-memory-close")) close();
     if (button.hasAttribute("data-image-upload")) $("#memory-image-file")?.click();
+    if (button.hasAttribute("data-memory-create-client")) entityForm("client");
+    if (button.hasAttribute("data-memory-create-booking")) entityForm("booking");
+    if (button.hasAttribute("data-memory-create-cancel")) $("#memory-create-form").hidden = true;
+    if (button.hasAttribute("data-memory-create-submit")) createEntity(button.dataset.memoryCreateSubmit);
     if (button.hasAttribute("data-memory-image")) {
       getAttachment(button.dataset.memoryImage).then(record => {
         if (!record?.blob) return alert("本浏览器找不到原图片，可能已清除网站数据。");
