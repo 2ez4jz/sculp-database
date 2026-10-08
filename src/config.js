@@ -1,5 +1,6 @@
 const defaults={
  environment:'demo',
+ cloudIntakeAiEnabled:false,
  supabaseUrl:'https://lztzzdhqghwubygpzcbq.supabase.co',
  supabasePublishableKey:'sb_publishable_WjRIfa_fXiwHuhs57jQ68A_0nAPJtDE',
  aiMode:'openai',

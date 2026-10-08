@@ -1,6 +1,6 @@
 # Demo development checklist
 
-最新 AI 模块进度与已做／未做明细：[工作日志](docs/WORK_LOG.md)（2026-10-07）。
+最新 AI 模块进度与已做／未做明细：[工作日志](docs/WORK_LOG.md)（2026-10-08）。
 
 - [x] SCULP branded responsive working surface
 - [x] Booking list and calendar, entity/date/status/service filters
@@ -35,3 +35,7 @@
 - [ ] Apply approved changes to canonical order time/price/payment fields
 - [ ] Real image upload and tagging — V2
 - [ ] Client interaction history and follow-up — V2
+
+- [x] Reviewed atomic cloud client/booking intake, source timestamps, retry protection and database-layer acceptance
+- [ ] Enable new AI intake after explicit OpenAI destination authorization; verify full live-model flow
+- [ ] Authenticated real-device cloud intake and team acceptance
