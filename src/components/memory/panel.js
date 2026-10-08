@@ -201,7 +201,7 @@ export function createMemoryPanel({
         record = {id:"demo-"+crypto.randomUUID(),name,city,email:"",phone:"",wechat:"",instagram:"",birthday:"",weddingDate:"",referral:"",preferences:[],opportunity:""};
       } else {
         const clientId = $("#memory-new-client")?.value, date = $("#memory-new-date")?.value;
-        if (!data.clients.some(c=>c.id===clientId) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date||"") || Number.isNaN(Date.parse(date+"T12:00:00Z"))) throw Error("请选择有效客户和服务日期。");
+        if (!data.clients.some(c=>c.id===clientId) || !/^\d{4}-\d{2}-\d{2}$/.test(date||"") || Number.isNaN(Date.parse(date+"T12:00:00Z"))) throw Error("请选择有效客户和服务日期。");
         const artistId=$("#memory-new-artist")?.value,venueId=$("#memory-new-venue")?.value;
         if(!data.artists.some(a=>a.id===artistId) || !data.venues.some(v=>v.id===venueId)) throw Error("负责人或场地无效。");
         const service=$("#memory-new-service")?.value;
@@ -395,7 +395,7 @@ export function createMemoryPanel({
       getContext().state.memories || [],
       target,
       getContext(),
-    );
+    ).sort((a,b)=>Date.parse(b.batch.recordedAt || b.batch.createdAt)-Date.parse(a.batch.recordedAt || a.batch.createdAt));
     const section = document.createElement("section");
     section.id = "context-memories";
     section.className = "panel contextual-records";
