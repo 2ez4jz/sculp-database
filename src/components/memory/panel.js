@@ -148,7 +148,7 @@ export function createMemoryPanel({
       )
       .join(
         "",
-      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-upload>▧ 上传图片</button><input id="memory-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><small>也可在输入框粘贴截图或拖入图片</small></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理摘要</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
+      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-upload>▧ 上传图片</button><input id="memory-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><small>也可在输入框粘贴截图或拖入图片</small></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理全文</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
     review();
   }
   function open() {
@@ -237,7 +237,7 @@ export function createMemoryPanel({
       if (current !== version || !dialog.open) return;
       const proposal = normalizeProposal(result, root, related(), rawText);
       items = proposal.items;
-      polishedText = String(result.summary || rawText).trim();
+      polishedText = String(result.polishedText || result.summary || rawText).trim();
       $("#memory-polished-text").textContent = polishedText;
       $("#memory-polished").hidden = false;
       draftId = crypto.randomUUID();
