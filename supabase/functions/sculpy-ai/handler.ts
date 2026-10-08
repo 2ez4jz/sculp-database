@@ -3,6 +3,7 @@ import { cors, json, rateLimited } from "./http.ts";
 import { transcribe } from "./transcribe.ts";
 import { extract } from "./extract.ts";
 import { search } from "./search.ts";
+import { readImage } from "./image.ts";
 
 export const handleRequest = async (request: Request) => {
   const origin = request.headers.get("origin") || "";
@@ -25,6 +26,7 @@ export const handleRequest = async (request: Request) => {
     const action = new URL(request.url).searchParams.get("action");
     if (action === "transcribe") return await transcribe(request, origin);
     if (action === "extract") return await extract(request, origin);
+    if (action === "image") return await readImage(request, origin);
     if (action === "search") return await search(request, origin);
     return json(origin, { error: "Unknown action." }, 404);
   } catch (error) {
