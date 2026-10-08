@@ -217,3 +217,19 @@ test("context extraction passes an explicit target and filters hallucinated dest
     globalThis.fetch = old;
   }
 });
+
+test('entity intake has a separate review-only contract without requiring an existing target', async () => {
+  const old = globalThis.fetch;
+  globalThis.fetch = async (_url, options) => {
+    const payload = JSON.parse(options.body);
+    assert.equal(payload.text.format.name,'sculpy_entity_intake');
+    assert.deepEqual(JSON.parse(payload.input),{rawText:'新客户 Demo Person'});
+    assert.equal(payload.text.format.schema.properties.entities.maxItems,6);
+    return Response.json({output_text:JSON.stringify({entities:[{type:'client',name:'Demo Person',city:'',date:'',service:'',artist:'',venue:'',evidence:'新客户 Demo Person'}],warnings:[]})});
+  };
+  try {
+    const response = await handleRequest(request('extract',{rawText:'新客户 Demo Person',pageContext:{mode:'entity_intake'}}));
+    assert.equal(response.status,200);
+    assert.equal((await response.json()).entities[0].name,'Demo Person');
+  } finally { globalThis.fetch = old; }
+});

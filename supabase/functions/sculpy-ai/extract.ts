@@ -1,3 +1,4 @@
+import { intake } from "./intake.ts";
 import { json } from "./http.ts";
 import { openAIJson } from "./openai.ts";
 import { extractSchema, contextMemorySchema } from "./schemas.ts";
@@ -11,6 +12,8 @@ export async function extract(request: Request, origin: string) {
       { error: "Work note must be 1–4,000 characters." },
       400,
     );
+
+  if (body?.pageContext?.mode === "entity_intake") return intake(rawText, origin);
 
   if (body?.pageContext?.mode === "context_memory") {
     const context = body.pageContext;

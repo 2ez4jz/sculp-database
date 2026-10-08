@@ -164,3 +164,31 @@ test("staff cannot read another employee pending management request", () => {
   assert.equal(visibleMemories(records, root, identity).length, 0);
   assert.equal(visibleMemories(records, root, { role: "admin" }).length, 1);
 });
+
+const { validDate, normalizeEntityProposals, uniqueNameId, validateNewEntity } = await import('../src/domain/intake.js');
+test('intake leaves ambiguous IDs and unknown fields empty; validates real calendar dates', () => {
+  assert.equal(validDate('2026-02-30'), false);
+  assert.equal(validDate('2028-02-29'), true);
+  assert.equal(uniqueNameId([{id:'1',name:'Sarah'},{id:'2',name:'SARAH'}], 'Sarah'), '');
+  assert.equal(uniqueNameId(data.clients, ' sarah '), 'c1');
+  const [p] = normalizeEntityProposals({entities:[{type:'booking',name:'Sarah',date:'2026-02-30',service:'unknown',artist:{id:'a1'}}]});
+  assert.equal(p.date, ''); assert.equal(p.artist, ''); assert.equal(p.service, '');
+  assert.deepEqual(normalizeEntityProposals({entities:[{type:'delete'}]}), []);
+  assert.throws(()=>validateNewEntity('client',{name:'Sarah',city:''},data), /同名/);
+  const fields = {clientId:'c1',date:'2026-11-01',artistId:'a1',venueId:'v1',service:'Wedding'};
+  assert.throws(()=>validateNewEntity('booking',{...fields,artistId:''},data), /负责人/);
+  assert.throws(()=>validateNewEntity('booking',{...fields,date:'2026-02-30'},data), /日期/);
+  assert.throws(()=>validateNewEntity('booking',fields,{...data,bookings:[fields]}), /重复/);
+  assert.equal(validateNewEntity('booking',fields,data).needsReview, true);
+});
+test('entity and original source are persisted together or neither is saved', async () => {
+  let state = {demoClients:[],memories:[]}, ok = false;
+  const repo = createDemoMemoryRepository({getState:()=>state,setState:s=>state=s,storage:()=>ok});
+  const client = {id:'new',name:'New Demo'}, batch = {id:'source',rawText:'  original source  ',recordedAt:'2026-10-08T00:00:00Z',items:[]};
+  await assert.rejects(repo.createEntity('client',client,batch));
+  assert.equal(state.demoClients.length,0); assert.equal(state.memories.length,0);
+  ok = true; await repo.createEntity('client',client,batch);
+  assert.equal(state.demoClients.length,1); assert.equal(state.memories[0].rawText,'  original source  ');
+  await assert.rejects(repo.createEntity('client',client,batch));
+  assert.equal(state.memories.length,1);
+});

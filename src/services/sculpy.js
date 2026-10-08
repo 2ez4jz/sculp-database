@@ -62,3 +62,8 @@ export async function extractContextMemory({rawText,entity,related}) {
  if(config.aiMode==='mock')return {summary:rawText,preferences:[],opportunities:[],provider:'mock',warnings:['Mock 模式保留原话，请手动添加需要关联的保存项。']};
  return request('extract',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({rawText,bookingId:entity.type==='booking'?entity.id:null,pageContext:{mode:'context_memory',entity,related}})});
 }
+
+export async function extractEntityProposals(rawText) {
+ if(config.aiMode==='mock') return {entities:[],warnings:['Mock 模式不自动识别新档案，请使用手动新建。']};
+ return request('extract',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({rawText,pageContext:{mode:'entity_intake'}})});
+}

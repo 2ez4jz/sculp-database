@@ -7,13 +7,14 @@ export function createDemoMemoryRepository({
 }) {
   return {
     mode: "demo",
-    async createEntity(type, payload) {
+    async createEntity(type, payload, sourceBatch = null) {
       if (!["client", "booking"].includes(type)) throw Error("不支持的记录类型。");
       const state = getState();
       const key = type === "client" ? "demoClients" : "demoBookings";
       const list = state[key] || [];
       if (list.some(x => x.id === payload.id)) throw Error("记录编号重复。");
-      const next = { ...state, [key]: [...list, payload] };
+      const next = { ...state, [key]: [...list, payload],
+        memories: sourceBatch ? [...(state.memories || []), sourceBatch] : (state.memories || []) };
       if (!storage(next)) throw Error("浏览器存储失败，新记录没有创建。");
       setState(next);
       return payload;
