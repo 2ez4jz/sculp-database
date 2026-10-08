@@ -19,6 +19,11 @@ export async function transcribeAudio(blob){
  return request('transcribe',{method:'POST',body:form});
 }
 
+export async function transcribeImage(dataUrl) {
+ if(config.aiMode==='mock') throw Error('Mock 模式未启用图片识别，请使用文字输入。');
+ return request('image',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({dataUrl})});
+}
+
 export async function extractMemory(payload){
  if(config.aiMode==='mock'){
   await wait(350);
