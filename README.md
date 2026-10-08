@@ -42,4 +42,4 @@ Use **发布会演示** on Bookings: bookings → wedding detail → client → 
 
 Authenticated owner/operations accounts can open **录入新订单**, retain the original message, review a client match and booking fields, and explicitly save through `sculpy_confirm_intake`. The transaction persists the client, booking, optional artist assignment and source together. Cloud details and Sculpy context read the same canonical booking. Budget is not price; unknown times/prices are not guessed. Demo entry remains local-only.
 
-The new AI extraction function is implemented but **not deployed or enabled**: automatic approval review requires explicit authorization to send customer source text to OpenAI. `cloudIntakeAiEnabled` remains `false`. See [the work log](docs/WORK_LOG.md) for verification and remaining acceptance boundaries.
+The AI extraction function is deployed and enabled after explicit authorization. It sends source text to OpenAI only when an authenticated owner/operations user clicks **识别订单**; extracted fields remain drafts until human confirmation. See [the work log](docs/WORK_LOG.md) for verification and remaining acceptance boundaries.
