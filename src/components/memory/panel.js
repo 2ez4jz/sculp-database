@@ -35,6 +35,8 @@ export function createMemoryPanel({
   let root = null,
     items = [],
     rawText = "",
+    polishedText = "",
+    recordedAt = "",
     inputType = "text",
     draftId = "",
     version = 0,
@@ -145,7 +147,7 @@ export function createMemoryPanel({
       )
       .join(
         "",
-      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p></section><section class="memory-composer"><label for="memory-text">发生了什么？</label><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><div id="memory-review"></div>`;
+      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-help>▧ 图片</button></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理摘要</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
     review();
   }
   function open() {
@@ -157,6 +159,8 @@ export function createMemoryPanel({
     items = [];
     rawText = root ? drafts.get(keyOf(root)) || "" : "";
     inputType = "text";
+    polishedText = "";
+    recordedAt = new Date().toISOString();
     draftId = "";
     editor();
     dialog.showModal();
@@ -186,6 +190,8 @@ export function createMemoryPanel({
     voice.dispose();
     const current = ++version;
     items = [];
+    polishedText = "";
+    $("#memory-polished").hidden = true;
     review();
     setBusy(true);
     status("Sculpy 正在整理，请稍候……");
@@ -198,6 +204,9 @@ export function createMemoryPanel({
       if (current !== version || !dialog.open) return;
       const proposal = normalizeProposal(result, root, related(), rawText);
       items = proposal.items;
+      polishedText = String(result.summary || rawText).trim();
+      $("#memory-polished-text").textContent = polishedText;
+      $("#memory-polished").hidden = false;
       draftId = crypto.randomUUID();
       review();
       const warning = proposal.warnings.join(" ");
@@ -232,6 +241,8 @@ export function createMemoryPanel({
         entityType: root.type,
         entityId: root.id,
         rawText: rawText.trim(),
+        polishedText,
+        recordedAt,
         inputType,
         createdBy:
           identity.role === "admin"
@@ -299,7 +310,7 @@ export function createMemoryPanel({
     const section = document.createElement("section");
     section.id = "context-memories";
     section.className = "panel contextual-records";
-    section.innerHTML = `<div class="section-head"><div><div class="eyebrow">SCULPY / CONTEXT MEMORY</div><h2>${target.type === "booking" ? "补充记录与待办" : "Sculpy 记录"}</h2></div><button data-memory-open>＋ 告诉 Sculpy</button></div>${records.length ? records.map(({ batch, item }) => `<article class="context-memory-entry"><div class="context-memory-meta"><span class="tag">${esc(kindNames[item.kind])}</span>${item.status === "pending_review" ? '<span class="memory-kind review">待管理员确认</span>' : ""}<span>${esc(new Date(batch.createdAt).toLocaleString("zh-CN"))}</span></div><p>${esc(item.text)}</p>${item.kind === "task" ? `<div class="memory-task-meta">负责人：${esc(data.artists.find((a) => a.id === item.assigneeId)?.name || "待分配")} · 日期：${esc(item.dueDate || "待定日期")}</div>` : ""}<details><summary>查看原话与来源</summary><p class="raw">${esc(batch.rawText)}</p><span class="small muted">${esc(batch.createdBy)} · ${batch.inputType === "voice" ? "语音记录" : "文字记录"}</span>${targets().some((t) => t.type === batch.entityType && t.id === batch.entityId) ? ` · <a class="link" href="#${routes[batch.entityType]}/${encodeURIComponent(batch.entityId)}">原始记录位置</a>` : ""}</details></article>`).join("") : '<p class="memory-empty">把这次沟通、服务偏好或下次要做的事留在这里。</p>'}`;
+    section.innerHTML = `<div class="section-head"><div><div class="eyebrow">SCULPY / CONTEXT MEMORY</div><h2>${target.type === "booking" ? "补充记录与待办" : "Sculpy 记录"}</h2></div><button data-memory-open>＋ 告诉 Sculpy</button></div>${records.length ? records.map(({ batch, item }) => `<article class="context-memory-entry"><div class="context-memory-meta"><span class="tag">${esc(kindNames[item.kind])}</span>${item.status === "pending_review" ? '<span class="memory-kind review">待管理员确认</span>' : ""}<time title="保存时间">${esc(new Date(batch.createdAt).toLocaleString("zh-CN",{hour12:false}))}</time></div><p>${esc(item.text)}</p>${item.kind === "task" ? `<div class="memory-task-meta">负责人：${esc(data.artists.find((a) => a.id === item.assigneeId)?.name || "待分配")} · 日期：${esc(item.dueDate || "待定日期")}</div>` : ""}<details><summary>查看原话与来源</summary><p class="raw">${esc(batch.rawText)}</p><small class="memory-source-stamp">原始记录时间：${esc(new Date(batch.recordedAt || batch.createdAt).toLocaleString("zh-CN",{hour12:false}))} · 保存时间：${esc(new Date(batch.createdAt).toLocaleString("zh-CN",{hour12:false}))}</small>${batch.polishedText ? `<p class="memory-organized">整理摘要：${esc(batch.polishedText)}</p>` : ""}<span class="small muted">${esc(batch.createdBy)} · ${batch.inputType === "voice" ? "语音记录" : "文字记录"}</span>${targets().some((t) => t.type === batch.entityType && t.id === batch.entityId) ? ` · <a class="link" href="#${routes[batch.entityType]}/${encodeURIComponent(batch.entityId)}">原始记录位置</a>` : ""}</details></article>`).join("") : '<p class="memory-empty">把这次沟通、服务偏好或下次要做的事留在这里。</p>'}`;
     const stack = document.querySelector("#main > .two-col > .stack");
     if (stack) stack.prepend(section);
     else document.querySelector("#main").append(section);
@@ -309,6 +320,7 @@ export function createMemoryPanel({
     if (!button) return;
     if (button.hasAttribute("data-memory-open")) open();
     if (button.hasAttribute("data-memory-close")) close();
+    if (button.hasAttribute("data-image-help")) status("图片拖拽／粘贴识别尚未接入；请先将截图中的文字粘贴到输入框。不会假装识别或保存图片。", true);
     if (button.hasAttribute("data-memory-prepare")) prepare();
     if (button.hasAttribute("data-memory-save")) save();
     if (button.id === "memory-voice") {
@@ -362,6 +374,8 @@ export function createMemoryPanel({
       if (busy || items.length) {
         version++;
         items = [];
+        polishedText = "";
+        $("#memory-polished").hidden = true;
         review();
         setBusy(false);
         status("原话已修改，请重新整理后保存。");
@@ -383,6 +397,8 @@ export function createMemoryPanel({
       rawText = root ? drafts.get(keyOf(root)) || "" : "";
       items = [];
       inputType = "text";
+      polishedText = "";
+      recordedAt = new Date().toISOString();
       editor();
     }
   });
