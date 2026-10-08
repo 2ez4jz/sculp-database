@@ -32,6 +32,7 @@ jobs:
           node scripts/permissions.cjs
           node scripts/sculpy-lifecycle.cjs
           node scripts/context-memory.cjs
+          node scripts/intake.cjs
       - name: Save visual checks
         if: always()
         uses: actions/upload-artifact@v4

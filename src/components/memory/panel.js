@@ -12,11 +12,14 @@ import {
 } from "../../domain/memory.js";
 import {
   extractContextMemory,
+  extractEntityProposals,
   transcribeAudio,
   transcribeImage,
 } from "../../services/sculpy.js";
 import { createVoiceCapture } from "../../pages/sculpy/voice.js";
 import { storeAttachments, removeAttachments, getAttachment } from "../../services/attachments.js";
+
+import { normalizeEntityProposals, uniqueNameId, validateNewEntity } from "../../domain/intake.js";
 
 export function createMemoryPanel({
   data,
@@ -35,6 +38,7 @@ export function createMemoryPanel({
     footer = host.querySelector(".memory-footer");
   const $ = (selector) => dialog.querySelector(selector);
   let root = null,
+    entityProposals = [],
     items = [],
     rawText = "",
     polishedText = "",
@@ -94,7 +98,7 @@ export function createMemoryPanel({
         .forEach((el) => (el.disabled = value));
     dialog
       .querySelectorAll(
-        "[data-memory-prepare],[data-memory-save],#memory-target,#memory-voice,[data-memory-add]",
+        "[data-memory-prepare],[data-memory-save],#memory-target,#memory-voice,[data-memory-add],[data-memory-identify],[data-memory-create-client],[data-memory-create-booking],[data-memory-create-submit],[data-entity-review]",
       )
       .forEach((b) => (b.disabled = value));
   }
@@ -150,7 +154,7 @@ export function createMemoryPanel({
       )
       .join(
         "",
-      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p>${getContext().role === "admin" && repository.mode === "demo" ? '<div class="memory-create-actions"><button type="button" data-memory-create-client>＋ 新建虚拟客户</button><button type="button" data-memory-create-booking>＋ 新建虚拟订单</button></div>' : ""}</section><section id="memory-create-form" class="memory-create-form" hidden></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-upload>▧ 上传图片</button><input id="memory-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><small>也可在输入框粘贴截图或拖入图片</small></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理全文</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
+      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p>${getContext().role === "admin" && repository.mode === "demo" ? '<div class="memory-create-actions"><button type="button" data-memory-identify>从原文识别新客户／订单</button><button type="button" data-memory-create-client>＋ 新建虚拟客户</button><button type="button" data-memory-create-booking>＋ 新建虚拟订单</button></div>' : ""}</section><section id="memory-create-form" class="memory-create-form" hidden></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-upload>▧ 上传图片</button><input id="memory-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><small>也可在输入框粘贴截图或拖入图片</small></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理全文</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-entities"></div><div id="memory-review"></div>`;
     review();
   }
   function open() {
@@ -159,6 +163,7 @@ export function createMemoryPanel({
     stop();
     saving = false;
     root = routeTarget(location.hash, targets());
+    clearEntityProposals();
     items = [];
     rawText = root ? drafts.get(keyOf(root)) || "" : "";
     inputType = "text";
@@ -178,7 +183,40 @@ export function createMemoryPanel({
     dialog.close();
     if (restore && opener?.isConnected) opener.focus();
   }
-  function entityForm(type) {
+  function clearEntityProposals() {
+    entityProposals = [];
+    const zone = $("#memory-entities");
+    if (zone) zone.innerHTML = "";
+    const form = $("#memory-create-form");
+    if (form) { form.hidden = true; form.innerHTML = ""; }
+  }
+  async function identifyEntities() {
+    if (busy || saving || repository.mode !== "demo" || getContext().role !== "admin") return;
+    capture();
+    if (!rawText.trim()) return status("请先输入要识别的原文。", true);
+    voice.dispose();
+    clearEntityProposals();
+    items = []; polishedText = "";
+    $("#memory-polished").hidden = true;
+    review();
+    const current = ++version;
+    setBusy(true);
+    status("正在识别新客户和订单，仅生成待确认卡片……");
+    try {
+      const result = await extractEntityProposals(rawText);
+      if (current !== version || !dialog.open) return;
+      entityProposals = normalizeEntityProposals(result);
+      $("#memory-entities").innerHTML = entityProposals.map((p,i) => `<article class="memory-card-review"><h3>${p.type === "client" ? "新客户" : "新订单"} · ${esc(p.name || "姓名待补充")}</h3><p>${esc([p.city,p.date,p.service,p.artist,p.venue].filter(Boolean).join(" · ") || "信息待补充")}</p><p class="raw">原文依据：${esc(p.evidence || "未提供，请核对原文")}</p><button type="button" data-entity-review="${i}">核对并补齐</button></article>`).join("");
+      const warnings = Array.isArray(result.warnings) ? result.warnings.filter(x => typeof x === "string").join(" ") : "";
+      status((entityProposals.length ? "尚未保存。逐张核对后再确认创建；新客户需先创建，再识别其订单。" : "没有识别到明确的新客户或新订单，可手动新建。") + " " + warnings);
+    } catch (error) {
+      if (current === version) status("识别失败：" + error.message + "；原文仍保留，可重试或手动新建。", true);
+    } finally {
+      if (current === version) { setBusy(false); updateFooter(); }
+    }
+  }
+  function entityForm(type, proposal = null) {
+    if (busy || saving || repository.mode !== "demo" || getContext().role !== "admin") return;
     const zone = $("#memory-create-form");
     if (!zone) return;
     if (type === "client") {
@@ -186,28 +224,50 @@ export function createMemoryPanel({
     } else {
       zone.innerHTML = `<h3>新增虚拟订单</h3><label>客户 <select id="memory-new-client">${data.clients.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}</select></label><label>服务日期 <input id="memory-new-date" type="date" required></label><label>服务类型 <select id="memory-new-service"><option value="Wedding">婚礼造型</option><option value="Trial">婚礼试妆</option><option value="Event">活动造型</option><option value="Photoshoot">拍摄造型</option><option value="Commercial">商业造型</option><option value="Education">教学</option></select></label><label>负责人 <select id="memory-new-artist">${data.artists.filter(a=>a.bookingEligible!==false).map(a=>`<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("")}</select></label><label>场地 <select id="memory-new-venue">${data.venues.map(v=>`<option value="${esc(v.id)}">${esc(v.name)}</option>`).join("")}</select></label><p>新订单先创建为「咨询中」，默认 10:00–12:00，金额为 0；这些都是演示占位值，需人工确认后才能用于统计。</p><button type="button" data-memory-create-submit="booking">确认创建订单</button><button type="button" data-memory-create-cancel>取消</button>`;
     }
+    if (proposal) {
+      const set = (id,value) => { const el = $(id); if (el) el.value = value || ""; };
+      if (type === "client") {
+        set("#memory-new-name", proposal.name); set("#memory-new-city", proposal.city);
+      } else {
+        for (const id of ["#memory-new-client", "#memory-new-service", "#memory-new-artist", "#memory-new-venue"]) {
+          const option = document.createElement("option"); option.value = ""; option.textContent = "请选择（未确认）"; $(id).prepend(option);
+        }
+        set("#memory-new-client", uniqueNameId(data.clients, proposal.name));
+        set("#memory-new-date", proposal.date); set("#memory-new-service", proposal.service);
+        set("#memory-new-artist", uniqueNameId(data.artists.filter(a=>a.bookingEligible!==false), proposal.artist));
+        set("#memory-new-venue", uniqueNameId(data.venues, proposal.venue));
+      }
+    }
     zone.hidden = false;
     zone.querySelector("input,select")?.focus();
   }
   async function createEntity(type) {
     if (busy || saving || repository.mode !== "demo" || getContext().role !== "admin") return;
     try {
-      let record;
-      if(type === "client") {
-        const name = $("#memory-new-name")?.value.trim(), city = $("#memory-new-city")?.value.trim() || "Toronto";
-        if (!name || name.length < 2) throw Error("请输入客户姓名。");
-        const existing = data.clients.filter(c=>c.name.toLocaleLowerCase() === name.toLocaleLowerCase());
-        if (existing.length) throw Error("已有同名客户，请先核对后再创建。");
-        record = {id:"demo-"+crypto.randomUUID(),name,city,email:"",phone:"",wechat:"",instagram:"",birthday:"",weddingDate:"",referral:"",preferences:[],opportunity:""};
-      } else {
-        const clientId = $("#memory-new-client")?.value, date = $("#memory-new-date")?.value;
-        if (!data.clients.some(c=>c.id===clientId) || !/^\d{4}-\d{2}-\d{2}$/.test(date||"") || Number.isNaN(Date.parse(date+"T12:00:00Z"))) throw Error("请选择有效客户和服务日期。");
-        const artistId=$("#memory-new-artist")?.value,venueId=$("#memory-new-venue")?.value;
-        if(!data.artists.some(a=>a.id===artistId) || !data.venues.some(v=>v.id===venueId)) throw Error("负责人或场地无效。");
-        const service=$("#memory-new-service")?.value;
-        record={id:"demo-"+crypto.randomUUID(),date,startTime:"10:00",endTime:"12:00",clientId,artistIds:[artistId],venueId,partnerIds:[],service,price:0,status:"Inquiry",createdAt:new Date().toISOString()};
+      capture();
+      if (pendingImages.length && !rawText.trim()) throw Error("请保留图片识别原文后再创建，以便关联图片来源。");
+      const value = id => $(id)?.value || "";
+      const fields = type === "client"
+        ? { name:value("#memory-new-name"), city:value("#memory-new-city") }
+        : { clientId:value("#memory-new-client"), date:value("#memory-new-date"), artistId:value("#memory-new-artist"), venueId:value("#memory-new-venue"), service:value("#memory-new-service") };
+      const now = new Date().toISOString();
+      const record = { ...validateNewEntity(type, fields, data), id:"demo-"+crypto.randomUUID(), createdAt:now };
+      const source = rawText.trim() ? {
+        id:crypto.randomUUID(), entityType:type, entityId:record.id, rawText, polishedText:"", recordedAt, inputType,
+        createdAt:now, createdBy:getContext().adminPersona || "jz",
+        items:[{kind:"note",entityType:type,entityId:record.id,text:"新建"+(type === "client" ? "客户" : "订单")+"的原始输入（已人工确认档案字段）",status:"confirmed"}],
+      } : null;
+      saving = true; setBusy(true);
+      let created;
+      try {
+        if (source && pendingImages.length) source.attachments = await storeAttachments(source.id, pendingImages);
+        created = await repository.createEntity(type,record,source);
+      } catch (error) {
+        if (source && pendingImages.length) await removeAttachments(source.id).catch(()=>{});
+        throw error;
       }
-      const created = await repository.createEntity(type,record);
+      pendingImages = [];
+      clearEntityProposals();
       data[type==="client"?"clients":"bookings"].push(created);
       rawText = $("#memory-text")?.value || rawText;
       root = {type,id:created.id,label:type==="client"?created.name:`${data.clients.find(c=>c.id===created.clientId)?.name||"客户"} · ${created.date}`};
@@ -215,6 +275,7 @@ export function createMemoryPanel({
       editor();
       status("虚拟"+(type==="client"?"客户":"订单")+"已创建并写入此浏览器。可继续补充原文，再用 AI 整理保存。");
     } catch(error) {status("创建失败："+error.message,true);}
+    finally { saving = false; setBusy(false); updateFooter(); }
   }
   async function ingestImage(file) {
     if (busy || saving || !file) return;
@@ -234,6 +295,7 @@ export function createMemoryPanel({
       });
       const result = await transcribeImage(dataUrl);
       if (current !== version || !dialog.open) return;
+      clearEntityProposals();
       const editor = $("#memory-text");
       editor.value = [editor.value.trim(), `[图片：${file.name} · 识别文字]\n${result.text}`].filter(Boolean).join("\n\n").slice(0,4000);
       rawText = editor.value;
@@ -252,6 +314,7 @@ export function createMemoryPanel({
   async function prepare() {
     if (busy || saving) return;
     capture();
+    clearEntityProposals();
     if (!root) {
       status("请先选择记录到哪一条订单或档案。", true);
       $("#memory-target").focus();
@@ -410,6 +473,11 @@ export function createMemoryPanel({
     if (button.hasAttribute("data-memory-open")) open();
     if (button.hasAttribute("data-memory-close")) close();
     if (button.hasAttribute("data-image-upload")) $("#memory-image-file")?.click();
+    if (button.hasAttribute("data-memory-identify")) identifyEntities();
+    if (button.hasAttribute("data-entity-review") && !busy && !saving) {
+      const proposal = entityProposals[Number(button.dataset.entityReview)];
+      if (proposal) entityForm(proposal.type, proposal);
+    }
     if (button.hasAttribute("data-memory-create-client")) entityForm("client");
     if (button.hasAttribute("data-memory-create-booking")) entityForm("booking");
     if (button.hasAttribute("data-memory-create-cancel")) $("#memory-create-form").hidden = true;
@@ -472,6 +540,7 @@ export function createMemoryPanel({
     const el = event.target;
     if (el.id === "memory-text") {
       rawText = el.value;
+      clearEntityProposals();
       if (busy || items.length) {
         version++;
         items = [];
@@ -495,6 +564,7 @@ export function createMemoryPanel({
     if (event.target.id === "memory-target") {
       stash();
       stop();
+      clearEntityProposals();
       root = targets().find((t) => keyOf(t) === event.target.value) || null;
       rawText = root ? drafts.get(keyOf(root)) || "" : "";
       items = [];

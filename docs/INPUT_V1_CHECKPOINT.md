@@ -39,7 +39,15 @@ Paste a fictional conversation screenshot; verify OCR text can be corrected; cli
 - Added Playwright browser regression for creating customer and booking, refreshing and finding both. Automated workflow must succeed before calling this verified.
 
 ## Known next blockers
-- AI must propose new entities as reviewable structured cards (not yet implemented).
+- Reviewable AI entity cards are implemented locally in the follow-up below; publishing and live-model acceptance remain blocked/pending.
 - Image binary cloud storage, privacy controls, upload abuse protection and live authenticated data write path must precede any real-customer usage.
 - Multi-image attachments in a single input and image previews need additional QA.
 - Browser reset currently clears textual index but may leave orphaned local IndexedDB images; archive reset/purge should be added before claiming complete cleanup.
+
+## Next-stage follow-up — reviewed entity intake (publication authorized)
+- Added a separate `entity_intake` extraction contract and editable client/booking confirmation cards for demo administrators, without requiring an existing target first.
+- IDs are resolved locally only for an exact unique name; ambiguous/missing references remain blank. Invalid calendar dates, missing required booking fields, duplicate client names and same-client/date/service bookings are blocked.
+- Entity and original source batch persist in a single localStorage write; image originals use the existing archive with rollback on a failed entity write. Changing source invalidates the proposal.
+- Verified: 22 Node tests, `scripts/intake.cjs`, and existing `scripts/context-memory.cjs` pass locally with stubbed AI. Mobile overflow checked; Chinese font rendering unavailable in this local browser environment.
+- No production schema changes or real customer writes. User authorized publication; sculpy-ai v4 deployed. Frontend proceeds through PR verification before publication. Live sample results are recorded in WORK_LOG.md.
+- Scope remains one confirmation at a time. For a new client plus booking, create the client then identify again; no batch multi-entity transaction or production CRUD is claimed.
