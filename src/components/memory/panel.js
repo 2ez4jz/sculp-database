@@ -16,6 +16,7 @@ import {
   transcribeImage,
 } from "../../services/sculpy.js";
 import { createVoiceCapture } from "../../pages/sculpy/voice.js";
+import { storeAttachments, removeAttachments, getAttachment } from "../../services/attachments.js";
 
 export function createMemoryPanel({
   data,
@@ -38,6 +39,7 @@ export function createMemoryPanel({
     rawText = "",
     polishedText = "",
     recordedAt = "",
+    pendingImages = [],
     inputType = "text",
     draftId = "",
     version = 0,
@@ -160,6 +162,7 @@ export function createMemoryPanel({
     items = [];
     rawText = root ? drafts.get(keyOf(root)) || "" : "";
     inputType = "text";
+    pendingImages = [];
     polishedText = "";
     recordedAt = new Date().toISOString();
     draftId = "";
@@ -196,11 +199,12 @@ export function createMemoryPanel({
       const editor = $("#memory-text");
       editor.value = [editor.value.trim(), `[图片：${file.name} · 识别文字]\n${result.text}`].filter(Boolean).join("\n\n").slice(0,4000);
       rawText = editor.value;
+      pendingImages.push({file, capturedAt: new Date().toISOString()});
       inputType = "image";
       polishedText = "";
       items = [];
       review();
-      status("图片文字已添加到原文区。请核对识别内容后点击「整理记录」。当前版本只保存文字与图片文件名，不保存图片原件。");
+      status("图片文字已添加到原文区。请核对识别内容后点击「整理记录」。确认后图片原件也会保存在此浏览器的本地归档中，不会同步设备。");
     } catch (error) {
       if (current === version) status("图片识别失败：" + error.message + "；请改用文字输入。", true);
     } finally {
@@ -276,6 +280,7 @@ export function createMemoryPanel({
         rawText: rawText.trim(),
         polishedText,
         recordedAt,
+        attachments: pendingImages.map(({file,capturedAt},i)=>({id:`${draftId || "pending"}:${i}`,name:file.name,type:file.type,size:file.size,capturedAt})),
         inputType,
         createdBy:
           identity.role === "admin"
@@ -287,8 +292,20 @@ export function createMemoryPanel({
       saving = true;
       setBusy(true);
       status("正在保存，请稍候……");
-      await repository.save(batch);
+      if (pendingImages.length && repository.mode !== "demo") throw Error("云端图片原件存储尚未启用，不能提交可能丢失图片的记录。");
+      let archived = false;
+      try {
+        if (pendingImages.length) {
+          batch.attachments = await storeAttachments(batch.id, pendingImages);
+          archived = true;
+        }
+        await repository.save(batch);
+      } catch (error) {
+        if (archived) await removeAttachments(batch.id).catch(() => {});
+        throw error;
+      }
       success = true;
+      pendingImages = [];
       drafts.delete(keyOf(root));
       body.innerHTML = `<section class="memory-success"><span class="memory-success-mark">✓</span><div class="eyebrow">MEMORY SAVED</div><h3>这件事，记下来了。</h3><p>${repository.mode === "cloud" ? "已保存到工作室云端。" : "已保存到此浏览器，刷新后仍可查看。"}</p><div class="memory-saved-items">${chosen
         .map((i) => {
@@ -323,6 +340,7 @@ export function createMemoryPanel({
         stop();
         dialog.close();
         rawText = "";
+        pendingImages = [];
         items = [];
       }
     }
@@ -343,7 +361,7 @@ export function createMemoryPanel({
     const section = document.createElement("section");
     section.id = "context-memories";
     section.className = "panel contextual-records";
-    section.innerHTML = `<div class="section-head"><div><div class="eyebrow">SCULPY / CONTEXT MEMORY</div><h2>${target.type === "booking" ? "补充记录与待办" : "Sculpy 记录"}</h2></div><button data-memory-open>＋ 告诉 Sculpy</button></div>${records.length ? records.map(({ batch, item }) => `<article class="context-memory-entry"><div class="context-memory-meta"><span class="tag">${esc(kindNames[item.kind])}</span>${item.status === "pending_review" ? '<span class="memory-kind review">待管理员确认</span>' : ""}<time title="保存时间">${esc(new Date(batch.createdAt).toLocaleString("zh-CN",{hour12:false}))}</time></div><p>${esc(item.text)}</p>${item.kind === "task" ? `<div class="memory-task-meta">负责人：${esc(data.artists.find((a) => a.id === item.assigneeId)?.name || "待分配")} · 日期：${esc(item.dueDate || "待定日期")}</div>` : ""}<details><summary>查看原话与来源</summary><p class="raw">${esc(batch.rawText)}</p><small class="memory-source-stamp">原始记录时间：${esc(new Date(batch.recordedAt || batch.createdAt).toLocaleString("zh-CN",{hour12:false}))} · 保存时间：${esc(new Date(batch.createdAt).toLocaleString("zh-CN",{hour12:false}))}</small>${batch.polishedText ? `<p class="memory-organized">整理摘要：${esc(batch.polishedText)}</p>` : ""}<span class="small muted">${esc(batch.createdBy)} · ${batch.inputType === "voice" ? "语音记录" : "文字记录"}</span>${targets().some((t) => t.type === batch.entityType && t.id === batch.entityId) ? ` · <a class="link" href="#${routes[batch.entityType]}/${encodeURIComponent(batch.entityId)}">原始记录位置</a>` : ""}</details></article>`).join("") : '<p class="memory-empty">把这次沟通、服务偏好或下次要做的事留在这里。</p>'}`;
+    section.innerHTML = `<div class="section-head"><div><div class="eyebrow">SCULPY / CONTEXT MEMORY</div><h2>${target.type === "booking" ? "补充记录与待办" : "Sculpy 记录"}</h2></div><button data-memory-open>＋ 告诉 Sculpy</button></div>${records.length ? records.map(({ batch, item }) => `<article class="context-memory-entry"><div class="context-memory-meta"><span class="tag">${esc(kindNames[item.kind])}</span>${item.status === "pending_review" ? '<span class="memory-kind review">待管理员确认</span>' : ""}<time title="保存时间">${esc(new Date(batch.createdAt).toLocaleString("zh-CN",{hour12:false}))}</time></div><p>${esc(item.text)}</p>${item.kind === "task" ? `<div class="memory-task-meta">负责人：${esc(data.artists.find((a) => a.id === item.assigneeId)?.name || "待分配")} · 日期：${esc(item.dueDate || "待定日期")}</div>` : ""}<details><summary>查看原话与来源</summary><p class="raw">${esc(batch.rawText)}</p><small class="memory-source-stamp">原始记录时间：${esc(new Date(batch.recordedAt || batch.createdAt).toLocaleString("zh-CN",{hour12:false}))} · 保存时间：${esc(new Date(batch.createdAt).toLocaleString("zh-CN",{hour12:false}))}</small>${batch.polishedText ? `<p class="memory-organized">整理全文：${esc(batch.polishedText)}</p>` : ""}${(batch.attachments || []).map(a=>`<button type="button" data-memory-image="${esc(a.id)}">查看原图 · ${esc(a.name)}</button>`).join("")}<span class="small muted">${esc(batch.createdBy)} · ${batch.inputType === "voice" ? "语音记录" : "文字记录"}</span>${targets().some((t) => t.type === batch.entityType && t.id === batch.entityId) ? ` · <a class="link" href="#${routes[batch.entityType]}/${encodeURIComponent(batch.entityId)}">原始记录位置</a>` : ""}</details></article>`).join("") : '<p class="memory-empty">把这次沟通、服务偏好或下次要做的事留在这里。</p>'}`;
     const stack = document.querySelector("#main > .two-col > .stack");
     if (stack) stack.prepend(section);
     else document.querySelector("#main").append(section);
@@ -354,6 +372,14 @@ export function createMemoryPanel({
     if (button.hasAttribute("data-memory-open")) open();
     if (button.hasAttribute("data-memory-close")) close();
     if (button.hasAttribute("data-image-upload")) $("#memory-image-file")?.click();
+    if (button.hasAttribute("data-memory-image")) {
+      getAttachment(button.dataset.memoryImage).then(record => {
+        if (!record?.blob) return alert("本浏览器找不到原图片，可能已清除网站数据。");
+        const url = URL.createObjectURL(record.blob);
+        window.open(url, "_blank", "noopener");
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      }).catch(error => alert("读取图片失败：" + error.message));
+    }
     if (button.hasAttribute("data-memory-prepare")) prepare();
     if (button.hasAttribute("data-memory-save")) save();
     if (button.id === "memory-voice") {
@@ -430,7 +456,9 @@ export function createMemoryPanel({
       root = targets().find((t) => keyOf(t) === event.target.value) || null;
       rawText = root ? drafts.get(keyOf(root)) || "" : "";
       items = [];
+      pendingImages = [];
       inputType = "text";
+      pendingImages = [];
       polishedText = "";
       recordedAt = new Date().toISOString();
       editor();
