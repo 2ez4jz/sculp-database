@@ -30,3 +30,16 @@ All entries require source fidelity:
 
 ## Next acceptance test
 Paste a fictional conversation screenshot; verify OCR text can be corrected; click organize; compare polished full text and review cards; confirm, refresh and verify source metadata; repeat with long voice transcription. Never test with real client records in public demo.
+
+## Follow-up implementation — same development session
+- Added IndexedDB browser-local image binary archive linked to confirmed memory batches; image input still requires OCR service availability. The archive is device/browser scoped, not shared cloud storage. Clearing browser site data also removes it.
+- Added admin-only demo customer creation (name + city, same-name warning) and demo booking creation (selected customer, service date/type, artist and venue). Canonical placeholder values are explicitly identified; no automatic model-generated customer or booking creation yet.
+- Added localStorage overlay collections `demoClients` and `demoBookings`; the app hydrates these into demo directories and booking views on reload, and demo reset clears these overlays. No actual Supabase production CRUD or cross-device persistence.
+- Newest-first contextual records display original recorded time and save time.
+- Added Playwright browser regression for creating customer and booking, refreshing and finding both. Automated workflow must succeed before calling this verified.
+
+## Known next blockers
+- AI must propose new entities as reviewable structured cards (not yet implemented).
+- Image binary cloud storage, privacy controls, upload abuse protection and live authenticated data write path must precede any real-customer usage.
+- Multi-image attachments in a single input and image previews need additional QA.
+- Browser reset currently clears textual index but may leave orphaned local IndexedDB images; archive reset/purge should be added before claiming complete cleanup.
