@@ -13,6 +13,7 @@ import {
 import {
   extractContextMemory,
   transcribeAudio,
+  transcribeImage,
 } from "../../services/sculpy.js";
 import { createVoiceCapture } from "../../pages/sculpy/voice.js";
 
@@ -147,7 +148,7 @@ export function createMemoryPanel({
       )
       .join(
         "",
-      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-help>▧ 图片</button></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理摘要</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
+      )}</select><p>默认跟随当前页面。跨对象的内容会列出保存位置，由你确认。</p></section><section class="memory-composer"><div class="memory-input-heading"><label for="memory-text">原始输入 · 完整保留</label><time id="memory-recorded-at">${esc(recordedAt ? new Date(recordedAt).toLocaleString("zh-CN",{hour12:false}) : "尚未开始")}</time></div><div class="memory-input-modes" role="group" aria-label="录入方式"><span>⌨ 文字</span><span>🎙 语音</span><button type="button" data-image-upload>▧ 上传图片</button><input id="memory-image-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><small>也可在输入框粘贴截图或拖入图片</small></div><textarea id="memory-text" rows="5" maxlength="4000" placeholder="说说工作反馈、客户偏好，或下一次需要记得的事……">${esc(rawText)}</textarea><div class="memory-compose-actions"><button id="memory-voice" class="memory-record">开始语音记录</button><button class="primary" data-memory-prepare>整理记录 <span aria-hidden="true">↗</span></button></div><p id="memory-voice-status">语音先转为文字，你可以修改后再整理。</p></section><div id="memory-message" role="status" aria-live="polite"></div><section id="memory-polished" class="memory-polished" hidden><div class="memory-input-heading"><strong>AI 整理摘要</strong><small>原始全文不变 · 请与原话对照</small></div><p id="memory-polished-text"></p></section><div id="memory-review"></div>`;
     review();
   }
   function open() {
@@ -173,6 +174,38 @@ export function createMemoryPanel({
     stop();
     dialog.close();
     if (restore && opener?.isConnected) opener.focus();
+  }
+  async function ingestImage(file) {
+    if (busy || saving || !file) return;
+    if (!["image/png","image/jpeg","image/webp"].includes(file.type) || file.size > 4_000_000) {
+      status("请选择小于 4MB 的 PNG、JPEG 或 WebP 图片。", true);
+      return;
+    }
+    const current = ++version;
+    setBusy(true);
+    status("正在识别图片全文，不会自动保存到数据库……");
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(Error("图片读取失败"));
+        reader.readAsDataURL(file);
+      });
+      const result = await transcribeImage(dataUrl);
+      if (current !== version || !dialog.open) return;
+      const editor = $("#memory-text");
+      editor.value = [editor.value.trim(), `[图片：${file.name} · 识别文字]\n${result.text}`].filter(Boolean).join("\n\n").slice(0,4000);
+      rawText = editor.value;
+      inputType = "image";
+      polishedText = "";
+      items = [];
+      review();
+      status("图片文字已添加到原文区。请核对识别内容后点击「整理记录」。当前版本只保存文字与图片文件名，不保存图片原件。");
+    } catch (error) {
+      if (current === version) status("图片识别失败：" + error.message + "；请改用文字输入。", true);
+    } finally {
+      if (current === version) { setBusy(false); updateFooter(); }
+    }
   }
   async function prepare() {
     if (busy || saving) return;
@@ -320,7 +353,7 @@ export function createMemoryPanel({
     if (!button) return;
     if (button.hasAttribute("data-memory-open")) open();
     if (button.hasAttribute("data-memory-close")) close();
-    if (button.hasAttribute("data-image-help")) status("图片拖拽／粘贴识别尚未接入；请先将截图中的文字粘贴到输入框。不会假装识别或保存图片。", true);
+    if (button.hasAttribute("data-image-upload")) $("#memory-image-file")?.click();
     if (button.hasAttribute("data-memory-prepare")) prepare();
     if (button.hasAttribute("data-memory-save")) save();
     if (button.id === "memory-voice") {
@@ -390,6 +423,7 @@ export function createMemoryPanel({
     }
   });
   dialog.addEventListener("change", (event) => {
+    if (event.target.id === "memory-image-file") { const file = event.target.files?.[0]; ingestImage(file); event.target.value = ""; return; }
     if (event.target.id === "memory-target") {
       stash();
       stop();
@@ -401,6 +435,17 @@ export function createMemoryPanel({
       recordedAt = new Date().toISOString();
       editor();
     }
+  });
+  dialog.addEventListener("paste", (event) => {
+    const image = [...(event.clipboardData?.files || [])].find((file) => file.type.startsWith("image/"));
+    if (image) { event.preventDefault(); ingestImage(image); }
+  });
+  dialog.addEventListener("dragover", (event) => {
+    if ([...(event.dataTransfer?.types || [])].includes("Files")) event.preventDefault();
+  });
+  dialog.addEventListener("drop", (event) => {
+    const image = [...(event.dataTransfer?.files || [])].find((file) => file.type.startsWith("image/"));
+    if (image) { event.preventDefault(); ingestImage(image); }
   });
   window.addEventListener("hashchange", () => {
     if (dialog.open) close({ restore: false });
