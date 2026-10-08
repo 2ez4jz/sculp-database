@@ -58,6 +58,7 @@ export const contextMemorySchema = {
   type: "object",
   additionalProperties: false,
   properties: {
+    polishedText: { type: "string" },
     summary: { type: "string" },
     items: {
       type: "array",
@@ -83,5 +84,5 @@ export const contextMemorySchema = {
     warnings: { type: "array", items: { type: "string" } },
     confidence: { type: "number" },
   },
-  required: ["summary", "items", "warnings", "confidence"],
+  required: ["polishedText", "summary", "items", "warnings", "confidence"],
 };
