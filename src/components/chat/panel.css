@@ -384,3 +384,14 @@ body.sculpy-chat-page #main.sculpy-reveal { animation: none; }
 .chat-header img, .chat-launcher img, .chat-welcome-avatar { object-position: 90% center; }
 .chat-inline .chat-composer textarea:focus-visible { outline: none; }
 .chat-inline .chat-composer:focus-within { border-color: #8eaa99; box-shadow: 0 0 0 3px #dfe8dd77; }
+
+/* Keep the inline composer above the mobile viewport bottom, including the wrapped topbar. */
+@media (max-width: 600px) {
+  body.sculpy-chat-page .chat-inline .chat-dialog {
+    height: max(380px, calc(100dvh - 185px));
+    max-height: calc(100dvh - 185px);
+    min-height: 0;
+  }
+  body.sculpy-chat-page .chat-inline .chat-messages { min-height: 0; }
+  body.sculpy-chat-page .chat-inline .chat-composer { flex-shrink: 0; }
+}
