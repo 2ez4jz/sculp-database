@@ -30,3 +30,7 @@ test("this month and last month use the latest fictional booking month",()=>{
  assert.deepEqual(current.chartRows.map(r=>r.month),["2026-10"]);
  assert.deepEqual(previous.chartRows.map(r=>r.month),["2026-09"]);
 });
+
+test("service revenue pie request preserves existing service chart route",()=>{
+ assert.equal(analyzeMonthlyQuestion("过去一个月服务收入饼图",bookings,admin),null);
+});
