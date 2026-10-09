@@ -26,6 +26,7 @@ jobs:
       - name: Verify interactions and responsive layouts
         run: |
           python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
+          node scripts/monthly-browser.cjs
           node scripts/chat.cjs
           node scripts/auth.cjs
           node scripts/smoke.cjs
