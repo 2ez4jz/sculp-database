@@ -23,3 +23,10 @@ test("unknown months return zeros rather than invented income",()=>{
  assert.equal(r.chartRows[0].amountCents,0);
  assert.equal(r.chartRows[0].bookings,0);
 });
+
+test("this month and last month use the latest fictional booking month",()=>{
+ const current=analyzeMonthlyQuestion("本月收入",bookings,admin);
+ const previous=analyzeMonthlyQuestion("上个月收入",bookings,admin);
+ assert.deepEqual(current.chartRows.map(r=>r.month),["2026-10"]);
+ assert.deepEqual(previous.chartRows.map(r=>r.month),["2026-09"]);
+});
