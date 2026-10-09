@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
  const browser = await chromium.launch({headless:true, executablePath:process.env.CHROME_PATH || '/usr/bin/google-chrome',args:['--no-sandbox']});
  try {
   const page = await browser.newPage({viewport:{width:390,height:844}});
+  await page.addInitScript(() => localStorage.setItem('memora-demo-language','zh'));
   const errors=[]; page.on('pageerror',e=>errors.push(e.message));
   let response = {entities:[{type:'client',name:'Intake Demo',city:'Markham',evidence:'新客户 Intake Demo'}],warnings:[]};
   await page.route('**/functions/v1/sculpy-ai*',route=>route.fulfill({json:response}));
