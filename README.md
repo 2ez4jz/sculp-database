@@ -6,6 +6,12 @@ Every SCULP booking becomes a record connecting the client, artist, venue, partn
 
 No build or dependencies required. Run `python -m http.server 4173` in this folder and open http://localhost:4173.
 
+For development checks, use Node.js 24 and run `npm ci`, then `npm test`.
+Dependencies are for tests only. Cloud order editing, permission checks, monthly
+reporting and PostgreSQL acceptance instructions are in [Cloud operations V1](docs/CLOUD_OPERATIONS_V1.md).
+The new operations migration is locally verified; deployment and real-account
+cross-device acceptance remain pending.
+
 ## Included
 
 - 24 linked bookings, 12 fictional clients, 9 team profiles, 6 venues and 8 partners.

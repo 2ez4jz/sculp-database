@@ -1,5 +1,12 @@
 # Username login and Jz account administration
 
+Current capability update: the authenticated workspace now reads cloud orders
+and supports reviewed intake. Cloud order modification and monthly reporting
+are implemented locally in [Cloud operations V1](CLOUD_OPERATIONS_V1.md), with
+deployment and real-account acceptance pending. Historical deployment notes below
+describe their original checkpoint; they do not imply the current UI is only a
+connection-status screen.
+
 Login is **sculp_name + password**, e.g. `sculp_jz`, `sculp_miranda`, `sculp_michelle`. Names use 1–26 ASCII letters, digits or underscores; login is case-insensitive and stored in lowercase. The creation form supplies the fixed `sculp_` prefix. Users never provide an email address or receive verification mail. There is no public registration.
 
 Internally Supabase's password provider uses the deterministic reserved identifier `<username>@accounts.sculp.invalid`. This is not a contact address. Auth handles password hashing and verification; plaintext passwords are not written to profiles, logs, audit events, or browser persistence. Session tokens use sessionStorage and automatic refresh. The login verifies getUser and an active profiles row.
