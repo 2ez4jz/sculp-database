@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox']});
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'no-preference'});
+ await page.addInitScript(()=>localStorage.setItem('memora-demo-language','zh'));
  const go=async url=>{await page.goto(url);await page.waitForFunction(()=>document.querySelector('#main')?.dataset.route===location.hash);};
  await go('http://localhost:4173/?demo=1#artists');
  assert.equal(await page.locator('.profile-card').count(),9);
