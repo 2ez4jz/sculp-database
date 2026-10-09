@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox','--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream']});
  try {
  const page=await browser.newPage({permissions:['microphone'],reducedMotion:'reduce',viewport:{width:1440,height:1000}});
+ await page.addInitScript(()=>localStorage.setItem('memora-demo-language','zh'));
  const errors=[]; page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{ window.__streams=[]; const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices); navigator.mediaDevices.getUserMedia=async opts=>{const s=await original(opts);window.__streams.push(s);return s;}; });
  let pending, delayChat=false, delayVoice=false, calls=[];
