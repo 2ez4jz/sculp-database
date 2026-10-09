@@ -35,3 +35,10 @@ This is a **standalone demo page**; it has not been integrated into the main Ins
 - Added monthly unit and edge suites to required GitHub CI, plus `monthly-insights.test.mjs` for displayed amounts and employee visibility.
 - Changed browser chat smoke locator to stable `.chat-launcher`, because the old test used a localized Chinese accessible label and fails after English-first UI localization. Final CI pass is pending; browser tests may expose additional localization-sensitive assertions.
 - Not yet implemented: natural-language monthly aggregation in main chat, authenticated cloud reporting, direct AI business commentary, exploratory insights.
+
+## 2026-10-09 — conversational demo analytics and verification
+- Added `src/domain/monthly-chat.js`: deterministic Chinese/English keyword routing for explicit YYYY-MM or recent N-month queries, anchored to latest fictional booking month. No arbitrary SQL and no model-produced numeric results.
+- Demo Sculpy chat returns verified monthly booking counts, completed-order amounts and data-quality warnings; displays a dynamic per-month bar chart. Conservative optional commentary is clearly labeled `AI 探索性分析`. This is a deterministic demo explanation, not production autonomous insight discovery.
+- Studio Insights already displays deterministic month-level amounts and table. Added unit/UI contract tests and an end-to-end browser scenario; included all in required CI.
+- Updated a localized chat browser test from fragile Chinese button labels to stable selectors/disabled state. CI is still running at this checkpoint, so full regression success is NOT confirmed.
+- Unfinished beyond this demo round: real authenticated Supabase analytics RPC, open-ended agentic exploration, persistent analyst-specific memory and production financial reconciliation. Revenue statistics remain completed-booking prices, NOT settled payments.
