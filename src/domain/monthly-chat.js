@@ -11,6 +11,8 @@ export function analyzeMonthlyQuestion(message,records,context){
  const chinese={一:1,二:2,三:3,四:4,五:5,六:6};
  const count=c?Number(chinese[c[1]]||c[1]):3;
  if(explicit.length){months=explicit.filter((x,i,a)=>a.indexOf(x)===i).sort();}
+ else if(/上(?:一)?个?月|last month/i.test(q)){months=months.length>=2?[months[months.length-2]]:[];}
+ else if(/本月|这个月|当月|this month/i.test(q)){months=months.length?[months.at(-1)]:[];}
  else if(c&&count>=1&&count<=12){
   const anchor=months.at(-1);
   if(anchor){const [y,m]=anchor.split("-").map(Number);months=Array.from({length:count},(_,i)=>{const d=new Date(Date.UTC(y,m-count+i,1));return d.toISOString().slice(0,7);});}
