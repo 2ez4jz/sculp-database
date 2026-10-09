@@ -1,6 +1,7 @@
 import {createChatPanel} from './components/chat/panel.js?v=single-chat-2';
 import {demoChatAdapter} from './services/chat.js?v=single-chat-2';
 import {searchCatalog} from './domain/sculpy.js';
+import {analyzeMonthlyQuestion,renderMonthlyChatChart} from './domain/monthly-chat.js';
 import {clientPreferences} from './domain/memory.js';
 import {createMemoryPanel} from './components/memory/panel.js?v=single-chat-2';
 import {createDemoMemoryRepository,createCloudMemoryRepository} from './services/memory.js';
@@ -78,7 +79,7 @@ const memoryRepository=config.environment==='demo'?createDemoMemoryRepository({g
 const memoryPanel=createMemoryPanel({data:{bookings,clients,artists,venues,partners},getContext,repository:memoryRepository,onSaved:()=>{hydrateDemoEntities();render()},esc,config});
 const chatCatalog=()=>{const context=getContext(),list=available(),catalog=searchCatalog({bookings:list,artists,partners,notes:[...notes,...state.notes],client,serviceName,context});
  for(const batch of state.memories||[])for(const item of batch.items||[])if(item.entityType==='booking'&&list.some(b=>b.id===item.entityId)&&(context.role==='admin'||batch.createdBy===context.artistId||(item.status==='confirmed'&&!['task','change'].includes(item.kind))))catalog.notes.push({entityId:item.entityId,aiSummary:item.text,status:item.status,kind:item.kind});return catalog;};
-const chatPanel=createChatPanel({renderSupplement:turn=>turn.chartKey==='service-revenue'&&isGlobal()?serviceRevenueChart():'',adapter:demoChatAdapter({resolveLocal:message=>wantsRevenueChart(message)?{answer:isGlobal()?'这是演示订单按已配置统计周期计算的服务收入占比。':'收入与全局经营数据仅对 Jz 和 Miranda 开放。',chartKey:isGlobal()?'service-revenue':null,references:[],proposals:[],sourceIds:[]}:null,getIdentity:()=>role==='admin'?adminPersona:artistId,getCatalog:chatCatalog,getContext,saveBatch:batch=>memoryRepository.save(batch)}),getScope:()=>{const [type,id]=location.hash.slice(1).split('/'),b=['bookings','sculpy'].includes(type)&&available().find(b=>b.id===id);return b?{id:b.id,label:client(b.clientId).name+' · '+b.date}:{id:'global',label:'全局工作助手'};}});
+const chatPanel=createChatPanel({renderSupplement:turn=>turn.chartKey==='monthly-analytics'&&isGlobal()?renderMonthlyChatChart(turn.chartRows,esc):turn.chartKey==='service-revenue'&&isGlobal()?serviceRevenueChart():'',adapter:demoChatAdapter({resolveLocal:message=>analyzeMonthlyQuestion(message,available(),getContext()) || (wantsRevenueChart(message)?{answer:isGlobal()?'这是演示订单按已配置统计周期计算的服务收入占比。':'收入与全局经营数据仅对 Jz 和 Miranda 开放。',chartKey:isGlobal()?'service-revenue':null,references:[],proposals:[],sourceIds:[]}:null),getIdentity:()=>role==='admin'?adminPersona:artistId,getCatalog:chatCatalog,getContext,saveBatch:batch=>memoryRepository.save(batch)}),getScope:()=>{const [type,id]=location.hash.slice(1).split('/'),b=['bookings','sculpy'].includes(type)&&available().find(b=>b.id===id);return b?{id:b.id,label:client(b.clientId).name+' · '+b.date}:{id:'global',label:'全局工作助手'};}});
 document.addEventListener('input',e=>sculpyPage.handleInput(e.target));
 window.addEventListener('pagehide',()=>sculpyPage.dispose());
 $('#artistIdentity').innerHTML=bookingArtists.map(a=>`<option value="${a.id}" ${a.id===artistId?'selected':''}>${a.name}</option>`).join('');
