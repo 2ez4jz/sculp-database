@@ -22,7 +22,7 @@ export function analyzeMonthlyQuestion(message,records,context){
  if(!months.length)return {answer:"目前没有可用的月份记录，无法生成统计。",references:[],proposals:[],sourceIds:[]};
  const rows=months.map(month=>monthlyStats(records,month,context));
  const format=cents=>new Intl.NumberFormat("en-CA",{style:"currency",currency:"CAD"}).format(cents/100);
- const lines=rows.map(r=>r.month+"："+r.bookings+" 单，已完成 "+r.completed+" 单，已完成订单金额 "+format(r.amountCents)+(r.unpriced?"（"+r.unpriced+" 笔已完成订单缺少有效标价）":""));
+ const lines=rows.map(r=>r.month+"："+r.bookings+" 单（已完成 "+r.completed+"、已确认 "+r.confirmed+"、咨询 "+r.inquiries+"；另有取消 "+r.cancelled+"），已完成订单金额 "+format(r.amountCents)+(r.unpriced?"（"+r.unpriced+" 笔已完成订单缺少有效标价）":""));
  const total=rows.reduce((a,r)=>a+r.bookings,0);
  const notes=[];
  if(rows.some(r=>r.unpriced)) notes.push("有已完成订单缺少有效标价，金额合计不完整。");
