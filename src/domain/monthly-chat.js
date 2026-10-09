@@ -2,6 +2,8 @@ import {monthlyStats} from "./monthly-stats.js";
 const MONTH=/20\d{2}-(?:0[1-9]|1[0-2])/g;
 export function analyzeMonthlyQuestion(message,records,context){
  const q=String(message||"");
+ // Preserve the existing service-revenue pie chart route; it has different grouping.
+ if(/(?:饼图|pie)/i.test(q)&&/(?:服务|service)/i.test(q))return null;
  if(!/(订单|收入|营收|销售额|业绩|月份|月度|bookings?|revenue|sales|monthly)/i.test(q))return null;
  if(!/(月|month|季度|quarter|趋势|trend|收入|营收|revenue)/i.test(q))return null;
  if(context.role!=="admin")return {answer:"全局经营统计仅对管理人员开放。",references:[],proposals:[],sourceIds:[]};
