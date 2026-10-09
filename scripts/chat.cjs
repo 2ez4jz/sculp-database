@@ -82,7 +82,7 @@ fs.mkdirSync("qa-screens", { recursive: true });
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   );
-  await page.getByRole("button", { name: "关闭聊天", exact: true }).click();
+  await page.locator("[data-close]").click();
   await page.selectOption("#role", "artist");
   await page.selectOption("#artistIdentity", "michelle");
   await page.goto("http://localhost:4173/?demo=1#sculpy");
