@@ -1,3 +1,4 @@
+import {renderMonthlyAnalytics} from "./monthly.js";
 export function createInsights({
   getContext,
   available,
@@ -77,6 +78,7 @@ export function createInsights({
         ],
       ]) +
       (isTechnical() ? technicalOverview() : "") +
+      renderMonthlyAnalytics({records:list,context:getContext(),esc,money}) +
       `<div class="two-col"><div class="stack"><section class="panel"><h2>常去的场地</h2>${bars(list, "venue", venues)}</section><section class="panel"><h2>常合作的摄影师</h2>${bars(
         list,
         "partner",
