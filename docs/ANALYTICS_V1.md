@@ -42,3 +42,9 @@ This is a **standalone demo page**; it has not been integrated into the main Ins
 - Studio Insights already displays deterministic month-level amounts and table. Added unit/UI contract tests and an end-to-end browser scenario; included all in required CI.
 - Updated a localized chat browser test from fragile Chinese button labels to stable selectors/disabled state. CI is still running at this checkpoint, so full regression success is NOT confirmed.
 - Unfinished beyond this demo round: real authenticated Supabase analytics RPC, open-ended agentic exploration, persistent analyst-specific memory and production financial reconciliation. Revenue statistics remain completed-booking prices, NOT settled payments.
+
+## 2026-10-09 afternoon — analysis compatibility and mobile regression
+- Fixed conflict between new monthly analysis router and existing service-revenue pie chart; added a regression assertion.
+- Expanded standard monthly results to include completed, confirmed, inquiry and cancelled counts separately, without changing the verified financial definition.
+- Latest browser CI exposed a separate mobile issue: inline Sculpy send control extended beyond the viewport after localization/header wrapping. Added responsive height constraint; check the latest Verify run before accepting.
+- No production Supabase analytics query, full autonomous business-discovery engine or new memory system was delivered in this pass.
