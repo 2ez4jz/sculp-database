@@ -29,3 +29,9 @@ This is a **standalone demo page**; it has not been integrated into the main Ins
 2. Include the monthly tests in CI and repair the existing language-sensitive chat browser locator.
 3. Add permission-checked cloud SQL/RPC aggregates with separate financial and payment definitions before any production reporting.
 4. Build conservative AI commentary on top of verified metrics; label insights as hypotheses, not facts.
+
+## 2026-10-09 continuation — main Insights integration
+- Added `src/pages/insights/monthly.js`, wired into `src/pages/insights/index.js` for admin demo views. Displays up to six months of deterministic booking count, completed count, CAD completed-booking value and missing-price count, with table and bars. Values still computed from fictional demo bookings, not AI.
+- Added monthly unit and edge suites to required GitHub CI, plus `monthly-insights.test.mjs` for displayed amounts and employee visibility.
+- Changed browser chat smoke locator to stable `.chat-launcher`, because the old test used a localized Chinese accessible label and fails after English-first UI localization. Final CI pass is pending; browser tests may expose additional localization-sensitive assertions.
+- Not yet implemented: natural-language monthly aggregation in main chat, authenticated cloud reporting, direct AI business commentary, exploratory insights.
