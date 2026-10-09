@@ -18,7 +18,7 @@ jobs:
       - name: Install Chinese fonts for visual checks
         run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
       - name: Verify calculations and AI handler contracts
-        run: node --test scripts/domain.test.mjs scripts/backend.test.mjs scripts/context-memory.test.mjs scripts/account-admin.test.mjs scripts/chat.test.mjs scripts/intake-backend.test.mjs scripts/channels.test.mjs
+        run: node --test scripts/domain.test.mjs scripts/backend.test.mjs scripts/context-memory.test.mjs scripts/account-admin.test.mjs scripts/chat.test.mjs scripts/intake-backend.test.mjs scripts/channels.test.mjs scripts/monthly-stats.test.mjs scripts/monthly-stats-edge.test.mjs
       - name: Prepare browser check
         run: npm install --no-save --package-lock=false playwright @electric-sql/pglite
       - name: Verify database transaction and permissions
