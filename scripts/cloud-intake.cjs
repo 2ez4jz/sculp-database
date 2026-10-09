@@ -3,7 +3,8 @@ const assert=require('node:assert/strict');
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox']});
  try{
- const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const page=await browser.newPage();
+  await page.addInitScript(() => localStorage.setItem('memora-demo-language','zh'));const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://localhost:4173/');await page.locator('#login-form').waitFor();
  await page.evaluate(async()=>{
   document.body.innerHTML='<main id="test-root"></main>';
