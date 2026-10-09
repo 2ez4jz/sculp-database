@@ -16,6 +16,7 @@ const fs = require("node:fs");
       viewport: { width: 1440, height: 1000 },
       permissions: ["microphone"],
     });
+  await page.addInitScript(() => localStorage.setItem('memora-demo-language','zh'));
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.route("**/functions/v1/sculpy-ai*", async (route) => {
