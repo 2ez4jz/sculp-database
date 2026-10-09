@@ -43,3 +43,7 @@ Use **发布会演示** on Bookings: bookings → wedding detail → client → 
 Authenticated owner/operations accounts can open **录入新订单**, retain the original message, review a client match and booking fields, and explicitly save through `sculpy_confirm_intake`. The transaction persists the client, booking, optional artist assignment and source together. Cloud details and Sculpy context read the same canonical booking. Budget is not price; unknown times/prices are not guessed. Demo entry remains local-only.
 
 The AI extraction function is deployed and enabled after explicit authorization. It sends source text to OpenAI only when an authenticated owner/operations user clicks **识别订单**; extracted fields remain drafts until human confirmation. See [the work log](docs/WORK_LOG.md) for verification and remaining acceptance boundaries.
+
+## Bilingual fictional demo
+
+Open `?demo=1#bookings` for the fictional workspace. First visits default to English; the English / 中文 control remembers the browser preference. `lang=en` or `lang=zh` can explicitly choose a language. `i18n/catalog.js` contains UI and sample-data translations; `i18n/runtime.js` translates the presentation without modifying records, option values, drafts, or persisted data. English service names are searchable. The adapter runs only in the fictional demo; authenticated workspaces and the database are unchanged. Online AI receives a language preference in demo requests, but the deployed backend and its response language were not changed or verified by this frontend update.

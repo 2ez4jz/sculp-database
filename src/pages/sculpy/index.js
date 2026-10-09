@@ -150,7 +150,7 @@ export function createSculpyPage({
     if (action === "example") {
       const b0 = available().find((b) => b.id === "b0");
       if (b0) $("#sculpy-booking").value = "b0";
-      $("#sculpy-text").value = example;
+      $("#sculpy-text").value = window.DemoI18n?.text(example) || example;
       prepare();
     }
     if (action === "prepare") prepare();

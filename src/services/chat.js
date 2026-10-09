@@ -84,7 +84,7 @@ export function demoChatAdapter({
           bookingId: scope === "global" ? null : scope,
           catalog: getCatalog(),
           turns: history,
-          preferences: state.preferences,
+          preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
         });
       const fresh = read(storageKey);
       write(

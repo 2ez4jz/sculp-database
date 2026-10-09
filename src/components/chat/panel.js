@@ -172,7 +172,7 @@ export function createChatPanel({
     if (!button) return;
     if (button.id === "chat-voice" && !busy) voice.toggle();
     if (button.dataset.example) {
-      $("#chat-input").value = button.dataset.example;
+      $("#chat-input").value = window.DemoI18n?.text(button.dataset.example) || button.dataset.example;
       $("#chat-input").focus();
     }
     if (button.dataset.reference) {
