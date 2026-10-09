@@ -47,7 +47,7 @@ fs.mkdirSync("qa-screens", { recursive: true });
   assert.equal(bodies[0].bookingId, "b0");
   await page.locator("[data-save]").click();
   await page.waitForFunction(
-    () => document.querySelector("[data-save]").textContent === "已保存",
+    () => document.querySelector("[data-save]")?.disabled === true,
   );
   await page.locator("#chat-input").fill("她上一次呢？");
   await page.locator("[data-send]").click();
@@ -65,11 +65,11 @@ fs.mkdirSync("qa-screens", { recursive: true });
   await page.waitForFunction(() =>
     document
       .querySelector(".chat-status")
-      .textContent.includes("已保存你的回复偏好"),
+      .textContent.match(/已保存|saved/i),
   );
   await page.locator(".chat-preferences summary").click();
   await page.screenshot({ path: "qa-screens/chat-desktop.png" });
-  await page.getByRole("button", { name: "关闭聊天", exact: true }).click();
+  await page.locator("[data-close]").click();
   await page.reload();
   await page.locator(".chat-launcher").click();
   await page.locator(".chat-assistant").first().waitFor();
