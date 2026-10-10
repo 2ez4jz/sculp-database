@@ -91,7 +91,8 @@ export async function handleRequest(req: Request) {
       turns = (session?.turns || []).filter(
         (t: any) =>
           Array.isArray(t.sourceIds) &&
-          t.sourceIds.every((id: any) => allowed.has(id)),
+          t.sourceIds.every((id: any) => allowed.has(id)) &&
+          (!t.businessReport || ["owner", "operations"].includes(context.actor?.role)),
       );
     } else {
       const list = Array.isArray(body.catalog?.bookings)
@@ -203,6 +204,8 @@ export async function handleRequest(req: Request) {
         delete result.allowedBookingIds;
         return result;
       },
+      monthlyReport: !demo && ["owner", "operations"].includes(context.actor?.role)
+        ? (month: string) => rpc("sculpy_monthly_report", { p_month: month }) : undefined,
       callModel: async (payload: any) => {
         const response = await fetch("https://api.openai.com/v1/responses", {
           method: "POST",

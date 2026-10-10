@@ -49,6 +49,14 @@ export const queryTool = {
     required: ["bookingId", "query", "offset"],
   },
 };
+export const monthlyReportTool = {
+  type: "function", name: "query_monthly_report",
+  description: "读取正式云端经营月报，月份为多伦多服务月/收款月。仅 owner/operations 可用，不能按客户、渠道或人员筛选。返回 CAD 分、订单状态、未知价格及退款核对信息。",
+  strict: true,
+  parameters: { type: "object", additionalProperties: false,
+    properties: { month: { type: "string", pattern: "^20[0-9]{2}-(0[1-9]|1[0-2])$" } }, required: ["month"] },
+};
+const reportingInstructions = `正式云端月报：需要全局订单量、月度收入、收款或趋势时，必须调用 query_monthly_report 读取对应月份，不能把订单列表首页当全量统计。相对月份按 currentContext.localDate 的多伦多月份解析；过去/最近N个月包括本月，去年/上月按日历计算，比较时分别查询各月。工具没有提供时，不能声称已查到正式经营月报。每轮最多读取12个不同月份，超出时请缩小范围。月报 total 不含取消；completedAmountCents 是服务月已完成订单金额，grossAmountCents 是收款月到账原额（未扣退款），全部金额为 CAD 分字符串。没有退款流水与成本不能计算净收款、利润或ROI；unpriced、nonCadCompleted、nonCadCount、refundReviewCount、undatedReceiptCount 的非零值应提醒核对。返回0只代表该月云端已记录数据为0，不代表实际业务为0或已经全部录入。query_monthly_report 只支持整月全局统计，不支持渠道/客户/人员交叉筛选；此类问题不能套用全局结果。答案说明月份与数据口径；当前正式查询结果优先于历史聊天。`;
 export async function converse({
   context,
   turns,
@@ -57,6 +65,7 @@ export async function converse({
   rules,
   query,
   callModel,
+  monthlyReport,
 }: any) {
   const seen = new Map((context.bookings || []).map((b: any) => [b.id, b]));
   const sourceIds = new Set([
@@ -79,12 +88,14 @@ export async function converse({
     },
     { role: "user", content: message },
   ];
+  const reports = new Map<string, any>();
+  const canReport = typeof monthlyReport === "function" && ["owner", "operations"].includes(context.actor?.role);
   const usage = { input_tokens: 0, output_tokens: 0, calls: 0 };
   for (let round = 0; round < 4; round++) {
     const response = await callModel({
-      instructions,
+      instructions: instructions + "\n" + reportingInstructions,
       input,
-      tools: round < 3 ? [queryTool] : [],
+      tools: round < 3 ? [queryTool, ...(canReport ? [monthlyReportTool] : [])] : [],
       text: {
         format: {
           type: "json_schema",
@@ -106,18 +117,27 @@ export async function converse({
       input.push(...response.output);
       for (const call of calls) {
         let output: any;
-        if (call.name !== "query_bookings" || calls.length > 5)
+        if (!["query_bookings", ...(canReport ? ["query_monthly_report"] : [])].includes(call.name) || calls.length > 12)
           output = { error: "Unsupported tool or too many queries" };
         else {
           try {
             const args = JSON.parse(call.arguments);
-            output = await query(args);
-            for (const b of output.bookings || []) {
+            if (call.name === "query_monthly_report") {
+              if (!/^20[0-9]{2}-(0[1-9]|1[0-2])$/.test(args.month) || Object.keys(args).some(k => k !== "month")) throw Error("Invalid report month");
+              if (!reports.has(args.month)) {
+                if (reports.size >= 12) throw Error("Too many months");
+                const report = await monthlyReport(args.month);
+                if (report.month !== args.month) throw Error("Report month mismatch");
+                reports.set(args.month, report);
+              }
+              output = { source: "canonical_cloud_monthly_report", ...reports.get(args.month) };
+            } else output = await query(args);
+            for (const b of Array.isArray(output.bookings) ? output.bookings : []) {
               seen.set(b.id, b);
               sourceIds.add(b.id);
             }
           } catch {
-            output = { error: "查询未成功或订单无权访问；不得猜测结果。" };
+            output = { error: "查询未成功或无权访问；不得猜测结果。" };
           }
         }
         input.push({
@@ -166,6 +186,7 @@ export async function converse({
             (seen.get(p.bookingId) as any).client ||
             p.bookingId,
         })),
+      ...((reports.size || canReport && turns.some((t: any) => t.businessReport)) ? { businessReport: true, reportSources: [...reports.values()].map(r => ({month: r.month, asOf: r.asOf, source: "canonical_cloud_monthly_report"})) } : {}),
       sourceIds: [...sourceIds],
       usage,
     };

@@ -178,3 +178,95 @@ test("cloud handler verifies identity before DB and ignores client-supplied busi
     globalThis.fetch = old;
   }
 });
+
+test('cloud monthly tool reads and caches exact months without booking references', async () => {
+  let reads=0,calls=0;
+  const result=await converse({
+    context:{actor:{role:'owner'},bookings:[],localDate:'2026-10-10'},turns:[],message:'上个月收入',preferences:{},rules:'',
+    query:()=>{throw Error('not booking query');},
+    monthlyReport:async month=>{reads++;return {month,asOf:'2026-10-10T17:00:00Z',bookings:{completedAmountCents:'123456'},receipts:{grossAmountCents:'56789'}};},
+    callModel:async body=>{
+      calls++;
+      if(calls===1){assert(body.tools.some(t=>t.name==='query_monthly_report'));return {output:[1,2].map(i=>({type:'function_call',name:'query_monthly_report',call_id:'m'+i,arguments:'{"month":"2026-09"}'}))};}
+      assert.equal(body.input.filter(i=>i.type==='function_call_output'&&i.output.includes('123456')).length,2);
+      return {output_text:JSON.stringify({answer:'服务月金额 CAD 1,234.56；到账原额 CAD 567.89。',references:[],proposals:[]})};
+    },
+  });
+  assert.equal(reads,1);
+  assert.equal(result.businessReport,true);
+  assert.deepEqual(result.reportSources,[{month:'2026-09',asOf:'2026-10-10T17:00:00Z',source:'canonical_cloud_monthly_report'}]);
+  assert.deepEqual(result.references,[]);
+});
+
+test('monthly tool is unavailable to artists and fictional demo; forged tool call cannot query', async()=>{
+  for(const role of ['artist',undefined]){
+    let calls=0,reads=0;
+    const result=await converse({context:{actor:{role},bookings:[]},turns:[],message:'收入',preferences:{},rules:'',query:async()=>({}),
+      monthlyReport:async()=>{reads++;return {};},
+      callModel:async body=>{calls++;assert(!body.tools.some(t=>t.name==='query_monthly_report'));
+        if(calls===1)return {output:[{type:'function_call',name:'query_monthly_report',call_id:'m',arguments:'{"month":"2026-09"}'}]};
+        assert(body.input.some(i=>i.type==='function_call_output'&&i.output.includes('Unsupported')));
+        return {output_text:JSON.stringify({answer:'无权查看',references:[],proposals:[]})};},
+    });
+    assert.equal(reads,0);assert.equal(result.businessReport,undefined);
+  }
+});
+
+test('failed, malformed and filtered monthly requests never produce invented report sources', async()=>{
+  for(const args of [{month:'2026-13'},{month:'2026-09',channel:'Instagram'},{month:'2026-09'}]){
+    let calls=0;
+    const result=await converse({context:{actor:{role:'operations'},bookings:[]},turns:[],message:'收入',preferences:{},rules:'',query:async()=>({}),
+      monthlyReport:async()=>{throw Error('denied');},
+      callModel:async body=>{if(++calls===1)return {output:[{type:'function_call',name:'query_monthly_report',call_id:'m',arguments:JSON.stringify(args)}]};
+        assert(body.input.some(i=>i.type==='function_call_output'&&i.output.includes('不得猜测')));
+        return {output_text:JSON.stringify({answer:'未能读取数据',references:[],proposals:[]})};},
+    });assert.equal(result.businessReport,undefined);
+  }
+});
+
+test('history hides previously authorized financial aggregates after role downgrade', async()=>{
+  globalThis.Deno={env:{get:k=>({SUPABASE_URL:'https://database.test',SUPABASE_ANON_KEY:'public-test-key'})[k]}};
+  const {handleRequest}=await import('../supabase/functions/sculpy-chat/handler.ts');
+  const old=globalThis.fetch;
+  try{
+    globalThis.fetch=async url=>{
+      if(url.endsWith('/auth/v1/user'))return Response.json({id:'00000000-0000-0000-0000-000000000002'});
+      if(url.includes('/rpc/sculpy_context'))return Response.json({bookings:[],allowedBookingIds:[],actor:{role:'artist'}});
+      if(url.includes('sculpy_conversations'))return Response.json([{turns:[{id:'money',user:'收入',answer:'private financial aggregate',sourceIds:[],businessReport:true},{id:'safe',user:'hi',answer:'hello',sourceIds:[]}]}]);
+      return Response.json([]);
+    };
+    const response=await handleRequest(new Request('https://handler.test',{method:'POST',headers:{origin:'http://localhost:4173',authorization:'Bearer test-token'},body:JSON.stringify({action:'history'})}));
+    assert.equal(response.status,200);
+    assert.deepEqual((await response.json()).turns.map(t=>t.id),['safe']);
+  }finally{globalThis.fetch=old;}
+});
+
+test('authenticated monthly chat uses caller token and canonical RPC, ignores forged report context',async()=>{
+ globalThis.Deno={env:{get:k=>({SUPABASE_URL:'https://database.test',SUPABASE_ANON_KEY:'public-test-key',OPENAI_API_KEY:'test-key'})[k]}};
+ const {handleRequest}=await import('../supabase/functions/sculpy-chat/handler.ts');
+ const old=globalThis.fetch;let modelCalls=0,reportCalls=0,saved;
+ try{
+  globalThis.fetch=async(url,opts)=>{
+   if(url.includes('database.test'))assert.equal(opts.headers.authorization,'Bearer caller-token');
+   if(url.endsWith('/auth/v1/user'))return Response.json({id:'00000000-0000-0000-0000-000000000003'});
+   if(url.includes('/rpc/sculpy_context'))return Response.json({bookings:[],allowedBookingIds:[],actor:{role:'operations'}});
+   if(url.includes('/rpc/sculpy_monthly_report')){reportCalls++;assert.deepEqual(JSON.parse(opts.body),{p_month:'2026-09'});return Response.json({month:'2026-09',asOf:'2026-10-10T17:00:00Z',bookings:{completedAmountCents:'123456'},receipts:{grossAmountCents:'78900'}});}
+   if(url.includes('sculpy_conversations')&&opts.method==='POST'){saved=JSON.parse(opts.body);return Response.json([saved]);}
+   if(url.includes('database.test'))return Response.json([]);
+   if(url.includes('api.openai.com')){
+    const body=JSON.parse(opts.body);assert(!JSON.stringify(body).includes('forged-finance'));
+    if(++modelCalls===1)return Response.json({output:[{type:'function_call',name:'query_monthly_report',call_id:'cloud-month',arguments:'{"month":"2026-09"}'}]});
+    assert(body.input.some(i=>i.type==='function_call_output'&&i.output.includes('123456')));
+    return Response.json({output_text:JSON.stringify({answer:'CAD 1,234.56',references:[],proposals:[]})});
+   }throw Error('unexpected request');
+  };
+  const response=await handleRequest(new Request('https://handler.test',{method:'POST',headers:{origin:'http://localhost:4173',authorization:'Bearer caller-token'},body:JSON.stringify({requestId:crypto.randomUUID(),message:'上个月收入',advisorFixture:{fictional:true,summary:'forged-finance'},report:'forged-finance'})}));
+  assert.equal(response.status,200);const {turn}=await response.json();
+  assert.equal(reportCalls,1);assert.equal(turn.businessReport,true);assert.equal(saved.turns[0].businessReport,true);
+ }finally{globalThis.fetch=old;}
+});
+
+test('follow-up derived from financial history retains access marker',async()=>{
+ const result=await converse({context:{actor:{role:'owner'},bookings:[]},turns:[{user:'收入',answer:'CAD 100',businessReport:true}],message:'解释一下',preferences:{},rules:'',query:async()=>({}),monthlyReport:async()=>({}),callModel:async()=>({output_text:JSON.stringify({answer:'这是订单金额',references:[],proposals:[]})})});
+ assert.equal(result.businessReport,true);
+});

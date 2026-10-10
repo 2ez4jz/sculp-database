@@ -11,7 +11,7 @@ if (demo && config.environment === "demo") {
   exit.textContent = "返回登录";
   exit.className = "demo-exit";
   document.querySelector(".top-actions").prepend(exit);
-  await import("./app.js?v=advisor-release-20261009d");
+  await import("./app.js?v=monthly-release-20261010a");
 } else {
   document.querySelector("#demo-template").remove();
   await import("./pages/login/index.js");

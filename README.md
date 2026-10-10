@@ -53,3 +53,7 @@ The AI extraction function is deployed and enabled after explicit authorization.
 ## Bilingual fictional demo
 
 Open `?demo=1#bookings` for the fictional workspace. First visits default to English; the English / 中文 control remembers the browser preference. `lang=en` or `lang=zh` can explicitly choose a language. `i18n/catalog.js` contains UI and sample-data translations; `i18n/runtime.js` translates the presentation without modifying records, option values, drafts, or persisted data. English service names are searchable. The adapter runs only in the fictional demo; authenticated workspaces and the database are unchanged. Online AI receives a language preference in demo requests, but the deployed backend and its response language were not changed or verified by this frontend update.
+
+## Cloud conversational monthly reports (2026-10-10)
+
+Authenticated owner/operations chat can query the canonical cloud monthly report. Service-month completed booking value and receipt-month gross original receipts remain separate CAD measures; missing prices and refund limitations are surfaced. Demo charts select requested Toronto calendar periods from the isolated 300-order advisor fixture. Profile browsing still uses the original 24 linked sample bookings. Real-account and two-device acceptance remains outstanding.

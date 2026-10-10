@@ -104,7 +104,7 @@ interrupt a request: reread the order and operations audit before repeating an e
 
 `sculpy_monthly_report(month)` accepts one YYYY-MM month, 2000–2099, and checks
 the administrator role in the database. The cloud workspace exposes a query panel.
-It does not yet add production natural-language reporting to Sculpy chat.
+Sculpy chat can now call the same RPC through the read-only `query_monthly_report` tool for authenticated owner/operations users. It supports whole calendar months, not channel/client/artist cross-filters. Report-derived turns retain a business-access marker and are hidden after role downgrade. Real-account conversational acceptance remains outstanding.
 
 - All periods use America/Toronto calendar boundaries.
 - Service-month order counts distinguish inquiry, confirmed, completed and cancelled.
