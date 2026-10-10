@@ -100,4 +100,4 @@ if(b.dataset.channelRemove&&isGlobal()){const id=b.dataset.channelRemove;if(!(st
 $('#lightbox').addEventListener('click',e=>{if(e.target===$('#lightbox'))$('#lightbox').close()});
 render();
 
-window.addEventListener('storage',event=>{if(event.key==='sculp-memory-demo-300-v2'){state=loadState();bookings.splice(0,bookings.length,...workspaceBookings(generateAdvisorFixtures(),venues));hydrateDemoEntities();render()}});
+window.addEventListener('storage',event=>{if(event.key==='sculp-memory-demo-300-v2'){state=loadState();bookings.splice(0,bookings.length,...workspaceBookings(generateAdvisorFixtures(),venues));for(let i=clients.length-1;i>=0;i--)if(clients[i].id.startsWith('demo-'))clients.splice(i,1);hydrateDemoEntities();render()}});
