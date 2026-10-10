@@ -105,6 +105,14 @@ export async function handleRequest(req: Request) {
         asOf: new Date().toISOString(),
         timezone: "America/Toronto",
         total: list.length,
+        advisorFixture: body.advisorFixture?.version === "sculp-300-v1" && body.advisorFixture?.fictional === true ? {
+          mode: "fictional_fixture_only",
+          summary: body.advisorFixture.summary,
+          insights: body.advisorFixture.insights,
+          byMonth: body.advisorFixture.byMonth,
+          byService: body.advisorFixture.byService,
+          byChannel: body.advisorFixture.byChannel,
+        } : null,
       };
       turns = (Array.isArray(body.turns) ? body.turns : [])
         .filter(
