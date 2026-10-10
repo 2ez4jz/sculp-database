@@ -139,6 +139,8 @@ export async function handleRequest(req: Request) {
       rules =
         "这是虚构演示数据。任何保存只发生在浏览器。不得声称已写入正式数据库。";
     }
+    context.timezone = context.timezone || "America/Toronto";
+    context.localDate = new Intl.DateTimeFormat("en-CA", { timeZone: context.timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     context.currentBookingId = body.bookingId || null;
     context.coverage = {
       workLogs: "latest 20",
