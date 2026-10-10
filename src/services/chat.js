@@ -1,4 +1,6 @@
 import { config } from "../config.js";
+import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js";
+import { advisorMetrics, advisorInsight } from "../domain/advisor-engine.js";
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };
   if (supabase) {
@@ -83,6 +85,7 @@ export function demoChatAdapter({
           ...body,
           bookingId: scope === "global" ? null : scope,
           catalog: getCatalog(),
+          advisorFixture: (() => { const rows = generateAdvisorFixtures(); return { version: "sculp-300-v1", fictional: true, summary: fixtureSummary(rows), insights: advisorInsight(rows), byMonth: Array.from({length:12}, (_,i) => advisorMetrics(rows, {month:`2026-${String(i+1).padStart(2,"0")}`})), byService: ["bridal","occasion","lesson","commercial"].map(service=>({service,...advisorMetrics(rows,{service})})), byChannel: ["Instagram","Google","Planner","Referral","Website"].map(channel=>({channel,...advisorMetrics(rows,{channel})})) }; })(),
           turns: history,
           preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
         });
