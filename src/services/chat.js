@@ -1,5 +1,5 @@
 import { config } from "../config.js";
-import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js";
+import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=advisor-release-20261009";
 import { advisorMetrics, advisorInsight } from "../domain/advisor-engine.js";
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };

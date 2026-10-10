@@ -26,7 +26,7 @@
   }
   const sources = new WeakMap();
   const attributes = new WeakMap();
-  const skipped = 'script,style,textarea,[data-i18n-ignore],.chat-user div,.message.user';
+  const skipped = 'script,style,textarea,[data-i18n-ignore],.chat-user div,.chat-assistant .chat-answer,.message.user';
   const observer = new MutationObserver(records => {
     observer.disconnect();
     const roots = new Set();
@@ -53,7 +53,7 @@
     }
     if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.DOCUMENT_NODE) return;
     if (node.nodeType === Node.ELEMENT_NODE) {
-      if (node.matches('script,style,[data-i18n-ignore],.chat-user div,.message.user')) return;
+      if (node.matches('script,style,[data-i18n-ignore],.chat-user div,.chat-assistant .chat-answer,.message.user')) return;
       const saved = attributes.get(node) || {};
       for (const attribute of ['placeholder','aria-label','title','alt']) {
         if (!node.hasAttribute(attribute)) continue;

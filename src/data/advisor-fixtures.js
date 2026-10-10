@@ -42,5 +42,5 @@ export function fixtureSummary(records) {
     paidCents+=row.paidCents;
     channelsSummary[row.channel]=(channelsSummary[row.channel]??0)+1;
   }
-  return {total:records.length,currency:"CAD",statusCounts,completed:statusCounts.completed,counts,bridalByMonth:months,completedCents,paidCents,channelsSummary};
+  return {total:records.length,currency:"CAD",courseSchedule:{weekly:{weekday:"Wednesday",time:"18:00",count:52},monthly:{months:"January–August",weekday:"second Sunday",time:"13:00",count:8},total:60},statusCounts,completed:statusCounts.completed,counts,bridalByMonth:months,completedCents,paidCents,channelsSummary};
 }
