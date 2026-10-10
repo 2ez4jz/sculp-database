@@ -3,8 +3,9 @@ import {canViewBusiness} from './permissions.js';
 export function monthlyStats(records,month,context){
  if(!canViewBusiness(context||{}))throw Error('Report requires studio management role');
  if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month))throw RangeError('Use YYYY-MM');
- const result={month,bookings:0,completed:0,confirmed:0,inquiries:0,cancelled:0,amountCents:0,unpriced:0};
+ const result={month,bookings:0,completed:0,confirmed:0,inquiries:0,cancelled:0,amountCents:0,receivedCents:0,unpriced:0};
  for(const b of records){
+  if(b&&(!b.currency||b.currency==='CAD')&&b.paidDate?.slice(0,7)===month&&Number.isFinite(+new Date(b.paidDate+'T12:00:00Z'))&&new Date(b.paidDate+'T12:00:00Z').toISOString().slice(0,10)===b.paidDate&&Number.isSafeInteger(b.paidCents)&&b.paidCents>=0)result.receivedCents+=b.paidCents;
   if(!b || typeof b.date!=='string'||b.date.slice(0,7)!==month)continue;
   const d=new Date(b.date+'T00:00:00Z');
   if(Number.isNaN(d.valueOf())||d.toISOString().slice(0,10)!==b.date)continue;

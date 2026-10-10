@@ -3,11 +3,13 @@ import {fixtureSummary} from '../data/advisor-fixtures.js';
 export function advisorMetrics(rows,{service=null,channel=null,month=null}={}) {
   const chosen=rows.filter(r=>(!service||r.service===service)&&(!channel||r.channel===channel)&&(!month||r.month===month));
   const completed=chosen.filter(r=>r.status==='completed');
-  const totalCents=completed.reduce((a,r)=>a+r.amountCents,0);
-  const paidCents=chosen.reduce((a,r)=>a+r.paidCents,0);
+  const totalCents=completed.reduce((a,r)=>a+(Number.isSafeInteger(r.amountCents)?r.amountCents:0),0);
+  const receipts=rows.filter(r=>(!service||r.service===service)&&(!channel||r.channel===channel)&&(!month||(r.paidMonth??r.month)===month));
+  const paidCents=receipts.reduce((a,r)=>a+r.paidCents,0);
   const cancelled=chosen.filter(r=>r.status==='cancelled').length;
   return {count:chosen.length,completed:completed.length,cancelled,completedCents:totalCents,receivedCents:paidCents,
-    averageCompletedCents:completed.length?Math.round(totalCents/completed.length):null,
+    unpricedCompleted:completed.filter(r=>!Number.isSafeInteger(r.amountCents)).length,
+    averageCompletedCents:completed.some(r=>Number.isSafeInteger(r.amountCents))?Math.round(totalCents/completed.filter(r=>Number.isSafeInteger(r.amountCents)).length):null,
     warning:chosen.length<10?'LOW_SAMPLE':null, source:'fictional-fixture'};
 }
 export function advisorInsight(rows) {

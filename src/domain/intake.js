@@ -29,5 +29,10 @@ export function validateNewEntity(type, fields, data) {
   if (!data.artists.some(a => a.id === fields.artistId && a.bookingEligible !== false) || !data.venues.some(v => v.id === fields.venueId)) throw Error('请选择负责人和场地，未识别的信息需要人工补齐。');
   if (!serviceTypes.includes(fields.service)) throw Error('请选择服务类型。');
   if (data.bookings.some(b => b.clientId === fields.clientId && b.date === fields.date && b.service === fields.service)) throw Error('这位客户当天已有同类订单，请先核对，避免重复建单。');
-  return { date:fields.date, clientId:fields.clientId, artistIds:[fields.artistId], venueId:fields.venueId, service:fields.service, startTime:'10:00', endTime:'12:00', partnerIds:[], price:0, status:'Inquiry', needsReview:true };
+  const startTime=fields.startTime||'',endTime=fields.endTime||'';
+  const clock=v=>/^([01]\d|2[0-3]):[0-5]\d$/.test(v);
+  if(startTime&&!clock(startTime)||endTime&&!clock(endTime)||startTime&&endTime&&endTime<=startTime)throw Error('请选择有效服务时间，结束须晚于开始。');
+  let price=null;
+  if(fields.price!==undefined&&fields.price!==''){if(!/^\d{1,8}(\.\d{1,2})?$/.test(fields.price))throw Error('金额最多两位小数，未知价格留空。');price=Number(fields.price);}
+  return { date:fields.date, clientId:fields.clientId, artistIds:[fields.artistId], venueId:fields.venueId, service:fields.service, startTime,endTime,partnerIds:[],price,paidCents:0,paidDate:null,channelId:fields.channelId||null,currency:'CAD',fictional:true,status:'Inquiry',needsReview:true,version:0 };
 }

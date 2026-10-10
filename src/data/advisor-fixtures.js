@@ -33,14 +33,15 @@ export function generateAdvisorFixtures() {
 export function fixtureSummary(records) {
   const counts={bridal:0,occasion:0,lesson:0,commercial:0};
   const months=Array(12).fill(0),channelsSummary={};
-  let completedCents=0,paidCents=0;
+  let completedCents=0,paidCents=0,unpricedCompleted=0;
   const statusCounts={completed:0,confirmed:0,inquiry:0,cancelled:0};
   for(const row of records){
-    if(!Object.hasOwn(counts,row.service)||!/^2026-(0[1-9]|1[0-2])$/.test(row.month))throw Error('Invalid fictional fixture');
+    if(!Object.hasOwn(counts,row.service)||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(row.month))throw Error('Invalid fictional fixture');
     statusCounts[row.status]++;counts[row.service]++;if(row.service==='bridal')months[Number(row.month.slice(5))-1]++;
-    if(row.status==='completed')completedCents+=row.amountCents;
+    if(row.status==='completed'){if(Number.isSafeInteger(row.amountCents)&&row.amountCents>=0)completedCents+=row.amountCents;else unpricedCompleted++;}
     paidCents+=row.paidCents;
     channelsSummary[row.channel]=(channelsSummary[row.channel]??0)+1;
   }
-  return {total:records.length,currency:"CAD",courseSchedule:{weekly:{weekday:"Wednesday",time:"18:00",count:52},monthly:{months:"January–August",weekday:"second Sunday",time:"13:00",count:8},total:60},statusCounts,completed:statusCounts.completed,counts,bridalByMonth:months,completedCents,paidCents,channelsSummary};
+  const weekly=records.filter(r=>r.classSchedule==='weekly-wednesday-18').length, monthly=records.filter(r=>r.classSchedule==='monthly-second-sunday-13').length;
+  return {total:records.length,unpricedCompleted,currency:"CAD",courseSchedule:{weekly:{weekday:"Wednesday",time:"18:00",count:weekly},monthly:{months:"January–August",weekday:"second Sunday",time:"13:00",count:monthly},total:weekly+monthly},statusCounts,completed:statusCounts.completed,counts,bridalByMonth:months,completedCents,paidCents,channelsSummary};
 }

@@ -14,7 +14,7 @@ cross-device acceptance remain pending.
 
 ## Included
 
-- 24 linked bookings, 12 fictional clients, 9 team profiles, 6 venues and 8 partners.
+- 300 linked fictional bookings, 300 fictional clients, 9 team profiles, 6 venues and 8 partners.
 - Booking list and month calendar, global booking search, artist/service/status/date/venue filters.
 - Client, artist, venue and partner profiles with calculated collaboration history.
 - Booking notes with original text, prepared demo summaries and structured preferences.
@@ -56,4 +56,4 @@ Open `?demo=1#bookings` for the fictional workspace. First visits default to Eng
 
 ## Cloud conversational monthly reports (2026-10-10)
 
-Authenticated owner/operations chat can query the canonical cloud monthly report. Service-month completed booking value and receipt-month gross original receipts remain separate CAD measures; missing prices and refund limitations are surfaced. Demo charts select requested Toronto calendar periods from the isolated 300-order advisor fixture. Profile browsing still uses the original 24 linked sample bookings. Real-account and two-device acceptance remains outstanding.
+Authenticated owner/operations chat can query the canonical cloud monthly report. Service-month completed booking value and receipt-month gross original receipts remain separate CAD measures; missing prices and refund limitations are surfaced. Demo lists, profiles, channels, reports and AI share one editable 300-order baseline. Prior 24-order browser state and chat caches are removed. Changes persist in this browser; reset restores 300 orders. Unknown prices stay blank; completed value and gross receipts remain separate. Real-account and two-device acceptance remains outstanding.

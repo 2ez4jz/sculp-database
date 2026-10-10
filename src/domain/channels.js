@@ -11,10 +11,10 @@ export function channelCatalog(state) {
   return [...DEFAULT_CHANNELS, ...(state.extraChannels || [])].filter(x=>!(state.disabledChannels||[]).includes(x.id));
 }
 export function channelForBooking(booking,state) {
-  return (state.channelAssignments||{})[booking.id] || booking.channelId || null;
+  return Object.hasOwn(state.channelAssignments||{},booking.id)?state.channelAssignments[booking.id]:(booking.channelId||null);
 }
 export function channelSummary(bookings,state) {
-  const catalog=channelCatalog(state);
+  const catalog=[...DEFAULT_CHANNELS,...(state.extraChannels||[])].map(c=>({...c,name:c.name+((state.disabledChannels||[]).includes(c.id)?'（已停用）':'')}));
   return [...catalog.map(c=>({
     ...c,
     count:bookings.filter(b=>channelForBooking(b,state)===c.id).length

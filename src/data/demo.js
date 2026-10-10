@@ -1,3 +1,5 @@
+import {generateAdvisorFixtures} from './advisor-fixtures.js';
+import {workspaceBookings} from '../domain/demo-workspace.js';
 export const artists = [
  {id:'miranda',name:'Miranda',level:'Signature Artist / Founder',systemRole:'owner',accountStatus:'pilot',image:'https://2ez4jz.github.io/sculpstudio/assets/images/miranda-portrait.webp',specialties:['Editorial','Luxury Bridal','Destination'],bio:'十年以上时尚、名人造型与高端婚礼经验，以编辑视角完成现代新娘造型。'},
  {id:'yuki',name:'Yuki',level:'Director Artist',systemRole:'artist',accountStatus:'profile_only',image:'https://2ez4jz.github.io/sculpstudio/assets/images/yuki-portrait.webp',specialties:['Bridal','Education','Technical'],bio:'拥有十年以上婚礼造型经验，结合专业技术、教学背景与精致的艺术表达。'},
@@ -28,17 +30,12 @@ export const partners=[
  {id:'sunday',name:'Sunday Portraits',type:'Photography',instagram:'sunday_demo',note:'示例：活动肖像合作。'}
 ];
 const names=['Sarah Chen','Amy Wong','Jessica Li','Lisa Park','Chloe Zhang','Olivia Liu','Emma Tan','Sophie Wang','Isabella Lin','Grace Wu','Victoria Sun','Rachel Kim'];
-export const clients=names.map((name,i)=>({id:'c'+i,name,city:i%3?'Toronto':'Markham',email:name.toLowerCase().replace(' ','.')+'@example.com',phone:'+1 (416) 555-01'+String(i).padStart(2,'0'),wechat:'demo_'+name.split(' ')[0].toLowerCase(),instagram:'demo_'+name.replace(' ','_').toLowerCase(),birthday:'1993-'+String(i%12+1).padStart(2,'0')+'-15',weddingDate:i%2?'2026-09-12':'2026-10-02',referral:i%2?'朋友推荐':'合作摄影师推荐',preferences:i%2?['偏爱干净、轻盈的妆感','发型希望有自然蓬松感']:['喜欢自然轻薄底妆','不喜欢过重的睫毛'],opportunity:i%2?'来年周年纪念照，可在本人同意后跟进。':'提到十二月公司晚宴，待确认日期。'}));
-const types=['Wedding','Trial','Event','Photoshoot','Commercial','Education'];
-const pricing={Wedding:1990,Trial:350,Event:280,Photoshoot:490,Commercial:850,Education:450};
-const bookingArtists=artists.filter(a=>a.bookingEligible!==false);
-export const bookings=Array.from({length:24},(_,i)=>{
- const service=i===0?'Wedding':types[i%6],clientId='c'+(i%12),staff=[bookingArtists[i%bookingArtists.length].id];if(service==='Wedding')staff.push(bookingArtists[(i+3)%bookingArtists.length].id);
- const date=i===0?'2026-10-02':i<6?'2026-10-'+String(3+Math.floor(i/2)).padStart(2,'0'): '2026-09-'+String(30-(i-6)).padStart(2,'0');
- const venueId=service==='Trial'||service==='Education'?'studio':venues[i%6].id;
- return {id:'b'+i,date,startTime:service==='Wedding'?'07:00':'10:00',endTime:service==='Wedding'?'17:00':'12:00',clientId,artistIds:staff,venueId,partnerIds:service==='Trial'||service==='Education'?[]:i%2?['lumi','ever']:['mango','rebecca','bloom'],service,price:pricing[service],status:i===0||i>=6?'Completed':i===5?'Inquiry':'Confirmed',createdAt:date+'T08:00:00-04:00'};
+export const bookings=workspaceBookings(generateAdvisorFixtures(),venues);
+export const clients=bookings.map((b,i)=>{
+ const name=names[i%names.length]+(i<names.length?'':' '+String(Math.floor(i/names.length)+1).padStart(2,'0'));
+ return {id:b.clientId,name,city:i%3?'Toronto':'Markham',email:'fictional.'+i+'@example.com',phone:'+1 (416) 555-'+String(i).padStart(4,'0'),wechat:'demo_client_'+i,instagram:'demo_client_'+i,birthday:'',weddingDate:b.service==='Wedding'?b.date:'',referral:'',preferences:i%2?['偏爱干净、轻盈的妆感','发型希望有自然蓬松感']:['喜欢自然轻薄底妆','不喜欢过重的睫毛'],opportunity:i%2?'来年周年纪念照，可在本人同意后跟进。':'提到十二月公司晚宴，待确认日期。'};
 });
-export const notes=bookings.map((b,i)=>({id:'n'+i,entityType:'booking',entityId:b.id,createdBy:b.artistIds[0],createdAt:b.date+'T18:00:00-04:00',source:'manual',rawText:i===0?'今天 Sarah 整体很满意，尤其喜欢轻薄的底妆。第一次的睫毛她觉得有点重，后来换了一副轻一些的。头发做了自然的松卷。她提到十二月公司有晚宴，妹妹可能明年夏天结婚。摄影是 Mango，准备房靠窗的光线很好。':'今天客人喜欢自然一些的妆感，沟通过参考图后做了轻薄底妆和柔和眉形。发型最后做了调整，整体反馈满意。下次服务可以先询问睫毛和发饰的偏好。',aiSummary:i===0?'喜欢轻薄底妆与松卷；更换轻量睫毛后满意。准备房自然光良好。':'偏爱自然妆感；发型调整后满意。下次提前确认睫毛与发饰。',structuredData:{preferences:clients[i%12].preferences,opportunities:[clients[i%12].opportunity]},summarySource:'prepared_demo'}));
+export const notes=bookings.map((b,i)=>({id:'n'+i,entityType:'booking',entityId:b.id,createdBy:b.artistIds[0],createdAt:b.date+'T18:00:00-04:00',source:'manual',rawText:i===0?'今天 Sarah 整体很满意，尤其喜欢轻薄的底妆。第一次的睫毛她觉得有点重，后来换了一副轻一些的。头发做了自然的松卷。她提到十二月公司有晚宴，妹妹可能明年夏天结婚。摄影是 Mango，准备房靠窗的光线很好。':'今天客人喜欢自然一些的妆感，沟通过参考图后做了轻薄底妆和柔和眉形。发型最后做了调整，整体反馈满意。下次服务可以先询问睫毛和发饰的偏好。',aiSummary:i===0?'喜欢轻薄底妆与松卷；更换轻量睫毛后满意。准备房自然光良好。':'偏爱自然妆感；发型调整后满意。下次提前确认睫毛与发饰。',structuredData:{preferences:clients[i].preferences,opportunities:[clients[i].opportunity]},summarySource:'prepared_demo'}));
 const weddingImages=['garden-bride-hero','bridal-profile','selected-window-bride','selected-veil-detail','selected-smiling-bride','garden-couple'];
 const eventImages=['chair-portrait','occasions-feature-motion-red','occasions-feature-red-flower'];
 export const media=bookings.flatMap((b,i)=>(b.service==='Wedding'||b.service==='Trial'?weddingImages.slice(0,b.service==='Wedding'?6:3):eventImages).map((file,j)=>({id:'m'+i+'-'+j,bookingId:b.id,clientId:b.clientId,artistIds:b.artistIds,fileUrl:'assets/'+file+'.jpg',category:b.service==='Wedding'||b.service==='Trial'?['Bride','Makeup','Hair','Details','Final Look','Bride'][j]:['Editorial','Event','Final Look'][j],createdAt:b.date,source:'import',sample:true})));

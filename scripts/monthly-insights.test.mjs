@@ -8,7 +8,7 @@ test("monthly analysis shows expected demo September totals",()=>{
  const html=renderMonthlyAnalytics({records:bookings,context:{role:"admin"},esc,money});
  assert.match(html,/data-monthly-analytics/);
  assert.match(html,/2026-09/);
- assert.match(html,/13,230/);
+ assert.match(html,/19,685/);
  assert.match(html,/不是实收/);
 });
 test("artist cannot render global revenue analytics",()=>{

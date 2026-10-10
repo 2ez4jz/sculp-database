@@ -16,12 +16,13 @@ export function searchCatalog({
     bookings: bookings.map((b) => ({
       id: b.id,
       date: b.date,
+      startTime:b.startTime, endTime:b.endTime, clientId:b.clientId, details:b.details||"",
       status: b.status,
       service: b.service,
       artistIds: b.artistIds,
       venueId: b.venueId,
       partnerIds: b.partnerIds,
-      ...(global ? { price: b.price } : {}),
+      ...(global ? { price: b.price, paidCents:b.paidCents||0, paidDate:b.paidDate||null, channelId:b.channelId||null } : {}),
       label: `${client(b.clientId).name} · ${serviceName[b.service]} · ${b.date}`,
       searchText: [
         client(b.clientId).name,

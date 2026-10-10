@@ -58,7 +58,7 @@ export async function handleRequest(req: Request) {
       turns: any[] = [],
       preferences: any,
       rules = "",
-      session: any;
+      session: any, demoCatalog: any[] = [];
     const scope = body.bookingId || "global";
     if (!demo) {
       if (!/^Bearer\s+\S+$/i.test(token))
@@ -96,17 +96,19 @@ export async function handleRequest(req: Request) {
       );
     } else {
       const list = Array.isArray(body.catalog?.bookings)
-        ? body.catalog.bookings.slice(0, 200)
+        ? body.catalog.bookings.slice(0, 500)
         : [];
+      if (body.catalog?.bookings?.length > 500) return reply({error:"演示查询最多支持500条订单，请缩小数据集。"},413);
+      demoCatalog = list;
       context = {
         mode: "fictional_demo",
-        bookings: list,
+        bookings: body.bookingId ? list.filter((b: any)=>b.id===body.bookingId) : list.slice(0,30),
         notes: (body.catalog?.notes || []).slice(0, 80),
         currentBookingId: body.bookingId || null,
         asOf: new Date().toISOString(),
         timezone: "America/Toronto",
         total: list.length,
-        advisorFixture: body.advisorFixture?.version === "sculp-300-v1" && body.advisorFixture?.fictional === true ? {
+        advisorFixture: ["sculp-300-v1", "sculp-unified-300-v2"].includes(body.advisorFixture?.version) && body.advisorFixture?.fictional === true ? {
           mode: "fictional_fixture_only",
           summary: body.advisorFixture.summary,
           insights: body.advisorFixture.insights,
@@ -179,7 +181,7 @@ export async function handleRequest(req: Request) {
       rules,
       query: async (args: any) => {
         if (demo) {
-          const rows = context.bookings.filter(
+          const rows = demoCatalog.filter(
             (b: any) =>
               (!args.bookingId || b.id === args.bookingId) &&
               (!args.query ||
