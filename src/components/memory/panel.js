@@ -1,3 +1,4 @@
+import {channelCatalog} from '../../domain/channels.js';
 import {
   memoryTargets,
   relatedTargets,
@@ -222,7 +223,7 @@ export function createMemoryPanel({
     if (type === "client") {
       zone.innerHTML = `<h3>新增虚拟客户</h3><label>客户姓名 <input id="memory-new-name" maxlength="100" required placeholder="例如：Jessica Demo"></label><label>城市 <input id="memory-new-city" maxlength="100" placeholder="Toronto"></label><p>仅添加虚构资料。创建后即可将原文和备注关联到这位客户。</p><button type="button" data-memory-create-submit="client">确认创建客户</button><button type="button" data-memory-create-cancel>取消</button>`;
     } else {
-      zone.innerHTML = `<h3>新增虚拟订单</h3><label>客户 <select id="memory-new-client">${data.clients.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}</select></label><label>服务日期 <input id="memory-new-date" type="date" required></label><label>服务类型 <select id="memory-new-service"><option value="Wedding">婚礼造型</option><option value="Trial">婚礼试妆</option><option value="Event">活动造型</option><option value="Photoshoot">拍摄造型</option><option value="Commercial">商业造型</option><option value="Education">教学</option></select></label><label>负责人 <select id="memory-new-artist">${data.artists.filter(a=>a.bookingEligible!==false).map(a=>`<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("")}</select></label><label>场地 <select id="memory-new-venue">${data.venues.map(v=>`<option value="${esc(v.id)}">${esc(v.name)}</option>`).join("")}</select></label><p>新订单先创建为「咨询中」，默认 10:00–12:00，金额为 0；这些都是演示占位值，需人工确认后才能用于统计。</p><button type="button" data-memory-create-submit="booking">确认创建订单</button><button type="button" data-memory-create-cancel>取消</button>`;
+      zone.innerHTML = `<h3>新增虚拟订单</h3><label>客户 <select id="memory-new-client">${data.clients.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")}</select></label><label>服务日期 <input id="memory-new-date" type="date" required></label><label>服务类型 <select id="memory-new-service"><option value="Wedding">婚礼造型</option><option value="Trial">婚礼试妆</option><option value="Event">活动造型</option><option value="Photoshoot">拍摄造型</option><option value="Commercial">商业造型</option><option value="Education">教学</option></select></label><label>负责人 <select id="memory-new-artist">${data.artists.filter(a=>a.bookingEligible!==false).map(a=>`<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("")}</select></label><label>场地 <select id="memory-new-venue">${data.venues.map(v=>`<option value="${esc(v.id)}">${esc(v.name)}</option>`).join("")}</select></label><label>开始时间（未知留空）<input id="memory-new-start" type="time"></label><label>结束时间（未知留空）<input id="memory-new-end" type="time"></label><label>订单金额 · CAD（未知留空）<input id="memory-new-price" inputmode="decimal"></label><label>来源渠道<select id="memory-new-channel"><option value="">未填写</option>${channelCatalog(getContext().state).map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select></label><p>新订单先创建为「咨询中」。未知时间与价格留空；明确确认后可在订单详情修改状态，金额与到账原额分开记录。</p><button type="button" data-memory-create-submit="booking">确认创建订单</button><button type="button" data-memory-create-cancel>取消</button>`;
     }
     if (proposal) {
       const set = (id,value) => { const el = $(id); if (el) el.value = value || ""; };
@@ -249,7 +250,7 @@ export function createMemoryPanel({
       const value = id => $(id)?.value || "";
       const fields = type === "client"
         ? { name:value("#memory-new-name"), city:value("#memory-new-city") }
-        : { clientId:value("#memory-new-client"), date:value("#memory-new-date"), artistId:value("#memory-new-artist"), venueId:value("#memory-new-venue"), service:value("#memory-new-service") };
+        : { clientId:value("#memory-new-client"), date:value("#memory-new-date"), artistId:value("#memory-new-artist"), venueId:value("#memory-new-venue"), service:value("#memory-new-service"),startTime:value("#memory-new-start"),endTime:value("#memory-new-end"),price:value("#memory-new-price"),channelId:value("#memory-new-channel") };
       const now = new Date().toISOString();
       const record = { ...validateNewEntity(type, fields, data), id:"demo-"+crypto.randomUUID(), createdAt:now };
       const source = rawText.trim() ? {

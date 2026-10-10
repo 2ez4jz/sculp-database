@@ -1370,3 +1370,5 @@ window.DEMO_NATIVE_TRANSLATIONS = {
   "Dec 30": "12月30日",
   "Dec 31": "12月31日"
 };
+
+Object.assign(window.DEMO_TRANSLATIONS, {"300 单虚构测试基线": "300 fictional orders baseline", "当前": "Current", "单": "orders", "本浏览器保存": "Saved in this browser", "修改演示订单": "Edit demo order", "服务日期": "Service date", "开始时间": "Start time", "结束时间": "End time", "订单状态": "Order status", "订单金额 · CAD": "Booking value · CAD", "到账原额 · CAD": "Gross receipts · CAD", "收款日期": "Receipt date", "主化妆师": "Lead artist", "服务说明": "Service details", "修改原因": "Reason for change", "核对修改": "Review changes", "核对修改前后内容": "Review before and after", "确认保存修改": "Confirm changes", "取消本次修改": "Cancel changes", "价格未确认": "Price unconfirmed", "到账原额 · 收款月": "Gross receipts · receipt month", "核对后只保存到此浏览器。订单金额与到账原额分别填写；未知价格留空，不作为零金额。": "After review, save in this browser. Enter booking value and gross receipts separately. Leave unknown prices blank.", "到账原额未扣退款；此版本没有成本和退款流水，不能计算利润。": "Gross receipts exclude refund adjustments. Costs and refund transactions are unavailable; profit cannot be calculated."});

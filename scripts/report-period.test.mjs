@@ -1,3 +1,5 @@
+import {bookings} from '../src/data/demo.js';
+import {advisorRowsFromBookings} from '../src/domain/demo-workspace.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {reportMonths,torontoMonth} from '../src/domain/report-period.js';
@@ -29,7 +31,7 @@ test('demo adapter attaches only requested fixture chart months and never calls 
   globalThis.localStorage={getItem:k=>state.get(k)||null,setItem:(k,v)=>state.set(k,v)};
   globalThis.window={DemoI18n:{language:'en'}};
   globalThis.fetch=async(url,options)=>{payload=JSON.parse(options.body);return Response.json({turn:{id:payload.requestId,user:payload.message,answer:'fixture reply'}});};
-  const adapter=demoChatAdapter({getIdentity:()=> 'test',getCatalog:()=>({bookings:[]}),getContext:()=>({role:'admin'}),saveBatch:()=>{}});
+  const adapter=demoChatAdapter({getIdentity:()=> 'test',getCatalog:()=>({bookings:[]}),getAdvisorRows:()=>advisorRowsFromBookings(bookings),getContext:()=>({role:'admin'}),saveBatch:()=>{}});
   const turn=await adapter.send('global',{requestId:crypto.randomUUID(),message:'2026-09 month revenue'});
   assert.deepEqual(turn.chartRows.map(r=>r.month),['2026-09']);
   assert.equal(turn.chartRows[0].amountCents,1968500);

@@ -1,7 +1,7 @@
 import { config } from "../config.js";
-import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=monthly-release-20261010a";
+import { advisorRowsFromBookings, advisorSnapshot } from "../domain/demo-workspace.js";
 import { reportMonths } from "../domain/report-period.js";
-import { advisorMetrics, advisorInsight } from "../domain/advisor-engine.js";
+import { advisorMetrics } from "../domain/advisor-engine.js";
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };
   if (supabase) {
@@ -29,10 +29,11 @@ export function demoChatAdapter({
   getIdentity,
   getCatalog,
   getContext,
+  getAdvisorRows,
   saveBatch,
   resolveLocal = () => null,
 }) {
-  const key = () => `sculpy-chat-v1:${getIdentity()}`;
+  const key = () => `sculpy-chat-300-v2:${getIdentity()}`;
   const read = (storageKey = key()) => {
     try {
       return JSON.parse(localStorage.getItem(storageKey) || "{}");
@@ -65,6 +66,7 @@ export function demoChatAdapter({
         state = read(storageKey),
         history = state[scope] || [];
       let result;
+      const rows = getAdvisorRows ? getAdvisorRows() : advisorRowsFromBookings(getCatalog().bookings);
       const preserveChart = /(?:饼图|pie)/i.test(body.message) && !/(?:300|虚拟|虚构|fictional|fixture)/i.test(body.message);
       const local = !preserveChart && /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);
       if (local) result = { turn: { ...local, id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };
@@ -87,24 +89,11 @@ export function demoChatAdapter({
           ...body,
           bookingId: scope === "global" ? null : scope,
           catalog: getCatalog(),
-          advisorFixture: (() => {
-            const rows = generateAdvisorFixtures();
-            return {
-              version: "sculp-300-v1", fictional: true,
-              summary: fixtureSummary(rows), insights: advisorInsight(rows),
-              byMonth: Array.from({length:12}, (_,i) => {
-                const month = `2026-${String(i+1).padStart(2,"0")}`;
-                return {month, ...advisorMetrics(rows, {month})};
-              }),
-              byService: ["bridal","occasion","lesson","commercial"].map(service=>({service,...advisorMetrics(rows,{service})})),
-              byChannel: ["Instagram","Google","Planner","Referral","Website"].map(channel=>({channel,...advisorMetrics(rows,{channel})})),
-            };
-          })(),
-          turns: history,
+          advisorFixture: getContext().role === "admin" ? advisorSnapshot(rows) : null,
+          turns: history.slice(-12),
           preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
         });
       if (!preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
-        const rows = generateAdvisorFixtures();
         result.turn.chartKey = "monthly-analytics";
         result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));
       }
