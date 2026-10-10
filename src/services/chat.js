@@ -1,5 +1,5 @@
 import { config } from "../config.js";
-import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=advisor-release-20261009c";
+import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=advisor-release-20261009d";
 import { advisorMetrics, advisorInsight } from "../domain/advisor-engine.js";
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };
@@ -90,7 +90,7 @@ export function demoChatAdapter({
           turns: history,
           preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
         });
-      if (scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
+      if (!preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
         const rows = generateAdvisorFixtures();
         result.turn.chartKey = "monthly-analytics";
         result.turn.chartRows = Array.from({length:12}, (_,i) => { const month = `2026-${String(i+1).padStart(2,"0")}`; return {month,amountCents:advisorMetrics(rows,{month}).completedCents}; });
