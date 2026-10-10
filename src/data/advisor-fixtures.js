@@ -34,12 +34,13 @@ export function fixtureSummary(records) {
   const counts={bridal:0,occasion:0,lesson:0,commercial:0};
   const months=Array(12).fill(0),channelsSummary={};
   let completedCents=0,paidCents=0;
+  const statusCounts={completed:0,confirmed:0,inquiry:0,cancelled:0};
   for(const row of records){
     if(!Object.hasOwn(counts,row.service)||!/^2026-(0[1-9]|1[0-2])$/.test(row.month))throw Error('Invalid fictional fixture');
-    counts[row.service]++;if(row.service==='bridal')months[Number(row.month.slice(5))-1]++;
+    statusCounts[row.status]++;counts[row.service]++;if(row.service==='bridal')months[Number(row.month.slice(5))-1]++;
     if(row.status==='completed')completedCents+=row.amountCents;
     paidCents+=row.paidCents;
     channelsSummary[row.channel]=(channelsSummary[row.channel]??0)+1;
   }
-  return {total:records.length,counts,bridalByMonth:months,completedCents,paidCents,channelsSummary};
+  return {total:records.length,currency:"CAD",statusCounts,completed:statusCounts.completed,counts,bridalByMonth:months,completedCents,paidCents,channelsSummary};
 }
