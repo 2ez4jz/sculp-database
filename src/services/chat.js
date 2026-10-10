@@ -1,5 +1,6 @@
 import { config } from "../config.js";
-import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=advisor-release-20261009d";
+import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=monthly-release-20261010a";
+import { reportMonths } from "../domain/report-period.js";
 import { advisorMetrics, advisorInsight } from "../domain/advisor-engine.js";
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };
@@ -86,14 +87,26 @@ export function demoChatAdapter({
           ...body,
           bookingId: scope === "global" ? null : scope,
           catalog: getCatalog(),
-          advisorFixture: (() => { const rows = generateAdvisorFixtures(); return { version: "sculp-300-v1", fictional: true, summary: fixtureSummary(rows), insights: advisorInsight(rows), byMonth: Array.from({length:12}, (_,i) => advisorMetrics(rows, {month:`2026-${String(i+1).padStart(2,"0")}`})), byService: ["bridal","occasion","lesson","commercial"].map(service=>({service,...advisorMetrics(rows,{service})})), byChannel: ["Instagram","Google","Planner","Referral","Website"].map(channel=>({channel,...advisorMetrics(rows,{channel})})) }; })(),
+          advisorFixture: (() => {
+            const rows = generateAdvisorFixtures();
+            return {
+              version: "sculp-300-v1", fictional: true,
+              summary: fixtureSummary(rows), insights: advisorInsight(rows),
+              byMonth: Array.from({length:12}, (_,i) => {
+                const month = `2026-${String(i+1).padStart(2,"0")}`;
+                return {month, ...advisorMetrics(rows, {month})};
+              }),
+              byService: ["bridal","occasion","lesson","commercial"].map(service=>({service,...advisorMetrics(rows,{service})})),
+              byChannel: ["Instagram","Google","Planner","Referral","Website"].map(channel=>({channel,...advisorMetrics(rows,{channel})})),
+            };
+          })(),
           turns: history,
           preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
         });
       if (!preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
         const rows = generateAdvisorFixtures();
         result.turn.chartKey = "monthly-analytics";
-        result.turn.chartRows = Array.from({length:12}, (_,i) => { const month = `2026-${String(i+1).padStart(2,"0")}`; return {month,amountCents:advisorMetrics(rows,{month}).completedCents}; });
+        result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));
       }
       const fresh = read(storageKey);
       write(
