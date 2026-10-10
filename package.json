@@ -1,0 +1,18 @@
+{
+  "name": "sculp-database",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "24.x" },
+  "scripts": {
+    "test": "node --test scripts/*.test.mjs",
+    "test:unit": "node --test scripts/domain.test.mjs scripts/backend.test.mjs scripts/context-memory.test.mjs scripts/account-admin.test.mjs scripts/chat.test.mjs scripts/intake-backend.test.mjs scripts/channels.test.mjs scripts/monthly-stats.test.mjs scripts/monthly-stats-edge.test.mjs scripts/monthly-insights.test.mjs scripts/monthly-chat.test.mjs scripts/cloud-report.test.mjs",
+    "test:database": "node --test scripts/memory-database.test.mjs scripts/auth-database.test.mjs scripts/chat-database.test.mjs scripts/intake-database.test.mjs scripts/cloud-operations-database.test.mjs",
+    "test:postgres": "node --test scripts/cloud-operations-database.test.mjs",
+    "test:recovery": "node scripts/postgres-recovery.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.3",
+    "pg": "8.16.3",
+    "playwright": "1.61.1"
+  }
+}

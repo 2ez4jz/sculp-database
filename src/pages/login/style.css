@@ -215,6 +215,15 @@
 .auth-workspace {
   max-width: 480px;
 }
+.cloud-report-metrics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.cloud-report-metrics dt { font-size: 13px; }
+.cloud-report-metrics dd { margin: 0 0 10px; font-weight: 600; overflow-wrap: anywhere; }
+[data-change-review] li { overflow-wrap: anywhere; }
+[data-report-warnings] { line-height: 1.7; overflow-wrap: anywhere; }
 @media (max-width: 760px) {
   .auth-layout {
     grid-template-columns: 1fr;

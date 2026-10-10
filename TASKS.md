@@ -40,3 +40,15 @@
 - [x] Enable new AI intake after explicit OpenAI destination authorization
 - [ ] Verify the full live-model flow with a real authenticated administrator account
 - [ ] Authenticated real-device cloud intake and team acceptance
+
+## Cloud operations iteration — local implementation
+
+- [x] Canonical order time/location/details/status confirmation, version conflicts, replay and audit
+- [x] Remove direct browser-role grants on canonical/financial tables; full migration and role matrix tests
+- [x] Minimal administrator cloud monthly RPC/UI with separate service-month value and gross receipt definitions
+- [x] Pinned test dependencies, PostgreSQL 17 multi-connection checks and fictional fixture backup/recovery
+- [ ] Apply new migration in private test Supabase and verify actual Auth/REST permissions
+- [ ] Real-account two-device order editing and deployed team acceptance
+- [ ] Service/personnel changes, reviewed AI change application, payment/refund ledger and cloud channels
+
+Current scope and release requirements: [Cloud operations V1](docs/CLOUD_OPERATIONS_V1.md).
