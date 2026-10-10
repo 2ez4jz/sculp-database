@@ -1,0 +1,36 @@
+// Real deployed-model evaluation: sole 300-order fictional baseline, no business writes.
+import {spawn} from 'node:child_process';
+import {writeFileSync,mkdirSync} from 'node:fs';
+import {bookings,clients,artists,partners} from '../src/data/demo.js';
+import {advisorRowsFromBookings,advisorSnapshot} from '../src/domain/demo-workspace.js';
+import {searchCatalog} from '../src/domain/sculpy.js';
+import {config} from '../src/config.js';
+const stamp='2026-10-10',output=process.argv[2]||'/tmp/sculp-daily-eval.json';
+const money=n=>(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+function metrics(rows,from,to){const selected=rows.filter(b=>b.date>=from&&b.date<=to),done=selected.filter(b=>b.status==='Completed');return {records:selected.length,completed:done.length,completedCents:done.reduce((n,b)=>n+(b.price===null?0:Math.round(b.price*100)),0),receivedCents:rows.filter(b=>b.paidDate>=from&&b.paidDate<=to).reduce((n,b)=>n+b.paidCents,0),unknownPrices:done.filter(b=>b.price===null).length,ids:selected.map(b=>b.id)}}
+const gold={today:metrics(bookings,stamp,stamp),mtd:metrics(bookings,'2026-10-01',stamp),september:metrics(bookings,'2026-09-01','2026-09-30'),instagramWedding:metrics(bookings.filter(b=>b.service==='Wedding'&&b.channelId==='instagram'),'2026-09-01','2026-09-30'),googleWedding:metrics(bookings.filter(b=>b.service==='Wedding'&&b.channelId==='google'),'2026-09-01','2026-09-30'),michelleWedding:metrics(bookings.filter(b=>b.service==='Wedding'&&b.artistIds.includes('michelle')),'2026-09-01','2026-09-30'),busyDay:metrics(bookings,'2026-09-05','2026-09-05'),futureCompleted:bookings.filter(b=>b.status==='Completed'&&b.date>stamp).length,pastCompleted:bookings.filter(b=>b.status==='Completed'&&b.date<=stamp).length};
+const numbers=(answer,g)=>[g.records,g.completed,money(g.completedCents),money(g.receivedCents)].every(n=>answer.replaceAll(',','').includes(String(n).replaceAll(',','').replace(/\.00$/,'')));
+const fictional=a=>/虚构|模拟|fictional|demo/i.test(a),noProfit=a=>/不能|无法|不支持|不足|不可|未|没有|cannot|unavailable/i.test(a);
+const changed=structuredClone(bookings);Object.assign(changed.find(b=>b.id==='b157'),{price:null,paidCents:5025,paidDate:'2026-10-09',channelId:null});
+const groups=[
+ [{id:'daily-today',message:'按多伦多2026年10月10日出经营日报。先列当天记录数、已完成数、已完成订单金额、按实际收款日统计的到账原额，然后解释服务类型+渠道+化妆师组合，并给最多3条有证据的行动。明确数据是虚构模拟。不要把全月数当今日数。',check:a=>numbers(a,gold.today)&&fictional(a)},
+ {id:'daily-mtd-followup',message:'继续：补本月截至10月10日的累计数据，不能包含10月11日以后的已完成状态。给记录数、完成数、完成金额、实际到账，分别与刚才今日数区分。',check:a=>numbers(a,gold.mtd)},
+ {id:'daily-next-week',message:'下一步检查10月11日至17日的待服务安排，只列已确认和咨询中，按日期、化妆师、服务组合。未来日期已经写成Completed的记录请标数据质量问题，不能当真实已服务。有哪些该核对的风险？',check:a=>/确认|咨询/.test(a)&&/核对|质量|未来/.test(a)&&/3|三/.test(a)&&/Education|教学|课程/.test(a)},
+ {id:'daily-receivables',message:'日报里已完成金额减到账能直接叫逾期应收吗？有没有办法知道今天新增了几单，或者客户转化率？按当前字段解释，不要假设。',check:a=>noProfit(a)&&/逾期/.test(a)&&/创建|新增|时间戳|created/i.test(a)},
+ {id:'daily-busy-day',message:'再独立出2026-09-05日报：先列记录总数、完成数、完成金额和到账原额，再按化妆师+时段+状态检查排班重叠。尤其核对Elaine参与的两个婚礼是否已全确认；不要把Inquiry占位说成确定的双重预约，不要猜路程。',check:a=>numbers(a,gold.busyDay)&&/Elaine/.test(a)&&/咨询|Inquiry/.test(a)&&/重叠|冲突|同一/.test(a)}],
+ [{id:'cross-instagram-wedding',message:'组合筛选：2026年9月+婚礼Wedding+Instagram渠道。请精确列记录数、已完成数、已完成金额和到账原额，金额为CAD，取消单不计完成金额。若查询不支持交叉筛选，要说明，不要从独立汇总猜数字。',check:a=>numbers(a,gold.instagramWedding)&&/样本/.test(a)},
+ {id:'cross-google-followup',message:'保持9月婚礼条件，只把渠道改成Google。列同样四项指标，再和刚才Instagram比较。样本少于10单要提示，不要叫ROI或获客转化率。',check:a=>numbers(a,gold.googleWedding)&&/样本/.test(a)&&!/Google.{0,25}(多.?1.?条记录|多.?一.?条记录)/.test(a)},
+ {id:'cross-michelle-wedding',message:'重新独立计算9月婚礼且Michelle参与的订单（主负责人或协作都算），取消单不计完成金额：记录数、完成数、完成金额、到账原额。然后说明这能不能代表工时利用率。',check:a=>numbers(a,gold.michelleWedding)&&noProfit(a)&&/样本/.test(a)},
+ {id:'cross-channel-actions',message:'利用上面组合做获客建议：我应该把预算全投Instagram吗？你能算真实转化率、CAC和ROI吗？列最多3个小规模验证动作，各写所需新增数据和停止/继续规则。不要虚构广告花费或线索数量。',check:a=>noProfit(a)&&/线索|咨询/.test(a)&&/花费|成本|预算/.test(a)},
+ {id:'cross-september-rank',message:'用9月全量订单按渠道分组，分别指出已完成金额最高的渠道和到账原额最高的渠道及金额，两种排名要独立比较。记录数包含取消，不要当咨询线索数。',check:a=>/website|官网/i.test(a)&&a.replaceAll(',','').includes('5475')&&a.replaceAll(',','').includes('3745')}],
+ [{id:'finance-september',message:'2026年9月按已完成服务月金额和实际收款月到账原额分别做财务日报背景。列9月记录总数（含取消）、完成数、完成金额、到账原额，并解释差额为何不能直接说利润或逾期欠款。',check:a=>numbers(a,gold.september)&&noProfit(a)},
+ {id:'finance-future-completed',message:'截至多伦多2026-10-10，这300单里有多少已完成记录日期在未来？多少已完成日期不晚于今天？请实际核对全量，未来已完成不能当今天以前的真实业绩，给数据质量提示。',check:a=>a.includes(String(gold.futureCompleted))&&a.includes(String(gold.pastCompleted))&&/未来/.test(a)},
+ {id:'finance-mutated-order',variant:true,message:'只查当前订单b157。我已经在测试数据把价格清空，收款改为CAD50.25且收款日2026-10-09，来源留空。出它10月10日的简短日报：服务完成数、完成金额是否完整、今天到账、昨天到账、渠道是否已知。不能沿用原来的CAD425或Instagram。',check:a=>/50\.25/.test(a)&&/缺|未知|未确认/.test(a)&&!/到账.{0,5}(425|50\.25).*今天/.test(a)},
+ {id:'daily-english',variant:true,message:'Give a short English daily report for booking b157 on October 10, 2026, using the CURRENT fields. State that its price and acquisition source are unknown, and the CAD50.25 receipt belongs to October 9. Do not invent net profit or claim a saved report.',check:a=>/50\.25/.test(a)&&/unknown|missing|unconfirmed/i.test(a)&&!/\p{Script=Han}/u.test(a)},
+ {id:'daily-empty',message:'独立检查2026-10-11日报：是否有当天服务记录和当天到账？若为零就报零，只代表目录未记录，不要虚构一单，也不要沿用刚才b157的金额。',check:a=>/0|零|没有/.test(a)&&/未记录|目录|不代表/.test(a)&&!/50\.25|425/.test(a)}]
+];
+const results=[];mkdirSync('docs/evaluations',{recursive:true});
+function persist(){writeFileSync(output,JSON.stringify({date:stamp,mode:'fictional_300_live',gold,results},null,2));}
+async function request(body){return new Promise(resolve=>{const child=spawn('curl',['-sS','--max-time','150',config.supabaseUrl+'/functions/v1/sculpy-chat','-H','Origin: http://localhost:4173','-H','Content-Type: application/json','-H','apikey: '+config.supabasePublishableKey,'--data-binary','@-']);let out='',err='';child.stdout.on('data',x=>out+=x);child.stderr.on('data',x=>err+=x);child.on('close',()=>{try{resolve(JSON.parse(out))}catch{resolve({error:err||out})}});child.stdin.end(JSON.stringify(body));})}
+await Promise.all(groups.map(async cases=>{let turns=[];for(const c of cases){if(process.env.EVAL_CASES&&!process.env.EVAL_CASES.split(',').includes(c.id))continue;const rows=c.variant?changed:bookings;const catalog=searchCatalog({bookings:rows,artists,partners,notes:[],client:id=>clients.find(x=>x.id===id),serviceName:{Wedding:'婚礼',Event:'活动',Education:'教学',Commercial:'商业'},context:{role:'admin'}});const start=Date.now();const data=await request({mode:'demo',requestId:crypto.randomUUID(),bookingId:c.variant?'b157':null,message:c.message,turns:turns.slice(-4),preferences:{verbosity:'detailed'},language:c.id==='daily-english'?'en':'zh',catalog,advisorFixture:advisorSnapshot(advisorRowsFromBookings(rows))});const row={id:c.id,message:c.message,ms:Date.now()-start,passed:!!data.turn&&c.check(data.turn.answer),...data};results.push(row);persist();if(data.turn)turns.push(data.turn);console.log(JSON.stringify({id:c.id,passed:row.passed,ms:row.ms,error:data.error,answer:data.turn?.answer}));}}));
+console.log(`Passed ${results.filter(x=>x.passed).length}/${results.length}. Heuristic checks require manual review.`);

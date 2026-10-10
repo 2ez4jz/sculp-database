@@ -39,3 +39,13 @@ test('demo adapter attaches only requested fixture chart months and never calls 
   assert.equal(payload.advisorFixture.byMonth[8].month,'2026-09');
  }finally{globalThis.fetch=oldFetch;globalThis.localStorage=oldStorage;globalThis.window=oldWindow;}
 });
+test('daily, cutoff and intersection questions never show a conflicting full-month chart or local answer',async()=>{
+ const oldFetch=globalThis.fetch,oldStorage=globalThis.localStorage,oldWindow=globalThis.window;
+ try{
+  globalThis.localStorage={getItem:()=>null,setItem:()=>{}};globalThis.window={DemoI18n:{language:'zh'}};
+  let local=0,online=0;globalThis.fetch=async()=>{online++;return Response.json({turn:{answer:'精确日报'}})};
+  const adapter=demoChatAdapter({getIdentity:()=> 'report',getCatalog:()=>({bookings:[]}),getAdvisorRows:()=>advisorRowsFromBookings(bookings),getContext:()=>({role:'admin'}),saveBatch:()=>{},resolveLocal:()=>{local++;return {answer:'整月本地统计'}}});
+  for(const message of ['今天收入日报','本月截至10月10日收入','9月Instagram婚礼收入','September Michelle revenue']){const t=await adapter.send('global',{requestId:crypto.randomUUID(),message});assert.equal(t.answer,'精确日报');assert.equal(t.chartRows,undefined);}
+  assert.equal(local,0);assert.equal(online,4);
+ }finally{globalThis.fetch=oldFetch;globalThis.localStorage=oldStorage;globalThis.window=oldWindow;}
+});

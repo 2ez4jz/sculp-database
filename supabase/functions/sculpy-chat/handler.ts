@@ -1,3 +1,4 @@
+import {demoReport} from "./demo-report.ts";
 import { converse } from "./core.ts";
 const env = (key: string) => Deno.env.get(key) || "";
 const origins = new Set(
@@ -208,6 +209,7 @@ export async function handleRequest(req: Request) {
       },
       monthlyReport: !demo && ["owner", "operations"].includes(context.actor?.role)
         ? (month: string) => rpc("sculpy_monthly_report", { p_month: month }) : undefined,
+      demoReport: demo && context.advisorFixture ? (args:any)=>demoReport(demoCatalog,args,context.localDate) : undefined,
       callModel: async (payload: any) => {
         const response = await fetch("https://api.openai.com/v1/responses", {
           method: "POST",

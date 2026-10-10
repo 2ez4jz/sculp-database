@@ -56,6 +56,12 @@ export const monthlyReportTool = {
   parameters: { type: "object", additionalProperties: false,
     properties: { month: { type: "string", pattern: "^20[0-9]{2}-(0[1-9]|1[0-2])$" } }, required: ["month"] },
 };
+export const demoReportTool = {
+ type:'function',name:'query_demo_report',strict:true,
+ description:'仅虚构Demo使用：从当前完整目录精确计算日期区间与服务、渠道、化妆师参与、订单ID、状态的AND交叉筛选。服务金额按服务日期，到账原额按收款日期独立计算。全部金额为CAD分。from/to含首尾。无筛选时传null；channelId=unattributed筛无渠道。artistId含协作者；groupBy artist仅按主负责人分组，不是工时。汇总覆盖全量，recordsSample最多30条。',
+ parameters:{type:'object',additionalProperties:false,properties:{from:{type:'string'},to:{type:'string'},service:{type:['string','null'],enum:[null,'Wedding','Event','Education','Commercial','Trial','Photoshoot']},channelId:{type:['string','null']},artistId:{type:['string','null']},bookingId:{type:['string','null']},status:{type:['string','null'],enum:[null,'Completed','Confirmed','Inquiry','Cancelled']},groupBy:{type:['string','null'],enum:[null,'service','channel','artist']}},required:['from','to','service','channelId','artistId','bookingId','status','groupBy']}
+};
+const demoReportingInstructions = `当前Demo精确报表：工具存在时，日报、截至某日累计、交叉筛选、分组排名和未来已完成核对必须调用 query_demo_report，不能用独立维度汇总拼接，不能由语言模型逐条心算全量。按localDate解释今日；当期累计to不得超出截至日期。金额为CAD分，除以100。records含取消，statusCounts分开；grossReceivedCents按同一服务/渠道/参与者范围的收款日期统计，与服务日期独立，不代表净收款或利润。catalogQuality是全目录质量核对；futureCompleted不计截至今天业绩，但保留为核对项，不擅自改状态。未来已到账日期也不能当今天已到账。sampleTruncated只限制详情样本，全部匹配行已用于精确汇总，不得把它说成汇总不全。unknownPrice不能填0：unpricedCompleted非零表示已完成金额不完整。未知渠道用unattributed，ID按目录原值，Google用google、Instagram用instagram；化妆师ID小写。artistId包括协作者，groupBy artist按主负责人，不能当工时利用率。创建时间、真实线索分母、广告花费、成本、退款及账期缺失时不能算新增订单、转化率、CAC、ROI、利润、净收款或逾期应收。工具结果优先于旧回答，保留本轮已读结果，不因下轮上下文首页不含该单而撤回已验证事实。涉及最高/第一/并列等排名，必须直接使用rankings对应字段的leaders和maximum；已完成金额用rankings.completedAmountCents，到账用rankings.grossReceivedCents，不用完成数排名代替金额，不在记录样本中自己寻找最大值。存在未知价格时说明金额排名仅基于已知价格。涉及渠道比较时优先使用channelComparisons.currentMinusPeer的程序差值：负数是当前渠道更少，正数更多；recordCountRelation=fewer必须说记录更少，不能颠倒，完成数的大小不能套到记录数。细分报表warning=LOW_SAMPLE时正文明确说明样本较小、不能据此推断长期表现。首次独立日报/经营分析标明虚构模拟；连续追问可简短沿用。经营建议标为分析/假设并给可验证行动，不虚构市场事实。`;
 const reportingInstructions = `正式云端月报：需要全局订单量、月度收入、收款或趋势时，必须调用 query_monthly_report 读取对应月份，不能把订单列表首页当全量统计。相对月份按 currentContext.localDate 的多伦多月份解析；过去/最近N个月包括本月，去年/上月按日历计算，比较时分别查询各月。工具没有提供时，不能声称已查到正式经营月报。每轮最多读取12个不同月份，超出时请缩小范围。月报 total 不含取消；completedAmountCents 是服务月已完成订单金额，grossAmountCents 是收款月到账原额（未扣退款），全部金额为 CAD 分字符串。没有退款流水与成本不能计算净收款、利润或ROI；unpriced、nonCadCompleted、nonCadCount、refundReviewCount、undatedReceiptCount 的非零值应提醒核对。返回0只代表该月云端已记录数据为0，不代表实际业务为0或已经全部录入。query_monthly_report 只支持整月全局统计，不支持渠道/客户/人员交叉筛选；此类问题不能套用全局结果。答案说明月份与数据口径；当前正式查询结果优先于历史聊天。`;
 export async function converse({
   context,
@@ -66,6 +72,7 @@ export async function converse({
   query,
   callModel,
   monthlyReport,
+  demoReport,
 }: any) {
   const seen = new Map((context.bookings || []).map((b: any) => [b.id, b]));
   const sourceIds = new Set([
@@ -89,13 +96,15 @@ export async function converse({
     { role: "user", content: message },
   ];
   const reports = new Map<string, any>();
+  const demoReports = new Map<string, any>();
   const canReport = typeof monthlyReport === "function" && ["owner", "operations"].includes(context.actor?.role);
+  const canDemoReport = context.mode === "fictional_demo" && !!context.advisorFixture && typeof demoReport === "function";
   const usage = { input_tokens: 0, output_tokens: 0, calls: 0 };
   for (let round = 0; round < 4; round++) {
     const response = await callModel({
-      instructions: instructions + "\n" + reportingInstructions,
+      instructions: instructions + "\n" + reportingInstructions + (canDemoReport ? "\n" + demoReportingInstructions : ""),
       input,
-      tools: round < 3 ? [queryTool, ...(canReport ? [monthlyReportTool] : [])] : [],
+      tools: round < 3 ? [queryTool, ...(canReport ? [monthlyReportTool] : []), ...(canDemoReport ? [demoReportTool] : [])] : [],
       text: {
         format: {
           type: "json_schema",
@@ -117,7 +126,7 @@ export async function converse({
       input.push(...response.output);
       for (const call of calls) {
         let output: any;
-        if (!["query_bookings", ...(canReport ? ["query_monthly_report"] : [])].includes(call.name) || calls.length > 12)
+        if (!["query_bookings", ...(canReport ? ["query_monthly_report"] : []), ...(canDemoReport ? ["query_demo_report"] : [])].includes(call.name) || calls.length > 12)
           output = { error: "Unsupported tool or too many queries" };
         else {
           try {
@@ -131,8 +140,13 @@ export async function converse({
                 reports.set(args.month, report);
               }
               output = { source: "canonical_cloud_monthly_report", ...reports.get(args.month) };
-            } else output = await query(args);
-            for (const b of Array.isArray(output.bookings) ? output.bookings : []) {
+            } else if (call.name === "query_demo_report") {
+              const key=JSON.stringify(args);
+              if(!demoReports.has(key)){if(demoReports.size>=12)throw Error('Too many demo reports');demoReports.set(key,await demoReport(args));}
+              output=demoReports.get(key);
+            }
+            else output = await query(args);
+            for (const b of Array.isArray(output.bookings) ? output.bookings : Array.isArray(output.recordsSample) ? output.recordsSample : []) {
               seen.set(b.id, b);
               sourceIds.add(b.id);
             }
@@ -187,6 +201,7 @@ export async function converse({
             p.bookingId,
         })),
       ...((reports.size || canReport && turns.some((t: any) => t.businessReport)) ? { businessReport: true, reportSources: [...reports.values()].map(r => ({month: r.month, asOf: r.asOf, source: "canonical_cloud_monthly_report"})) } : {}),
+      ...(demoReports.size ? {demoReportSources:[...demoReports.values()].map(r=>({source:r.source,fictional:r.fictional,asOfDate:r.asOfDate,filters:r.filters,coverage:r.coverage,records:r.records,completed:r.completed,completedAmountCents:r.completedAmountCents,grossReceivedCents:r.grossReceivedCents,unpricedCompleted:r.unpricedCompleted,catalogQuality:r.catalogQuality}))} : {}),
       sourceIds: [...sourceIds],
       usage,
     };
