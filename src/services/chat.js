@@ -1,5 +1,5 @@
 import { config } from "../config.js";
-import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=advisor-release-20261009b";
+import { generateAdvisorFixtures, fixtureSummary } from "../data/advisor-fixtures.js?v=advisor-release-20261009c";
 import { advisorMetrics, advisorInsight } from "../domain/advisor-engine.js";
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };
@@ -64,7 +64,8 @@ export function demoChatAdapter({
         state = read(storageKey),
         history = state[scope] || [];
       let result;
-      const local = /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);
+      const preserveChart = /(?:饼图|pie)/i.test(body.message) && !/(?:300|虚拟|虚构|fictional|fixture)/i.test(body.message);
+      const local = !preserveChart && /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);
       if (local) result = { turn: { ...local, id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };
       else if (config.aiMode === "mock")
         result = {
