@@ -1,3 +1,4 @@
+import {buildAnalysisCharts,wantsAnalysisVisual} from "../components/analysis/charts.js";
 import { config } from "../config.js";
 import { advisorRowsFromBookings, advisorSnapshot } from "../domain/demo-workspace.js";
 import { reportMonths } from "../domain/report-period.js";
@@ -66,10 +67,11 @@ export function demoChatAdapter({
         state = read(storageKey),
         history = state[scope] || [];
       let result;
+      const catalog=getCatalog();
       const rows = getAdvisorRows ? getAdvisorRows() : advisorRowsFromBookings(getCatalog().bookings);
       const preserveChart = /(?:饼图|pie)/i.test(body.message) && !/(?:300|虚拟|虚构|fictional|fixture)/i.test(body.message);
       const scopedReport = /(?:日报|daily|截至|as of|今日|[今昨明]天|组合|交叉|渠道|channel|婚礼|Wedding|化妆师|artist|Instagram|Google|Michelle|Miranda|Emily|Elaine|Giselle|Angelina|Yuki|Mira)/i.test(body.message);
-      const local = scopedReport || !preserveChart && /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);
+      const local = wantsAnalysisVisual(body.message) || scopedReport || !preserveChart && /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);
       if (local) result = { turn: { ...local, id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };
       else if (config.aiMode === "mock")
         result = {
@@ -89,7 +91,7 @@ export function demoChatAdapter({
           mode: "demo",
           ...body,
           bookingId: scope === "global" ? null : scope,
-          catalog: getCatalog(),
+          catalog,
           advisorFixture: getContext().role === "admin" ? advisorSnapshot(rows) : null,
           turns: history.slice(-12),
           preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
@@ -97,6 +99,10 @@ export function demoChatAdapter({
       if (!scopedReport && !preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
         result.turn.chartKey = "monthly-analytics";
         result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));
+      }
+      if(scope === "global" && getContext().role === "admin") {
+        result.turn.analysisCharts=buildAnalysisCharts({message:body.message,bookings:catalog.bookings,reports:result.turn.demoReportSources||[],previousReports:[...history].reverse().find(t=>t.demoReportSources?.length)?.demoReportSources||[]});
+        if(result.turn.analysisCharts.length){delete result.turn.chartKey;delete result.turn.chartRows;}
       }
       const fresh = read(storageKey);
       write(
