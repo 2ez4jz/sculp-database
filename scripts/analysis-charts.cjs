@@ -22,15 +22,18 @@ const assert=require('node:assert/strict');
   assert.match(await last().innerText(),/订单目前走到哪一步/);
   await last().scrollIntoViewIfNeeded();await page.screenshot({path:'qa-screens/analysis-daily-desktop.png'});
   await send('8月和9月收入对比');assert.equal(await last().locator('.analysis-line').count(),1);
-  await page.setViewportSize({width:390,height:844});await last().scrollIntoViewIfNeeded();
+  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(350);await last().scrollIntoViewIfNeeded();
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   assert(await last().evaluate(el=>el.scrollWidth<=el.clientWidth+1));
-  await page.screenshot({path:'qa-screens/analysis-trend-mobile.png'});
+  await last().locator('.analysis-card').first().evaluate(el=>el.scrollIntoView({block:'start'}));await page.screenshot({path:'qa-screens/analysis-trend-mobile.png'});
   await send('9月排期');assert.equal(await last().locator('.analysis-schedule-row').count(),12);
   await last().scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:'qa-screens/analysis-schedule-mobile.png'});
   await page.reload();await page.locator('#chat-input:not(:disabled)').waitFor();assert(await page.locator('.analysis-line').count());
-  await page.selectOption('#role','artist');await page.locator('#chat-input:not(:disabled)').waitFor();
+  const preview=await browser.newPage({viewport:{width:390,height:1100}});
+  for(const kind of ['donut','trend','schedule']){const html=await page.locator('[data-analysis-chart="'+kind+'"]').first().evaluate(el=>el.outerHTML);await preview.setContent('<link rel="stylesheet" href="http://localhost:4173/src/components/chat/panel.css"><div style="padding:12px;font-family:Arial,sans-serif">'+html+'</div>');await preview.waitForTimeout(150);await preview.screenshot({path:'qa-screens/analysis-'+kind+'-card-mobile.png'});}
+  await preview.close();
+  await page.selectOption('#role','artist');await page.evaluate(()=>location.hash='sculpy');await page.waitForFunction(()=>document.querySelector('#main')?.dataset.route==='#sculpy');await page.locator('#chat-input:not(:disabled)').waitFor();
   await send('9月收入饼图');assert.equal(await page.locator('.analysis-card').count(),0);
   assert.deepEqual(errors,[]);console.log('Automatic charts: exact daily report, desktop/mobile, trend, schedule, history and role isolation passed');
  }finally{await browser.close();}

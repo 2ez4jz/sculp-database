@@ -7,7 +7,7 @@ const args={from:'2026-10-10',to:'2026-10-10',service:null,channelId:null,artist
 const report=(patch={},rows=bookings)=>demoReport(rows,{...args,...patch},'2026-10-10');
 test('daily report, month-to-date cutoff and future completion quality use full 300 records',()=>{
  const day=report();assert.equal(day.records,1);assert.equal(day.completedAmountCents,42500);assert.equal(day.grossReceivedCents,42500);assert.equal(day.catalogQuality.futureCompleted,35);assert.equal(day.catalogQuality.completedOnOrBeforeAsOf,187);
- const mtd=report({from:'2026-10-01'});assert.equal(mtd.records,7);assert.equal(mtd.completed,6);assert.equal(mtd.completedAmountCents,507000);assert.equal(mtd.grossReceivedCents,442500);assert.equal(mtd.futureCompleted,0);
+ const mtd=report({from:'2026-10-01'});assert.equal(mtd.records,7);assert.equal(mtd.completed,6);assert.equal(mtd.completedAmountCents,507000);assert.equal(mtd.grossReceivedCents,442500);assert.deepEqual(mtd.displayAmounts,{completed:'CAD 5,070.00',grossReceived:'CAD 4,425.00'});assert.equal(mtd.futureCompleted,0);
  const all=report({from:'2026-01-01',to:'2026-12-31'});assert.equal(all.records,300);assert.equal(all.completed,222);assert.equal(all.sampleTruncated,true);assert.equal(all.coverage.allMatchingRowsAggregated,true);
 });
 test('AND combinations and group totals distinguish artist participation from lead responsibility',()=>{

@@ -13,10 +13,12 @@ export function demoReport(catalog,args,asOfDate){
  const aggregate=(rows)=>{
   const selected=rows.filter(b=>validDate(b.date)&&b.date>=args.from&&b.date<=args.to),completed=selected.filter(b=>b.status==='Completed');
   const receipts=rows.filter(b=>validDate(b.paidDate)&&b.paidDate>=args.from&&b.paidDate<=args.to);
+  const displayAmount=n=>'CAD '+(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
   const stateCounts=Object.fromEntries(statuses.map(s=>[s,selected.filter(b=>b.status===s).length]));
   const priced=completed.filter(b=>(!b.currency||b.currency==='CAD')&&cents(b)!==null);
   const validReceipts=receipts.filter(b=>(!b.currency||b.currency==='CAD')&&Number.isSafeInteger(b.paidCents)&&b.paidCents>=0);
   return {warning:selected.length<10?'LOW_SAMPLE':null,records:selected.length,statusCounts:stateCounts,completed:completed.length,completedAmountCents:priced.reduce((n,b)=>n+cents(b),0),grossReceivedCents:validReceipts.reduce((n,b)=>n+b.paidCents,0),
+   displayAmounts:{completed:displayAmount(priced.reduce((n,b)=>n+cents(b),0)),grossReceived:displayAmount(validReceipts.reduce((n,b)=>n+b.paidCents,0))},
    unpricedCompleted:completed.filter(b=>cents(b)===null).length,nonCadCompleted:completed.filter(b=>b.currency&&b.currency!=='CAD').length,
    futureCompleted:completed.filter(b=>b.date>asOfDate).length,completedOnOrBeforeAsOf:completed.filter(b=>b.date<=asOfDate).length,
    unknownChannel:selected.filter(b=>!b.channelId).length,unknownTime:selected.filter(b=>!b.startTime||!b.endTime).length,
