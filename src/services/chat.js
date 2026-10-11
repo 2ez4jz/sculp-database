@@ -101,7 +101,7 @@ export function demoChatAdapter({
         result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));
       }
       if(scope === "global" && getContext().role === "admin") {
-        result.turn.analysisCharts=buildAnalysisCharts({message:body.message,bookings:catalog.bookings,reports:result.turn.demoReportSources||[],previousReports:[...history].reverse().find(t=>t.demoReportSources?.length)?.demoReportSources||[]});
+        result.turn.analysisCharts=buildAnalysisCharts({message:body.message,bookings:catalog.bookings,reports:result.turn.demoReportSources||[],previousReports:[...history].reverse().find(t=>t.demoReportSources?.length)?.demoReportSources||[],previousMessage:[...history].reverse().find(t=>t.demoReportSources?.length)?.user||''});
         if(result.turn.analysisCharts.length){delete result.turn.chartKey;delete result.turn.chartRows;}
       }
       const fresh = read(storageKey);

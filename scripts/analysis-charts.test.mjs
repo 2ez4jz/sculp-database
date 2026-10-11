@@ -66,3 +66,9 @@ test('receipt composition uses receipt dates and its own metric label',()=>{
  assert.equal(chart.metric,'grossReceivedCents');assert.equal(chart.rows.reduce((n,r)=>n+r.value,0),report().grossReceivedCents);
  assert.match(renderAnalysisCharts([chart],esc),/到账原额 · CAD/);
 });
+test('vague draw followup preserves receipt metric or status grouping from the previous question',()=>{
+ const receipt=build('用图看看',[],{previousReports:[report({groupBy:'channel'})],previousMessage:'9月各渠道收款占比'})[0];
+ assert.equal(receipt.metric,'grossReceivedCents');assert.equal(receipt.title,'channel');
+ const status=build('用图看看',[],{previousReports:[report({service:'Wedding',channelId:'instagram'})],previousMessage:'Instagram婚礼订单状态'})[0];
+ assert.equal(status.title,'status');assert.equal(status.rows.reduce((n,r)=>n+r.value,0),3);
+});

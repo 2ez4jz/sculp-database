@@ -43,3 +43,23 @@ export function demoReport(catalog,args,asOfDate){
   limitations:{newOrderCountUnavailable:true,conversionRateUnavailable:true,profitUnavailable:true,netReceiptsUnavailable:true,overdueReceivablesUnavailable:true},
   catalogQuality:{futureDatedReceipts:catalog.filter(b=>b.paidCents>0&&validDate(b.paidDate)&&b.paidDate>asOfDate).length,futureCompleted:catalog.filter(b=>b.status==='Completed'&&validDate(b.date)&&b.date>asOfDate).length,completedOnOrBeforeAsOf:catalog.filter(b=>b.status==='Completed'&&validDate(b.date)&&b.date<=asOfDate).length,invalidServiceDates:catalog.filter(b=>!validDate(b.date)).length}};
 }
+
+// Basic chart figures are rendered from verified tool results, never model arithmetic.
+export function demoVisualSummary(report,question,en=false){
+ const names={Wedding:['婚礼','Wedding'],Event:['活动','Event'],Education:['课程','Education'],Commercial:['商业','Commercial'],Completed:['已完成','Completed'],Confirmed:['已确认','Confirmed'],Inquiry:['咨询中','Inquiry'],Cancelled:['已取消','Cancelled'],website:['官网','Website'],referral:['转介绍','Referral'],instagram:['Instagram','Instagram'],google:['Google','Google'],planner:['Planner','Planner'],unattributed:['未归因','Unattributed']};
+ const name=v=>names[v]?.[en?1:0]||v;
+ const money=n=>'CAD '+(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+ const monetary=/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(question);
+ const metric=monetary?/(到账|收款|receipt|received)/i.test(question)&&!/(完成|completed)/i.test(question)?'grossReceivedCents':'completedAmountCents':'records';
+ const scope=Object.entries(report.filters).filter(([k,v])=>!['from','to','groupBy'].includes(k)&&v!==null).map(([,v])=>name(v)).join(' · ');
+ const groups=report.groups.length?report.groups.map(g=>({label:name(g.value),value:g[metric]})):!monetary?Object.entries(report.statusCounts).map(([k,value])=>({label:name(k),value})):[];
+ const total=report[metric],fmt=v=>monetary?money(v):v+(en?' records':' 条');
+ const heading=(en?'Fictional test data: ':'虚构测试数据：')+report.filters.from+' → '+report.filters.to+(scope?' · '+scope:'');
+ let text=heading+'\n'+(en?'Total: ':'合计：')+fmt(total)+(en?'.':'。');
+ if(groups.length&&total>0)text+='\n'+groups.map(g=>g.label+' '+fmt(g.value)+'（'+(g.value/total*100).toFixed(1)+'%）').join('；')+(en?'.':'。');
+ if(report.warning)text+='\n'+(en?'Small sample: these records do not establish long-term performance.':'样本少，只说明这部分记录的情况。');
+ if(monetary)text+='\n'+(metric==='grossReceivedCents'?(en?'Receipts follow actual receipt dates, before refunds.':'收款按实际收款日期统计，为未扣退款的到账原额。'):(en?'Completed value follows service dates; it is not profit.':'完成金额按服务日期统计，不是利润。'));
+ if(metric==='completedAmountCents'&&(report.unpricedCompleted||report.nonCadCompleted))text+='\n'+(en?'Missing prices or non-CAD amounts make this total incomplete.':'有未知价格或非 CAD 金额，合计不完整。');
+ if(report.futureCompleted)text+='\n'+(en?'Future-dated completed statuses require review.':'含未来日期的完成状态，需核对。');
+ return text;
+}

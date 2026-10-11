@@ -33,3 +33,8 @@ test('exact demo reports are unavailable in cloud and limited employee contexts;
  assert(body.input.some(i=>i.type==='function_call_output'&&i.output.includes('42500')));return {output_text:JSON.stringify({answer:'CAD425',references:['b157'],proposals:[]})};}});
  assert.equal(reads,1);assert.equal(r.demoReportSources[0].records,1);assert.equal(r.references[0].id,'b157');
 });
+test('basic visual answer uses exact tool cents even if AI invents totals or chart code',async()=>{
+ const filters={...args,from:'2026-09-01',to:'2026-09-30',groupBy:'channel'};let calls=0;
+ const r=await converse({context:{mode:'fictional_demo',advisorFixture:{},bookings:[]},turns:[],message:'9月到账占比饼图',preferences:{},rules:'',query:async()=>({}),demoReport:a=>report(a),callModel:async()=>++calls===1?{output:[{type:'function_call',name:'query_demo_report',call_id:'chart',arguments:JSON.stringify(filters)}]}:{output_text:JSON.stringify({answer:'总额 CAD 9,436.00，```mermaid pie```',references:[],proposals:[]})}});
+ assert.match(r.answer,/CAD 13,725\.00/);assert.match(r.answer,/CAD 3,745\.00（27\.3%）/);assert(!r.answer.includes('9,436'));assert(!r.answer.includes('mermaid'));
+});
