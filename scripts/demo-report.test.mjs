@@ -7,7 +7,7 @@ const args={from:'2026-10-10',to:'2026-10-10',service:null,channelId:null,artist
 const report=(patch={},rows=bookings)=>demoReport(rows,{...args,...patch},'2026-10-10');
 test('daily report, month-to-date cutoff and future completion quality use full 300 records',()=>{
  const day=report();assert.equal(day.records,1);assert.equal(day.completedAmountCents,42500);assert.equal(day.grossReceivedCents,42500);assert.equal(day.catalogQuality.futureCompleted,35);assert.equal(day.catalogQuality.completedOnOrBeforeAsOf,187);
- const mtd=report({from:'2026-10-01'});assert.equal(mtd.records,7);assert.equal(mtd.completed,6);assert.equal(mtd.completedAmountCents,507000);assert.equal(mtd.grossReceivedCents,442500);assert.equal(mtd.futureCompleted,0);
+ const mtd=report({from:'2026-10-01'});assert.equal(mtd.records,7);assert.equal(mtd.completed,6);assert.equal(mtd.completedAmountCents,507000);assert.equal(mtd.grossReceivedCents,442500);assert.deepEqual(mtd.displayAmounts,{completed:'CAD 5,070.00',grossReceived:'CAD 4,425.00'});assert.equal(mtd.futureCompleted,0);
  const all=report({from:'2026-01-01',to:'2026-12-31'});assert.equal(all.records,300);assert.equal(all.completed,222);assert.equal(all.sampleTruncated,true);assert.equal(all.coverage.allMatchingRowsAggregated,true);
 });
 test('AND combinations and group totals distinguish artist participation from lead responsibility',()=>{
@@ -32,4 +32,9 @@ test('exact demo reports are unavailable in cloud and limited employee contexts;
  if(++calls===1)return {output:[{type:'function_call',name:'query_demo_report',call_id:'d1',arguments:JSON.stringify(args)},{type:'function_call',name:'query_demo_report',call_id:'d2',arguments:JSON.stringify(args)}]};
  assert(body.input.some(i=>i.type==='function_call_output'&&i.output.includes('42500')));return {output_text:JSON.stringify({answer:'CAD425',references:['b157'],proposals:[]})};}});
  assert.equal(reads,1);assert.equal(r.demoReportSources[0].records,1);assert.equal(r.references[0].id,'b157');
+});
+test('basic visual answer uses exact tool cents even if AI invents totals or chart code',async()=>{
+ const filters={...args,from:'2026-09-01',to:'2026-09-30',groupBy:'channel'};let calls=0;
+ const r=await converse({context:{mode:'fictional_demo',advisorFixture:{},bookings:[]},turns:[],message:'9月到账占比饼图',preferences:{},rules:'',query:async()=>({}),demoReport:a=>report(a),callModel:async()=>++calls===1?{output:[{type:'function_call',name:'query_demo_report',call_id:'chart',arguments:JSON.stringify(filters)}]}:{output_text:JSON.stringify({answer:'总额 CAD 9,436.00，```mermaid pie```',references:[],proposals:[]})}});
+ assert.match(r.answer,/CAD 13,725\.00/);assert.match(r.answer,/CAD 3,745\.00（27\.3%）/);assert(!r.answer.includes('9,436'));assert(!r.answer.includes('mermaid'));
 });

@@ -1,12 +1,13 @@
+import {renderAnalysisCharts} from "./components/analysis/charts.js";
 import {mountDemoOrderEditor} from './pages/demo/order-editor.js';
-import {createChatPanel} from './components/chat/panel.js?v=daily-report-20261010b';
-import {demoChatAdapter} from './services/chat.js?v=daily-report-20261010b';
+import {createChatPanel} from './components/chat/panel.js?v=analysis-visuals-20261011a';
+import {demoChatAdapter} from './services/chat.js?v=analysis-visuals-20261011a';
 import {searchCatalog} from './domain/sculpy.js';
 import {analyzeMonthlyQuestion,renderMonthlyChatChart} from './domain/monthly-chat.js';
 import {clientPreferences} from './domain/memory.js';
-import {createMemoryPanel} from './components/memory/panel.js?v=daily-report-20261010b';
+import {createMemoryPanel} from './components/memory/panel.js?v=analysis-visuals-20261011a';
 import {createDemoMemoryRepository,createCloudMemoryRepository} from './services/memory.js';
-import {artists,clients,venues,partners,bookings,notes,media,portfolioMedia} from './data/demo.js?v=daily-report-20261010b';
+import {artists,clients,venues,partners,bookings,notes,media,portfolioMedia} from './data/demo.js?v=analysis-visuals-20261011a';
 import {loadState,saveState,resetState} from './services/storage.js';
 import {config} from './config.js';
 import {workspaceBookings,advisorRowsFromBookings} from './domain/demo-workspace.js';
@@ -83,7 +84,7 @@ const memoryRepository=config.environment==='demo'?createDemoMemoryRepository({g
 const memoryPanel=createMemoryPanel({data:{bookings,clients,artists,venues,partners},getContext,repository:memoryRepository,onSaved:()=>{hydrateDemoEntities();render()},esc,config});
 const chatCatalog=()=>{const context=getContext(),list=available().map(b=>({...b,channelId:channelForBooking(b,state)})),catalog=searchCatalog({bookings:list,artists,partners,notes:[...notes,...state.notes],client,serviceName,context});
  for(const batch of state.memories||[])for(const item of batch.items||[])if(item.entityType==='booking'&&list.some(b=>b.id===item.entityId)&&(context.role==='admin'||batch.createdBy===context.artistId||(item.status==='confirmed'&&!['task','change'].includes(item.kind))))catalog.notes.push({entityId:item.entityId,aiSummary:item.text,status:item.status,kind:item.kind});const ids=new Set([...list.slice(0,30).map(b=>b.id),location.hash.split('/')[1]]);catalog.notes=catalog.notes.filter(n=>ids.has(n.entityId)).slice(-80);return catalog;};
-const chatPanel=createChatPanel({renderSupplement:turn=>turn.chartKey==='monthly-analytics'&&isGlobal()?renderMonthlyChatChart(turn.chartRows,esc):turn.chartKey==='service-revenue'&&isGlobal()?serviceRevenueChart():'',adapter:demoChatAdapter({resolveLocal:message=>analyzeMonthlyQuestion(message,available(),getContext()) || (wantsRevenueChart(message)?{answer:isGlobal()?'这是演示订单按已配置统计周期计算的服务收入占比。':'收入与全局经营数据仅对 Jz 和 Miranda 开放。',chartKey:isGlobal()?'service-revenue':null,references:[],proposals:[],sourceIds:[]}:null),getAdvisorRows:()=>advisorRowsFromBookings(available(),{channelForBooking:b=>channelForBooking(b,state),channels:channelCatalog(state)}),getIdentity:()=>role==='admin'?adminPersona:artistId,getCatalog:chatCatalog,getContext,saveBatch:batch=>memoryRepository.save(batch)}),getScope:()=>{const [type,id]=location.hash.slice(1).split('/'),b=['bookings','sculpy'].includes(type)&&available().find(b=>b.id===id);return b?{id:b.id,label:client(b.clientId).name+' · '+b.date}:{id:'global',label:'全局工作助手'};}});
+const chatPanel=createChatPanel({renderSupplement:turn=>turn.analysisCharts?.length&&isGlobal()?renderAnalysisCharts(turn.analysisCharts,esc,window.DemoI18n?.language!=='zh'):turn.chartKey==='monthly-analytics'&&isGlobal()?renderMonthlyChatChart(turn.chartRows,esc):turn.chartKey==='service-revenue'&&isGlobal()?serviceRevenueChart():'',adapter:demoChatAdapter({resolveLocal:message=>analyzeMonthlyQuestion(message,available(),getContext()) || (wantsRevenueChart(message)?{answer:isGlobal()?'这是演示订单按已配置统计周期计算的服务收入占比。':'收入与全局经营数据仅对 Jz 和 Miranda 开放。',chartKey:isGlobal()?'service-revenue':null,references:[],proposals:[],sourceIds:[]}:null),getAdvisorRows:()=>advisorRowsFromBookings(available(),{channelForBooking:b=>channelForBooking(b,state),channels:channelCatalog(state)}),getIdentity:()=>role==='admin'?adminPersona:artistId,getCatalog:chatCatalog,getContext,saveBatch:batch=>memoryRepository.save(batch)}),getScope:()=>{const [type,id]=location.hash.slice(1).split('/'),b=['bookings','sculpy'].includes(type)&&available().find(b=>b.id===id);return b?{id:b.id,label:client(b.clientId).name+' · '+b.date}:{id:'global',label:'全局工作助手'};}});
 document.addEventListener('input',e=>sculpyPage.handleInput(e.target));
 window.addEventListener('pagehide',()=>sculpyPage.dispose());
 $('#artistIdentity').innerHTML=bookingArtists.map(a=>`<option value="${a.id}" ${a.id===artistId?'selected':''}>${a.name}</option>`).join('');
