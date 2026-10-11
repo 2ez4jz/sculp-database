@@ -34,8 +34,8 @@ export function buildAnalysisCharts({message,bookings,reports=[],previousReports
     push({...base,kind:'schedule',title:'schedule',metric:'schedule',truncated:r.sampleTruncated||schedule.length>12,rows:schedule.slice(0,12)});continue;
    }
    if(explicit||mix.filter(g=>g.value>0).length>1)push({...base,kind:mix.filter(g=>g.value>0).length>6||dimension==='artist'||dimension==='channel'&&!/(饼图|圆环|占比|pie|donut|share)/i.test(message)?'bars':'donut',title:dimension,metric,rows:mix});
-   if(/日报|daily|状态|status/i.test(message))push({...base,kind:'bars',title:'status',metric:'records',rows:Object.entries(r.statusCounts).map(([label,value])=>({label,value}))});
-   if(/(分析|情况|收入|金额|营收|到账|收款|revenue|value|receipt|analy|dashboard|日报|daily)/i.test(message)){
+   if(/日报|daily|状态|status/i.test(message)&&dimension!=='status')push({...base,kind:'bars',title:'status',metric:'records',rows:Object.entries(r.statusCounts).map(([label,value])=>({label,value}))});
+   if((!explicit&&/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(message)||/(分析|情况|analy|dashboard|日报|daily)/i.test(message))&&(!/(订单数量|订单状态|order count|order status)/i.test(message)||/(日报|daily|收入|金额|到账|收款|revenue|value|receipt)/i.test(message))){
     push({...base,kind:'bars',title:'finance',metric:'cents',rows:[{label:'completed',value:r.completedAmountCents},{label:'receipts',value:r.grossReceivedCents}]});
     const groups=run({...args,groupBy:input.groupBy||'channel'});
     if(groups.groups.filter(g=>g.records||g.grossReceivedCents).length>1)push({...base,kind:'bars',title:input.groupBy||'channel',metric:'cents',paired:true,rows:cleanGroups(groups)});
@@ -55,12 +55,12 @@ export function buildAnalysisCharts({message,bookings,reports=[],previousReports
    if(new Set(trend.map(r=>r.label)).size>1)result.unshift({kind:'trend',title:'trend',metric:'cents',paired:true,from:trend[0].label.slice(0,10),to:trend.at(-1).label.slice(-10),filters:reports[0].filters,rows:trend,fictional:true});
   }
  }
- return result.slice(0,6);
+ return result[0]?.kind==='trend'||result[0]?.title==='comparison'?[result[0]]:result.slice(0,4);
 }
 export function renderAnalysisCharts(charts,esc,en=false){
  if(!Array.isArray(charts)||!charts.length)return '';
  const t=(zh,english)=>en?english:zh,money=v=>'CAD '+(v/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
- const title={service:t('哪些服务贡献更多','Which services contribute more'),channel:t('订单来源渠道对比','Order source comparison'),artist:t('主负责人订单分布','Orders by lead artist'),finance:t('做了多少金额，收到了多少','Completed value and money received'),status:t('订单目前走到哪一步','Where orders stand'),trend:t('金额怎样随时间变化','How amounts change over time'),schedule:t('每天谁在什么时间服务','Who is scheduled and when'),comparison:t('这些条件下，哪边更多','Compare these groups')};
+ const title={service:t('各类服务的数量或金额','Services by count or value'),channel:t('订单来源渠道对比','Order source comparison'),artist:t('主负责人订单分布','Orders by lead artist'),finance:t('做了多少金额，收到了多少','Completed value and money received'),status:t('订单目前走到哪一步','Where orders stand'),trend:t('金额怎样随时间变化','How amounts change over time'),schedule:t('每天谁在什么时间服务','Who is scheduled and when'),comparison:t('这些条件下，哪边更多','Compare these groups')};
  return '<div class="analysis-charts">'+charts.map(c=>{
   const rows=(c.rows||[]).filter(r=>Number.isSafeInteger(r.value)&&r.value>=0&&(r.secondary===undefined||Number.isSafeInteger(r.secondary)&&r.secondary>=0)),total=rows.reduce((n,r)=>n+r.value,0),fmt=v=>c.metric==='records'?v+' '+t('条','records'):money(v);
   const scope=Object.entries(c.filters||{}).filter(([k,v])=>!['from','to','groupBy'].includes(k)&&v!==null).map(([,v])=>label(v,en)).join(' · ');
