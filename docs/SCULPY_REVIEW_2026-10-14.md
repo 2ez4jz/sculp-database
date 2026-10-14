@@ -34,7 +34,7 @@
 - v21 实际线上只读对话 6 轮通过：SDK 双月比较、SDK 英文、SDK 明确截至10月10日、默认路径图表+解释、订单内讨论、普通能力说明；另验证未登录正式历史为401。SDK 调用确实返回 engine=sdk，无 fallback；所读报表数值逐项与程序重新汇总一致。
 - 双月数值：8月完成金额 CAD 26,025.00、到账原额 CAD 21,235.00；9月 CAD 19,685.00、CAD 13,725.00。实际文字已审阅，变化被区分为事实与待核实原因。
 - [实际线上结果](evaluations/sculpy-review-20261014-live.json)；[可重复运行的线上脚本](../scripts/review-live.mjs)。该脚本是显式真实调用，不加入自动 CI。
-- 主要修复提交 `1bb66a5` 的全部四个 Actions 工作流已成功，包含完整浏览器、PostgreSQL与恢复验收；最后导航可读性/v21说明补丁的检查以最终提交 Actions 为准。
+- 主要修复提交 `1bb66a5` 的全部四个 Actions 工作流已成功，包含完整浏览器、PostgreSQL与恢复验收；最终导航可读性/v21口径补丁 `97603e6` 的全部四个 Actions 工作流也已成功：[完整浏览器与数据库回归](https://github.com/2ez4jz/sculp-database/actions/runs/38650633133)、[全套及重复精确回归](https://github.com/2ez4jz/sculp-database/actions/runs/38650632991)、[前端部署](https://github.com/2ez4jz/sculp-database/actions/runs/38650633006)。线上视觉复核确认导航文字可读，助手独立显示。
 
 ## 数据与权限核对
 
