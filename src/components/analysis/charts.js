@@ -24,6 +24,17 @@ export function buildAnalysisCharts({message,bookings,reports=[],previousReports
  const sources=reports.length?reports.map(r=>r.filters):explicit?[explicitArgs(message,day,previousReports.at(-1)?.filters)]:[];
  for(const input of sources.slice(0,3)){
   try{const args={...input,groupBy:null},r=run(args),base={from:args.from,to:args.to,filters:args,fictional:true,unpriced:r.unpricedCompleted+r.nonCadCompleted,future:r.futureCompleted,lowSample:r.records<10};
+   const fromTime=Date.parse(args.from+'T12:00:00Z'),toTime=Date.parse(args.to+'T12:00:00Z');
+   if(Number.isFinite(fromTime)&&Number.isFinite(toTime)&&toTime>=fromTime&&toTime<=Date.parse(day+'T12:00:00Z')){
+    const span=Math.round((toTime-fromTime)/86400000)+1;
+    const priorTo=new Date(fromTime-86400000).toISOString().slice(0,10);
+    const priorFrom=new Date(fromTime-span*86400000).toISOString().slice(0,10);
+    try{
+     const earlier=run({...args,from:priorFrom,to:priorTo,groupBy:null});
+     if(earlier.records>0)base.previous={from:priorFrom,to:priorTo,records:earlier.records,completedAmountCents:earlier.completedAmountCents,grossReceivedCents:earlier.grossReceivedCents};
+     base.current={records:r.records,completedAmountCents:r.completedAmountCents,grossReceivedCents:r.grossReceivedCents};
+    }catch{/* No comparable data: omit comparison. */}
+   }
    const intent=/(渠道|channel|化妆师|artist|服务|service|状态|status|收入|金额|到账|收款|revenue|value|receipt)/i.test(message)?message:message+' '+previousMessage;
    const dimension=input.groupBy||(/(状态|status)/i.test(intent)?'status':/(渠道|channel)/i.test(intent)?'channel':/(化妆师|artist)/i.test(intent)?'artist':'service');
    const metric=/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(intent)?/(到账|收款|received|receipt)/i.test(intent)&&!/(完成|completed)/i.test(intent)?'grossReceivedCents':'completedAmountCents':'records';
@@ -70,6 +81,13 @@ export function chartCommentary(c,en=false){
  if(c.kind==='trend'&&rows.length>1){
   const delta=rows.at(-1).value-rows[0].value;
   observation=en?'Displayed values changed by '+format(Math.abs(delta))+' ('+(delta>0?'increase':delta<0?'decrease':'unchanged')+').':'图中首尾数值'+(delta>0?'增加':delta<0?'减少':'未变化')+format(Math.abs(delta))+'。';
+ }
+ if(c.previous&&c.current){
+  const key=c.metric==='records'?'records':c.metric==='grossReceivedCents'?'grossReceivedCents':'completedAmountCents';
+  const delta=c.current[key]-c.previous[key],baseline=c.previous[key];
+  const change=baseline>0?' ('+(delta/baseline*100>=0?'+':'')+(delta/baseline*100).toFixed(1)+'%)':'';
+  const comparison=en?' Compared with '+c.previous.from+' to '+c.previous.to+', the same-scope total changed by '+format(Math.abs(delta))+change+'.':' 对比'+c.previous.from+'至'+c.previous.to+'的同口径数据，总量'+(delta>0?'增加':delta<0?'减少':'未变化')+format(Math.abs(delta))+change+'。';
+  observation+=comparison;
  }
  const suggestion=c.title==='channel'?'核对渠道带来的咨询质量与确认率':c.title==='artist'?'结合排班核对人员实际工作量':c.title==='service'?'对照相同季节的服务结构':c.kind==='trend'?'核对比较周期的长度和季节性':'核对对应记录并与可比时期的数据对照';
  return en?observation+' Suggested check: review comparable historical records before acting.':observation+' 建议'+suggestion+'；没有可比历史数据时，不能据此断言增长或下降。';
