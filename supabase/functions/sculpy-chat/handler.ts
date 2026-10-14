@@ -174,7 +174,21 @@ export async function handleRequest(req: Request) {
     if (!message || message.length > 4000)
       return reply({ error: "请输入 1–4000 字。" }, 400);
     delete context.allowedBookingIds;
-    const result = await converse({
+    // Agent SDK is deliberately gated to fictional demo data. Real accounts keep the
+    // existing authenticated, role-filtered conversation implementation.
+    const agentEnabled = demo && env("SCULPY_AGENT_DEMO_ENABLED") === "true" && body.agentMode === "sdk";
+    const result = agentEnabled
+      ? await (async () => {
+          const { runSculpyDemoAgent } = await import("./agent.ts");
+          return runSculpyDemoAgent({
+            message, context, turns,
+            apiKey: env("OPENAI_API_KEY"),
+            demoReport: context.advisorFixture
+              ? (args:any) => demoReport(demoCatalog,args,context.localDate)
+              : undefined,
+          });
+        })()
+      : await converse({
       context,
       turns,
       message,
