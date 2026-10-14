@@ -17,7 +17,7 @@ const assert=require('node:assert/strict');
   await page.goto('http://localhost:4173/?demo=1#sculpy');
   const send=async q=>{await page.locator('#chat-input:not(:disabled)').waitFor();await page.locator('#chat-input').fill(q);await page.locator('#chat-input').press('Enter');await page.locator('#chat-input:not(:disabled)').waitFor();};
   await send('9月日报');await page.locator('.analysis-donut').waitFor();
-  const last=()=>page.locator('.chat-assistant').last();
+  const last=()=>page.locator('#sculpy-dashboard');
   assert.equal(await last().locator('.analysis-card').count(),4);
   assert.match(await last().innerText(),/订单目前走到哪一步/);
   await last().scrollIntoViewIfNeeded();await page.screenshot({path:'qa-screens/analysis-daily-desktop.png'});
