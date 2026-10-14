@@ -81,3 +81,16 @@ tbody tr:hover{background:#f7f8f4}
 .sculpy-dashboard-grid .analysis-bar-row{grid-template-columns:minmax(80px,1fr) minmax(80px,2fr) auto}
 @media(max-width:980px){.sculpy-dashboard-grid .analysis-charts{grid-template-columns:1fr}.sculpy-dashboard-grid .analysis-card:first-child:nth-last-child(3){grid-column:auto}}
 @media(max-width:620px){.sculpy-dashboard-heading{align-items:flex-start;flex-direction:column}.sculpy-dashboard-heading button{font-size:12px}.sculpy-dashboard-grid .analysis-card{padding:17px!important}}
+
+/* V2.2 — resilient dashboard empty state, readable reporting on narrow screens. */
+.sculpy-dashboard-empty{grid-column:1/-1;margin:0;padding:28px;border:1px dashed var(--line);border-radius:var(--ui-radius);color:var(--muted);background:var(--paper);line-height:1.7}
+.sculpy-dashboard-heading button:focus-visible{outline:3px solid #9cafa0;outline-offset:3px}
+.sculpy-dashboard-grid .analysis-card{overflow-wrap:anywhere}
+.sculpy-dashboard-grid .analysis-scope{font-variant-numeric:tabular-nums;word-break:break-word}
+.sculpy-dashboard-grid .analysis-legend strong,.sculpy-dashboard-grid .analysis-bar-row strong{font-variant-numeric:tabular-nums}
+@media(max-width:620px){
+ .sculpy-dashboard-grid .analysis-bar-row{grid-template-columns:minmax(65px,1fr) minmax(75px,1.35fr) minmax(76px,auto);gap:8px}
+ .sculpy-dashboard-grid .analysis-card{min-width:0}
+ .sculpy-dashboard-grid .analysis-line{display:block;width:100%;height:auto}
+ .sculpy-dashboard-grid .analysis-legend>div{gap:7px}
+}
