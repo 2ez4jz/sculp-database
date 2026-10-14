@@ -29,7 +29,7 @@ const assert=require('node:assert/strict');
   await send('9月排期');assert.equal(await last().locator('.analysis-schedule-row').count(),12);
   await last().scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:'qa-screens/analysis-schedule-mobile.png'});
-  await page.reload();await page.locator('#chat-input:not(:disabled)').waitFor();assert(await page.locator('.analysis-line').count());
+  await page.reload();await page.locator('#chat-input:not(:disabled)').waitFor();await page.locator('#sculpy-dashboard .analysis-schedule-row').first().waitFor();assert.equal(await page.locator('#sculpy-dashboard .analysis-schedule-row').count(),12);
   const preview=await browser.newPage({viewport:{width:390,height:1100}});
   for(const kind of ['donut','trend','schedule']){const html=await page.locator('[data-analysis-chart="'+kind+'"]').first().evaluate(el=>el.outerHTML);await preview.setContent('<link rel="stylesheet" href="http://localhost:4173/src/components/chat/panel.css"><div style="padding:12px;font-family:Arial,sans-serif">'+html+'</div>');await preview.waitForTimeout(150);await preview.screenshot({path:'qa-screens/analysis-'+kind+'-card-mobile.png'});}
   await preview.close();
