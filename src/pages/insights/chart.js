@@ -11,7 +11,7 @@ export function createRevenueChart({
   esc,
 }) {
   function serviceRevenueChart() {
-    const { rows, total, start, end } = serviceRevenue(
+    const { rows, total, start, end, unpriced } = serviceRevenue(
         available(),
         serviceName,
         config,
@@ -25,7 +25,7 @@ export function createRevenueChart({
         "#a9879b",
       ];
     if (!total)
-      return '<div class="empty">过去 30 天没有已完成的收入记录。</div>';
+      return '<div class="empty">过去 30 天没有可统计的已完成订单金额。'+(unpriced?'有 '+unpriced+' 条未知价格或非 CAD 订单，金额不完整。':'')+'</div>';
     let cursor = 0;
     const stops = rows.map((row, i) => {
         const startAngle = cursor,
@@ -43,7 +43,7 @@ export function createRevenueChart({
           return `<span class="slice-label" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%">${row.percent}%</span>`;
         })
         .join("");
-    return `<div class="sculpy-chart"><div class="pie-wrap"><div class="pie-chart" style="background:conic-gradient(${stops.join(",")})" role="img" aria-label="过去 30 天各种服务收入饼图">${labels}<div><strong>${money(total)}</strong><span>已完成收入</span></div></div></div><div class="chart-detail"><div><div class="eyebrow">REVENUE BY SERVICE</div><h3>过去 30 天 · 服务收入</h3><p>${date(start.toISOString().slice(0, 10))} – ${date(end.toISOString().slice(0, 10))}</p></div><div class="chart-legend">${rows.map((row, i) => `<div><i style="background:${colors[i % colors.length]}"></i><span>${esc(row.label)}</span><strong>${money(row.value)}</strong><small>${row.percent}%</small></div>`).join("")}</div><p class="fake-note">仅统计已完成场次；金额由数据库记录计算，不由 AI 生成。</p></div></div>`;
+    return `<div class="sculpy-chart"><div class="pie-wrap"><div class="pie-chart" style="background:conic-gradient(${stops.join(",")})" role="img" aria-label="过去 30 天各种服务收入饼图">${labels}<div><strong>${money(total)}</strong><span>已完成收入</span></div></div></div><div class="chart-detail"><div><div class="eyebrow">REVENUE BY SERVICE</div><h3>过去 30 天 · 服务收入</h3><p>${date(start.toISOString().slice(0, 10))} – ${date(end.toISOString().slice(0, 10))}</p></div><div class="chart-legend">${rows.map((row, i) => `<div><i style="background:${colors[i % colors.length]}"></i><span>${esc(row.label)}</span><strong>${money(row.value)}</strong><small>${row.percent}%</small></div>`).join("")}</div><p class="fake-note">仅统计已完成场次标价，不是实收或利润；金额由程序计算。${unpriced?` ${unpriced} 条未知价格或非 CAD 订单未计金额，合计不完整。`:""}</p></div></div>`;
   }
   return serviceRevenueChart;
 }

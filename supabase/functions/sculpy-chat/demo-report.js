@@ -44,6 +44,10 @@ export function demoReport(catalog,args,asOfDate){
   catalogQuality:{futureDatedReceipts:catalog.filter(b=>b.paidCents>0&&validDate(b.paidDate)&&b.paidDate>asOfDate).length,futureCompleted:catalog.filter(b=>b.status==='Completed'&&validDate(b.date)&&b.date>asOfDate).length,completedOnOrBeforeAsOf:catalog.filter(b=>b.status==='Completed'&&validDate(b.date)&&b.date<=asOfDate).length,invalidServiceDates:catalog.filter(b=>!validDate(b.date)).length}};
 }
 
+// Persist only the report scope and verified summary. Full samples/groups are
+// tool inputs, not conversation history; retaining them inflates every follow-up.
+export const compactDemoReport=r=>({source:r.source,fictional:r.fictional,asOfDate:r.asOfDate,filters:r.filters,coverage:r.coverage,records:r.records,completed:r.completed,completedAmountCents:r.completedAmountCents,grossReceivedCents:r.grossReceivedCents,unpricedCompleted:r.unpricedCompleted,nonCadCompleted:r.nonCadCompleted,catalogQuality:r.catalogQuality});
+
 // Basic chart figures are rendered from verified tool results, never model arithmetic.
 export function demoVisualSummary(report,question,en=false){
  const names={Wedding:['婚礼','Wedding'],Event:['活动','Event'],Education:['课程','Education'],Commercial:['商业','Commercial'],Completed:['已完成','Completed'],Confirmed:['已确认','Confirmed'],Inquiry:['咨询中','Inquiry'],Cancelled:['已取消','Cancelled'],website:['官网','Website'],referral:['转介绍','Referral'],instagram:['Instagram','Instagram'],google:['Google','Google'],planner:['Planner','Planner'],unattributed:['未归因','Unattributed']};

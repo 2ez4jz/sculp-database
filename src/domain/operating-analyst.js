@@ -11,7 +11,7 @@ export function diagnosePeriods({current,previous,metric='completedAmountCents'}
  const comparison=delta(current[metric],previous[metric]);
  if(!comparison)return {status:'insufficient',reason:'Non-integer or missing measure'};
  const warnings=[];
- if((current.unpricedCompleted||previous.unpricedCompleted)&&metric==='completedAmountCents')warnings.push('存在未定价已完成订单，金额变化不完整');
+ if((current.unpricedCompleted||previous.unpricedCompleted||current.nonCadCompleted||previous.nonCadCompleted)&&metric==='completedAmountCents')warnings.push('存在未知价格或非 CAD 已完成订单，金额变化不完整');
  if(metric==='grossReceivedCents')warnings.push('到账原额未扣除退款，不等于利润或净收款');
  if((current.records??10)<10||(previous.records??10)<10)warnings.push('样本较少，变化可能不稳定');
  return {status:'supported',metric,comparison,warnings,

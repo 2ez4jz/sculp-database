@@ -1,0 +1,446 @@
+{
+  "fictionalOnly": true,
+  "at": "2026-10-14T22:45:40.784Z",
+  "cases": [
+    {
+      "name": "sdk-two-month-comparison",
+      "status": 200,
+      "ms": 8960,
+      "turn": {
+        "id": "724c5dba-f8ea-46ff-8105-c621bf3c8eab",
+        "user": "比较2026年8月和9月已完成订单金额、到账原额，各自查询后解释变化。",
+        "answer": "2026年8月已完成订单金额共计26,025加元，到账原额为21,235加元；9月已完成订单金额为19,685加元，到账原额为13,725加元。\n\n对比来看，9月的完成订单金额比8月减少了6,340加元，降幅约24.4%；到账原额减少了7,510加元，降幅约35.3%。这表明9月无论是完成的订单金额还是实际到账都较8月显著下降。\n\n这种下降可能是订单量减少，或者部分订单尚未到账所致，但具体原因无法仅凭这数据证实。建议核查9月订单数量及客户付款状态，确认减少原因和账款回收情况是否正常。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-14",
+            "filters": {
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": "Completed",
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 222,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 26,
+            "completed": 26,
+            "completedAmountCents": 2602500,
+            "grossReceivedCents": 2123500,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 26,
+              "futureCompleted": 32,
+              "completedOnOrBeforeAsOf": 190,
+              "invalidServiceDates": 0
+            }
+          },
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-14",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": "Completed",
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 222,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 21,
+            "completed": 21,
+            "completedAmountCents": 1968500,
+            "grossReceivedCents": 1372500,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 26,
+              "futureCompleted": 32,
+              "completedOnOrBeforeAsOf": 190,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "engine": "sdk",
+        "createdAt": "2026-10-14T22:45:20.738Z"
+      }
+    },
+    {
+      "name": "sdk-english",
+      "status": 200,
+      "ms": 4797,
+      "turn": {
+        "id": "faa9babb-cf90-4908-9a45-5443ca8ff8a3",
+        "user": "Compare completed booking value in August 2026 and September 2026. Explain briefly in English.",
+        "answer": "The completed booking value was CAD 26,025.00 in August 2026 and CAD 19,685.00 in September 2026. This shows a decrease of CAD 6,340.00 from August to September. The number of completed bookings also dropped from 26 in August to 21 in September. This likely indicates a slowdown in business activity or fewer bookings completed in September compared to August.\n\nSuggestion: Check if the drop in September is due to seasonality, specific service types, or artist/channel availability to better understand the cause.",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-14",
+            "filters": {
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": "Completed",
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 222,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 26,
+            "completed": 26,
+            "completedAmountCents": 2602500,
+            "grossReceivedCents": 2123500,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 26,
+              "futureCompleted": 32,
+              "completedOnOrBeforeAsOf": 190,
+              "invalidServiceDates": 0
+            }
+          },
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-14",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": "Completed",
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 222,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 21,
+            "completed": 21,
+            "completedAmountCents": 1968500,
+            "grossReceivedCents": 1372500,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 26,
+              "futureCompleted": 32,
+              "completedOnOrBeforeAsOf": 190,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "engine": "sdk",
+        "createdAt": "2026-10-14T22:45:25.548Z"
+      }
+    },
+    {
+      "name": "sdk-exact-cutoff",
+      "status": 200,
+      "ms": 3369,
+      "turn": {
+        "id": "46c759b7-d00f-490c-92cc-9e781eec9724",
+        "user": "2026年10月1日至10月10日的经营日报，给完成金额和到账原额并提一条核对建议。",
+        "answer": "2026年10月1日至10月10日共完成6笔订单，完成金额为CAD 5,070.00，加元；到账原额为CAD 4,425.00，加元。样本量较少，建议核对未到账订单的支付状态及原因，确保收款完整。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-14",
+            "filters": {
+              "from": "2026-10-01",
+              "to": "2026-10-10",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": "Completed",
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 222,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 6,
+            "completed": 6,
+            "completedAmountCents": 507000,
+            "grossReceivedCents": 442500,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 26,
+              "futureCompleted": 32,
+              "completedOnOrBeforeAsOf": 190,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "engine": "sdk",
+        "createdAt": "2026-10-14T22:45:28.931Z"
+      }
+    },
+    {
+      "name": "legacy-visual-with-analysis",
+      "status": 200,
+      "ms": 4806,
+      "turn": {
+        "id": "7de27af8-b013-40c5-808c-0f20e8f14935",
+        "user": "9月各渠道收款金额饼图，并解释结构、给一条核对建议。",
+        "answer": "9月虚构演示数据的收款饼图：Website CAD 3,745（27.3%）、Referral CAD 3,300（24.0%）、Google CAD 3,080（22.4%）、Instagram CAD 1,730（12.6%）、Planner CAD 1,870（13.6%）；合计 CAD 13,725。Website 占比最高，Instagram 最低；各渠道记录数仅5–6条，样本较小，结构不宜外推为长期表现。这里按收款日期统计到账原额，不是净收款或利润。\n建议：抽查各渠道的收款日期、金额与实际入账记录是否一致，尤其核对已完成但本月未见到账的订单。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-14",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": "channel"
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 28,
+            "completed": 21,
+            "completedAmountCents": 1968500,
+            "grossReceivedCents": 1372500,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 26,
+              "futureCompleted": 32,
+              "completedOnOrBeforeAsOf": 190,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b156",
+          "b244",
+          "b144",
+          "b278",
+          "b79",
+          "b83",
+          "b87",
+          "b132",
+          "b245",
+          "b80",
+          "b84",
+          "b88",
+          "b120",
+          "b204",
+          "b246",
+          "b108",
+          "b192",
+          "b81",
+          "b85",
+          "b89",
+          "b180",
+          "b247",
+          "b168",
+          "b290",
+          "b82",
+          "b86",
+          "b90",
+          "b248"
+        ],
+        "usage": {
+          "input_tokens": 27912,
+          "output_tokens": 251,
+          "calls": 2
+        },
+        "engine": "legacy",
+        "createdAt": "2026-10-14T22:45:33.737Z"
+      }
+    },
+    {
+      "name": "scoped-order-stays-legacy",
+      "status": 200,
+      "ms": 3737,
+      "turn": {
+        "id": "16ddca47-6405-4a39-b0fb-489065efd76e",
+        "user": "这笔订单的服务日期是什么？",
+        "answer": "这笔订单的服务日期是 2026年1月5日。",
+        "references": [
+          {
+            "id": "b0",
+            "label": "b0"
+          }
+        ],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-14",
+            "filters": {
+              "from": "2026-01-05",
+              "to": "2026-01-05",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": "b0",
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 1,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 1,
+            "completed": 1,
+            "completedAmountCents": 169000,
+            "grossReceivedCents": 169000,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 26,
+              "futureCompleted": 32,
+              "completedOnOrBeforeAsOf": 190,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0"
+        ],
+        "usage": {
+          "input_tokens": 10957,
+          "output_tokens": 103,
+          "calls": 2
+        },
+        "engine": "legacy",
+        "createdAt": "2026-10-14T22:45:37.482Z"
+      }
+    },
+    {
+      "name": "ordinary-query-stays-legacy",
+      "status": 200,
+      "ms": 2459,
+      "turn": {
+        "id": "b25cd66a-6bc5-42cc-a12d-24c17f0d2056",
+        "user": "你现在能做什么？用两句话介绍。",
+        "answer": "我是 SCULP Studio 的工作助手，可以按权限查询订单，并协助整理客户需求、化妆师安排、场地和工作记录。你明确提出时，我也能生成备注、待办或变更的确认卡片；正式时间、价格和付款状态只能提交待审核建议，确认后才会保存。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29"
+        ],
+        "usage": {
+          "input_tokens": 9312,
+          "output_tokens": 93,
+          "calls": 1
+        },
+        "engine": "legacy",
+        "createdAt": "2026-10-14T22:45:39.942Z"
+      }
+    },
+    {
+      "name": "unauthenticated-cloud-history",
+      "status": 401
+    }
+  ]
+}

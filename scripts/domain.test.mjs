@@ -64,9 +64,9 @@ test("revenue includes both 30-day boundaries, excludes cancelled and old record
   assert.deepEqual(records, before);
   assert.equal(serviceRevenue([], {}, { today: "2026-10-07" }).total, 0);
 });
-test("demo and production reporting anchors differ explicitly", () => {
+test("fixture anchor is opt-in; demo defaults to the real calendar", () => {
   assert.equal(
-    serviceRevenue(records, {}, { environment: "demo", today: "2027-01-01" })
+    serviceRevenue(records, {}, { environment: "demo", today: "2027-01-01", anchorToLatest:true })
       .total,
     300,
   );

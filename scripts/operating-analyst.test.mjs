@@ -12,7 +12,7 @@ test('missing or invalid report cannot produce a confident recommendation',()=>{
 });
 test('finance warning and unknown-price gate',()=>{
  const x=diagnosePeriods({current:{completedAmountCents:120000,records:7,unpricedCompleted:1},previous:{completedAmountCents:100000,records:8}});
- assert.equal(x.comparison.percent,20);assert.match(x.warnings.join(' '),/未定价/);assert.match(x.warnings.join(' '),/样本/);
+ assert.equal(x.comparison.percent,20);assert.match(x.warnings.join(' '),/未知价格/);assert.match(x.warnings.join(' '),/样本/);
  const y=diagnosePeriods({current:{grossReceivedCents:1000,records:12},previous:{grossReceivedCents:800,records:12},metric:'grossReceivedCents'});
  assert.match(y.warnings.join(' '),/退款/);
 });

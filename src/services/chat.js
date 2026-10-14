@@ -3,6 +3,7 @@ import { config } from "../config.js";
 import { advisorRowsFromBookings, advisorSnapshot } from "../domain/demo-workspace.js";
 import { reportMonths } from "../domain/report-period.js";
 import { advisorMetrics } from "../domain/advisor-engine.js";
+import { boundedDemoRequest } from "../domain/chat-history.js";
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };
   if (supabase) {
@@ -87,7 +88,7 @@ export function demoChatAdapter({
           },
         };
       else
-        result = await chatRequest({
+        result = await chatRequest(boundedDemoRequest({
           mode: "demo",
           agentMode: new URLSearchParams(location.search).get("agent") === "sdk" ? "sdk" : undefined,
           ...body,
@@ -96,7 +97,7 @@ export function demoChatAdapter({
           advisorFixture: getContext().role === "admin" ? advisorSnapshot(rows) : null,
           turns: history.slice(-12),
           preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
-        });
+        }));
       if (!scopedReport && !preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
         result.turn.chartKey = "monthly-analytics";
         result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));

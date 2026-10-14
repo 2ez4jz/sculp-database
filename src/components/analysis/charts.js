@@ -8,13 +8,14 @@ export const wantsAnalysisVisual=q=>/(饼图|圆环|占比|图表|柱状|趋势�
 const dateToday=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const defaultArgs=day=>({from:day.slice(0,7)+'-01',to:day,service:null,channelId:null,artistId:null,bookingId:null,status:null,groupBy:null});
 function explicitArgs(q,day,previous){
- const period=/(20\d{2}|月|month|year|年|日|today|yesterday|天)/i.test(q);
+ const period=/(20\d{2}|月|month|year|年|日|today|yesterday|天|季度|quarter|Q[1-4])/i.test(q);
  let args={...defaultArgs(day),...(!period&&previous?previous:{})};
- if(/300|全年|年度|annual|year/i.test(q)){const y=q.match(/20\d{2}/)?.[0]||day.slice(0,4);args={...defaultArgs(day),from:y+'-01-01',to:y+'-12-31'};}
+ if(/300|全年|年度|今年|去年|annual|year/i.test(q)){const months=reportMonths(/300/.test(q)?'全年':q,day.slice(0,7));args={...defaultArgs(day),from:months[0]+'-01',to:months.at(-1)+'-31'};}
  else if(/[今昨]天|今日|today|yesterday/i.test(q)){let d=day;if(/昨天|yesterday/i.test(q))d=new Date(Date.parse(day+'T12:00:00Z')-86400000).toISOString().slice(0,10);args.from=args.to=d;}
- else if(period){const exact=[...q.matchAll(/20\d{2}-\d{2}-\d{2}/g)].map(x=>x[0]);if(exact.length){args.from=exact[0];args.to=exact[1]||exact[0];}else{const m=reportMonths(q,day.slice(0,7));args.from=m[0]+'-01';const last=m.at(-1);args.to=new Date(Date.UTC(Number(last.slice(0,4)),Number(last.slice(5)),0)).toISOString().slice(0,10);if(/截至|本月|this month|as of/i.test(q)&&last===day.slice(0,7))args.to=day;}}
+ else if(period){const exact=[...q.matchAll(/20\d{2}-\d{2}-\d{2}/g)].map(x=>x[0]);if(exact.length){args.from=exact.length===1&&/截至|as of/i.test(q)?exact[0].slice(0,7)+'-01':exact[0];args.to=exact[1]||exact[0];}else{const m=reportMonths(q,day.slice(0,7));if(!m.length)throw Error('Unsupported chart period');args.from=m[0]+'-01';const last=m.at(-1);args.to=new Date(Date.UTC(Number(last.slice(0,4)),Number(last.slice(5)),0)).toISOString().slice(0,10);const cutoff=q.match(/(?:截至|as of)\s*(?:([1-9]|1[0-2])月)?\s*([1-9]|[12]\d|3[01])日/i);if(cutoff)args.to=last+'-'+cutoff[2].padStart(2,'0');else if(/截至|本月|this month|as of/i.test(q)&&last===day.slice(0,7))args.to=day;}}
  for(const [name,regex] of Object.entries({Wedding:/婚礼|wedding|bridal/i,Event:/活动|occasion|event/i,Education:/课程|教学|education|lesson/i,Commercial:/商业|commercial/i}))if(regex.test(q))args.service=name;
  for(const id of ['instagram','google','planner','referral','website'])if(new RegExp(id,'i').test(q)&&!/(各|所有|all|by).{0,6}(渠道|channel)/i.test(q))args.channelId=id;
+ if(/截至|as of/i.test(q)&&args.to>day)args.to=day;
  args.groupBy=null;return args;
 }
 const cleanGroups=r=>r.groups.map(g=>({label:g.value,value:g.completedAmountCents,secondary:g.grossReceivedCents,count:g.records}));
@@ -22,7 +23,10 @@ export function buildAnalysisCharts({message,bookings,reports=[],previousReports
  const explicit=wantsAnalysisVisual(message),result=[],seen=new Set();
  const push=c=>{const key=JSON.stringify(c);if(!seen.has(key)){seen.add(key);result.push(c)}};
  const run=args=>demoReport(bookings,args,day);
- const sources=reports.length?reports.map(r=>r.filters):explicit?[explicitArgs(message,day,previousReports.at(-1)?.filters)]:[];
+ let sources;try{sources=reports.length?reports.map(r=>r.filters):explicit?[explicitArgs(message,day,previousReports.at(-1)?.filters)]:[];}catch{return [];}
+ if(!reports.length)for(const args of sources){
+  if(!/(各|所有|全部|all|by).{0,8}(化妆师|artist)/i.test(message)){const id=[...new Set(bookings.flatMap(b=>b.artistIds||[]))].find(id=>new RegExp('\\b'+id+'\\b','i').test(message));if(id)args.artistId=id;}
+ }
  for(const input of sources.slice(0,3)){
   try{const args={...input,groupBy:null},r=run(args),base={from:args.from,to:args.to,filters:args,fictional:true,unpriced:r.unpricedCompleted+r.nonCadCompleted,future:r.futureCompleted,lowSample:r.records<10};
    const fromTime=Date.parse(args.from+'T12:00:00Z'),toTime=Date.parse(args.to+'T12:00:00Z');
@@ -32,8 +36,8 @@ export function buildAnalysisCharts({message,bookings,reports=[],previousReports
     const priorFrom=new Date(fromTime-span*86400000).toISOString().slice(0,10);
     try{
      const earlier=run({...args,from:priorFrom,to:priorTo,groupBy:null});
-     if(earlier.records>0)base.previous={from:priorFrom,to:priorTo,records:earlier.records,completedAmountCents:earlier.completedAmountCents,grossReceivedCents:earlier.grossReceivedCents};
-     base.current={records:r.records,completedAmountCents:r.completedAmountCents,grossReceivedCents:r.grossReceivedCents};
+     if(earlier.records>0)base.previous={from:priorFrom,to:priorTo,records:earlier.records,completedAmountCents:earlier.completedAmountCents,grossReceivedCents:earlier.grossReceivedCents,unpricedCompleted:earlier.unpricedCompleted+earlier.nonCadCompleted};
+     base.current={records:r.records,completedAmountCents:r.completedAmountCents,grossReceivedCents:r.grossReceivedCents,unpricedCompleted:r.unpricedCompleted+r.nonCadCompleted};
     }catch{/* No comparable data: omit comparison. */}
    }
    const intent=/(渠道|channel|化妆师|artist|服务|service|状态|status|收入|金额|到账|收款|revenue|value|receipt)/i.test(message)?message:message+' '+previousMessage;
@@ -55,16 +59,18 @@ export function buildAnalysisCharts({message,bookings,reports=[],previousReports
   }catch{ /* Invalid or unsupported report ranges must not produce an invented chart. */ }
  }
  if(reports.length>1){
+  const quality=reports.map(s=>run({...s.filters,groupBy:null}));
+  const comparisonQuality={unpriced:quality.reduce((n,r)=>n+r.unpricedCompleted+r.nonCadCompleted,0),future:quality.reduce((n,r)=>n+r.futureCompleted,0),lowSample:quality.some(r=>r.records<10)};
   const scopes=new Set(reports.map(r=>JSON.stringify({...r.filters,groupBy:null})));
   if(scopes.size>1&&reports.every(r=>r.filters.from===reports[0].filters.from&&r.filters.to===reports[0].filters.to)){
    const count=!/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(message);
    const comparisons=reports.map(s=>{const r=run({...s.filters,groupBy:null});return {label:Object.entries(s.filters).filter(([k,v])=>!['from','to','groupBy'].includes(k)&&v!==null).map(([,v])=>v).join(' · ')||'all',value:count?r.records:r.completedAmountCents,...(!count?{secondary:r.grossReceivedCents}:{})};});
-   result.unshift({kind:'bars',title:'comparison',metric:count?'records':'cents',paired:!count,from:reports[0].filters.from,to:reports[0].filters.to,filters:{},rows:comparisons,fictional:true});
+   result.unshift({kind:'bars',title:'comparison',metric:count?'records':'cents',paired:!count,from:reports[0].filters.from,to:reports[0].filters.to,filters:{},rows:comparisons,fictional:true,...comparisonQuality});
   }
   const key=a=>JSON.stringify(Object.fromEntries(Object.entries(a).filter(([k])=>!['from','to','groupBy'].includes(k))));
   if(reports.every(r=>key(r.filters)===key(reports[0].filters))){
    const trend=[...new Map(reports.map(s=>{const r=run({...s.filters,groupBy:null});return {label:s.filters.from+' → '+s.filters.to,value:r.completedAmountCents,secondary:r.grossReceivedCents}}).map(r=>[r.label,r])).values()].sort((a,b)=>a.label.localeCompare(b.label));
-   if(new Set(trend.map(r=>r.label)).size>1)result.unshift({kind:'trend',title:'trend',metric:'cents',paired:true,from:trend[0].label.slice(0,10),to:trend.at(-1).label.slice(-10),filters:reports[0].filters,rows:trend,fictional:true});
+   if(new Set(trend.map(r=>r.label)).size>1)result.unshift({kind:'trend',title:'trend',metric:'cents',paired:true,from:trend[0].label.slice(0,10),to:trend.at(-1).label.slice(-10),filters:reports[0].filters,rows:trend,fictional:true,...comparisonQuality});
   }
  }
  return result[0]?.kind==='trend'||result[0]?.title==='comparison'?[result[0]]:result.slice(0,4);
@@ -73,6 +79,12 @@ export function chartCommentary(c,en=false){
  const rows=(c.rows||[]).filter(r=>Number.isSafeInteger(r.value)&&r.value>=0);
  if(c.kind==='schedule')return '';
  if(!rows.length)return en?'No positive values in this period.':'当前范围没有正值数据，暂时不能分析结构。';
+ if(c.kind==='trend'&&c.paired&&rows.length>1){
+  const money=n=>'CAD '+(Math.abs(n)/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const describe=(a,b)=>{const n=b-a;return (en?(n>0?'increased by ':n<0?'decreased by ':'unchanged at '):(n>0?'增加':n<0?'减少':'未变化，差额'))+money(n);};
+  const primary=describe(rows[0].value,rows.at(-1).value),secondary=describe(rows[0].secondary||0,rows.at(-1).secondary||0);
+  return en?'Between the first and last displayed periods, completed value '+primary+'; gross receipts '+secondary+'. Check period lengths, seasonality and missing prices; these are not profit.':'图中首尾周期，完成金额'+primary+'；到账原额'+secondary+'。建议核对周期长度、季节性与缺失价格；这不是利润变化。';
+ }
  if(c.title==='finance'||c.paired)return en?'Completed value and gross receipts use different date meanings; they are not profit. Check payment and refund records.':'完成金额与到账原额的日期口径不同，不是利润。建议核对收款日期与退款记录。';
  const total=rows.reduce((sum,r)=>sum+r.value,0);
  const sorted=[...rows].sort((a,b)=>b.value-a.value);
@@ -95,7 +107,7 @@ export function chartCommentary(c,en=false){
   }
  }
  const suggestion=c.title==='channel'?'核对渠道带来的咨询质量与确认率':c.title==='artist'?'结合排班核对人员实际工作量':c.title==='service'?'对照相同季节的服务结构':c.kind==='trend'?'核对比较周期的长度和季节性':'核对对应记录并与可比时期的数据对照';
- return en?observation+' Suggested check: review comparable historical records before acting.':observation+' 建议'+suggestion+'；没有可比历史数据时，不能据此断言增长或下降。';
+ return en?observation+' Suggested check: review comparable historical records before acting.':observation+' 建议'+suggestion+(c.previous&&c.current?'；变化原因仍需核查。':'；没有可比历史数据时，不能据此断言增长或下降。');
 }
 export function renderAnalysisCharts(charts,esc,en=false){
  if(!Array.isArray(charts)||!charts.length)return '';

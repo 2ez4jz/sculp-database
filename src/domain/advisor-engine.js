@@ -4,8 +4,8 @@ export function advisorMetrics(rows,{service=null,channel=null,month=null}={}) {
   const chosen=rows.filter(r=>(!service||r.service===service)&&(!channel||r.channel===channel)&&(!month||r.month===month));
   const completed=chosen.filter(r=>r.status==='completed');
   const totalCents=completed.reduce((a,r)=>a+(Number.isSafeInteger(r.amountCents)?r.amountCents:0),0);
-  const receipts=rows.filter(r=>(!service||r.service===service)&&(!channel||r.channel===channel)&&(!month||(r.paidMonth??r.month)===month));
-  const paidCents=receipts.reduce((a,r)=>a+r.paidCents,0);
+  const receipts=rows.filter(r=>(!service||r.service===service)&&(!channel||r.channel===channel)&&(!month||(Object.hasOwn(r,'paidMonth')?r.paidMonth:r.month)===month));
+  const paidCents=receipts.reduce((a,r)=>a+(Number.isSafeInteger(r.paidCents)&&r.paidCents>=0?r.paidCents:0),0);
   const cancelled=chosen.filter(r=>r.status==='cancelled').length;
   return {count:chosen.length,completed:completed.length,cancelled,completedCents:totalCents,receivedCents:paidCents,
     unpricedCompleted:completed.filter(r=>!Number.isSafeInteger(r.amountCents)).length,

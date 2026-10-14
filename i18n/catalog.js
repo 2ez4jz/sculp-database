@@ -7,6 +7,7 @@ window.DEMO_TRANSLATIONS = {
   "来源渠道": "Acquisition channels",
   "作品图库": "Media library",
   "工作室概览": "Studio overview",
+  "经营图表": "Dashboard",
   "设置": "Settings",
   "场次日志覆盖": "Booking note coverage",
   "场次时间线": "Booking timeline",

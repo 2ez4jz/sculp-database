@@ -41,17 +41,19 @@ Unknown prices and missing payment dates are missing, NOT zero. Use integer cent
 13. If only one or two values are needed, omit decorative chart.
 14. Multi-turn questions (“九月婚礼收入” → “只看Google” → “用饼图” → “讲简单点”) preserve filters and metric until changed.
 15. Model must distinguish observation (“工资占比上升”) from unproven cause (“工资上涨因为效率低”).
-16. No advice on price, hiring, budgets, channels or layoffs in default descriptive mode.
+16. 最新方向（2026-10-14）：经营分析默认给一条有证据支持的低风险核查建议；具体调价、增员、预算等行动须说明假设，不能视为已批准。
 17. Validate Chinese and English answers against the same numerical fixtures.
 18. No real names, payments, credentials, or customer records in public demo fixtures or test logs.
 
 ## Work queue
 - [x] Inspect existing README, cloud reporting contract, test scripts, and identify definitions and outstanding deployments.
-- [ ] Add a per-month independent reconciliation suite and negative cases for multi-artist and refund interpretation.
+- [x] Add a per-month independent reconciliation suite and negative cases for multi-artist and refund interpretation.
 - [ ] Audit each UI/AI label for value-versus-receipt and margin-versus-profit mistakes.
-- [ ] Implement a consistent observation / common interpretation / unknown-cause response style in Sculpy prompt.
+- [x] Implement a consistent observation / common interpretation / unknown-cause response style in Sculpy prompt.
 - [ ] Run full Node 24 suite and focused 30-question evaluation; document actual pass/fail, not invented scores.
 - [ ] Separate draft PR review from any deployment. Production promotion requires explicit approval and real-account acceptance.
 
 ## Release gates
 P0: exact calculation and chart-to-data consistency; zero fabricated financial facts; no access-control regression. P1: >=90% reviewed understanding/clarity on a declared evaluation set. Report test environment, sample size, failing cases and unresolved issues. Do not mark a gate passed merely because code is committed.
+
+最新审查与修复证据见 [2026-10-14完整review](SCULPY_REVIEW_2026-10-14.md)。以上历史工作队列不应被当作当前部署状态；未执行30问质量门槛不能标为通过。

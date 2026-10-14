@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import {compactDemoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
 
 // Exercises the ACTUAL agent adapter with injected SDK stand-ins.
 // It deliberately does not call a paid model or production database.
@@ -15,14 +16,14 @@ function harness(script){
   Agent:class{constructor(options){this.options=options;}},
   tool:options=>options,
   setDefaultOpenAIKey:key=>assert.equal(key,'fake-key'),
-  run:async(agent,prompt,options)=>{
+  Runner:class{constructor(options){assert.equal(options.tracingDisabled,true);} async run(agent,prompt,options){
    assert.equal(options.maxTurns,7);
    const execute=agent.options.tools.find(t=>t.name==='query_demo_report').execute;
    const output=await script(execute,traces);
    return {finalOutput:output};
-  }
+  }}
  };
- const ctx={...sdk,z:{object:()=>({}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',JSON,Error,String,Array};
+ const ctx={...sdk,z:{object:()=>({}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',demoReportingInstructions:'Test-only report rules',JSON,Error,String,Array,AbortSignal,compactDemoReport};
  vm.runInNewContext(source+';globalThis.agentEntry=runSculpyDemoAgent;',ctx);
  return {entry:ctx.agentEntry,traces};
 }
@@ -59,10 +60,21 @@ test('multi-step channel comparison preserves different scopes',async()=>{
 test('rejects invalid date order and disallows non-demo contexts',async()=>{
  const h=harness(async execute=>{
   await assert.rejects(()=>execute({...base,from:'2026-10-01',to:'2026-09-01'}),/Invalid date order/);
-  return '日期错误，无法分析';
+  await execute(base);return '日期错误，无法分析';
  });
  const valid=await h.entry({message:'日期测试',context:validContext,apiKey:'fake-key',demoReport:async filters=>({filters})});
- assert.equal(valid.demoReportSources.length,0);
+ assert.equal(valid.demoReportSources.length,1);
  await assert.rejects(()=>h.entry({message:'真实订单',context:{mode:'production',advisorFixture:{}},apiKey:'fake-key',demoReport:async()=>({})}),/fictional demo/);
  await assert.rejects(()=>h.entry({message:'缺少密钥',context:validContext,apiKey:'',demoReport:async()=>({})}),/API key/);
+});
+
+test('Agent enforces six report calls and rejects analysis without verified sources',async()=>{
+ const h=harness(async execute=>{
+  for(let i=0;i<6;i++)await execute(base);
+  await assert.rejects(()=>execute(base),/Too many report calls/);
+  return '已核对六个查询';
+ });
+ let count=0;await h.entry({message:'多步骤分析',context:validContext,apiKey:'fake-key',demoReport:async()=>{count++;return {};}});assert.equal(count,6);
+ const missing=harness(async()=> '没有查报表');
+ await assert.rejects(()=>missing.entry({message:'收入',context:validContext,apiKey:'fake-key',demoReport:async()=>({})}),/without verified reports/);
 });

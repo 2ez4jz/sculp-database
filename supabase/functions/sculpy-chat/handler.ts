@@ -1,5 +1,6 @@
 import {demoReport} from "./demo-report.ts";
 import { converse } from "./core.ts";
+import { isAnalystQuestion } from "./agent-routing.js";
 const env = (key: string) => Deno.env.get(key) || "";
 const origins = new Set(
   (
@@ -31,7 +32,7 @@ export async function handleRequest(req: Request) {
   if (req.method !== "POST") return reply({ error: "POST required" }, 405);
   try {
     const raw = await req.text();
-    if (raw.length > 180000)
+    if (new TextEncoder().encode(raw).length > 180000)
       return reply({ error: "本次内容太多，请分段发送。" }, 413);
     const body = JSON.parse(raw);
     const demo = body.mode === "demo";
@@ -176,19 +177,9 @@ export async function handleRequest(req: Request) {
     delete context.allowedBookingIds;
     // Agent SDK is deliberately gated to fictional demo data. Real accounts keep the
     // existing authenticated, role-filtered conversation implementation.
-    const agentEnabled = demo && env("SCULPY_AGENT_DEMO_ENABLED") !== "false" && body.agentMode === "sdk";
-    const result = agentEnabled
-      ? await (async () => {
-          const { runSculpyDemoAgent } = await import("./agent.ts");
-          return runSculpyDemoAgent({
-            message, context, turns,
-            apiKey: env("OPENAI_API_KEY"),
-            demoReport: context.advisorFixture
-              ? (args:any) => demoReport(demoCatalog,args,context.localDate)
-              : undefined,
-          });
-        })()
-      : await converse({
+    const agentEnabled = demo && env("SCULPY_AGENT_DEMO_ENABLED") !== "false" && body.agentMode === "sdk"
+      && !body.bookingId && !!context.advisorFixture && isAnalystQuestion(message, turns);
+    const legacy = () => converse({
       context,
       turns,
       message,
@@ -245,6 +236,17 @@ export async function handleRequest(req: Request) {
         return response.json();
       },
     });
+    let result;
+    if(agentEnabled){
+      try{
+        const { runSculpyDemoAgent } = await import("./agent.ts");
+        result = {...await runSculpyDemoAgent({message,context,turns,preferences,
+          apiKey:env("OPENAI_API_KEY"),demoReport:(args:any)=>demoReport(demoCatalog,args,context.localDate)}),engine:"sdk"};
+      }catch(error){
+        console.error("sculpy-sdk fallback",error instanceof Error?error.name:"Error");
+        result={...await legacy(),engine:"legacy",agentFallback:true};
+      }
+    }else result={...await legacy(),engine:"legacy"};
     const turn = {
       id: body.requestId,
       user: message,
