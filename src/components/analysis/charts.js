@@ -60,6 +60,7 @@ export function buildAnalysisCharts({message,bookings,reports=[],previousReports
 export function chartCommentary(c,en=false){
  const rows=(c.rows||[]).filter(r=>Number.isSafeInteger(r.value)&&r.value>=0);
  if(!rows.length||c.kind==='schedule')return '';
+ if(c.title==='finance'||c.paired)return en?'Completed value and gross receipts use different date meanings; they are not profit. Check payment and refund records.':'完成金额与到账原额的日期口径不同，不是利润。建议核对收款日期与退款记录。';
  const total=rows.reduce((sum,r)=>sum+r.value,0);
  const sorted=[...rows].sort((a,b)=>b.value-a.value);
  if(!total)return en?'No positive values in this period.':'当前范围没有正值数据，暂时不能分析结构。';
