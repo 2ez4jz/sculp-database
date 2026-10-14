@@ -176,7 +176,7 @@ export async function handleRequest(req: Request) {
     delete context.allowedBookingIds;
     // Agent SDK is deliberately gated to fictional demo data. Real accounts keep the
     // existing authenticated, role-filtered conversation implementation.
-    const agentEnabled = demo && env("SCULPY_AGENT_DEMO_ENABLED") === "true" && body.agentMode === "sdk";
+    const agentEnabled = demo && env("SCULPY_AGENT_DEMO_ENABLED") !== "false" && body.agentMode === "sdk";
     const result = agentEnabled
       ? await (async () => {
           const { runSculpyDemoAgent } = await import("./agent.ts");
