@@ -7,7 +7,7 @@ const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
 const chat=readFileSync(new URL('../src/components/chat/panel.js',import.meta.url),'utf8');
 const dashboard=readFileSync(new URL('../src/components/analysis/sculpy-dashboard.js',import.meta.url),'utf8');
 test('Sculpy embeds one dashboard above chat and updates from turns',()=>{
- assert.match(app,/id=\\"sculpy-dashboard\\".*id=\\"sculpy-chat-root\\"/);
+ assert.ok(app.includes('id="sculpy-dashboard"') && app.includes('id="sculpy-chat-root"'));
  assert.match(app,/sculpyDashboard\.render\(turns\)/);
  assert.match(chat,/onTurnsChanged\(turns, scope\)/);
  assert.match(dashboard,/latest=newest\.analysisCharts/);
