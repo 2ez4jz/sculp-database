@@ -18,20 +18,24 @@ const assert=require('node:assert/strict');
   const send=async q=>{await page.locator('#chat-input:not(:disabled)').waitFor();await page.locator('#chat-input').fill(q);await page.locator('#chat-input').press('Enter');await page.locator('#chat-input:not(:disabled)').waitFor();};
   await send('9月日报');await page.locator('.analysis-donut').waitFor();
   const last=()=>page.locator('#sculpy-dashboard');
+  const previews={};
   assert.equal(await last().locator('.analysis-card').count(),4);
+  previews.donut=await page.locator('[data-analysis-chart="donut"]').first().evaluate(el=>el.outerHTML);
   assert.match(await last().innerText(),/订单目前走到哪一步/);
   await last().scrollIntoViewIfNeeded();await page.screenshot({path:'qa-screens/analysis-daily-desktop.png'});
   await send('8月和9月收入对比');assert.equal(await last().locator('.analysis-line').count(),1);
+  previews.trend=await page.locator('[data-analysis-chart="trend"]').first().evaluate(el=>el.outerHTML);
   await page.setViewportSize({width:390,height:844});await page.waitForTimeout(350);await last().scrollIntoViewIfNeeded();
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   assert(await last().evaluate(el=>el.scrollWidth<=el.clientWidth+1));
   await last().locator('.analysis-card').first().evaluate(el=>el.scrollIntoView({block:'start'}));await page.screenshot({path:'qa-screens/analysis-trend-mobile.png'});
   await send('9月排期');assert.equal(await last().locator('.analysis-schedule-row').count(),12);
+  previews.schedule=await page.locator('[data-analysis-chart="schedule"]').first().evaluate(el=>el.outerHTML);
   await last().scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:'qa-screens/analysis-schedule-mobile.png'});
   await page.reload();await page.locator('#chat-input:not(:disabled)').waitFor();await page.locator('#sculpy-dashboard .analysis-schedule-row').first().waitFor();assert.equal(await page.locator('#sculpy-dashboard .analysis-schedule-row').count(),12);
   const preview=await browser.newPage({viewport:{width:390,height:1100}});
-  for(const kind of ['donut','trend','schedule']){const html=await page.locator('[data-analysis-chart="'+kind+'"]').first().evaluate(el=>el.outerHTML);await preview.setContent('<link rel="stylesheet" href="http://localhost:4173/src/components/chat/panel.css"><div style="padding:12px;font-family:Arial,sans-serif">'+html+'</div>');await preview.waitForTimeout(150);await preview.screenshot({path:'qa-screens/analysis-'+kind+'-card-mobile.png'});}
+  for(const kind of ['donut','trend','schedule']){const html=previews[kind];assert.ok(html,kind);await preview.setContent('<link rel="stylesheet" href="http://localhost:4173/src/components/chat/panel.css"><div style="padding:12px;font-family:Arial,sans-serif">'+html+'</div>');await preview.waitForTimeout(150);await preview.screenshot({path:'qa-screens/analysis-'+kind+'-card-mobile.png'});}
   await preview.close();
   await page.selectOption('#role','artist');await page.evaluate(()=>location.hash='sculpy');await page.waitForFunction(()=>document.querySelector('#main')?.dataset.route==='#sculpy');await page.locator('#chat-input:not(:disabled)').waitFor();
   await send('9月收入饼图');assert.equal(await page.locator('.analysis-card').count(),0);
