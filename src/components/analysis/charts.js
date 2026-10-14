@@ -1,5 +1,6 @@
 import {demoReport} from '../../../supabase/functions/sculpy-chat/demo-report.js';
 import {reportMonths} from '../../domain/report-period.js';
+import {diagnosePeriods} from '../../domain/operating-analyst.js';
 const palette=['#40584c','#8caa83','#d2b575','#b97769','#718fa6','#a184a8','#999'];
 const names={Wedding:['婚礼','Wedding'],Event:['活动','Event'],Education:['课程','Education'],Commercial:['商业','Commercial'],Trial:['试妆','Trial'],Photoshoot:['拍摄','Photoshoot'],instagram:['Instagram','Instagram'],google:['Google','Google'],planner:['Planner','Planner'],referral:['转介绍','Referral'],website:['官网','Website'],unattributed:['未归因','Unattributed'],Completed:['已完成','Completed'],Confirmed:['已确认','Confirmed'],Inquiry:['咨询中','Inquiry'],Cancelled:['已取消','Cancelled']};
 const label=(v,en)=>names[v]?.[en?1:0]||({michelle:'Michelle',miranda:'Miranda',emily:'Emily',elaine:'Elaine',giselle:'Giselle',angelina:'Angelina',yuki:'Yuki',mira:'Mira',all:en?'All':'全部'})[v]||v;
@@ -84,10 +85,13 @@ export function chartCommentary(c,en=false){
  }
  if(c.previous&&c.current){
   const key=c.metric==='records'?'records':c.metric==='grossReceivedCents'?'grossReceivedCents':'completedAmountCents';
-  const delta=c.current[key]-c.previous[key],baseline=c.previous[key];
-  const change=baseline>0?' ('+(delta/baseline*100>=0?'+':'')+(delta/baseline*100).toFixed(1)+'%)':'';
-  const comparison=en?' Compared with '+c.previous.from+' to '+c.previous.to+', the same-scope total changed by '+format(Math.abs(delta))+change+'.':' 对比'+c.previous.from+'至'+c.previous.to+'的同口径数据，总量'+(delta>0?'增加':delta<0?'减少':'未变化')+format(Math.abs(delta))+change+'。';
-  observation+=comparison;
+  const diagnosis=diagnosePeriods({current:c.current,previous:c.previous,metric:key});
+  if(diagnosis.status==='supported'){
+   const {change,percent}=diagnosis.comparison;
+   const changeText=percent===null?'':(percent>=0?' +':' ')+percent.toFixed(1)+'%';
+   observation+=en?' Compared with '+c.previous.from+' to '+c.previous.to+', '+(change>0?'up ':change<0?'down ':'flat ')+format(Math.abs(change))+changeText+'.':' 对比'+c.previous.from+'至'+c.previous.to+'，同口径总量'+(change>0?'增加':change<0?'减少':'未变化')+format(Math.abs(change))+(changeText?' ('+changeText.trim()+')':'')+'。';
+   if(diagnosis.warnings.length)observation+=' '+diagnosis.warnings.join('；')+'。';
+  }
  }
  const suggestion=c.title==='channel'?'核对渠道带来的咨询质量与确认率':c.title==='artist'?'结合排班核对人员实际工作量':c.title==='service'?'对照相同季节的服务结构':c.kind==='trend'?'核对比较周期的长度和季节性':'核对对应记录并与可比时期的数据对照';
  return en?observation+' Suggested check: review comparable historical records before acting.':observation+' 建议'+suggestion+'；没有可比历史数据时，不能据此断言增长或下降。';
