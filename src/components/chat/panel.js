@@ -19,6 +19,7 @@ export function createChatPanel({
   getScope = () => ({ id: "global", label: "全局工作助手" }),
   onReference,
   renderSupplement = () => "",
+  onTurnsChanged = () => {},
 }) {
   const host = document.createElement("div");
   host.className = "chat-host";
@@ -70,6 +71,7 @@ export function createChatPanel({
       : `<div class="chat-welcome"><img class="chat-welcome-avatar" src="assets/sculpy.webp" alt=""><span>YOUR STUDIO COMPANION</span><h3>今天有什么想一起理清楚？</h3><p>我会先读取${scope?.id === "global" ? "你有权限查看的订单" : "当前订单"}，需要时再查其他相关记录。</p><div><button data-example="这${scope?.id === "global" ? "些" : "个"}订单有哪些信息还需要确认？">检查待确认事项</button><button data-example="帮我整理一下目前的安排，并解释需要注意的地方。">一起看一下安排</button></div></div>`;
     if (pendingMessage) $(".chat-messages").insertAdjacentHTML("beforeend", `<article class="chat-user"><small>你</small><div>${esc(pendingMessage)}</div></article><article class="chat-assistant chat-thinking"><small>SCULPY</small><span>正在想一想…</span></article>`);
     $(".chat-messages").scrollTop = $(".chat-messages").scrollHeight;
+    onTurnsChanged(turns, scope);
   }
   async function open(next = getScope()) {
     voice.dispose();
