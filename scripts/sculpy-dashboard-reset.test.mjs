@@ -28,7 +28,7 @@ test('reset remains on default after same chat turns redraw',async()=>{
  const f=await fixture(),turn={analysisCharts:[{kind:'trend'}]};
  f.dashboard.render([turn]);assert.match(f.markup(),/trend/);
  f.click();assert.doesNotMatch(f.markup(),/trend/);
- f.dashboard.render([turn]);assert.doesNotMatch(f.markup(),/trend/);
+ f.dashboard.render([structuredClone(turn)]);assert.doesNotMatch(f.markup(),/trend/);
  f.dashboard.render([turn,{analysisCharts:[{kind:'donut'}]}]);assert.match(f.markup(),/donut/);
 });
 test('full reset clears dismissed selection',async()=>{
