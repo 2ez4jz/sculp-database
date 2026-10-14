@@ -19,3 +19,11 @@ test('single category, empty and trend cases stay safe',()=>{
  assert.match(chartCommentary({...base,rows:[]}),/没有正值/);
  assert.match(chartCommentary({...base,kind:'trend',metric:'cents',rows:[{label:'8月',value:10000},{label:'9月',value:13000}]}),/增加/);
 });
+
+test('comparable baseline is explained without invented causes',()=>{
+ const c={...base,previous:{from:'2026-08-01',to:'2026-08-31',records:10,completedAmountCents:0,grossReceivedCents:0},current:{records:20,completedAmountCents:0,grossReceivedCents:0}};
+ const insight=chartCommentary(c,false);
+ assert.match(insight,/2026-08-01/);
+ assert.match(insight,/100.0%/);
+ assert.doesNotMatch(insight,/因为效率|利润增长/);
+});
