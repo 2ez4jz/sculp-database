@@ -89,6 +89,7 @@ export function demoChatAdapter({
       else
         result = await chatRequest({
           mode: "demo",
+          agentMode: new URLSearchParams(location.search).get("agent") === "sdk" ? "sdk" : undefined,
           ...body,
           bookingId: scope === "global" ? null : scope,
           catalog,
