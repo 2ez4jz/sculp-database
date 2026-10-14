@@ -1,0 +1,32 @@
+name: Sculpy verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'supabase/functions/sculpy-chat/**'
+      - 'package*.json'
+      - '.github/workflows/sculpy-verification.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Repeat financial and chart unit checks three times
+        run: |
+          for attempt in 1 2 3; do
+            echo "Regression pass $attempt"
+            node --test scripts/sculpy-dashboard-reset.test.mjs scripts/v2-1-sculpy-dashboard.test.mjs scripts/v2-1-financial-reconciliation.test.mjs scripts/v2-1-analysis-policy.test.mjs scripts/analysis-charts.test.mjs
+          done
+      - name: Full suite
+        run: npm test
