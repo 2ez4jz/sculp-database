@@ -45,5 +45,11 @@ export async function runSculpyDemoAgent({message,context,turns=[],preferences={
  const answer=String(result.finalOutput??"").trim();
  if(!answer)throw Error("Agent returned empty answer");
  if(!sources.length)throw Error("Agent returned analysis without verified reports");
- return {answer:answer.slice(0,16000),references:[],proposals:[],sourceIds:[],demoReportSources:sources.map(compactDemoReport)};
+ const en=!/\p{Script=Han}/u.test(answer),notes=[];
+ if(/收入|营收|金额|到账|收款|财务|利润|revenue|value|receipt|financial|profit/i.test(message))notes.push(en?'Completed value follows service dates; gross receipts follow payment dates before refunds. Neither is profit, and their difference does not establish unpaid debt.':'完成金额按服务日期、到账原额按收款日期统计，未扣退款；两者都不是利润，差额也不能直接认定为欠款。');
+ if(sources.some(r=>r.unpricedCompleted||r.nonCadCompleted))notes.push(en?'Missing prices or non-CAD amounts make the completed-value total incomplete.':'存在未知价格或非 CAD 订单，完成金额合计不完整。');
+ if(sources.some(r=>r.futureCompleted))notes.push(en?'Future-dated completed statuses require review.':'含未来日期的完成状态，需核对。');
+ const prefix=/虚构|fictional|simulat/i.test(answer)?'':en?'Fictional test data: ':'虚构测试数据：';
+ const rendered=prefix+answer.slice(0,14000)+(notes.length?'\n\n'+notes.join(' '):'');
+ return {answer:rendered,references:[],proposals:[],sourceIds:[],demoReportSources:sources.map(compactDemoReport)};
 }

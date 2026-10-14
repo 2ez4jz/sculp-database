@@ -22,6 +22,7 @@ const assert=require('node:assert/strict');
    assert.equal(await page.locator('#sculpy-chat-root').count(),0);
    assert.equal(await page.locator('#nav a.active').getAttribute('href'),'#dashboard');
    const overview=await page.locator('#sculpy-dashboard').innerText();
+   assert.notEqual(await page.locator('#nav a[href="#sculpy"]').evaluate(el=>getComputedStyle(el).color),'rgba(0, 0, 0, 0)','assistant navigation label must be readable');
    await go('sculpy');await page.locator('#chat-input:not(:disabled)').waitFor();
    assert.equal(await page.locator('#sculpy-dashboard').count(),0);
    assert.equal(await page.locator('.chat-launcher:visible').count(),0);

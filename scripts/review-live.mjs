@@ -22,6 +22,7 @@ for(const c of cases){
  const data=await response.json();
  const record={name:c.name,status:response.status,ms:Date.now()-started,...data};output.push(record);
  assert.equal(response.status,200,JSON.stringify(record));assert.equal(data.turn.engine,c.engine,JSON.stringify(record));assert(!data.turn.agentFallback,'SDK live trial must actually execute SDK');
+ if(c.engine==='sdk')assert.match(data.turn.answer,/虚构|Fictional/);
  if(c.minimumReports){assert(data.turn.demoReportSources?.length>=c.minimumReports);for(const source of data.turn.demoReportSources){const expected=demoReport(bookings,source.filters,source.asOfDate);for(const metric of ['records','completedAmountCents','grossReceivedCents'])assert.equal(source[metric],expected[metric]);}}
  if(c.cutoff)assert(data.turn.demoReportSources.every(s=>s.filters.to===c.cutoff));
  if(c.name==='legacy-visual-with-analysis')assert.match(data.turn.answer,/建议|核对/);

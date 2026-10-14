@@ -44,7 +44,7 @@ test('two-step month comparison invokes separate exact reports and keeps chart s
  }});
  assert.equal(calls.length,2);
  assert.equal(result.demoReportSources.length,2);
- assert.match(result.answer,/建议/);
+ assert.match(result.answer,/建议/);assert.match(result.answer,/虚构测试数据/);assert.match(result.answer,/不能直接认定为欠款/);
 });
 test('multi-step channel comparison preserves different scopes',async()=>{
  const h=harness(async execute=>{
