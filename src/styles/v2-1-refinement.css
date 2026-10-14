@@ -67,3 +67,17 @@ tbody tr:hover{background:#f7f8f4}
 }
 @media(max-width:420px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat .value{font-size:31px}}
 @media(prefers-reduced-motion:reduce){nav a,.profile-card,button,input,select,textarea,tbody tr{transition:none}nav a:hover,.profile-card:hover{transform:none}}
+
+/* Sculpy dashboard: a compact rotating gallery of contextual charts. */
+#sculpy-dashboard{margin:0 0 25px}
+.sculpy-dashboard-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:0 0 18px}
+.sculpy-dashboard-heading h2{font-family:var(--serif);font-size:clamp(31px,3.2vw,43px);font-weight:400;margin:0 0 5px}
+.sculpy-dashboard-heading p{color:var(--muted);font-size:13px;margin:0}
+.sculpy-dashboard-heading button{background:#fffdf9;border-color:#e6e7e0;white-space:nowrap}
+.sculpy-dashboard-grid .analysis-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.sculpy-dashboard-grid .analysis-card{min-width:0;margin:0;box-shadow:0 10px 26px #3744380b}
+.sculpy-dashboard-grid .analysis-card:first-child:nth-last-child(3){grid-column:span 2}
+.sculpy-dashboard-grid .analysis-note{font-size:11px;line-height:1.6}
+.sculpy-dashboard-grid .analysis-bar-row{grid-template-columns:minmax(80px,1fr) minmax(80px,2fr) auto}
+@media(max-width:980px){.sculpy-dashboard-grid .analysis-charts{grid-template-columns:1fr}.sculpy-dashboard-grid .analysis-card:first-child:nth-last-child(3){grid-column:auto}}
+@media(max-width:620px){.sculpy-dashboard-heading{align-items:flex-start;flex-direction:column}.sculpy-dashboard-heading button{font-size:12px}.sculpy-dashboard-grid .analysis-card{padding:17px!important}}
