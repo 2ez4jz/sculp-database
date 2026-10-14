@@ -5,8 +5,11 @@ import {bookings} from '../src/data/demo.js';
 import {buildAnalysisCharts} from '../src/components/analysis/charts.js';
 const app=readFileSync(new URL('../src/app.js',import.meta.url),'utf8');
 const dashboard=readFileSync(new URL('../src/components/analysis/sculpy-dashboard.js',import.meta.url),'utf8');
-test('Sculpy keeps fixed dashboard above inline conversation charts',()=>{
- assert.ok(app.includes('id="sculpy-dashboard"')&&app.includes('id="sculpy-chat-root"'));
+test('Dashboard and Sculpy chat use separate routes with inline conversation charts',()=>{
+ assert.match(app,/else if\(key==='dashboard'\)html=/);
+ assert.match(app,/else if\(key==='sculpy'\)html=/);
+ assert.match(app,/if\(key==='dashboard'\)sculpyDashboard\.reset\(\)/);
+ assert.match(app,/if\(key==='sculpy'\)chatPanel\.mount/);
  assert.match(app,/renderSupplement:turn=>turn\.analysisCharts\?\.length&&isGlobal\(\)\?/);
  assert.match(app,/renderAnalysisCharts\(turn\.analysisCharts,esc/);
  assert.doesNotMatch(app,/sculpyDashboard\.render\(turns\)/);
