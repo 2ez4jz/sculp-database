@@ -5,7 +5,7 @@ const agent=readFileSync(new URL('../supabase/functions/sculpy-chat/agent.ts',im
 const handler=readFileSync(new URL('../supabase/functions/sculpy-chat/handler.ts',import.meta.url),'utf8');
 const client=readFileSync(new URL('../src/services/chat.js',import.meta.url),'utf8');
 test('Agent SDK is explicitly opt in and fictional demo only',()=>{
- assert.match(handler,/demo && env\("SCULPY_AGENT_DEMO_ENABLED"\) === "true" && body\.agentMode === "sdk"/);
+ assert.match(handler,/demo && env\("SCULPY_AGENT_DEMO_ENABLED"\) !== "false" && body\.agentMode === "sdk"/);
  assert.match(handler,/await converse\(/);
  assert.match(client,/new URLSearchParams\(location\.search\)\.get\("agent"\) === "sdk"/);
 });

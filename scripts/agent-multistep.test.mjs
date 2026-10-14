@@ -22,7 +22,7 @@ function harness(script){
    return {finalOutput:output};
   }
  };
- const ctx={...sdk,z:{object:()=>({}),string:()=>({regex:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',JSON,Error,String,Array};
+ const ctx={...sdk,z:{object:()=>({}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',JSON,Error,String,Array};
  vm.runInNewContext(source+';globalThis.agentEntry=runSculpyDemoAgent;',ctx);
  return {entry:ctx.agentEntry,traces};
 }

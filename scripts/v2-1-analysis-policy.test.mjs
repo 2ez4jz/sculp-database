@@ -5,8 +5,8 @@ import {bookings} from '../src/data/demo.js';
 import {demoReport, demoVisualSummary} from '../supabase/functions/sculpy-chat/demo-report.js';
 const base={from:'2026-01-01',to:'2026-12-31',service:null,channelId:null,artistId:null,bookingId:null,status:null,groupBy:null};
 const report=(patch={},rows=bookings)=>demoReport(rows,{...base,...patch},'2026-10-13');
-test('V2.1: model guidance defaults to evidence and everyday explanation, not unsolicited advice',()=>{
- for(const phrase of ['数据解释原则','不主动给经营决策建议','区分已证实事实与可能原因','简单问题直接答'])assert.ok(instructions.includes(phrase),phrase);
+test('V2.1: model guidance defaults to evidence and everyday explanation, with a low-risk suggested check',()=>{
+ for(const phrase of ['数据解释原则','应主动补充一条简短、低风险、可执行的核查或改善建议','区分已证实事实与可能原因','简单问题直接答'])assert.ok(instructions.includes(phrase),phrase);
 });
 test('V2.1: one-dimensional service and channel breakdowns reconcile on exact denominator',()=>{
  const total=report();
