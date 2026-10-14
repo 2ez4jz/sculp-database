@@ -8,7 +8,7 @@ test('increase, decline and zero baseline do not invent growth',()=>{
 });
 test('missing or invalid report cannot produce a confident recommendation',()=>{
  assert.equal(diagnosePeriods({current:{records:4}}).status,'insufficient');
- assert.equal(diagnosePeriods({current:{records:4},previous:{records:2},metric:'profit'}).status,'insufficient');
+ assert.throws(()=>diagnosePeriods({current:{records:4},previous:{records:2},metric:'profit'}),/Unsupported metric/);
 });
 test('finance warning and unknown-price gate',()=>{
  const x=diagnosePeriods({current:{completedAmountCents:120000,records:7,unpricedCompleted:1},previous:{completedAmountCents:100000,records:8}});
