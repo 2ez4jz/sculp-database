@@ -10,8 +10,8 @@ test('Sculpy embeds one dashboard above chat and updates from turns',()=>{
  assert.ok(app.includes('id="sculpy-dashboard"') && app.includes('id="sculpy-chat-root"'));
  assert.match(app,/sculpyDashboard\.render\(turns\)/);
  assert.match(chat,/onTurnsChanged\(turns, scope\)/);
- assert.match(dashboard,/latest=newest\.analysisCharts/);
- assert.match(dashboard,/latest=null;render\(\[\]\)/);
+ assert.match(dashboard,/newest!==dismissedTurn/);
+ assert.match(dashboard,/dismissedTurn=newest\|\|null;latest=null;render\(turns\)/);
 });
 test('three default diagram questions use the same full fictional catalog',()=>{
  for(const question of ['300单服务订单占比','300单各渠道收款金额饼图','300单化妆师订单占比']){
