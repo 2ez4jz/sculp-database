@@ -10,7 +10,7 @@ test('Sculpy embeds one dashboard above chat and updates from turns',()=>{
  assert.ok(app.includes('id="sculpy-dashboard"') && app.includes('id="sculpy-chat-root"'));
  assert.match(app,/sculpyDashboard\.render\(turns\)/);
  assert.match(chat,/onTurnsChanged\(turns, scope\)/);
- assert.match(dashboard,/newest!==dismissedTurn/);
+ assert.match(dashboard,/newestKey!==dismissedTurn/);
  assert.match(dashboard,/dismissedTurn=newest\|\|null;latest=null;render\(turns\)/);
 });
 test('three default diagram questions use the same full fictional catalog',()=>{
