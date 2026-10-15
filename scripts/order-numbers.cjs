@@ -29,7 +29,7 @@ const assert=require('node:assert/strict');
    const legacy={...bookings[0],id:'demo-legacy'};delete legacy.orderNumber;
    state.demoBookings=[legacy];localStorage.setItem('sculp-memory-demo-300-v2',JSON.stringify(state));
   });
-  await page.goto('http://localhost:4173/?demo=1#bookings/demo-legacy');await page.locator('.detail-head').waitFor();
+  await page.goto('http://localhost:4173/?demo=1#bookings/demo-legacy');await page.reload();await page.locator('.detail-head').waitFor();
   const upgraded=await page.locator('.detail-head .eyebrow').innerText();
   assert.match(upgraded,/BOOKING \/ 6[01235678][012356789]{4}$/);
   await page.reload();await page.getByText(upgraded,{exact:true}).waitFor();
