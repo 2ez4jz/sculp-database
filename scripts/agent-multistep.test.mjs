@@ -1,3 +1,4 @@
+import {analysisPeriodInstructions} from "../supabase/functions/sculpy-chat/period-policy.js";
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -26,7 +27,7 @@ function harness(script){
    return {finalOutput:output};
   }}
  };
- const ctx={conversationInstructions,selectSkills,...sdk,z:{object:()=>({}),number:()=>({int:()=>({min:()=>({})})}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',demoReportingInstructions:'Test-only report rules',JSON,Error,String,Array,AbortSignal,compactDemoReport,compareDemoReports};
+ const ctx={analysisPeriodInstructions,conversationInstructions,selectSkills,...sdk,z:{object:()=>({}),number:()=>({int:()=>({min:()=>({})})}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',demoReportingInstructions:'Test-only report rules',JSON,Error,String,Array,AbortSignal,compactDemoReport,compareDemoReports};
  vm.runInNewContext(source+';globalThis.agentEntry=runSculpyDemoAgent;',ctx);
  return {entry:ctx.agentEntry,traces};
 }

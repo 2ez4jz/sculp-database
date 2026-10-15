@@ -1,3 +1,4 @@
+import {catalogHistoryFrom} from "./period-policy.js";
 import {demoReport} from "./demo-report.ts";
 import { converse } from "./core.ts";
 import { structuredIntent } from "./skills.js";
@@ -149,6 +150,7 @@ export async function handleRequest(req: Request) {
     context.timezone = context.timezone || "America/Toronto";
     context.localDate = new Intl.DateTimeFormat("en-CA", { timeZone: context.timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     context.currentBookingId = body.bookingId || null;
+    if(demo)context.historyFrom=catalogHistoryFrom(demoCatalog,context.localDate);
     if (!demo && ["owner","operations"].includes(context.actor?.role)) {
       context.operatingMemory = await rpc("sculpy_search_memory", {p_query:String(body.message||"").slice(0,200)});
       context.memoryCoverage = "Up to 20 approved policies, matching text first, then latest; never complete history";
