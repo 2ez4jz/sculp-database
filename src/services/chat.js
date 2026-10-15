@@ -90,7 +90,7 @@ export function demoChatAdapter({
       else
         result = await chatRequest(boundedDemoRequest({
           mode: "demo",
-          agentMode: new URLSearchParams(location.search).get("agent") === "sdk" ? "sdk" : undefined,
+          agentMode: new URLSearchParams(location.search).get("agent") === "legacy" ? undefined : "sdk",
           ...body,
           bookingId: scope === "global" ? null : scope,
           catalog,
@@ -145,6 +145,10 @@ export function demoChatAdapter({
 }
 export function cloudChatAdapter(supabase, profile) {
   return {
+    memory: ["owner","operations"].includes(profile.role) ? {
+      async list(){const {data,error}=await supabase.from("sculpy_operating_memory").select("*").order("updated_at",{ascending:false}).limit(100);if(error)throw Error("经营记忆读取失败，请检查管理员权限。");return data;},
+      async manage({action,id,revision=null,content=null,supersedes=null}){const {data,error}=await supabase.rpc("sculpy_manage_memory",{p_action:action,p_id:id,p_revision:revision,p_content:content,p_supersedes:supersedes});if(error)throw Error("记忆操作未完成，可能权限不足或记录已变化，请重新读取核对。");return data;}
+    } : null,
     mode: "cloud",
     identity: () => profile.id,
     async load(scope) {

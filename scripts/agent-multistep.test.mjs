@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import {conversationInstructions,selectSkills} from '../supabase/functions/sculpy-chat/skills.js';
 import {compactDemoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
 
 // Exercises the ACTUAL agent adapter with injected SDK stand-ins.
@@ -15,15 +16,17 @@ function harness(script){
  const sdk={
   Agent:class{constructor(options){this.options=options;}},
   tool:options=>options,
-  setDefaultOpenAIKey:key=>assert.equal(key,'fake-key'),
+  MemorySession:class{constructor(options){this.items=options.initialItems;}},
+  OpenAIProvider:class{constructor(options){assert.equal(options.apiKey,'fake-key');}},
   Runner:class{constructor(options){assert.equal(options.tracingDisabled,true);} async run(agent,prompt,options){
    assert.equal(options.maxTurns,7);
+   for(const item of options.session.items)if(item.role==='assistant'){assert.equal(item.status,'completed');assert(Array.isArray(item.content));}
    const execute=agent.options.tools.find(t=>t.name==='query_demo_report').execute;
    const output=await script(execute,traces);
    return {finalOutput:output};
   }}
  };
- const ctx={...sdk,z:{object:()=>({}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',demoReportingInstructions:'Test-only report rules',JSON,Error,String,Array,AbortSignal,compactDemoReport};
+ const ctx={conversationInstructions,selectSkills,...sdk,z:{object:()=>({}),number:()=>({int:()=>({min:()=>({})})}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',demoReportingInstructions:'Test-only report rules',JSON,Error,String,Array,AbortSignal,compactDemoReport};
  vm.runInNewContext(source+';globalThis.agentEntry=runSculpyDemoAgent;',ctx);
  return {entry:ctx.agentEntry,traces};
 }
@@ -38,7 +41,7 @@ test('two-step month comparison invokes separate exact reports and keeps chart s
   return '9月比8月增加 CAD 200，建议核对渠道构成';
  });
  const calls=[];
- const result=await h.entry({message:'比较8月和9月收入',context:validContext,apiKey:'fake-key',demoReport:async filters=>{
+ const result=await h.entry({message:'比较8月和9月收入',turns:[{user:'上一个问题',answer:'上一个回复'}],context:validContext,apiKey:'fake-key',demoReport:async filters=>{
   calls.push(filters);
   return {filters,completedAmountCents:filters.from==='2026-08-01'?100000:120000};
  }});
@@ -75,6 +78,6 @@ test('Agent enforces six report calls and rejects analysis without verified sour
   return '已核对六个查询';
  });
  let count=0;await h.entry({message:'多步骤分析',context:validContext,apiKey:'fake-key',demoReport:async()=>{count++;return {};}});assert.equal(count,6);
- const missing=harness(async()=> '没有查报表');
+ const missing=harness(async()=> '9月完成金额CAD 1000000');
  await assert.rejects(()=>missing.entry({message:'收入',context:validContext,apiKey:'fake-key',demoReport:async()=>({})}),/without verified reports/);
 });

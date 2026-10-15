@@ -1,5 +1,6 @@
 import {demoReport} from "./demo-report.ts";
 import { converse } from "./core.ts";
+import { structuredIntent } from "./skills.js";
 import { isAnalystQuestion } from "./agent-routing.js";
 const env = (key: string) => Deno.env.get(key) || "";
 const origins = new Set(
@@ -94,7 +95,8 @@ export async function handleRequest(req: Request) {
         (t: any) =>
           Array.isArray(t.sourceIds) &&
           t.sourceIds.every((id: any) => allowed.has(id)) &&
-          (!t.businessReport || ["owner", "operations"].includes(context.actor?.role)),
+          (!t.businessReport || ["owner", "operations"].includes(context.actor?.role)) &&
+          (!t.operatingMemoryUsed || ["owner", "operations"].includes(context.actor?.role)),
       );
     } else {
       const list = Array.isArray(body.catalog?.bookings)
@@ -147,6 +149,10 @@ export async function handleRequest(req: Request) {
     context.timezone = context.timezone || "America/Toronto";
     context.localDate = new Intl.DateTimeFormat("en-CA", { timeZone: context.timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     context.currentBookingId = body.bookingId || null;
+    if (!demo && ["owner","operations"].includes(context.actor?.role)) {
+      context.operatingMemory = await rpc("sculpy_search_memory", {p_query:String(body.message||"").slice(0,200)});
+      context.memoryCoverage = "Up to 20 approved policies, matching text first, then latest; never complete history";
+    }
     context.coverage = {
       workLogs: "latest 20",
       contextRecords: "latest 30",
@@ -178,7 +184,7 @@ export async function handleRequest(req: Request) {
     // Agent SDK is deliberately gated to fictional demo data. Real accounts keep the
     // existing authenticated, role-filtered conversation implementation.
     const agentEnabled = demo && env("SCULPY_AGENT_DEMO_ENABLED") !== "false" && body.agentMode === "sdk"
-      && !body.bookingId && !!context.advisorFixture && isAnalystQuestion(message, turns);
+      && !body.bookingId && !!context.advisorFixture && !structuredIntent(message);
     const legacy = () => converse({
       context,
       turns,
@@ -223,9 +229,9 @@ export async function handleRequest(req: Request) {
             "content-type": "application/json",
           },
           body: JSON.stringify({
-            model: "gpt-6-luna",
+            model: env("SCULPY_CHAT_MODEL") || "gpt-6-sol",
             store: false,
-            reasoning: { effort: "low" },
+            reasoning: { effort: env("SCULPY_REASONING_EFFORT") || "medium" },
             max_output_tokens: 5000,
             ...payload,
           }),
@@ -241,7 +247,8 @@ export async function handleRequest(req: Request) {
       try{
         const { runSculpyDemoAgent } = await import("./agent.ts");
         result = {...await runSculpyDemoAgent({message,context,turns,preferences,
-          apiKey:env("OPENAI_API_KEY"),demoReport:(args:any)=>demoReport(demoCatalog,args,context.localDate)}),engine:"sdk"};
+          queryBookings:async (args:any)=>{const rows=demoCatalog.filter((b:any)=>(!args.bookingId||b.id===args.bookingId)&&(!args.query||JSON.stringify(b).toLowerCase().includes(String(args.query).toLowerCase())));const offset=Math.max(0,Math.min(Number(args.offset)||0,100000));return {bookings:rows.slice(offset,offset+30),total:rows.length,offset};},
+          apiKey:env("OPENAI_API_KEY"),model:env("SCULPY_CHAT_MODEL")||"gpt-6-sol",effort:env("SCULPY_REASONING_EFFORT")||"medium",demoReport:(args:any)=>demoReport(demoCatalog,args,context.localDate)}),engine:"sdk"};
       }catch(error){
         console.error("sculpy-sdk fallback",error instanceof Error?error.name:"Error");
         result={...await legacy(),engine:"legacy",agentFallback:true};
@@ -251,6 +258,7 @@ export async function handleRequest(req: Request) {
       id: body.requestId,
       user: message,
       ...result,
+      ...(context.operatingMemory?.length ? {operatingMemoryUsed:true,memorySourceIds:context.operatingMemory.map((m:any)=>m.id)} : {}),
       createdAt: new Date().toISOString(),
     };
     if (!demo) {
