@@ -55,12 +55,14 @@ export function demoVisualSummary(report,question,en=false){
  const names={Wedding:['婚礼','Wedding'],Event:['活动','Event'],Education:['课程','Education'],Commercial:['商业','Commercial'],Completed:['已完成','Completed'],Confirmed:['已确认','Confirmed'],Inquiry:['咨询中','Inquiry'],Cancelled:['已取消','Cancelled'],website:['官网','Website'],referral:['转介绍','Referral'],instagram:['Instagram','Instagram'],google:['Google','Google'],planner:['Planner','Planner'],unattributed:['未归因','Unattributed']};
  const name=v=>names[v]?.[en?1:0]||v;
  const money=n=>'CAD '+(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
- const monetary=/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(question);
- const metric=monetary?/(到账|收款|receipt|received)/i.test(question)&&!/(完成|completed)/i.test(question)?'grossReceivedCents':'completedAmountCents':'records';
+ const average=/(客单价|均价|平均.*(?:成交|金额|价格)|average.*(?:value|price))/i.test(question);
+ const monetary=average||/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(question);
+ const metric=average?'averageCompletedAmountCents':monetary?/(到账|收款|receipt|received)/i.test(question)&&!/(完成|completed)/i.test(question)?'grossReceivedCents':'completedAmountCents':'records';
  const scope=Object.entries(report.filters).filter(([k,v])=>!['from','to','groupBy'].includes(k)&&v!==null).map(([,v])=>name(v)).join(' · ');
- const groups=report.groups.length?report.groups.map(g=>({label:name(g.value),value:g[metric]})):!monetary?Object.entries(report.statusCounts).map(([k,value])=>({label:name(k),value})):[];
+ const groups=report.groups.length?report.groups.map(g=>({label:name(g.label||g.value),value:g[metric],count:g.pricedCompleted})):!monetary?Object.entries(report.statusCounts).map(([k,value])=>({label:name(k),value})):[];
  const total=report[metric],fmt=v=>monetary?money(v):v+(en?' records':' 条');
  const heading=(en?'Fictional test data: ':'虚构测试数据：')+report.filters.from+' → '+report.filters.to+(scope?' · '+scope:'');
+ if(average)return heading+'\n'+(groups.length?groups.map(g=>g.label+' '+(g.value===null?(en?'No priced completed orders':'无价格有效的已完成订单'):money(g.value)+' · '+g.count+(en?' priced completed orders':'笔价格有效的已完成订单'))).join('；'):(total===null?(en?'No priced completed orders.':'无价格有效的已完成订单。'):money(total)))+'\n'+(en?'Averages are not additive. Compare sample sizes; this is not profit.':'均价不能相加；需核对样本数，这不是利润。');
  let text=heading+'\n'+(en?'Total: ':'合计：')+fmt(total)+(en?'.':'。');
  if(groups.length&&total>0)text+='\n'+groups.map(g=>g.label+' '+fmt(g.value)+'（'+(g.value/total*100).toFixed(1)+'%）').join('；')+(en?'.':'。');
  if(report.warning)text+='\n'+(en?'Small sample: these records do not establish long-term performance.':'样本少，只说明这部分记录的情况。');
@@ -73,5 +75,5 @@ export function demoVisualSummary(report,question,en=false){
 // Current minus peer; zero denominators never produce a growth percentage.
 export function compareDemoReports(current,peer){
  const format=n=>'CAD '+(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
- return {direction:'current_minus_peer',currentFilters:current.filters,peerFilters:peer.filters,metrics:Object.fromEntries(['records','completed','completedAmountCents','grossReceivedCents'].map(key=>{const delta=current[key]-peer[key];return [key,{current:current[key],peer:peer[key],delta,percent:peer[key]===0?null:Math.round(delta/peer[key]*1000)/10,...(key.endsWith('Cents')?{displayDelta:format(delta)}:{})}];}))};
+ return {direction:'current_minus_peer',currentFilters:current.filters,peerFilters:peer.filters,metrics:Object.fromEntries(['records','completed','completedAmountCents','grossReceivedCents',...(current.averageCompletedAmountCents!==undefined&&peer.averageCompletedAmountCents!==undefined?['averageCompletedAmountCents']:[])].map(key=>{if(current[key]===null||peer[key]===null)return [key,{current:current[key],peer:peer[key],delta:null,percent:null}];const delta=current[key]-peer[key];return [key,{current:current[key],peer:peer[key],delta,percent:peer[key]===0?null:Math.round(delta/peer[key]*1000)/10,...(key.endsWith('Cents')?{displayDelta:format(delta)}:{})}];}))};
 }

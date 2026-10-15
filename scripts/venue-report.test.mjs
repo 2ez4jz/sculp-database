@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
+import {demoReport,demoVisualSummary,compareDemoReports} from '../supabase/functions/sculpy-chat/demo-report.js';
 import {buildAnalysisCharts} from '../src/components/analysis/charts.js';
 const args={from:'2026-01-01',to:'2026-10-15',service:'Wedding',channelId:null,artistId:null,bookingId:null,status:null,groupBy:'venue',venueId:null};
 const row=(id,venueId,price,status='Completed',extra={})=>({id,venueId,venueName:venueId+' Hall',price,status,service:'Wedding',date:'2026-08-01',artistIds:['miranda'],channelId:'google',...extra});
@@ -26,4 +26,11 @@ test('venue average charts use non-additive bars and proper labels',()=>{
  const charts=buildAnalysisCharts({message:'场地婚礼客单价图表',bookings:data,reports:[report],day:'2026-10-15'});
  assert.equal(charts[0].title,'venue');assert.equal(charts[0].metric,'averageCompletedAmountCents');assert.equal(charts[0].kind,'bars');
  assert.equal(charts[0].rows.find(r=>r.label==='A Hall').value,200000);
+});
+
+test('legacy chart summary keeps averages separate from totals and unknowns',()=>{
+ const r=demoReport(data,args,'2026-10-15'),text=demoVisualSummary(r,'场地婚礼客单价柱状图');
+ assert.match(text,/A Hall CAD 2,000.00/);assert.match(text,/C Hall 无价格有效/);assert.doesNotMatch(text,/合计|%/);
+ const peer={...r,averageCompletedAmountCents:null};assert.equal(compareDemoReports(r,peer).metrics.averageCompletedAmountCents.delta,null);
+ assert.equal(compareDemoReports({...r,averageCompletedAmountCents:150000},{...r,averageCompletedAmountCents:100000}).metrics.averageCompletedAmountCents.delta,50000);
 });
