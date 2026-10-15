@@ -14,12 +14,13 @@ const assert=require('node:assert/strict');
   });
   await page.route('**/functions/v1/sculpy-ai*',route=>route.fulfill({json:{text:'手机录音转写测试',provider:'openai'}}));
   for(const viewport of [{width:375,height:667},{width:390,height:844},{width:430,height:932}]){
-   await page.setViewportSize(viewport);await page.goto('http://localhost:4173/?demo=1#sculpy');
+   await page.setViewportSize(viewport);await page.goto('http://localhost:4173/?demo=1&mobile_layout_test='+viewport.width+'#sculpy');
    await page.locator('#chat-input:not(:disabled)').waitFor();
    const layout=await page.evaluate(()=>{
     const box=s=>{const r=document.querySelector(s).getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:r.height,width:r.width};};
     return {dialog:box('.chat-dialog'),messages:box('.chat-messages'),composer:box('.chat-composer'),header:box('.chat-header'),focused:document.activeElement.id,overflow:document.documentElement.scrollWidth>innerWidth};
    });
+   console.log('Mobile layout',viewport.width,JSON.stringify(layout));
    assert.equal(layout.focused==='chat-input',false,'opening the page must not summon the phone keyboard');
    assert.equal(layout.overflow,false);assert(layout.dialog.bottom<=viewport.height+1);
    assert(layout.messages.height>viewport.height*.55,'the transcript should occupy most of the screen');
