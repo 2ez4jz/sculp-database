@@ -21,10 +21,13 @@ const assert=require('node:assert/strict');
    assert.equal(await page.locator('.detail-head .eyebrow').innerText(),'BOOKING / '+number);
    await page.reload();await page.getByText('BOOKING / '+number,{exact:true}).waitFor();
    await page.goto('http://localhost:4173/?demo=1#bookings');
-   await page.locator('#search').fill(number);await page.locator('#search').dispatchEvent('change');
+   await page.locator('#search').fill(number);
    assert.equal(await page.locator('#booking-results tbody tr').count(),1);
    assert.equal(await page.locator('#booking-results tbody tr td').first().innerText(),number);
    await page.screenshot({path:'qa-screens/order-numbers-'+width+'.png'});
+   // Click while search still has focus: blur must not replace the target link.
+   await page.locator('#booking-results tbody tr td a').first().click();
+   await page.getByText('BOOKING / '+number,{exact:true}).waitFor();
   }
   // Upgrade a browser-saved older demo booking, without changing its ID or links.
   await page.evaluate(async()=>{
