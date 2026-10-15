@@ -43,3 +43,12 @@
 - [最终v29多轮原文](evaluations/venue-model-dates-20261015-v29.json)
 - [v28中间批次](evaluations/venue-model-dates-20261015-v28.json)
 - [最终兼容路径](evaluations/model-legacy-20261015-v29.json)
+
+## 发布与最终验收
+
+- PR #22 已合并，应用合并提交：32729081a3d52620cb9f5099c080414e37b81942。
+- 最终功能分支桌面／390px手机／PostgreSQL／备份恢复检查全部通过：[38776501663](https://github.com/2ez4jz/sculp-database/actions/runs/38776501663)。
+- 主分支 Sculpy 完整回归成功：[38776823967](https://github.com/2ez4jz/sculp-database/actions/runs/38776823967)。
+- GitHub Pages 实际部署成功：[38776824260](https://github.com/2ez4jz/sculp-database/actions/runs/38776824260)。
+- 直接HTTP读取公开index、模型指示灯CSS、日期筛选模块、场地名称投影与均价图表模块，五项均200，且源码包含本轮实现及缓存版本标记。
+- [打开助手](https://2ez4jz.github.io/sculp-database/?demo=1&release=dates-model-venue-20261015#sculpy) · [打开Dashboard](https://2ez4jz.github.io/sculp-database/?demo=1&release=dates-model-venue-20261015#dashboard)。
