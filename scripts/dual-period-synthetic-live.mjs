@@ -7,7 +7,7 @@ const rows=[{...base,id:'synthetic-1',venueId:'synthetic-a',venueName:'Synthetic
 const filters={from:'2026-09-15',to:'2026-10-14',service:'Wedding',venueId:null,channelId:null,artistId:null,bookingId:null,status:null,groupBy:'venue'};
 const seed=[{user:'哪个场地婚礼客单价最高',answer:'此前只看了最近30天。',sourceIds:[],demoReportSources:[{filters}]}];
 const results=[];
-for(const c of [{id:'screenshot-followup',message:'长期来看',turns:seed},{id:'fresh-ranking',message:'哪个场地婚礼客单价最高',turns:[]},{id:'explicit-month',message:'只看2026年8月，哪个场地婚礼客单价最高',turns:seed,explicit:true},{id:'legacy-followup',message:'长期来看',turns:seed,legacy:true}]){
+for(const c of [{id:'screenshot-followup',message:'长期来看，分析一下这些差异对寻找高预算客户有什么意义，给出下一步。',turns:seed},{id:'fresh-ranking',message:'哪个场地婚礼客单价最高',turns:[]},{id:'explicit-month',message:'只看2026年8月，哪个场地婚礼客单价最高',turns:seed,explicit:true},{id:'legacy-followup',message:'长期来看',turns:seed,legacy:true}]){
  const response=await fetch(endpoint,{method:'POST',headers:{origin:'https://2ez4jz.github.io','content-type':'application/json'},body:JSON.stringify({mode:'demo',agentMode:c.legacy?undefined:'sdk',requestId:crypto.randomUUID(),message:c.message,catalog:{bookings:rows,notes:[]},advisorFixture:{version:'sculp-unified-300-v2',fictional:true,summary:{}},turns:c.turns,preferences:{verbosity:'balanced',instructions:'请用中文回复。'}}),signal:AbortSignal.timeout(180000)});
  const data=await response.json(),sources=data.turn?.demoReportSources||[],errors=[];
  if(response.status!==200)errors.push('HTTP '+response.status);
@@ -19,7 +19,7 @@ for(const c of [{id:'screenshot-followup',message:'长期来看',turns:seed},{id
   if(/你想看|你是想|还是所有|还是全部|请选择/.test(data.turn?.answer||''))errors.push('clarification instead of direct answer');
  }
  results.push({id:c.id,message:c.message,status:response.status,errors,...data});
- await mkdir('docs/evaluations',{recursive:true});await writeFile('docs/evaluations/dual-period-synthetic-20261015-v31.json',JSON.stringify({fictionalOnly:true,inlineSyntheticRows:3,edgeVersion:31,results},null,2));
+ await mkdir('docs/evaluations',{recursive:true});await writeFile('docs/evaluations/dual-period-synthetic-20261015-v32.json',JSON.stringify({fictionalOnly:true,inlineSyntheticRows:3,edgeVersion:32,results},null,2));
  console.log(c.id,response.status,JSON.stringify(errors),'\n'+data.turn?.answer);
 }
 if(results.some(r=>r.errors.length))process.exitCode=1;

@@ -3,7 +3,7 @@ export const skills = {"business": "# SCULP Business Analysis\nTrigger on growth
 export function selectSkills(message, turns=[]) {
  const text=String(message)+' '+(turns.at(-1)?.user||'');
  return Object.entries(skills).filter(([name])=>({
- business:/经营|分析|增长|定价|排班|旺季|趋势|比较|建议|business|analy|growth|pricing|staff|compare/i,
+ business:/客单价|均价|消费能力|预算|支付意愿|场地|经营|分析|增长|定价|排班|旺季|趋势|比较|建议|business|analy|growth|pricing|staff|compare/i,
  finance:/财务|收入|营收|金额|到账|收款|利润|退款|成本|工资|定金|欠款|finance|revenue|receipt|profit|refund|cost|payroll/i,
  growth:/获客|渠道|投放|广告|咨询|转化|Google|Instagram|ROI|CAC|acquisition|channel|conversion|marketing/i
  }[name]).test(text)).map(([name,content])=>({name,content}));
