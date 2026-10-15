@@ -1,3 +1,4 @@
+import {demoOrderNumbers} from '../data/demo-order-numbers.js';
 import { fixtureSummary } from '../data/advisor-fixtures.js';
 import { advisorMetrics, advisorInsight } from './advisor-engine.js';
 const services={bridal:'Wedding',occasion:'Event',lesson:'Education',commercial:'Commercial'};
@@ -9,7 +10,7 @@ export function workspaceBookings(rows, venues) {
  return rows.map(row=>{
   const i=Number(row.id.replace('fixture-',''))-1;
   const date=row.startLocal.slice(0,10), hour=Number(row.startLocal.slice(11,13));
-  return {id:'b'+i,fixtureId:row.id,fictional:true,date,startTime:row.startLocal.slice(11,16),endTime:String(hour+(row.service==='bridal'?10:2)).padStart(2,'0')+':00',
+  return {id:'b'+i,orderNumber:demoOrderNumbers[row.id],fixtureId:row.id,fictional:true,date,startTime:row.startLocal.slice(11,16),endTime:String(hour+(row.service==='bridal'?10:2)).padStart(2,'0')+':00',
    clientId:'c'+i,artistIds:[row.artist.toLowerCase(),...(i===0&&row.artist!=='Michelle'?['michelle']:[])],
    venueId:row.service==='lesson'?'studio':venues[i%venues.length].id,
    partnerIds:row.service==='lesson'?[]:i%2?['lumi','ever']:['mango','rebecca','bloom'],

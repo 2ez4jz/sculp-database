@@ -1,4 +1,4 @@
-import { searchCatalog, searchLinks } from "../../domain/sculpy.js";
+import { searchCatalog, searchLinks } from "../../domain/sculpy.js?v=order-numbers-20261015";
 import {
   transcribeAudio,
   extractMemory,

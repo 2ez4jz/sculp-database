@@ -32,7 +32,7 @@ export function memoryTargets(data, identity) {
     ...own.map((b) => ({
       type: "booking",
       id: b.id,
-      label: `${lookup(data.clients, b.clientId)?.name || "客户"} · ${b.date}`,
+      label: `${b.orderNumber ? b.orderNumber+" · " : ""}${lookup(data.clients, b.clientId)?.name || "客户"} · ${b.date}`,
       clientId: b.clientId,
       venueId: b.venueId,
       partnerIds: b.partnerIds,

@@ -1,3 +1,4 @@
+import {allocateOrderNumber} from './order-numbers.js';
 // AI output is untrusted. Only supported, bounded draft fields reach the UI.
 export const serviceTypes = ['Wedding', 'Trial', 'Event', 'Photoshoot', 'Commercial', 'Education'];
 export function validDate(value) {
@@ -34,5 +35,5 @@ export function validateNewEntity(type, fields, data) {
   if(startTime&&!clock(startTime)||endTime&&!clock(endTime)||startTime&&endTime&&endTime<=startTime)throw Error('请选择有效服务时间，结束须晚于开始。');
   let price=null;
   if(fields.price!==undefined&&fields.price!==''){if(!/^\d{1,8}(\.\d{1,2})?$/.test(fields.price))throw Error('金额最多两位小数，未知价格留空。');price=Number(fields.price);}
-  return { date:fields.date, clientId:fields.clientId, artistIds:[fields.artistId], venueId:fields.venueId, service:fields.service, startTime,endTime,partnerIds:[],price,paidCents:0,paidDate:null,channelId:fields.channelId||null,currency:'CAD',fictional:true,status:'Inquiry',needsReview:true,version:0 };
+  return { orderNumber:allocateOrderNumber(fields.service,data.bookings.map(b=>b.orderNumber)), date:fields.date, clientId:fields.clientId, artistIds:[fields.artistId], venueId:fields.venueId, service:fields.service, startTime,endTime,partnerIds:[],price,paidCents:0,paidDate:null,channelId:fields.channelId||null,currency:'CAD',fictional:true,status:'Inquiry',needsReview:true,version:0 };
 }

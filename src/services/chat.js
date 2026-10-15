@@ -3,7 +3,7 @@ import { config } from "../config.js";
 import { advisorRowsFromBookings, advisorSnapshot } from "../domain/demo-workspace.js";
 import { reportMonths } from "../domain/report-period.js";
 import { advisorMetrics } from "../domain/advisor-engine.js";
-import { boundedDemoRequest } from "../domain/chat-history.js";
+import { boundedDemoRequest } from "../domain/chat-history.js?v=order-numbers-20261015";
 // Chat figures are opt-in; fixed Dashboard charts use a separate path.
 export function wantsChatVisual(message) {
  const q=String(message||"");
