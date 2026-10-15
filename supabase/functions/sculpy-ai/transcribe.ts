@@ -1,5 +1,6 @@
 import { OPENAI_API_KEY } from "./config.ts";
 import { json } from "./http.ts";
+import {audioUpload} from './audio-format.js';
 
 export async function transcribe(request: Request, origin: string) {
   const incoming = await request.formData();
@@ -14,7 +15,11 @@ export async function transcribe(request: Request, origin: string) {
     );
 
   const form = new FormData();
-  form.append("file", audio, audio.name || "sculpy.webm");
+  // Also repair uploads from older cached clients that named MP4 bytes .webm.
+  let upload;
+  try { upload=await audioUpload(audio); }
+  catch(error) { return json(origin,{error:error instanceof Error?error.message:'录音格式无法识别。'},400); }
+  form.append("file", upload.blob, upload.name);
   form.append("model", "gpt-transcribe");
   form.append(
     "prompt",

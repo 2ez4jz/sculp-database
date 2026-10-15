@@ -16,8 +16,8 @@ import {
   extractEntityProposals,
   transcribeAudio,
   transcribeImage,
-} from "../../services/sculpy.js";
-import { createVoiceCapture } from "../../pages/sculpy/voice.js";
+} from "../../services/sculpy.js?v=ios-audio-20261015";
+import { createVoiceCapture } from "../../pages/sculpy/voice.js?v=ios-audio-20261015";
 import { storeAttachments, removeAttachments, getAttachment } from "../../services/attachments.js";
 
 import { normalizeEntityProposals, uniqueNameId, validateNewEntity } from "../../domain/intake.js?v=order-numbers-20261015";
