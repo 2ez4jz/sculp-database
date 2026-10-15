@@ -1,0 +1,105 @@
+/* Compact phone workspace. Chat keeps its dedicated viewport layout. */
+[data-mobile-filters]{display:none}
+@media(max-width:600px){
+ body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+ body:not(.sculpy-chat-page){font-size:14px;line-height:1.55}
+ body:not(.sculpy-chat-page) #main{padding:14px 14px 86px;min-width:0}
+ body:not(.sculpy-chat-page) .topbar{min-height:52px;height:auto;padding:7px 12px;gap:6px}
+ body:not(.sculpy-chat-page) .top-actions{gap:5px;min-width:0;flex-wrap:wrap;justify-content:flex-end}
+ body:not(.sculpy-chat-page) .top-actions select{font-size:16px;max-width:145px;min-height:36px;padding:4px 5px}
+ body:not(.sculpy-chat-page) .demo-exit{font-size:11px;padding:5px}
+ body:not(.sculpy-chat-page) h1{font-size:28px;line-height:1.2;letter-spacing:-.025em;margin-bottom:7px;overflow-wrap:anywhere}
+ body:not(.sculpy-chat-page) h2{font-size:17px;margin-bottom:13px}
+ body:not(.sculpy-chat-page) h3{font-size:15px}
+ body:not(.sculpy-chat-page) .eyebrow{font-size:10px;letter-spacing:.1em;margin-bottom:6px}
+ body:not(.sculpy-chat-page) .page-head{gap:11px;margin-bottom:16px;align-items:flex-start}
+ body:not(.sculpy-chat-page) .page-head p{font-size:13px;line-height:1.55}
+ body:not(.sculpy-chat-page) .head-buttons{gap:7px;justify-content:flex-start}
+ body:not(.sculpy-chat-page) button{font-size:13px;min-height:38px;padding:7px 11px}
+ body:not(.sculpy-chat-page) input,body:not(.sculpy-chat-page) select,body:not(.sculpy-chat-page) textarea{font-size:16px;max-width:100%}
+ body:not(.sculpy-chat-page) .demo-data-notice{font-size:10px;line-height:1.5;margin:0 0 12px;color:#7b8075;overflow-wrap:anywhere}
+ body:not(.sculpy-chat-page) .stats{gap:8px;margin-bottom:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body:not(.sculpy-chat-page) .stat{padding:11px 12px;min-width:0;border-radius:12px;box-shadow:none}
+ body:not(.sculpy-chat-page) .stat .value{font-size:25px;line-height:1.15;margin-bottom:4px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+ body:not(.sculpy-chat-page) .stat .label{font-size:11px;line-height:1.4}
+ body:not(.sculpy-chat-page) #main[data-page=bookings]>.stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+ body:not(.sculpy-chat-page) #main[data-page=bookings]>.stats .stat{padding:10px 7px}
+ body:not(.sculpy-chat-page) #main[data-page=bookings]>.stats .value{font-size:23px}
+ body:not(.sculpy-chat-page) #main[data-page=bookings]>.stats .label{font-size:10px}
+ body:not(.sculpy-chat-page) .today{gap:0;margin-bottom:16px}
+ body:not(.sculpy-chat-page) .today .memory-card{display:none}
+ body:not(.sculpy-chat-page) .feature{min-height:0;padding:13px 15px;gap:15px;border-radius:13px}
+ body:not(.sculpy-chat-page) .feature .date-block{padding-right:14px}
+ body:not(.sculpy-chat-page) .feature .day{font-size:32px}
+ body:not(.sculpy-chat-page) .feature h3{font-size:22px;line-height:1.2}
+ body:not(.sculpy-chat-page) .feature p{font-size:11px;margin:4px 0 7px;line-height:1.45}
+ body:not(.sculpy-chat-page) .feature a{font-size:12px}
+ body:not(.sculpy-chat-page) .section-head{gap:8px;margin-bottom:10px;flex-wrap:wrap}
+ body:not(.sculpy-chat-page) .toolbar{gap:8px;margin-bottom:12px;min-width:0}
+ body:not(.sculpy-chat-page) .toolbar input{min-width:0;min-height:40px}
+ body:not(.sculpy-chat-page) .toolbar select{min-width:0;flex:1 1 130px}
+ body:not(.sculpy-chat-page) .booking-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto}
+ .booking-toolbar #search{width:100%;grid-column:1;font-size:16px;padding:8px 10px}
+ .booking-toolbar [data-mobile-filters]{display:block;grid-column:2;grid-row:1}
+ .booking-toolbar:not(.filters-expanded)>select,.booking-toolbar:not(.filters-expanded)>input[type=date],.booking-toolbar:not(.filters-expanded)>[data-action=clear]{display:none}
+ .booking-toolbar.filters-expanded>select,.booking-toolbar.filters-expanded>input[type=date]{width:100%;grid-column:auto}
+ .booking-toolbar.filters-expanded>[data-action=clear]{grid-column:1/-1}
+ body:not(.sculpy-chat-page) .table-wrap:has(>.booking-table){border:0;background:transparent;box-shadow:none;overflow:visible}
+ .booking-table,.booking-table tbody{display:block;width:100%;white-space:normal}
+ .booking-table thead{display:none}
+ .booking-table tbody{display:grid;gap:10px}
+ .booking-table tr{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:3px;padding:12px 14px;background:#fffefb;border:1px solid #e3e5dc;border-radius:13px;min-width:0}
+ .booking-table td{display:block;border:0;padding:0;font-size:13px;white-space:normal;min-width:0;overflow-wrap:anywhere}
+ .booking-table .booking-number{grid-column:1;grid-row:1;font-size:15px;line-height:1.7;font-variant-numeric:tabular-nums}
+ .booking-table .booking-status{grid-column:2;grid-row:1;justify-self:end}
+ .booking-table .pill{font-size:10px;padding:3px 8px}
+ .booking-table .booking-date{grid-column:1/-1;grid-row:2;font-size:11px;color:#7b8075}
+ .booking-table .booking-date .meta{display:inline;margin-left:8px;font-size:11px}
+ .booking-table .booking-client{grid-column:1/-1;grid-row:3;font-size:15px;margin:4px 0}
+ .booking-table .booking-client .meta{display:inline;margin-left:9px;font-size:11px}
+ .booking-table .booking-artists{grid-column:1;grid-row:4;font-size:12px}
+ .booking-table .booking-artists>div{display:inline;margin-right:6px}
+ .booking-table .booking-venue{grid-column:1;grid-row:5;font-size:12px;color:#727b6e}
+ .booking-table .booking-amount{grid-column:2;grid-row:4/6;align-self:end;font-size:14px;font-weight:500}
+ .booking-table .booking-partners{display:none}
+ body:not(.sculpy-chat-page) .panel{padding:15px;border-radius:13px;box-shadow:none}
+ body:not(.sculpy-chat-page) .two-col,body:not(.sculpy-chat-page) .stack{gap:14px}
+ body:not(.sculpy-chat-page) .detail-head{gap:12px;margin-bottom:18px}
+ body:not(.sculpy-chat-page) .detail-head .service{font-size:13px}
+ body:not(.sculpy-chat-page) .big-money{font-size:27px}
+ body:not(.sculpy-chat-page) .back{margin-bottom:13px}
+ body:not(.sculpy-chat-page) .entity-row{padding:11px 0;gap:12px;min-width:0}
+ body:not(.sculpy-chat-page) .entity-row>div{min-width:0;overflow-wrap:anywhere}
+ body:not(.sculpy-chat-page) .summary{font-size:14px;line-height:1.75}
+ body:not(.sculpy-chat-page) .grid{gap:10px}
+ body:not(.sculpy-chat-page) .profile-card{padding:14px;border-radius:13px;box-shadow:none}
+ body:not(.sculpy-chat-page) .profile-card img{width:48px;height:48px;margin-bottom:8px;float:left;margin-right:12px}
+ body:not(.sculpy-chat-page) .profile-card h3{font-size:22px;margin-bottom:5px}
+ body:not(.sculpy-chat-page) .profile-card p{font-size:12px;margin-bottom:8px}
+ body:not(.sculpy-chat-page) .profile-card .count{clear:both;margin-top:10px;padding-top:9px;font-size:12px}
+ body:not(.sculpy-chat-page) .profile-title{gap:12px;margin-bottom:18px}
+ body:not(.sculpy-chat-page) .profile-title h1{font-size:26px}
+ body:not(.sculpy-chat-page) .profile-title img{width:60px;height:72px}
+ body:not(.sculpy-chat-page) .info-grid{gap:12px}
+ body:not(.sculpy-chat-page) .gallery{gap:8px}
+ body:not(.sculpy-chat-page) .sculpy-dashboard-heading h1{font-size:28px}
+ body:not(.sculpy-chat-page) .analysis-card{padding:14px!important;border-radius:13px}
+ body:not(.sculpy-chat-page) .dashboard-date-form{gap:8px;padding:10px;margin-bottom:14px}
+ body:not(.sculpy-chat-page) .dashboard-date-form label{flex-basis:120px;font-size:11px}
+ body:not(.sculpy-chat-page) .bar-row{grid-template-columns:minmax(80px,105px) minmax(0,1fr) 32px;font-size:12px;gap:8px}
+ body:not(.sculpy-chat-page) .setting-row{padding:12px 0;gap:8px;font-size:13px;overflow-wrap:anywhere}
+ body:not(.sculpy-chat-page) .empty{padding:25px 14px}
+ body:not(.sculpy-chat-page) footer{font-size:10px;padding:14px 14px 30px}
+ body:not(.sculpy-chat-page) .chat-launcher{padding:7px;gap:0;right:12px;bottom:max(14px,env(safe-area-inset-bottom));border-radius:50%;width:52px;height:52px;justify-content:center}
+ body:not(.sculpy-chat-page) .chat-launcher>span{display:none}
+ body:not(.sculpy-chat-page) .chat-launcher img{width:36px;height:36px}
+ .auth-shell{padding:18px 12px}.auth-card{padding:20px 16px;border-radius:16px}
+ .auth-card h1{font-size:26px}.auth-card input,.auth-card select,.auth-card textarea{font-size:16px;max-width:100%}
+}
+@media(max-width:600px){
+ body:not(.sculpy-chat-page) .calendar-cell{min-width:0;padding:4px;min-height:72px;overflow:hidden}
+ body:not(.sculpy-chat-page) .calendar-event{font-size:9px;line-height:1.35;overflow-wrap:anywhere}
+ body:not(.sculpy-chat-page) .profile-title .monogram{width:52px;height:52px;flex:none;font-size:27px}
+ .auth-content{padding:22px 14px}.auth-story{padding:20px 16px}.auth-story h1{font-size:28px}.auth-story img{max-height:130px;object-fit:contain}
+ .auth-workspace{padding:14px}.cloud-intake{padding:13px;margin:14px 0}.cloud-order{padding:12px}
+}
