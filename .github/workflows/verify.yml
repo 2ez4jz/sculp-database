@@ -30,6 +30,7 @@ jobs:
           node scripts/monthly-browser.cjs
           node scripts/dashboard-navigation.cjs
           node scripts/chat.cjs
+          node scripts/readable-answers.cjs
           node scripts/auth.cjs
           node scripts/smoke.cjs
           node scripts/permissions.cjs
