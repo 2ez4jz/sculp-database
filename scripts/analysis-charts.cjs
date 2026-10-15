@@ -37,7 +37,7 @@ const assert=require('node:assert/strict');
   const preview=await browser.newPage({viewport:{width:390,height:1100}});
   for(const kind of ['donut','trend','schedule']){const html=previews[kind];assert.ok(html,kind);await preview.setContent('<link rel="stylesheet" href="http://localhost:4173/src/components/chat/panel.css"><div style="padding:12px;font-family:Arial,sans-serif">'+html+'</div>');await preview.waitForTimeout(150);await preview.screenshot({path:'qa-screens/analysis-'+kind+'-card-mobile.png'});}
   await preview.close();
-  await page.selectOption('#role','artist');await page.evaluate(()=>location.hash='sculpy');await page.waitForFunction(()=>document.querySelector('#main')?.dataset.route==='#sculpy');await page.locator('#chat-input:not(:disabled)').waitFor();
+  await page.goto('http://localhost:4173/?demo=1#bookings');await page.selectOption('#role','artist');await page.evaluate(()=>location.hash='sculpy');await page.waitForFunction(()=>document.querySelector('#main')?.dataset.route==='#sculpy');await page.locator('#chat-input:not(:disabled)').waitFor();
   await send('9月收入饼图');assert.equal(await page.locator('.analysis-card').count(),0);
   assert.deepEqual(errors,[]);console.log('Automatic charts: exact daily report, desktop/mobile, trend, schedule, history and role isolation passed');
  }finally{await browser.close();}

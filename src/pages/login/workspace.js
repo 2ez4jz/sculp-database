@@ -1,7 +1,7 @@
 import { mountCloudIntake } from './intake.js';
 import { mountOrderEditor } from './order-editor.js';
 import { mountMonthlyReport } from './monthly-report.js';
-import { createChatPanel } from "../../components/chat/panel.js?v=guided-20261015";
+import { createChatPanel } from "../../components/chat/panel.js?v=mobile-chat-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
 const esc = (value) =>
   String(value ?? "").replace(

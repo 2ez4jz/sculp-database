@@ -2,7 +2,7 @@ import {allocateOrderNumber,orderNumberPattern} from './domain/order-numbers.js'
 import {renderAnalysisCharts} from "./components/analysis/charts.js?v=dates-model-venue-20261015";
 import {createSculpyDashboard} from "./components/analysis/sculpy-dashboard.js?v=dates-20261015";
 import {mountDemoOrderEditor} from './pages/demo/order-editor.js';
-import {createChatPanel} from './components/chat/panel.js?v=guided-20261015';
+import {createChatPanel} from './components/chat/panel.js?v=mobile-chat-20261015';
 import {demoChatAdapter} from './services/chat.js?v=order-numbers-20261015';
 import {searchCatalog} from './domain/sculpy.js?v=order-numbers-20261015';
 import {analyzeMonthlyQuestion,renderMonthlyChatChart} from './domain/monthly-chat.js';
