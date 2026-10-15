@@ -1,5 +1,6 @@
+import {renderFollowups} from "./followups.js?v=guided-20261015";
 import {modelStatus} from "./model-status.js";
-import {renderChatAnswer} from "./answer-view.js?v=readable-20261014";
+import {renderChatAnswer} from "./answer-view.js?v=guided-20261015";
 import {createOperatingMemory} from "./operating-memory.js";
 import { createVoiceCapture } from "../../pages/sculpy/voice.js?v=single-chat-1";
 import { transcribeAudio } from "../../services/sculpy.js";
@@ -22,7 +23,7 @@ export function createChatPanel({
   const host = document.createElement("div");
   host.className = "chat-host";
   document.body.append(host);
-  host.innerHTML = `<button class="chat-launcher" aria-label="与 Sculpy 连续聊天"><img src="assets/sculpy.webp" alt=""><span>聊一聊<small>Sculpy 助手</small></span></button><dialog class="chat-dialog" aria-labelledby="chat-title"><header class="chat-header"><img src="assets/sculpy.webp" alt=""><div><span>SCULPY · YOUR WORK COMPANION</span><h2 id="chat-title">Sculpy</h2><p class="chat-scope"></p><div class="chat-model-status" data-i18n-ignore data-ai-state="idle" role="status" aria-live="polite"><i aria-hidden="true"></i><span>AI · 待连接</span></div></div><button data-close aria-label="关闭聊天">✕</button></header><details class="chat-preferences"><summary>回复偏好</summary><label>回复详略<select data-verbosity><option value="brief">简洁</option><option value="balanced">适中</option><option value="detailed">详细解释</option></select></label><label>希望 Sculpy 如何配合你<textarea data-instructions maxlength="1000" rows="2" placeholder="例如：先列待处理事项，给建议时说明原因。"></textarea></label><button data-save-preferences>保存我的偏好</button><small>这一版保存你明确设置的偏好，经营政策可由管理员在经营记忆面板提交并确认。</small></details><div class="chat-messages" role="log" aria-live="polite"></div><div class="chat-status" role="status" aria-live="polite"></div><form class="chat-composer"><label class="sr-only" for="chat-input">发送给 Sculpy</label><textarea id="chat-input" maxlength="4000" rows="3" placeholder="问一件事，补充一个细节，或接着刚才聊……"></textarea><div><button type="button" id="chat-voice">语音输入</button><span class="chat-storage"></span><button type="submit" class="primary" data-send>发送消息 ↗</button></div><small id="chat-voice-status">语音先转成文字，检查后发送。Enter 发送，Shift + Enter 换行。</small></form></dialog>`;
+  host.innerHTML = `<button class="chat-launcher" aria-label="与 Sculpy 连续聊天"><img src="assets/sculpy.webp" alt=""><span>聊一聊<small>Sculpy 助手</small></span></button><dialog class="chat-dialog" aria-labelledby="chat-title"><header class="chat-header"><img src="assets/sculpy.webp" alt=""><div><span>SCULPY · YOUR AI COMPANION</span><h2 id="chat-title">Sculpy</h2><p class="chat-scope"></p><div class="chat-model-status" data-i18n-ignore data-ai-state="idle" role="status" aria-live="polite"><i aria-hidden="true"></i><span>AI · 待连接</span></div></div><button data-close aria-label="关闭聊天">✕</button></header><details class="chat-preferences"><summary>回复偏好</summary><label>回复详略<select data-verbosity><option value="brief">简洁</option><option value="balanced">适中</option><option value="detailed">详细解释</option></select></label><label>希望 Sculpy 如何配合你<textarea data-instructions maxlength="1000" rows="2" placeholder="例如：先列待处理事项，给建议时说明原因。"></textarea></label><button data-save-preferences>保存我的偏好</button><small>这一版保存你明确设置的偏好，经营政策可由管理员在经营记忆面板提交并确认。</small></details><div class="chat-messages" role="log" aria-live="polite"></div><div class="chat-status" role="status" aria-live="polite"></div><form class="chat-composer"><label class="sr-only" for="chat-input">发送给 Sculpy</label><textarea id="chat-input" maxlength="4000" rows="3" placeholder="问一件事，补充一个细节，或接着刚才聊……"></textarea><div><button type="button" id="chat-voice">语音输入</button><span class="chat-storage"></span><button type="submit" class="primary" data-send>发送消息 ↗</button></div><small id="chat-voice-status">语音先转成文字，检查后发送。Enter 发送，Shift + Enter 换行。</small></form></dialog>`;
   createOperatingMemory(host.querySelector(".chat-preferences"), adapter.memory);
   const dialog = host.querySelector("dialog"),
     $ = (s) => host.querySelector(s);
@@ -65,6 +66,7 @@ export function createChatPanel({
     $("[data-save-preferences]").disabled = value;
     $("#chat-voice").disabled = value;
     $("#chat-input").disabled = value;
+    host.querySelectorAll("[data-followup]").forEach(button=>button.disabled=value);
   };
   function draw() {
     const expanded = new Set([...host.querySelectorAll("details[data-response-id][open]")].map(el=>el.dataset.responseId));
@@ -72,10 +74,10 @@ export function createChatPanel({
       ? turns
           .map(
             (t, i) =>
-              `<article class="chat-user"><small>你</small><div>${esc(t.user)}</div></article><article class="chat-assistant"><small>SCULPY</small>${renderChatAnswer(t,renderSupplement(t),{expanded:expanded.has(String(t.id||i)),key:String(t.id||i)})}<div class="chat-references">${(t.references || []).map((r) => `<button data-reference="${esc(r.id)}">${esc(r.label)} ↗</button>`).join("")}</div>${(t.proposals || []).map((p, j) => `<section class="chat-proposal"><strong>${p.kind === "change" ? "待确认的变更建议" : p.kind === "task" ? "待办记录" : "订单备注"} · ${esc(p.label)}</strong><p>${esc(p.text)}</p><small>${p.kind === "change" ? "仅保存建议，不修改正式日期、金额或付款字段。" : "核对后将内容保存到此订单。"}</small><button data-save="${i}:${j}" ${p.saved ? "disabled" : ""}>${p.saved ? "已保存" : p.kind === "change" ? "确认提交建议" : "确认保存到此订单"}</button></section>`).join("")}</article>`,
+              `<article class="chat-user"><small>你</small><div>${esc(t.user)}</div></article><article class="chat-assistant"><small>SCULPY</small>${renderChatAnswer(t,renderSupplement(t),{expanded:expanded.has(String(t.id||i)),key:String(t.id||i)})}<div class="chat-references">${(t.references || []).map((r) => `<button data-reference="${esc(r.id)}">${esc(r.label)} ↗</button>`).join("")}</div>${(t.proposals || []).map((p, j) => `<section class="chat-proposal"><strong>${p.kind === "change" ? "待确认的变更建议" : p.kind === "task" ? "待办记录" : "订单备注"} · ${esc(p.label)}</strong><p>${esc(p.text)}</p><small>${p.kind === "change" ? "仅保存建议，不修改正式日期、金额或付款字段。" : "核对后将内容保存到此订单。"}</small><button data-save="${i}:${j}" ${p.saved ? "disabled" : ""}>${p.saved ? "已保存" : p.kind === "change" ? "确认提交建议" : "确认保存到此订单"}</button></section>`).join("")}${i===turns.length-1?renderFollowups(t,{en:!/\p{Script=Han}/u.test(t.answer||''),previousTurns:turns.slice(0,i)}):''}</article>`,
           )
           .join("")
-      : `<div class="chat-welcome"><img class="chat-welcome-avatar" src="assets/sculpy.webp" alt=""><span>YOUR STUDIO COMPANION</span><h3>今天有什么想一起理清楚？</h3><p>我会先读取${scope?.id === "global" ? "你有权限查看的订单" : "当前订单"}，需要时再查其他相关记录。</p><div><button data-example="这${scope?.id === "global" ? "些" : "个"}订单有哪些信息还需要确认？">检查待确认事项</button><button data-example="帮我整理一下目前的安排，并解释需要注意的地方。">一起看一下安排</button></div></div>`;
+      : `<div class="chat-welcome"><img class="chat-welcome-avatar" src="assets/sculpy.webp" alt=""><span>YOUR STUDIO COMPANION</span><h3>今天想聊点什么？</h3><p>${scope?.id === "global" ? "可以聊想法、问问题、写点东西，也可以一起看看工作室的数据。" : "可以聊这笔订单，也可以换个话题。需要记录时，我会请你确认。"}</p><div><button data-example="最近工作室有哪些值得留意的变化？先用大白话说说。">看看最近的情况</button><button data-example="帮我想几个让老客人愿意推荐朋友的小点子。">找点灵感</button><button data-example="今天有点累，随便聊聊。">随便聊聊</button></div></div>`;
     if (pendingMessage) $(".chat-messages").insertAdjacentHTML("beforeend", `<article class="chat-user"><small>你</small><div>${esc(pendingMessage)}</div></article><article class="chat-assistant chat-thinking"><small>SCULPY</small><span>正在想一想…</span></article>`);
     $(".chat-messages").scrollTop = $(".chat-messages").scrollHeight;
     onTurnsChanged(turns, scope);
@@ -185,6 +187,13 @@ export function createChatPanel({
   host.addEventListener("click", async (e) => {
     const button = e.target.closest("button");
     if (!button) return;
+    if(button.dataset.followup){
+      if(busy)return;
+      const input=$("#chat-input");
+      if(input.value.trim()){status("输入框中还有你的草稿，请先发送或清空，再选择继续提问。");input.focus();return;}
+      input.value=button.dataset.followup;
+      $(".chat-composer").requestSubmit();return;
+    }
     if (button.id === "chat-voice" && !busy) voice.toggle();
     if (button.dataset.example) {
       $("#chat-input").value = window.DemoI18n?.text(button.dataset.example) || button.dataset.example;
