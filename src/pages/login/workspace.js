@@ -22,7 +22,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     getScope: () => current,
     onReference: (id) => { void openOrder(id).catch(()=>{}); },
   });
-  root.innerHTML = `<div data-intake-root></div><section data-order-detail hidden></section><button class="auth-primary" data-global>与 Sculpy 聊一聊 ↗</button><section class="cloud-orders"><h3>我的订单</h3><p class="cloud-note">仅显示当前账户有权限查看的云端订单。</p><form data-search><input aria-label="搜索云端订单" placeholder="客户、日期、场地或化妆师"><button class="auth-secondary">查找订单</button></form><p data-order-status role="status"></p><div data-orders></div><div><button data-prev>上一页</button> <button data-next>下一页</button></div></section>${["operations", "owner"].includes(profile.role) ? '<details class="company-rules"><summary>公司角色与工作规则</summary><p class="cloud-note">所有人的对话都会读取；请勿填写密码或限制共享的资料。</p><textarea maxlength="8000" aria-label="公司角色与工作规则"></textarea><button data-save-rules>保存公司规则</button><p data-rules-status role="status"></p></details>' : ""}`;
+  root.innerHTML = `<div data-intake-root></div><section data-order-detail hidden></section><button class="auth-primary" data-global>与 Sculpy 聊一聊 ↗</button><section class="cloud-orders"><h3>我的订单</h3><p class="cloud-note">仅显示当前账户有权限查看的云端订单。</p><form data-search><input aria-label="搜索云端订单" placeholder="单号、客户、日期、场地或化妆师"><button class="auth-secondary">查找订单</button></form><p data-order-status role="status"></p><div data-orders></div><div><button data-prev>上一页</button> <button data-next>下一页</button></div></section>${["operations", "owner"].includes(profile.role) ? '<details class="company-rules"><summary>公司角色与工作规则</summary><p class="cloud-note">所有人的对话都会读取；请勿填写密码或限制共享的资料。</p><textarea maxlength="8000" aria-label="公司角色与工作规则"></textarea><button data-save-rules>保存公司规则</button><p data-rules-status role="status"></p></details>' : ""}`;
   const $ = (s) => root.querySelector(s);
   $("[data-global]").onclick = () => {
     current = { id: "global", label: "全局工作助手" };
@@ -50,9 +50,9 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     if(destroyed || mine !== detailVersion) return;
     if(error || !data?.bookings?.length){detail.textContent="订单读取失败或权限已变化，请重新查询。";throw Error("Order read failed");}
     const b=data.bookings[0];
-    current={id,label:b.client+" · "+b.service};
-    detail.innerHTML=`<h3>${esc(b.client)} · ${esc(b.service)}</h3><p>${esc(new Date(b.starts_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 多伦多时间</p><p>${esc(b.venue||'地点待定')} · ${esc(b.artists.join(' / ')||'人员待定')}</p><p>服务需求：${esc(b.service_details||'待补充')}</p>${['operations','owner'].includes(profile.role)?`<p>预算：${b.budget_cad==null?'未填写':esc(b.budget_cad)+' CAD'} · 成交价：${b.price_cad==null?'未确定':esc(b.price_cad)+' CAD'}</p>`:''}<p>状态：${esc({inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'}[b.status]||b.status)}</p>${data.intake?`<details><summary>查看原始记录与时间</summary><p>录入：${esc(new Date(data.intake.recordedAt).toLocaleString('zh-CN'))} · 保存：${esc(new Date(data.intake.savedAt).toLocaleString('zh-CN'))}</p><pre>${esc(data.intake.rawText)}</pre></details>`:''}<button type="button" data-discuss>与 Sculpy 讨论这笔订单</button>`;
-    detail.querySelector('[data-discuss]').onclick=()=>{current={id,label:b.client+" · "+b.service};panel.open()};
+    current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};
+    detail.innerHTML=`<h3>${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)}</h3><p>${esc(new Date(b.starts_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 多伦多时间</p><p>${esc(b.venue||'地点待定')} · ${esc(b.artists.join(' / ')||'人员待定')}</p><p>服务需求：${esc(b.service_details||'待补充')}</p>${['operations','owner'].includes(profile.role)?`<p>预算：${b.budget_cad==null?'未填写':esc(b.budget_cad)+' CAD'} · 成交价：${b.price_cad==null?'未确定':esc(b.price_cad)+' CAD'}</p>`:''}<p>状态：${esc({inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'}[b.status]||b.status)}</p>${data.intake?`<details><summary>查看原始记录与时间</summary><p>录入：${esc(new Date(data.intake.recordedAt).toLocaleString('zh-CN'))} · 保存：${esc(new Date(data.intake.savedAt).toLocaleString('zh-CN'))}</p><pre>${esc(data.intake.rawText)}</pre></details>`:''}<button type="button" data-discuss>与 Sculpy 讨论这笔订单</button>`;
+    detail.querySelector('[data-discuss]').onclick=()=>{current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};panel.open()};
     if(businessAdmin && data.edit) {
       const editRoot=document.createElement('div');detail.append(editRoot);
       editor=mountOrderEditor({root:editRoot,supabase,bookingId:id,edit:data.edit,
@@ -79,7 +79,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     $("[data-orders]").innerHTML = data.bookings
       .map(
         (b) =>
-          `<button class="cloud-order" data-booking="${esc(b.id)}"><strong>${esc(b.client)} · ${esc(b.service || "服务待定")}</strong><small>${esc(new Date(b.starts_at).toLocaleString("zh-CN", { timeZone: "America/Toronto" }))} · ${esc(b.venue || "地点待定")}</small><small>${esc(b.artists.join(" / ") || "人员待定")} · 点击查看与讨论 ↗</small></button>`,
+          `<button class="cloud-order" data-booking="${esc(b.id)}"><strong>${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service || "服务待定")}</strong><small>${esc(new Date(b.starts_at).toLocaleString("zh-CN", { timeZone: "America/Toronto" }))} · ${esc(b.venue || "地点待定")}</small><small>${esc(b.artists.join(" / ") || "人员待定")} · 点击查看与讨论 ↗</small></button>`,
       )
       .join("");
     $("[data-prev]").disabled = offset === 0;

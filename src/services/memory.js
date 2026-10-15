@@ -13,6 +13,8 @@ export function createDemoMemoryRepository({
       const key = type === "client" ? "demoClients" : "demoBookings";
       const list = state[key] || [];
       if (list.some(x => x.id === payload.id)) throw Error("记录编号重复。");
+      if (type === 'booking' && payload.orderNumber && list.some(x=>x.orderNumber===payload.orderNumber))
+        throw Error('单号已使用，请重新核对并创建订单。');
       const next = { ...state, [key]: [...list, payload],
         memories: sourceBatch ? [...(state.memories || []), sourceBatch] : (state.memories || []) };
       if (!storage(next)) throw Error("浏览器存储失败，新记录没有创建。");

@@ -10,7 +10,7 @@ import {
   normalizeProposal,
   validateMemory,
   visibleMemories,
-} from "../../domain/memory.js";
+} from "../../domain/memory.js?v=order-numbers-20261015";
 import {
   extractContextMemory,
   extractEntityProposals,
@@ -20,7 +20,7 @@ import {
 import { createVoiceCapture } from "../../pages/sculpy/voice.js";
 import { storeAttachments, removeAttachments, getAttachment } from "../../services/attachments.js";
 
-import { normalizeEntityProposals, uniqueNameId, validateNewEntity } from "../../domain/intake.js";
+import { normalizeEntityProposals, uniqueNameId, validateNewEntity } from "../../domain/intake.js?v=order-numbers-20261015";
 
 export function createMemoryPanel({
   data,

@@ -1,5 +1,5 @@
 import {generateAdvisorFixtures} from './advisor-fixtures.js';
-import {workspaceBookings} from '../domain/demo-workspace.js';
+import {workspaceBookings} from '../domain/demo-workspace.js?v=order-numbers-20261015';
 export const artists = [
  {id:'miranda',name:'Miranda',level:'Signature Artist / Founder',systemRole:'owner',accountStatus:'pilot',image:'https://2ez4jz.github.io/sculpstudio/assets/images/miranda-portrait.webp',specialties:['Editorial','Luxury Bridal','Destination'],bio:'十年以上时尚、名人造型与高端婚礼经验，以编辑视角完成现代新娘造型。'},
  {id:'yuki',name:'Yuki',level:'Director Artist',systemRole:'artist',accountStatus:'profile_only',image:'https://2ez4jz.github.io/sculpstudio/assets/images/yuki-portrait.webp',specialties:['Bridal','Education','Technical'],bio:'拥有十年以上婚礼造型经验，结合专业技术、教学背景与精致的艺术表达。'},

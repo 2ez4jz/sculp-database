@@ -24,7 +24,7 @@ export function searchCatalog({
       venueName: b.venueName||b.venueId,
       partnerIds: b.partnerIds,
       ...(global ? { price: b.price, ...(b.currency?{currency:b.currency}:{}), paidCents:b.paidCents||0, paidDate:b.paidDate||null, channelId:b.channelId||null } : {}),
-      label: `${client(b.clientId).name} · ${serviceName[b.service]} · ${b.date}`,
+      label: `${b.orderNumber ? b.orderNumber+" · " : ""}${client(b.clientId).name} · ${serviceName[b.service]} · ${b.date}`,
       searchText: [
         client(b.clientId).name,
         serviceName[b.service],
