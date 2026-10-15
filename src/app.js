@@ -8,7 +8,7 @@ import {searchCatalog} from './domain/sculpy.js?v=order-numbers-20261015';
 import {analyzeMonthlyQuestion,renderMonthlyChatChart} from './domain/monthly-chat.js';
 import {clientPreferences} from './domain/memory.js?v=order-numbers-20261015';
 import {createMemoryPanel} from './components/memory/panel.js?v=order-numbers-20261015';
-import {createDemoMemoryRepository,createCloudMemoryRepository} from './services/memory.js';
+import {createDemoMemoryRepository,createCloudMemoryRepository} from './services/memory.js?v=order-numbers-20261015';
 import {artists,clients,venues,partners,bookings,notes,media,portfolioMedia} from './data/demo.js?v=order-numbers-20261015';
 import {loadState,saveState,resetState} from './services/storage.js';
 import {config} from './config.js';

@@ -49,7 +49,12 @@ test('cloud projection searches references and retains role boundaries; concurre
   try {
    const insert=connection=>connection.query(`insert into bookings(client_id,service_id,starts_at) select '${client}',id,now() from services where code='wedding' returning order_number`);
    const inserted=[];
-   for(let i=0;i<12;i++)inserted.push(...await Promise.all([insert(db),insert(second)]));
+   for(let i=0;i<12;i++){
+    // Force both sessions to propose the same random suffix, rather than
+    // hoping a low-probability collision happens during the test.
+    await Promise.all([db.query('select setseed($1)',[i/20]),second.query('select setseed($1)',[i/20])]);
+    inserted.push(...await Promise.all([insert(db),insert(second)]));
+   }
    assert.equal(new Set(inserted.map(r=>r.rows[0].order_number)).size,24);
   }finally{await second.end();}
  }finally{await db.close();}
