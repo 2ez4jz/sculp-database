@@ -34,6 +34,7 @@ jobs:
           node scripts/readable-answers.cjs
           node scripts/guided-chat.cjs
           node scripts/mobile-chat.cjs
+          node scripts/mobile-workspace.cjs
           node scripts/auth.cjs
           node scripts/smoke.cjs
           node scripts/permissions.cjs
