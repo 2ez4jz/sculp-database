@@ -12,8 +12,9 @@ const ReportArgs=z.object({
  channelId:z.string().nullable(),
  artistId:z.string().nullable(),
  bookingId:z.string().nullable(),
+ venueId:z.string().nullable(),
  status:z.enum(["Completed","Confirmed","Inquiry","Cancelled"]).nullable(),
- groupBy:z.enum(["service","channel","artist"]).nullable()
+ groupBy:z.enum(["service","channel","artist","venue"]).nullable()
 });
 export async function runSculpyDemoAgent({message,context,turns=[],preferences={},demoReport,queryBookings,apiKey,model="gpt-6-sol",effort="medium"}){
  if(!apiKey)throw Error("Agent API key not configured");
@@ -23,7 +24,7 @@ export async function runSculpyDemoAgent({message,context,turns=[],preferences={
  let calls=0;
  const report=tool({
   name:"query_demo_report",
-  description:"Read-only exact report for fictional demo bookings. Call for numerical analysis, comparisons, chart requests, metrics, channel/service/artist breakdowns. Amounts are CAD cents. Separate completed service date from gross receipt date. For a historical comparison call this tool for BOTH periods. Never guess numbers.",
+  description:"Read-only exact report for fictional demo bookings. Call for numerical analysis, comparisons, chart requests, metrics, channel/service/artist/venue breakdowns and average booking value rankings with priced sample counts. Amounts are CAD cents. Separate completed service date from gross receipt date. For a historical comparison call this tool for BOTH periods. Never guess numbers.",
   parameters:ReportArgs,
   execute:async (args)=>{
    if(++calls>6)throw Error("Too many report calls");

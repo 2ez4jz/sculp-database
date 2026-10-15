@@ -1,9 +1,9 @@
-import {renderAnalysisCharts} from "./components/analysis/charts.js";
-import {createSculpyDashboard} from "./components/analysis/sculpy-dashboard.js";
+import {renderAnalysisCharts} from "./components/analysis/charts.js?v=dates-model-venue-20261015";
+import {createSculpyDashboard} from "./components/analysis/sculpy-dashboard.js?v=dates-20261015";
 import {mountDemoOrderEditor} from './pages/demo/order-editor.js';
-import {createChatPanel} from './components/chat/panel.js?v=readable-20261014';
-import {demoChatAdapter} from './services/chat.js?v=sculpy-v22-20261014';
-import {searchCatalog} from './domain/sculpy.js';
+import {createChatPanel} from './components/chat/panel.js?v=dates-model-20261015';
+import {demoChatAdapter} from './services/chat.js?v=dates-model-venue-20261015';
+import {searchCatalog} from './domain/sculpy.js?v=dates-model-venue-20261015';
 import {analyzeMonthlyQuestion,renderMonthlyChatChart} from './domain/monthly-chat.js';
 import {clientPreferences} from './domain/memory.js';
 import {createMemoryPanel} from './components/memory/panel.js?v=analysis-visuals-20261011a';
@@ -83,7 +83,7 @@ const serviceRevenueChart=createRevenueChart({available,serviceName,config,money
 const sculpyPage=createSculpyPage({getContext,available,isGlobal,head,esc,date,serviceName,config,client,artists,partners,bookings,notes,get,$,toast,persist,serviceRevenueChart});
 const memoryRepository=config.environment==='demo'?createDemoMemoryRepository({getState:()=>state,setState:next=>{state=next}}):createCloudMemoryRepository({supabase:null});
 const memoryPanel=createMemoryPanel({data:{bookings,clients,artists,venues,partners},getContext,repository:memoryRepository,onSaved:()=>{hydrateDemoEntities();render()},esc,config});
-const chatCatalog=()=>{const context=getContext(),list=available().map(b=>({...b,channelId:channelForBooking(b,state)})),catalog=searchCatalog({bookings:list,artists,partners,notes:[...notes,...state.notes],client,serviceName,context});
+const chatCatalog=()=>{const context=getContext(),list=available().map(b=>({...b,venueName:venue(b.venueId)?.name||b.venueId,channelId:channelForBooking(b,state)})),catalog=searchCatalog({bookings:list,artists,partners,notes:[...notes,...state.notes],client,serviceName,context});
  for(const batch of state.memories||[])for(const item of batch.items||[])if(item.entityType==='booking'&&list.some(b=>b.id===item.entityId)&&(context.role==='admin'||batch.createdBy===context.artistId||(item.status==='confirmed'&&!['task','change'].includes(item.kind))))catalog.notes.push({entityId:item.entityId,aiSummary:item.text,status:item.status,kind:item.kind});const ids=new Set([...list.slice(0,30).map(b=>b.id),location.hash.split('/')[1]]);catalog.notes=catalog.notes.filter(n=>ids.has(n.entityId)).slice(-80);return catalog;};
 const sculpyDashboard=createSculpyDashboard({getBookings:()=>available(),isAllowed:isGlobal,english:()=>window.DemoI18n?.language!=='zh'});
 const chatPanel=createChatPanel({onTurnsChanged:()=>{},renderSupplement:turn=>turn.analysisCharts?.length&&isGlobal()?renderAnalysisCharts(turn.analysisCharts,esc,window.DemoI18n?.language!=='zh'):turn.chartKey==='monthly-analytics'&&isGlobal()?renderMonthlyChatChart(turn.chartRows,esc):turn.chartKey==='service-revenue'&&isGlobal()?serviceRevenueChart():'',adapter:demoChatAdapter({resolveLocal:message=>analyzeMonthlyQuestion(message,available(),getContext()) || (wantsRevenueChart(message)?{answer:isGlobal()?'这是演示订单按已配置统计周期计算的服务收入占比。':'收入与全局经营数据仅对 Jz 和 Miranda 开放。',chartKey:isGlobal()?'service-revenue':null,references:[],proposals:[],sourceIds:[]}:null),getAdvisorRows:()=>advisorRowsFromBookings(available(),{channelForBooking:b=>channelForBooking(b,state),channels:channelCatalog(state)}),getIdentity:()=>role==='admin'?adminPersona:artistId,getCatalog:chatCatalog,getContext,saveBatch:batch=>memoryRepository.save(batch)}),getScope:()=>{const [type,id]=location.hash.slice(1).split('/'),b=['bookings','sculpy'].includes(type)&&available().find(b=>b.id===id);return b?{id:b.id,label:client(b.clientId).name+' · '+b.date}:{id:'global',label:'全局工作助手'};}});

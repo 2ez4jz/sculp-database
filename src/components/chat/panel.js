@@ -1,3 +1,4 @@
+import {modelStatus} from "./model-status.js";
 import {renderChatAnswer} from "./answer-view.js?v=readable-20261014";
 import {createOperatingMemory} from "./operating-memory.js";
 import { createVoiceCapture } from "../../pages/sculpy/voice.js?v=single-chat-1";
@@ -21,7 +22,7 @@ export function createChatPanel({
   const host = document.createElement("div");
   host.className = "chat-host";
   document.body.append(host);
-  host.innerHTML = `<button class="chat-launcher" aria-label="与 Sculpy 连续聊天"><img src="assets/sculpy.webp" alt=""><span>聊一聊<small>Sculpy 助手</small></span></button><dialog class="chat-dialog" aria-labelledby="chat-title"><header class="chat-header"><img src="assets/sculpy.webp" alt=""><div><span>SCULPY · YOUR WORK COMPANION</span><h2 id="chat-title">Sculpy</h2><p class="chat-scope"></p></div><button data-close aria-label="关闭聊天">✕</button></header><details class="chat-preferences"><summary>回复偏好</summary><label>回复详略<select data-verbosity><option value="brief">简洁</option><option value="balanced">适中</option><option value="detailed">详细解释</option></select></label><label>希望 Sculpy 如何配合你<textarea data-instructions maxlength="1000" rows="2" placeholder="例如：先列待处理事项，给建议时说明原因。"></textarea></label><button data-save-preferences>保存我的偏好</button><small>这一版保存你明确设置的偏好，经营政策可由管理员在经营记忆面板提交并确认。</small></details><div class="chat-messages" role="log" aria-live="polite"></div><div class="chat-status" role="status" aria-live="polite"></div><form class="chat-composer"><label class="sr-only" for="chat-input">发送给 Sculpy</label><textarea id="chat-input" maxlength="4000" rows="3" placeholder="问一件事，补充一个细节，或接着刚才聊……"></textarea><div><button type="button" id="chat-voice">语音输入</button><span class="chat-storage"></span><button type="submit" class="primary" data-send>发送消息 ↗</button></div><small id="chat-voice-status">语音先转成文字，检查后发送。Enter 发送，Shift + Enter 换行。</small></form></dialog>`;
+  host.innerHTML = `<button class="chat-launcher" aria-label="与 Sculpy 连续聊天"><img src="assets/sculpy.webp" alt=""><span>聊一聊<small>Sculpy 助手</small></span></button><dialog class="chat-dialog" aria-labelledby="chat-title"><header class="chat-header"><img src="assets/sculpy.webp" alt=""><div><span>SCULPY · YOUR WORK COMPANION</span><h2 id="chat-title">Sculpy</h2><p class="chat-scope"></p><div class="chat-model-status" data-i18n-ignore data-ai-state="idle" role="status" aria-live="polite"><i aria-hidden="true"></i><span>AI · 待连接</span></div></div><button data-close aria-label="关闭聊天">✕</button></header><details class="chat-preferences"><summary>回复偏好</summary><label>回复详略<select data-verbosity><option value="brief">简洁</option><option value="balanced">适中</option><option value="detailed">详细解释</option></select></label><label>希望 Sculpy 如何配合你<textarea data-instructions maxlength="1000" rows="2" placeholder="例如：先列待处理事项，给建议时说明原因。"></textarea></label><button data-save-preferences>保存我的偏好</button><small>这一版保存你明确设置的偏好，经营政策可由管理员在经营记忆面板提交并确认。</small></details><div class="chat-messages" role="log" aria-live="polite"></div><div class="chat-status" role="status" aria-live="polite"></div><form class="chat-composer"><label class="sr-only" for="chat-input">发送给 Sculpy</label><textarea id="chat-input" maxlength="4000" rows="3" placeholder="问一件事，补充一个细节，或接着刚才聊……"></textarea><div><button type="button" id="chat-voice">语音输入</button><span class="chat-storage"></span><button type="submit" class="primary" data-send>发送消息 ↗</button></div><small id="chat-voice-status">语音先转成文字，检查后发送。Enter 发送，Shift + Enter 换行。</small></form></dialog>`;
   createOperatingMemory(host.querySelector(".chat-preferences"), adapter.memory);
   const dialog = host.querySelector("dialog"),
     $ = (s) => host.querySelector(s);
@@ -34,6 +35,13 @@ export function createChatPanel({
     disposed = false,
     inline = false,
     pendingMessage = "";
+  let lastModelTurn=null;
+  function showModel(state,turn=lastModelTurn){
+    if(turn)lastModelTurn=turn;
+    const view=modelStatus(state,turn,adapter.mode==='demo'&&window.DemoI18n?.language!=='zh');
+    const indicator=$(".chat-model-status");indicator.dataset.aiState=view.state;indicator.title=view.detail;
+    indicator.querySelector('span').textContent=view.text;
+  }
   const drafts = new Map();
   const voice = createVoiceCapture({
     $: (s) =>
@@ -79,6 +87,7 @@ export function createChatPanel({
     if (scope) drafts.set(`${identity}:${scope.id}`, $("#chat-input").value);
     scope = next;
     identity = adapter.identity();
+    lastModelTurn=null;showModel("idle");
     requestId = null;
     turns = [];
     pendingMessage = "";
@@ -95,6 +104,7 @@ export function createChatPanel({
       const result = await adapter.load(scope.id);
       if (mine !== version || disposed) return;
       turns = result.turns || [];
+      showModel("idle",turns.at(-1));
       $("[data-verbosity]").value = result.preferences?.verbosity || "detailed";
       $("[data-instructions]").value = result.preferences?.instructions || "";
       draw();
@@ -104,6 +114,7 @@ export function createChatPanel({
     } catch (error) {
       if (mine === version) {
         status(error.message, true);
+        showModel("error");
         lock(true);
       }
     }
@@ -129,11 +140,13 @@ export function createChatPanel({
     draw();
     lock(true);
     status("正在读取业务记录并整理回答…");
+    showModel("busy");
     try {
       const turn = await adapter.send(current, { message, requestId: id });
       if (mine !== version) return;
       pendingMessage = "";
       turns.push(turn);
+      showModel("ready",turn);
       requestId = null;
       $("#chat-input").value = "";
       drafts.delete(`${identity}:${current}`);
@@ -144,6 +157,7 @@ export function createChatPanel({
         pendingMessage = "";
         draw();
         status(error.message + " 原话仍保留，可重试。", true);
+        showModel("error");
       }
     } finally {
       if (mine === version) {

@@ -20,6 +20,8 @@ fs.mkdirSync("qa-screens", { recursive: true });
     await route.fulfill({
       json: {
         turn: {
+          modelProfile:{model:"test-backend-model"},
+          engine:"sdk",
           id: body.requestId,
           user: body.message,
           answer:

@@ -423,3 +423,12 @@ body.sculpy-chat-page #main.sculpy-reveal { animation: none; }
 .response-details{border-top:1px solid #e2e6de;margin-top:18px;padding-top:13px}.response-details>summary{font-size:12px;color:#65765e;cursor:pointer;line-height:1.8}.response-full{margin-top:16px;font-size:14px;line-height:1.85}.chat-response code{font-size:.9em;background:#edf0e8;padding:1px 4px;border-radius:4px}
 @media(max-width:600px){.response-lead{font-size:15px}.response-facts{padding:12px}.response-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.response-metric{padding:10px}.response-metric:last-child:nth-child(odd){grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}.response-metric:last-child:nth-child(odd) span{margin:0}.response-metric strong{font-size:17px}.response-table th,.response-table td{padding:9px 10px}.response-next{padding:11px 12px}.response-full{font-size:13px}}
 .response-warning{margin:14px 0;padding:11px 14px;border-radius:9px;background:#f7f3e9;border:1px solid #ece4d2}.response-warning>span{display:block;font-size:10px;font-weight:600;color:#80704f;margin-bottom:5px}.response-warning p{font-size:12px;line-height:1.8}
+.chat-header .chat-model-status{display:flex;align-items:center;gap:7px;min-width:0;margin-top:7px;font-size:11px;color:#737b73;line-height:1.5;letter-spacing:0}
+.chat-model-status i{flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#9b9f99}
+.chat-header .chat-model-status span{display:inline;font:inherit;letter-spacing:0;overflow-wrap:anywhere;color:inherit}
+.chat-model-status[data-ai-state=ready] i{background:#3b8659;box-shadow:0 0 0 3px #3b865915}
+.chat-model-status[data-ai-state=busy] i{background:#c49236;animation:ai-status-pulse 1.4s ease-in-out infinite}
+.chat-model-status[data-ai-state=error] i{background:#ba5445}
+.chat-model-status[data-ai-state=local] i,.chat-model-status[data-ai-state=unknown] i{background:#788ba0}
+@keyframes ai-status-pulse{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.chat-model-status[data-ai-state=busy] i{animation:none}}

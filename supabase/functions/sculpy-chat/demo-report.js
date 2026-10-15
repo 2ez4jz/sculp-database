@@ -5,10 +5,10 @@ const statuses=['Completed','Confirmed','Inquiry','Cancelled'];
 const validDate=(v)=>typeof v==='string'&&/^20\d{2}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(+new Date(v+'T12:00:00Z'))&&new Date(v+'T12:00:00Z').toISOString().slice(0,10)===v;
 const cents=(b)=>typeof b.price==='number'&&Number.isFinite(b.price)&&b.price>=0&&Number.isSafeInteger(Math.round(b.price*100))&&Math.abs(b.price*100-Math.round(b.price*100))<1e-6?Math.round(b.price*100):null;
 export function demoReport(catalog,args,asOfDate){
- if(!validDate(asOfDate)||!args||fields.some(k=>!(k in args))||Object.keys(args).some(k=>!fields.includes(k))||!validDate(args.from)||!validDate(args.to)||args.from>args.to)throw Error('Invalid report date or fields');
- if(args.service!==null&&!services.includes(args.service)||args.status!==null&&!statuses.includes(args.status)||![null,'service','channel','artist'].includes(args.groupBy))throw Error('Invalid report filters');
- for(const key of ['channelId','artistId','bookingId'])if(args[key]!==null&&(typeof args[key]!=='string'||!args[key]||args[key].length>100))throw Error('Invalid filter ID');
- const matches=(b,channelId=args.channelId)=>(args.service===null||b.service===args.service)&&(channelId===null||(b.channelId||'unattributed')===channelId)&&(args.artistId===null||b.artistIds?.includes(args.artistId))&&(args.bookingId===null||b.id===args.bookingId)&&(args.status===null||b.status===args.status);
+ if(!validDate(asOfDate)||!args||fields.some(k=>!(k in args))||Object.keys(args).some(k=>!fields.includes(k)&&k!=='venueId')||!validDate(args.from)||!validDate(args.to)||args.from>args.to)throw Error('Invalid report date or fields');
+ if(args.service!==null&&!services.includes(args.service)||args.status!==null&&!statuses.includes(args.status)||![null,'service','channel','artist','venue'].includes(args.groupBy))throw Error('Invalid report filters');
+ for(const key of ['channelId','artistId','bookingId','venueId'])if(args[key]!=null&&(typeof args[key]!=='string'||!args[key]||args[key].length>100))throw Error('Invalid filter ID');
+ const matches=(b,channelId=args.channelId)=>(args.venueId==null||(b.venueId||'unassigned')===args.venueId)&&(args.service===null||b.service===args.service)&&(channelId===null||(b.channelId||'unattributed')===channelId)&&(args.artistId===null||b.artistIds?.includes(args.artistId))&&(args.bookingId===null||b.id===args.bookingId)&&(args.status===null||b.status===args.status);
  const scoped=catalog.filter(b=>matches(b));
  const aggregate=(rows)=>{
   const selected=rows.filter(b=>validDate(b.date)&&b.date>=args.from&&b.date<=args.to),completed=selected.filter(b=>b.status==='Completed');
@@ -17,19 +17,21 @@ export function demoReport(catalog,args,asOfDate){
   const stateCounts=Object.fromEntries(statuses.map(s=>[s,selected.filter(b=>b.status===s).length]));
   const priced=completed.filter(b=>(!b.currency||b.currency==='CAD')&&cents(b)!==null);
   const validReceipts=receipts.filter(b=>(!b.currency||b.currency==='CAD')&&Number.isSafeInteger(b.paidCents)&&b.paidCents>=0);
-  return {warning:selected.length<10?'LOW_SAMPLE':null,records:selected.length,statusCounts:stateCounts,completed:completed.length,completedAmountCents:priced.reduce((n,b)=>n+cents(b),0),grossReceivedCents:validReceipts.reduce((n,b)=>n+b.paidCents,0),
+  const completedTotal=priced.reduce((n,b)=>n+cents(b),0),average=priced.length?Math.round(completedTotal/priced.length):null;
+  return {pricedCompleted:priced.length,averageCompletedAmountCents:average,displayAverageCompletedAmount:average===null?null:displayAmount(average),warning:selected.length<10?'LOW_SAMPLE':null,records:selected.length,statusCounts:stateCounts,completed:completed.length,completedAmountCents:priced.reduce((n,b)=>n+cents(b),0),grossReceivedCents:validReceipts.reduce((n,b)=>n+b.paidCents,0),
    displayAmounts:{completed:displayAmount(priced.reduce((n,b)=>n+cents(b),0)),grossReceived:displayAmount(validReceipts.reduce((n,b)=>n+b.paidCents,0))},
    unpricedCompleted:completed.filter(b=>cents(b)===null).length,nonCadCompleted:completed.filter(b=>b.currency&&b.currency!=='CAD').length,
    futureCompleted:completed.filter(b=>b.date>asOfDate).length,completedOnOrBeforeAsOf:completed.filter(b=>b.date<=asOfDate).length,
-   unknownChannel:selected.filter(b=>!b.channelId).length,unknownTime:selected.filter(b=>!b.startTime||!b.endTime).length,
+   unknownVenue:selected.filter(b=>!b.venueId).length,unknownChannel:selected.filter(b=>!b.channelId).length,unknownTime:selected.filter(b=>!b.startTime||!b.endTime).length,
    undatedReceipts:rows.filter(b=>b.paidCents>0&&!validDate(b.paidDate)).length,invalidReceiptAmounts:receipts.length-validReceipts.length,
    recordsSample:selected.sort((a,b)=>a.date.localeCompare(b.date)||a.id.localeCompare(b.id)).slice(0,30),sampleTruncated:selected.length>30};
  };
- const key=(b)=>args.groupBy==='service'?b.service:args.groupBy==='channel'?(b.channelId||'unattributed'):(b.artistIds?.[0]||'unassigned');
- const groups=args.groupBy?[...new Set(scoped.map(key))].sort().map(value=>({value,...aggregate(scoped.filter(b=>key(b)===value))})):[];
- const rankings=Object.fromEntries(['records','completed','completedAmountCents','grossReceivedCents'].map(field=>{
-  const maximum=groups.length?Math.max(...groups.map(g=>g[field])):null;
-  return [field,{maximum,leaders:groups.filter(g=>g[field]===maximum).map(g=>({value:g.value,records:g.records,completed:g.completed,completedAmountCents:g.completedAmountCents,grossReceivedCents:g.grossReceivedCents}))}];
+ const key=(b)=>args.groupBy==='service'?b.service:args.groupBy==='channel'?(b.channelId||'unattributed'):args.groupBy==='venue'?(b.venueId||'unassigned'):(b.artistIds?.[0]||'unassigned');
+ const groups=args.groupBy?[...new Set(scoped.map(key))].sort().map(value=>({value,label:args.groupBy==='venue'?(scoped.find(b=>key(b)===value)?.venueName||(value==='unassigned'?'未填写场地':value)):value,...aggregate(scoped.filter(b=>key(b)===value))})):[];
+ const rankings=Object.fromEntries(['records','completed','completedAmountCents','grossReceivedCents','averageCompletedAmountCents'].map(field=>{
+  const eligible=groups.filter(g=>g[field]!==null&&!(args.groupBy==='venue'&&g.value==='unassigned'));
+  const maximum=eligible.length?Math.max(...eligible.map(g=>g[field])):null;
+  return [field,{maximum,leaders:eligible.filter(g=>g[field]===maximum).map(g=>({value:g.value,label:g.label,pricedCompleted:g.pricedCompleted,averageCompletedAmountCents:g.averageCompletedAmountCents,displayAverageCompletedAmount:g.displayAverageCompletedAmount,records:g.records,completed:g.completed,completedAmountCents:g.completedAmountCents,grossReceivedCents:g.grossReceivedCents}))}];
  }));
  const current=aggregate(scoped);
  const relation=(n)=>n===0?'equal':n>0?'more':'fewer';
@@ -46,19 +48,21 @@ export function demoReport(catalog,args,asOfDate){
 
 // Persist only the report scope and verified summary. Full samples/groups are
 // tool inputs, not conversation history; retaining them inflates every follow-up.
-export const compactDemoReport=r=>({source:r.source,fictional:r.fictional,asOfDate:r.asOfDate,filters:r.filters,coverage:r.coverage,records:r.records,completed:r.completed,completedAmountCents:r.completedAmountCents,grossReceivedCents:r.grossReceivedCents,unpricedCompleted:r.unpricedCompleted,nonCadCompleted:r.nonCadCompleted,catalogQuality:r.catalogQuality});
+export const compactDemoReport=r=>({source:r.source,fictional:r.fictional,asOfDate:r.asOfDate,filters:r.filters,coverage:r.coverage,records:r.records,completed:r.completed,pricedCompleted:r.pricedCompleted,averageCompletedAmountCents:r.averageCompletedAmountCents,completedAmountCents:r.completedAmountCents,grossReceivedCents:r.grossReceivedCents,unpricedCompleted:r.unpricedCompleted,nonCadCompleted:r.nonCadCompleted,catalogQuality:r.catalogQuality});
 
 // Basic chart figures are rendered from verified tool results, never model arithmetic.
 export function demoVisualSummary(report,question,en=false){
  const names={Wedding:['婚礼','Wedding'],Event:['活动','Event'],Education:['课程','Education'],Commercial:['商业','Commercial'],Completed:['已完成','Completed'],Confirmed:['已确认','Confirmed'],Inquiry:['咨询中','Inquiry'],Cancelled:['已取消','Cancelled'],website:['官网','Website'],referral:['转介绍','Referral'],instagram:['Instagram','Instagram'],google:['Google','Google'],planner:['Planner','Planner'],unattributed:['未归因','Unattributed']};
  const name=v=>names[v]?.[en?1:0]||v;
  const money=n=>'CAD '+(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
- const monetary=/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(question);
- const metric=monetary?/(到账|收款|receipt|received)/i.test(question)&&!/(完成|completed)/i.test(question)?'grossReceivedCents':'completedAmountCents':'records';
+ const average=/(客单价|均价|平均.*(?:成交|金额|价格)|average.*(?:value|price))/i.test(question);
+ const monetary=average||/(收入|金额|营收|到账|收款|revenue|value|receipt|received)/i.test(question);
+ const metric=average?'averageCompletedAmountCents':monetary?/(到账|收款|receipt|received)/i.test(question)&&!/(完成|completed)/i.test(question)?'grossReceivedCents':'completedAmountCents':'records';
  const scope=Object.entries(report.filters).filter(([k,v])=>!['from','to','groupBy'].includes(k)&&v!==null).map(([,v])=>name(v)).join(' · ');
- const groups=report.groups.length?report.groups.map(g=>({label:name(g.value),value:g[metric]})):!monetary?Object.entries(report.statusCounts).map(([k,value])=>({label:name(k),value})):[];
+ const groups=report.groups.length?report.groups.map(g=>({label:name(g.label||g.value),value:g[metric],count:g.pricedCompleted})):!monetary?Object.entries(report.statusCounts).map(([k,value])=>({label:name(k),value})):[];
  const total=report[metric],fmt=v=>monetary?money(v):v+(en?' records':' 条');
  const heading=(en?'Fictional test data: ':'虚构测试数据：')+report.filters.from+' → '+report.filters.to+(scope?' · '+scope:'');
+ if(average)return heading+'\n'+(groups.length?groups.map(g=>g.label+' '+(g.value===null?(en?'No priced completed orders':'无价格有效的已完成订单'):money(g.value)+' · '+g.count+(en?' priced completed orders':'笔价格有效的已完成订单'))).join('；'):(total===null?(en?'No priced completed orders.':'无价格有效的已完成订单。'):money(total)))+'\n'+(en?'Averages are not additive. Compare sample sizes; this is not profit.':'均价不能相加；需核对样本数，这不是利润。');
  let text=heading+'\n'+(en?'Total: ':'合计：')+fmt(total)+(en?'.':'。');
  if(groups.length&&total>0)text+='\n'+groups.map(g=>g.label+' '+fmt(g.value)+'（'+(g.value/total*100).toFixed(1)+'%）').join('；')+(en?'.':'。');
  if(report.warning)text+='\n'+(en?'Small sample: these records do not establish long-term performance.':'样本少，只说明这部分记录的情况。');
@@ -71,5 +75,5 @@ export function demoVisualSummary(report,question,en=false){
 // Current minus peer; zero denominators never produce a growth percentage.
 export function compareDemoReports(current,peer){
  const format=n=>'CAD '+(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
- return {direction:'current_minus_peer',currentFilters:current.filters,peerFilters:peer.filters,metrics:Object.fromEntries(['records','completed','completedAmountCents','grossReceivedCents'].map(key=>{const delta=current[key]-peer[key];return [key,{current:current[key],peer:peer[key],delta,percent:peer[key]===0?null:Math.round(delta/peer[key]*1000)/10,...(key.endsWith('Cents')?{displayDelta:format(delta)}:{})}];}))};
+ return {direction:'current_minus_peer',currentFilters:current.filters,peerFilters:peer.filters,metrics:Object.fromEntries(['records','completed','completedAmountCents','grossReceivedCents',...(current.averageCompletedAmountCents!==undefined&&peer.averageCompletedAmountCents!==undefined?['averageCompletedAmountCents']:[])].map(key=>{if(current[key]===null||peer[key]===null)return [key,{current:current[key],peer:peer[key],delta:null,percent:null}];const delta=current[key]-peer[key];return [key,{current:current[key],peer:peer[key],delta,percent:peer[key]===0?null:Math.round(delta/peer[key]*1000)/10,...(key.endsWith('Cents')?{displayDelta:format(delta)}:{})}];}))};
 }
