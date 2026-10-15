@@ -43,11 +43,11 @@ function verifiedReports(turn){
 function scope(r){const f=r.filters;return [f.from+' → '+f.to,...['service','channelId','artistId','bookingId','status'].map(k=>f[k]).filter(Boolean)].join(' · ');}
 function facts(reports,en){
  if(!reports.length)return '';
- const labels=en?['Completed service value','Gross receipts','Completed orders']:['完成订单金额','到账原额','已完成订单'];
- const data=reports.length===1?`<div class="response-metrics">${[money(reports[0].completedAmountCents),money(reports[0].grossReceivedCents),String(reports[0].completed)].map((v,i)=>`<div class="response-metric"><span>${labels[i]}</span><strong>${esc(v)}</strong></div>`).join('')}</div>`:table([en?'Period / filter':'期间／筛选',...labels],reports.map(r=>[scope(r),money(r.completedAmountCents),money(r.grossReceivedCents),String(r.completed)]),en?'Verified comparison':'已核验数据对比');
- const limits=[en?'Fictional data. Completed value uses service dates; receipts use payment dates before refunds. Neither is profit.':'虚构数据。完成金额按服务日期；到账原额按收款日期、未扣退款。两者均非利润。'];
- if(reports.some(r=>r.unpricedCompleted||r.nonCadCompleted))limits.push(en?'Missing prices or non-CAD amounts: totals are incomplete.':'有缺价或非 CAD 订单，金额合计不完整。');
- if(reports.some(r=>r.filters.to>r.asOfDate&&r.catalogQuality?.futureCompleted))limits.push(en?'Future-dated completed statuses require review.':'含未来日期范围，完成状态需核对，不能作为截至今天业绩。');
+ const labels=en?['Completed service value','Gross receipts','Completed orders']:['已做完订单的总价','实际收到的钱','做完的订单数'];
+ const data=reports.length===1?`<div class="response-metrics">${[money(reports[0].completedAmountCents),money(reports[0].grossReceivedCents),String(reports[0].completed)].map((v,i)=>`<div class="response-metric"><span>${labels[i]}</span><strong>${esc(v)}</strong></div>`).join('')}</div>`:table([en?'Period / filter':'看的日期和范围',...labels],reports.map(r=>[scope(r),money(r.completedAmountCents),money(r.grossReceivedCents),String(r.completed)]),en?'Verified comparison':'已核验数据对比');
+ const limits=[en?'Fictional data. Completed value uses service dates; receipts use payment dates before refunds. Neither is profit.':'以下是虚构测试数据。总价按服务日期统计，收款按实际到账日期统计。收到的钱还没扣退款和成本，不是利润。'];
+ if(reports.some(r=>r.unpricedCompleted||r.nonCadCompleted))limits.push(en?'Missing prices or non-CAD amounts: totals are incomplete.':'有订单没填价格，或用了其他货币，金额合计不完整。');
+ if(reports.some(r=>r.filters.to>r.asOfDate&&r.catalogQuality?.futureCompleted))limits.push(en?'Future-dated completed statuses require review.':'这里包含未来日期的订单，需检查是否误标成已完成，不能算作截至今天已经做完的业绩。');
  return `<section class="response-facts" aria-label="${en?'Verified figures':'已核验数字'}"><div class="response-section-label">${en?'KEY FIGURES':'关键数字'} <span>${en?'Fictional demo':'虚构测试'}</span></div>${reports.length===1?`<p class="response-scope">${esc(scope(reports[0]))}</p>`:''}${data}<p class="response-basis">${limits.map(esc).join(' ')}</p></section>`;
 }
 export function renderChatAnswer(turn,supplement='',{expanded=false,key=turn.id||''}={}){
@@ -56,8 +56,11 @@ export function renderChatAnswer(turn,supplement='',{expanded=false,key=turn.id|
  if(!complex)return `<div class="chat-answer chat-response response-simple">${renderAnswerBlocks(blocks,en)}</div>${supplement}`;
  const reports=verifiedReports(turn),lead=blocks.find(b=>b.type==='paragraph'),suggestion=[...blocks].reverse().find(b=>b.type==='paragraph'&&b!==lead&&/建议|下一步|suggest|recommend|next step/i.test(b.text));
  const firstTable=blocks.find(b=>b.type==='table');
- const warnings=blocks.filter(b=>b.type==='paragraph'&&b!==lead&&b!==suggestion&&/无法|不能|不足|缺少|缺乏|不代表|cannot|not enough|missing|unknown/i.test(b.text));
- const warning=warnings.find(b=>/成本|缺少|缺乏|无法|不足|cannot|not enough|missing|unknown/i.test(b.text))||warnings[0];
- // Nothing is lost: the original complete answer remains available, including all caveats.
- return `<div class="chat-answer chat-response response-structured">${lead?`<div class="response-lead">${renderAnswerBlocks([lead],en)}</div>`:''}${facts(reports,en)}${firstTable&&reports.length<2?renderAnswerBlocks([firstTable],en):''}${supplement?`<div class="response-visual">${supplement}</div>`:''}${warning?`<aside class="response-warning"><span>${en?'Limitations':'注意口径'}</span>${renderAnswerBlocks([warning],en)}</aside>`:''}${suggestion?`<aside class="response-next"><span>${en?'Suggested check':'建议核查'}</span>${renderAnswerBlocks([suggestion],en)}</aside>`:''}<details class="response-details" data-response-id="${esc(key)}" ${expanded?'open':''}><summary>${en?'Full answer, reasoning and limitations':'查看完整回答、分析依据与限制'}</summary><div class="response-full">${renderAnswerBlocks(blocks,en)}</div></details></div>`;
+ const warnings=blocks.filter(b=>b.type==='paragraph'&&b!==lead&&b!==suggestion&&/^(?:注意|口径|限制|没有成本|缺少|缺乏|无法|不能|样本|数据不足|limitations|caution|without|missing|cannot|small sample)/i.test(b.text.replace(/^\*\*/,'')));
+ const warning=warnings[0];
+ const focused=/客单价|均价|平均成交|average|排名|排行|rank/i.test(String(turn.user||'')+' '+text);
+ // Show the original reasoning directly, preserving its order and wording.
+ // Only long supplementary detail stays in the complete-answer disclosure.
+ const reasoning=blocks.filter(b=>b!==lead&&b!==firstTable&&b!==warning&&b!==suggestion).slice(0,8);
+ return `<div class="chat-answer chat-response response-structured">${lead?`<div class="response-lead">${renderAnswerBlocks([lead],en)}</div>`:''}${focused?'':facts(reports,en)}${firstTable&&(focused||reports.length<2)?renderAnswerBlocks([firstTable],en):''}${supplement?`<div class="response-visual">${supplement}</div>`:''}${reasoning.length?`<section class="response-reasoning" aria-label="${en?'What this means':'这些数字意味着什么'}">${renderAnswerBlocks(reasoning,en)}</section>`:''}${warning?`<aside class="response-warning"><span>${en?'Important context':'理解这些结果时要注意'}</span>${renderAnswerBlocks([warning],en)}</aside>`:''}${suggestion?`<aside class="response-next"><span>${en?'What to do next':'接下来先做什么'}</span>${renderAnswerBlocks([suggestion],en)}</aside>`:''}<details class="response-details" data-response-id="${esc(key)}" ${expanded?'open':''}><summary>${en?'Full answer, reasoning and limitations':'查看完整回答、分析依据与限制'}</summary><div class="response-full">${renderAnswerBlocks(blocks,en)}</div></details></div>`;
 }
