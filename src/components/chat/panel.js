@@ -46,7 +46,10 @@ export function createChatPanel({
   const drafts = new Map();
   const mobile=()=>window.matchMedia('(max-width: 600px)').matches;
   const preferences=$('.chat-preferences');
-  $('[data-chat-menu]').onclick=()=>{preferences.open=!preferences.open;};
+  $('[data-chat-menu]').onclick=()=>{
+    preferences.open=!preferences.open;
+    $('[data-chat-menu]').setAttribute('aria-expanded',String(preferences.open));
+  };
   preferences.addEventListener('toggle',()=>{$('[data-chat-menu]').setAttribute('aria-expanded',String(preferences.open));});
   const desktopPlaceholder=$('#chat-input').placeholder;
   function resizeInput(){
