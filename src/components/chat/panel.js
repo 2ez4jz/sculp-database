@@ -1,3 +1,4 @@
+import {renderChatAnswer} from "./answer-view.js?v=readable-20261014";
 import {createOperatingMemory} from "./operating-memory.js";
 import { createVoiceCapture } from "../../pages/sculpy/voice.js?v=single-chat-1";
 import { transcribeAudio } from "../../services/sculpy.js";
@@ -10,11 +11,6 @@ const esc = (value) =>
         c
       ],
   );
-// Escape first; render only a tiny safe subset of Markdown, never model HTML/URLs.
-const format = (value) =>
-  esc(value)
-    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/^#{1,4}\s+(.+)$/gm, "<strong>$1</strong>");
 export function createChatPanel({
   adapter,
   getScope = () => ({ id: "global", label: "全局工作助手" }),
@@ -63,11 +59,12 @@ export function createChatPanel({
     $("#chat-input").disabled = value;
   };
   function draw() {
+    const expanded = new Set([...host.querySelectorAll("details[data-response-id][open]")].map(el=>el.dataset.responseId));
     $(".chat-messages").innerHTML = turns.length
       ? turns
           .map(
             (t, i) =>
-              `<article class="chat-user"><small>你</small><div>${esc(t.user)}</div></article><article class="chat-assistant"><small>SCULPY</small><div class="chat-answer">${format(t.answer)}</div>${renderSupplement(t)}<div class="chat-references">${(t.references || []).map((r) => `<button data-reference="${esc(r.id)}">${esc(r.label)} ↗</button>`).join("")}</div>${(t.proposals || []).map((p, j) => `<section class="chat-proposal"><strong>${p.kind === "change" ? "待确认的变更建议" : p.kind === "task" ? "待办记录" : "订单备注"} · ${esc(p.label)}</strong><p>${esc(p.text)}</p><small>${p.kind === "change" ? "仅保存建议，不修改正式日期、金额或付款字段。" : "核对后将内容保存到此订单。"}</small><button data-save="${i}:${j}" ${p.saved ? "disabled" : ""}>${p.saved ? "已保存" : p.kind === "change" ? "确认提交建议" : "确认保存到此订单"}</button></section>`).join("")}</article>`,
+              `<article class="chat-user"><small>你</small><div>${esc(t.user)}</div></article><article class="chat-assistant"><small>SCULPY</small>${renderChatAnswer(t,renderSupplement(t),{expanded:expanded.has(String(t.id||i)),key:String(t.id||i)})}<div class="chat-references">${(t.references || []).map((r) => `<button data-reference="${esc(r.id)}">${esc(r.label)} ↗</button>`).join("")}</div>${(t.proposals || []).map((p, j) => `<section class="chat-proposal"><strong>${p.kind === "change" ? "待确认的变更建议" : p.kind === "task" ? "待办记录" : "订单备注"} · ${esc(p.label)}</strong><p>${esc(p.text)}</p><small>${p.kind === "change" ? "仅保存建议，不修改正式日期、金额或付款字段。" : "核对后将内容保存到此订单。"}</small><button data-save="${i}:${j}" ${p.saved ? "disabled" : ""}>${p.saved ? "已保存" : p.kind === "change" ? "确认提交建议" : "确认保存到此订单"}</button></section>`).join("")}</article>`,
           )
           .join("")
       : `<div class="chat-welcome"><img class="chat-welcome-avatar" src="assets/sculpy.webp" alt=""><span>YOUR STUDIO COMPANION</span><h3>今天有什么想一起理清楚？</h3><p>我会先读取${scope?.id === "global" ? "你有权限查看的订单" : "当前订单"}，需要时再查其他相关记录。</p><div><button data-example="这${scope?.id === "global" ? "些" : "个"}订单有哪些信息还需要确认？">检查待确认事项</button><button data-example="帮我整理一下目前的安排，并解释需要注意的地方。">一起看一下安排</button></div></div>`;
