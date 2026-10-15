@@ -1,3 +1,4 @@
+import {catalogHistoryFrom} from "../supabase/functions/sculpy-chat/period-policy.js";
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -61,7 +62,7 @@ test('actual handler gates SDK by scope/fixture and safely falls back on runtime
  const raw=readFileSync(new URL('../supabase/functions/sculpy-chat/handler.ts',import.meta.url),'utf8');
  const source=stripTypeScriptTypes(raw).replace(/^import .*;\n/gm,'').replace('export async function','async function').replace('import("./agent.ts")','Promise.resolve({runSculpyDemoAgent:sdk})');
  let sdkCalls=0,legacyCalls=0,fail=false;
- const ctx={Request,Response,Intl,Date,Set,Map,JSON,String,Number,Error,TextEncoder,console:{error:()=>{}},demoReport,isAnalystQuestion,structuredIntent,Deno:{env:{get:()=>''}},converse:async()=>{legacyCalls++;return {answer:'legacy reply',references:[],proposals:[],sourceIds:[]};},sdk:async()=>{sdkCalls++;if(fail)throw Error('SDK unavailable');return {answer:'SDK reply',references:[],proposals:[],sourceIds:[]};}};
+ const ctx={catalogHistoryFrom,Request,Response,Intl,Date,Set,Map,JSON,String,Number,Error,TextEncoder,console:{error:()=>{}},demoReport,isAnalystQuestion,structuredIntent,Deno:{env:{get:()=>''}},converse:async()=>{legacyCalls++;return {answer:'legacy reply',references:[],proposals:[],sourceIds:[]};},sdk:async()=>{sdkCalls++;if(fail)throw Error('SDK unavailable');return {answer:'SDK reply',references:[],proposals:[],sourceIds:[]};}};
  vm.runInNewContext(source+';globalThis.entry=handleRequest;',ctx);
  const send=async patch=>{
   const response=await ctx.entry(new Request('https://example.test',{method:'POST',headers:{origin:'http://localhost:4173'},body:JSON.stringify({mode:'demo',agentMode:'sdk',message:'比较8月9月收入',requestId:crypto.randomUUID(),catalog:{bookings:[]},advisorFixture:{version:'sculp-unified-300-v2',fictional:true},...patch})}));
