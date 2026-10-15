@@ -23,3 +23,12 @@
 - 既有完整桌面／手机与PostgreSQL CI检查通过：[38779429179](https://github.com/2ez4jz/sculp-database/actions/runs/38779429179)。该次检查基于加入简短分析规则前的双范围实现；最终源码检查及最终v32结果发布时补记。
 - 原始记录：[v30内联虚构样本](evaluations/dual-period-synthetic-20261015-v30.json)。
 - 正式云端权限及月报能力不变；没有全历史访问能力时不得假称已读取。
+
+## 最终线上验证
+
+- sculpy-chat v32 ACTIVE。4项最终内联虚构样本检查全部HTTP 200：长期追问并分析、首次无日期排名、明确8月、兼容链路；两组范围与最高场地均正确。
+- 本轮没有新增AI模型、密钥、数据库写入或客户标签，也没有实际采集场地费用。
+- [v31中间批次](evaluations/dual-period-synthetic-20261015-v31.json)与[v32最终原文](evaluations/dual-period-synthetic-20261015-v32.json)分开保存。
+- 人工阅读v32首问：能够指出历史B场地均价主要受2025年一笔高价订单影响，而今年该场地成交价较低；提出核对服务内容、人数、报价与客户来源，再验证是否值得发展合作。该结论仅用于临时虚构样本。
+
+- 最终源码桌面／手机／PostgreSQL／备份恢复全部通过：[38780289311](https://github.com/2ez4jz/sculp-database/actions/runs/38780289311)。
