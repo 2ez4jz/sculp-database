@@ -1,3 +1,4 @@
+import {recordingMime} from '../../../supabase/functions/sculpy-ai/audio-format.js';
 // One capture session per mounted Sculpy page. Disposal never transcribes.
 export function createVoiceCapture({ $, transcribeAudio, config }) {
   let recorder = null;
@@ -50,11 +51,21 @@ export function createVoiceCapture({ $, transcribeAudio, config }) {
         return;
       }
       stream = acquired;
-      const capture = new MediaRecorder(acquired),
-        chunks = [];
+      const mimeType=recordingMime(MediaRecorder);
+      let capture;
+      try { capture=new MediaRecorder(acquired,mimeType?{mimeType}:undefined); }
+      catch(error){if(error.name!=='NotSupportedError')throw error;capture=new MediaRecorder(acquired);}
+      const chunks = [];
       recorder = capture;
       capture.ondataavailable = (event) => {
         if (event.data.size) chunks.push(event.data);
+      };
+      capture.onerror = () => {
+        capture.onstop=null;
+        acquired.getTracks().forEach(track=>track.stop());
+        if(current!==version)return;
+        recorder=null;stream=null;busy=false;button.textContent=initialLabel;
+        status.textContent='录音中断了，请重新录制。原来的文字仍保留。';
       };
       capture.onstop = async () => {
         acquired.getTracks().forEach((track) => track.stop());
@@ -63,7 +74,7 @@ export function createVoiceCapture({ $, transcribeAudio, config }) {
         stream = null;
         try {
           const transcript = await transcribeAudio(
-            new Blob(chunks, { type: capture.mimeType || "audio/webm" }),
+            new Blob(chunks, { type: chunks.find(chunk=>chunk.type)?.type || capture.mimeType || '' }),
           );
           if (current !== version) return;
           const input = $("#sculpy-text");

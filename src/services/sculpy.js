@@ -1,4 +1,5 @@
 import {config,apiUrl} from '../config.js';
+import {audioUpload} from '../../supabase/functions/sculpy-ai/audio-format.js';
 
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const example='今天 Sarah 整体挺满意的，她最喜欢轻薄底妆，不过第一次睫毛有点重，后来换轻了。她说十二月份公司有晚宴。摄影是 Mango。';
@@ -15,7 +16,8 @@ export async function transcribeAudio(blob){
   return {text:example,provider:'mock',durationEstimate:null};
  }
  const form=new FormData();
- form.append('audio',blob,`sculpy-${Date.now()}.webm`);
+ const upload=await audioUpload(blob,`sculpy-${Date.now()}`);
+ form.append('audio',upload.blob,upload.name);
  return request('transcribe',{method:'POST',body:form});
 }
 

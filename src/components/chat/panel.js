@@ -2,8 +2,8 @@ import {renderFollowups} from "./followups.js?v=guided-20261015";
 import {modelStatus} from "./model-status.js";
 import {renderChatAnswer} from "./answer-view.js?v=guided-20261015";
 import {createOperatingMemory} from "./operating-memory.js";
-import { createVoiceCapture } from "../../pages/sculpy/voice.js?v=single-chat-1";
-import { transcribeAudio } from "../../services/sculpy.js";
+import { createVoiceCapture } from "../../pages/sculpy/voice.js?v=ios-audio-20261015";
+import { transcribeAudio } from "../../services/sculpy.js?v=ios-audio-20261015";
 import { config } from "../../config.js";
 const esc = (value) =>
   String(value ?? "").replace(

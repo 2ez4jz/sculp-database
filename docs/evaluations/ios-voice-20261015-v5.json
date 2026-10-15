@@ -1,0 +1,38 @@
+{
+  "edgeVersion": 5,
+  "syntheticOnly": true,
+  "spokenText": "This is a synthetic Sculpy microphone test. Miranda has a wedding booking tomorrow.",
+  "beforeFix": {
+    "status": 500,
+    "error": "Audio file might be corrupted or unsupported"
+  },
+  "results": [
+    {
+      "id": "cached-iphone",
+      "status": 200,
+      "result": {
+        "text": "This is a synthetic Sculpy microphone test. Miranda has a wedding booking tomorrow.",
+        "provider": "openai",
+        "requestId": "req_a7c831f862bf421f99c7d9a8119c8670"
+      }
+    },
+    {
+      "id": "new-iphone",
+      "status": 200,
+      "result": {
+        "text": "This is a synthetic Sculpy microphone test. Miranda has a wedding booking tomorrow.",
+        "provider": "openai",
+        "requestId": "req_8f14e0a2b12d4079a0bed8857cd8c41c"
+      }
+    },
+    {
+      "id": "desktop-webm",
+      "status": 200,
+      "result": {
+        "text": "This is a synthetic Sculpy microphone test. Miranda has a wedding booking tomorrow.",
+        "provider": "openai",
+        "requestId": "req_4aae263a3f504a0c8927f375882e5d3e"
+      }
+    }
+  ]
+}

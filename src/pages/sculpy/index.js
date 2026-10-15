@@ -4,8 +4,8 @@ import {
   extractMemory,
   searchMemory,
   sculpyExample,
-} from "../../services/sculpy.js";
-import { createVoiceCapture } from "./voice.js";
+} from "../../services/sculpy.js?v=ios-audio-20261015";
+import { createVoiceCapture } from "./voice.js?v=ios-audio-20261015";
 import { wantsRevenueChart } from "../insights/chart.js";
 
 export function createSculpyPage({
