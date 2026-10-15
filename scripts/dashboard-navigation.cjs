@@ -53,7 +53,7 @@ const assert=require('node:assert/strict');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    await page.screenshot({path:'qa-screens/separate-sculpy-'+viewport.width+'.png'});
   }
-  await page.selectOption('#role','artist');await go('dashboard');
+  await go('bookings');await page.selectOption('#role','artist');await go('dashboard');
   assert.equal(await page.locator('#sculpy-dashboard .analysis-card').count(),0);
   assert.deepEqual(errors,[]);
   console.log('Separate dashboard/chat: desktop, mobile composer, history, refresh and role isolation passed');

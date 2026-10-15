@@ -23,7 +23,7 @@ export function createChatPanel({
   const host = document.createElement("div");
   host.className = "chat-host";
   document.body.append(host);
-  host.innerHTML = `<button class="chat-launcher" aria-label="与 Sculpy 连续聊天"><img src="assets/sculpy.webp" alt=""><span>聊一聊<small>Sculpy 助手</small></span></button><dialog class="chat-dialog" aria-labelledby="chat-title"><header class="chat-header"><img src="assets/sculpy.webp" alt=""><div><span>SCULPY · YOUR AI COMPANION</span><h2 id="chat-title">Sculpy</h2><p class="chat-scope"></p><div class="chat-model-status" data-i18n-ignore data-ai-state="idle" role="status" aria-live="polite"><i aria-hidden="true"></i><span>AI · 待连接</span></div></div><button data-close aria-label="关闭聊天">✕</button></header><details class="chat-preferences"><summary>回复偏好</summary><label>回复详略<select data-verbosity><option value="brief">简洁</option><option value="balanced">适中</option><option value="detailed">详细解释</option></select></label><label>希望 Sculpy 如何配合你<textarea data-instructions maxlength="1000" rows="2" placeholder="例如：先列待处理事项，给建议时说明原因。"></textarea></label><button data-save-preferences>保存我的偏好</button><small>这一版保存你明确设置的偏好，经营政策可由管理员在经营记忆面板提交并确认。</small></details><div class="chat-messages" role="log" aria-live="polite"></div><div class="chat-status" role="status" aria-live="polite"></div><form class="chat-composer"><label class="sr-only" for="chat-input">发送给 Sculpy</label><textarea id="chat-input" maxlength="4000" rows="3" placeholder="问一件事，补充一个细节，或接着刚才聊……"></textarea><div><button type="button" id="chat-voice">语音输入</button><span class="chat-storage"></span><button type="submit" class="primary" data-send>发送消息 ↗</button></div><small id="chat-voice-status">语音先转成文字，检查后发送。Enter 发送，Shift + Enter 换行。</small></form></dialog>`;
+  host.innerHTML = `<button class="chat-launcher" aria-label="与 Sculpy 连续聊天"><img src="assets/sculpy.webp" alt=""><span>聊一聊<small>Sculpy 助手</small></span></button><dialog class="chat-dialog" aria-labelledby="chat-title"><header class="chat-header"><img src="assets/sculpy.webp" alt=""><div><span>SCULPY · YOUR AI COMPANION</span><h2 id="chat-title">Sculpy</h2><p class="chat-scope"></p><div class="chat-model-status" data-i18n-ignore data-ai-state="idle" role="status" aria-live="polite"><i aria-hidden="true"></i><span>AI · 待连接</span></div></div><button type="button" data-chat-menu aria-label="聊天设置" aria-expanded="false">•••</button><button data-close aria-label="关闭聊天">✕</button></header><details class="chat-preferences"><summary>回复偏好</summary><label>回复详略<select data-verbosity><option value="brief">简洁</option><option value="balanced">适中</option><option value="detailed">详细解释</option></select></label><label>希望 Sculpy 如何配合你<textarea data-instructions maxlength="1000" rows="2" placeholder="例如：先列待处理事项，给建议时说明原因。"></textarea></label><button data-save-preferences>保存我的偏好</button><small>这一版保存你明确设置的偏好，经营政策可由管理员在经营记忆面板提交并确认。</small></details><div class="chat-messages" role="log" aria-live="polite"></div><div class="chat-status" role="status" aria-live="polite"></div><form class="chat-composer"><label class="sr-only" for="chat-input">发送给 Sculpy</label><textarea id="chat-input" maxlength="4000" rows="3" placeholder="问一件事，补充一个细节，或接着刚才聊……"></textarea><div><button type="button" id="chat-voice">语音输入</button><span class="chat-storage"></span><button type="submit" class="primary" data-send>发送消息 ↗</button></div><small id="chat-voice-status">语音先转成文字，检查后发送。</small><small class="chat-keyboard-hint">Enter 发送，Shift + Enter 换行。</small></form></dialog>`;
   createOperatingMemory(host.querySelector(".chat-preferences"), adapter.memory);
   const dialog = host.querySelector("dialog"),
     $ = (s) => host.querySelector(s);
@@ -44,6 +44,31 @@ export function createChatPanel({
     indicator.querySelector('span').textContent=view.text;
   }
   const drafts = new Map();
+  const mobile=()=>window.matchMedia('(max-width: 600px)').matches;
+  const preferences=$('.chat-preferences');
+  $('[data-chat-menu]').onclick=()=>{preferences.open=!preferences.open;};
+  preferences.addEventListener('toggle',()=>{$('[data-chat-menu]').setAttribute('aria-expanded',String(preferences.open));});
+  const desktopPlaceholder=$('#chat-input').placeholder;
+  function resizeInput(){
+    const input=$('#chat-input');
+    input.placeholder=mobile()?(window.DemoI18n?.language==='en'?'Message or record…':'发消息，或录音…'):desktopPlaceholder;
+    input.style.height=mobile()?'0px':'';
+    if(mobile())input.style.height=Math.min(128,Math.max(44,input.scrollHeight))+'px';
+  }
+  function viewportChanged(){
+    const messages=$('.chat-messages');
+    const atBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<60;
+    const viewport=window.visualViewport;
+    host.style.setProperty('--chat-viewport-height',(viewport?.height||window.innerHeight)+'px');
+    host.style.setProperty('--chat-viewport-top',(viewport?.offsetTop||0)+'px');
+    if(inline)document.body.style.setProperty('--mobile-chat-top',(viewport?.offsetTop||0)+'px');
+    resizeInput();
+    if(atBottom)requestAnimationFrame(()=>{if(!disposed)messages.scrollTop=messages.scrollHeight;});
+  }
+  window.visualViewport?.addEventListener('resize',viewportChanged);
+  window.visualViewport?.addEventListener('scroll',viewportChanged);
+  window.addEventListener('resize',viewportChanged);
+  viewportChanged();
   const voice = createVoiceCapture({
     $: (s) =>
       $(
@@ -56,6 +81,12 @@ export function createChatPanel({
     transcribeAudio,
     config,
   });
+  const voiceStateObserver=new MutationObserver(()=>{
+    const button=$('#chat-voice'),active=/结束录音|stop recording/i.test(button.textContent);
+    button.classList.toggle('is-recording',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+  voiceStateObserver.observe($('#chat-voice'),{childList:true,subtree:true,characterData:true});
   const status = (text, error = false) => {
     $(".chat-status").textContent = text;
     $(".chat-status").classList.toggle("error", error);
@@ -84,10 +115,12 @@ export function createChatPanel({
   }
   async function open(next = getScope()) {
     voice.dispose();
+    preferences.open=false;
     version++;
     const mine = version;
     if (scope) drafts.set(`${identity}:${scope.id}`, $("#chat-input").value);
     scope = next;
+    host.dataset.scope=next.id==='global'?'global':'booking';
     identity = adapter.identity();
     lastModelTurn=null;showModel("idle");
     requestId = null;
@@ -112,7 +145,8 @@ export function createChatPanel({
       draw();
       status("");
       lock(false);
-      $("#chat-input").focus();
+      resizeInput();
+      if(!mobile())$("#chat-input").focus();
     } catch (error) {
       if (mine === version) {
         status(error.message, true);
@@ -164,12 +198,14 @@ export function createChatPanel({
     } finally {
       if (mine === version) {
         lock(false);
-        $("#chat-input").focus();
+        resizeInput();
+        if(!mobile())$("#chat-input").focus();
       }
     }
   }
   $(".chat-composer").onsubmit = send;
   $("#chat-input").oninput = () => {
+    resizeInput();
     requestId = null;
   };
   $("#chat-input").onkeydown = (e) => {
@@ -197,6 +233,7 @@ export function createChatPanel({
     if (button.id === "chat-voice" && !busy) voice.toggle();
     if (button.dataset.example) {
       $("#chat-input").value = window.DemoI18n?.text(button.dataset.example) || button.dataset.example;
+      resizeInput();
       $("#chat-input").focus();
     }
     if (button.dataset.reference) {
@@ -259,12 +296,14 @@ export function createChatPanel({
       inline = true;
       host.classList.add("chat-inline");
       target.append(host);
+      viewportChanged();
       return open();
     },
     detach() {
       if (!inline) return;
       close();
       inline = false;
+      document.body.style.removeProperty('--mobile-chat-top');
       host.classList.remove("chat-inline");
       document.body.append(host);
     },
@@ -279,6 +318,10 @@ export function createChatPanel({
       disposed = true;
       version++;
       voice.dispose();
+      voiceStateObserver.disconnect();
+      window.visualViewport?.removeEventListener('resize',viewportChanged);
+      window.visualViewport?.removeEventListener('scroll',viewportChanged);
+      window.removeEventListener('resize',viewportChanged);
       host.remove();
     },
   };
