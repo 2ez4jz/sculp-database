@@ -1,0 +1,12 @@
+{
+ "environment":"Actual published GitHub Pages, fictional Demo only",
+ "frontendMerge":"937c2b3f3231de4be9cad80977cd252b42702dc7",
+ "backend":{"function":"sculpy-chat","version":27,"status":"ACTIVE"},
+ "url":"https://2ez4jz.github.io/sculp-database/?demo=1&release=v2.2#sculpy",
+ "beforeFix":{"question":"2026年8月完成金额是多少？一句话就好。","answer":"虚构模拟数据中，2026年8月按服务日期统计的已完成订单金额为 CAD 26,025.00（非当月到账金额）。","inlineCharts":3},
+ "afterFix":[{"question":"2026年9月完成金额是多少？一句话就好。","answer":"虚构模拟数据中，2026年9月按服务日期统计的已完成订单金额为 CAD 19,685.00。","inlineCharts":0},{"question":"用图看看9月各服务完成金额。","answer":"图表按服务日期展示2026年9月各服务的已完成金额（虚构模拟数据）：婚礼 CAD 15,050.00、活动造型 CAD 2,975.00、商业造型 CAD 1,280.00、教学 CAD 380.00；合计 CAD 19,685.00，婚礼金额最高。商业造型、教学和活动造型样本较小，不能据此推断长期表现；建议对照其他月份核查分布是否稳定。","inlineCharts":1}],
+ "dashboardCharts":3,
+ "frontendAssetVerified":{"versionQuery":"sculpy-v22-20261014","optInCharts":true,"lastModified":"Thu, 15 Oct 2026 00:32:49 GMT"},
+ "githubCI":{"source":"72f46bb0de197c01ef108f813fb0f799dc6dee12","run":38660516343,"conclusion":"success"},
+ "notRealAuthenticatedAccountTest":true
+}
