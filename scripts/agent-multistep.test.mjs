@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {conversationInstructions,selectSkills} from '../supabase/functions/sculpy-chat/skills.js';
-import {compactDemoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
+import {compactDemoReport,compareDemoReports} from '../supabase/functions/sculpy-chat/demo-report.js';
 
 // Exercises the ACTUAL agent adapter with injected SDK stand-ins.
 // It deliberately does not call a paid model or production database.
@@ -26,7 +26,7 @@ function harness(script){
    return {finalOutput:output};
   }}
  };
- const ctx={conversationInstructions,selectSkills,...sdk,z:{object:()=>({}),number:()=>({int:()=>({min:()=>({})})}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',demoReportingInstructions:'Test-only report rules',JSON,Error,String,Array,AbortSignal,compactDemoReport};
+ const ctx={conversationInstructions,selectSkills,...sdk,z:{object:()=>({}),number:()=>({int:()=>({min:()=>({})})}),string:()=>({regex:()=>({}),nullable:()=>({})}),enum:()=>({nullable:()=>({})})},instructions:'Test-only instructions',demoReportingInstructions:'Test-only report rules',JSON,Error,String,Array,AbortSignal,compactDemoReport,compareDemoReports};
  vm.runInNewContext(source+';globalThis.agentEntry=runSculpyDemoAgent;',ctx);
  return {entry:ctx.agentEntry,traces};
 }

@@ -11,3 +11,5 @@ test('V2.2 conversational text is not forced to structured output; writes retain
  const r=await converse({context:{bookings:[]},turns:[],message,preferences:{},rules:'',query:async()=>({}),callModel:async payload=>{assert.equal(Boolean(payload.text),structured);return {output_text:structured?JSON.stringify({answer:'请确认卡片',references:[],proposals:[]}):'今天想聊什么？'};}});assert(r.answer);assert.deepEqual(r.proposals,[]);
  }
 });
+
+ test('V2.2 comparisons use deterministic deltas and safe zero denominators',async()=>{const {compareDemoReports}=await import('../supabase/functions/sculpy-chat/demo-report.js');const a={filters:{from:'2026-09-01'},records:28,completed:21,completedAmountCents:1968500,grossReceivedCents:1372500},b={filters:{from:'2026-08-01'},records:34,completed:26,completedAmountCents:2602500,grossReceivedCents:2123500};const c=compareDemoReports(a,b);assert.equal(c.metrics.completedAmountCents.delta,-634000);assert.equal(c.metrics.completedAmountCents.percent,-24.4);assert.equal(c.metrics.grossReceivedCents.delta,-751000);assert.equal(compareDemoReports(a,{...b,records:0}).metrics.records.percent,null);});

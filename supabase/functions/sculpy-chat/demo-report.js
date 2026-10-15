@@ -67,3 +67,9 @@ export function demoVisualSummary(report,question,en=false){
  if(report.futureCompleted)text+='\n'+(en?'Future-dated completed statuses require review.':'含未来日期的完成状态，需核对。');
  return text;
 }
+
+// Current minus peer; zero denominators never produce a growth percentage.
+export function compareDemoReports(current,peer){
+ const format=n=>'CAD '+(n/100).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+ return {direction:'current_minus_peer',currentFilters:current.filters,peerFilters:peer.filters,metrics:Object.fromEntries(['records','completed','completedAmountCents','grossReceivedCents'].map(key=>{const delta=current[key]-peer[key];return [key,{current:current[key],peer:peer[key],delta,percent:peer[key]===0?null:Math.round(delta/peer[key]*1000)/10,...(key.endsWith('Cents')?{displayDelta:format(delta)}:{})}];}))};
+}

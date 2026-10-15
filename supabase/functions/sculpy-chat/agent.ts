@@ -3,7 +3,7 @@ import { Agent, Runner, tool, MemorySession, OpenAIProvider } from "npm:@openai/
 import { z } from "npm:zod@4.6.7";
 import { instructions, demoReportingInstructions } from "./core.ts";
 import { conversationInstructions,selectSkills } from "./skills.js";
-import { compactDemoReport } from "./demo-report.js";
+import { compactDemoReport,compareDemoReports } from "./demo-report.js";
 
 const ReportArgs=z.object({
  from:z.string().regex(/^20\d{2}-\d{2}-\d{2}$/),
@@ -28,7 +28,8 @@ export async function runSculpyDemoAgent({message,context,turns=[],preferences={
   execute:async (args)=>{
    if(++calls>6)throw Error("Too many report calls");
    if(args.from>args.to)throw Error("Invalid date order");
-   const data=await demoReport(args);
+   const raw=await demoReport(args);
+   const data={...raw,comparisons:sources.map(peer=>compareDemoReports(raw,peer))};
    sources.push(data);
    return JSON.stringify(data);
   }
