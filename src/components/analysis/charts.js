@@ -1,4 +1,4 @@
-import {demoReport} from '../../../supabase/functions/sculpy-chat/demo-report.js';
+import {demoReport} from '../../../supabase/functions/sculpy-chat/demo-report.js?v=dates-model-venue-20261015';
 import {reportMonths} from '../../domain/report-period.js';
 import {diagnosePeriods} from '../../domain/operating-analyst.js';
 const palette=['#40584c','#8caa83','#d2b575','#b97769','#718fa6','#a184a8','#999'];

@@ -1,4 +1,4 @@
-import {buildAnalysisCharts,renderAnalysisCharts} from '../analysis/charts.js';
+import {buildAnalysisCharts,renderAnalysisCharts} from '../analysis/charts.js?v=dates-model-venue-20261015';
 const htmlEscape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const validDate=value=>/^20\d{2}-\d{2}-\d{2}$/.test(value||'')&&Number.isFinite(Date.parse(value+'T12:00:00Z'))&&new Date(value+'T12:00:00Z').toISOString().slice(0,10)===value;
