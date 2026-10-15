@@ -4,9 +4,10 @@
  body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
  body:not(.sculpy-chat-page){font-size:14px;line-height:1.55}
  body:not(.sculpy-chat-page) #main{padding:14px 14px 86px;min-width:0}
- body:not(.sculpy-chat-page) .topbar{min-height:52px;height:auto;padding:7px 12px;gap:6px}
- body:not(.sculpy-chat-page) .top-actions{gap:5px;min-width:0;flex-wrap:wrap;justify-content:flex-end}
- body:not(.sculpy-chat-page) .top-actions select{font-size:16px;max-width:145px;min-height:36px;padding:4px 5px}
+ body:not(.sculpy-chat-page) .topbar{min-height:52px;height:auto;padding:7px 12px!important;gap:6px!important;flex-wrap:nowrap;align-items:center!important}
+ body:not(.sculpy-chat-page) .top-actions{gap:4px!important;min-width:0;flex-wrap:nowrap!important;justify-content:flex-end}
+ body:not(.sculpy-chat-page) .top-actions select{font-size:16px;max-width:128px;min-height:36px;padding:4px 5px}
+ body:not(.sculpy-chat-page) .top-actions .demo-language-switch button{font-size:11px;min-height:30px;padding:5px 6px}
  body:not(.sculpy-chat-page) .demo-exit{font-size:11px;padding:5px}
  body:not(.sculpy-chat-page) h1{font-size:28px;line-height:1.2;letter-spacing:-.025em;margin-bottom:7px;overflow-wrap:anywhere}
  body:not(.sculpy-chat-page) h2{font-size:17px;margin-bottom:13px}

@@ -26,6 +26,7 @@ const assert=require('node:assert/strict');
      const first=await page.locator('.booking-table tr').nth(1).boundingBox();
      console.log('Phone bookings',JSON.stringify({width:viewport.width,statsHeight:stats.height,featureHeight:feature.height,firstOrderTop:first.y}));
      assert(stats.height<95);assert(feature.height<145);assert(first.y<viewport.height,'first order should be reachable in the first screen');
+     assert((await page.locator('.topbar').boundingBox()).height<65,'phone navigation should stay in one compact row');
      assert.equal(await page.locator('.today .memory-card').isVisible(),false);
      assert.equal(await page.locator('[data-filter=service]').isVisible(),false);
      await page.locator('[data-mobile-filters]').click();assert.equal(await page.locator('[data-filter=service]').isVisible(),true);
