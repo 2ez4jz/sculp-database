@@ -81,3 +81,5 @@ test('Agent enforces six report calls and rejects analysis without verified sour
  const missing=harness(async()=> '9月完成金额CAD 1000000');
  await assert.rejects(()=>missing.entry({message:'收入',context:validContext,apiKey:'fake-key',demoReport:async()=>({})}),/without verified reports/);
 });
+
+test('financial caveats are not duplicated when the model already states the basis',async()=>{const h=harness(async execute=>{await execute(base);return '按服务日期统计，8月完成金额CAD 1000.00，不是利润。';});const r=await h.entry({message:'8月完成金额',context:validContext,apiKey:'fake-key',demoReport:async filters=>({filters,completedAmountCents:100000})});assert.equal(r.answer.match(/不是利润/g).length,1);assert(!r.answer.includes('差额也不能直接认定为欠款'));});
