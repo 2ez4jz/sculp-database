@@ -8,7 +8,7 @@ export function selectSkills(message, turns=[]) {
  growth:/获客|渠道|投放|广告|咨询|转化|Google|Instagram|ROI|CAC|acquisition|channel|conversion|marketing/i
  }[name]).test(text)).map(([name,content])=>({name,content}));
 }
-export const structuredIntent = message => /记一下|记录|保存|修改|更改|改成|备注|待办|提醒|录入|涨价|涨.*%|\b(save|record|update|change|note|remind)\b/i.test(message) && !/先别|别改|不要.*(?:记录|保存|修改)|不.*(?:保存|修改)|don't|do not/i.test(message);
+export const structuredIntent = message => /记一下|帮我记|记录(?:一下|这|客户|订单|下来|：|:|\s)|保存|修改|更改|改成|备注|待办|提醒|录入|涨价|涨.*%|\b(save|record|update|change|note|remind)\b/i.test(message) && !/先别|别改|不要.*(?:记录|保存|修改)|不.*(?:保存|修改)|don't|do not/i.test(message);
 export function conversationInstructions(message,turns=[]) {
  return selectSkills(message,turns).map(s=>'按需专业能力 '+s.name+':\n'+s.content).join('\n');
 }
