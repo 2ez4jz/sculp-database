@@ -17,9 +17,10 @@ async function run([id,message,business]){
  if(data.turn?.agentFallback)errors.push('unexpected fallback');
  if(!business&&data.turn?.demoReportSources?.length)errors.push('unnecessary business report');
  if(business&&!data.turn?.demoReportSources?.length)errors.push('business figures not queried');
+ if(id==='brief'&&/建议|核对|先看/.test(data.turn?.answer||''))errors.push('advice added to explicit short answer');
  if(id==='brief'&&data.turn?.answer?.split(/[。！？]/).filter(x=>x.trim()).length>2)errors.push('explicit brief ignored');
  results.push({id,message,status:response.status,errors,...data});
- await mkdir('docs/evaluations',{recursive:true});await writeFile('docs/evaluations/guided-chat-20261015-v33.json',JSON.stringify({edgeVersion:33,fictionalOnly:true,inlineSyntheticRows:3,results},null,2));
+ await mkdir('docs/evaluations',{recursive:true});await writeFile('docs/evaluations/guided-chat-20261015-v34.json',JSON.stringify({edgeVersion:34,fictionalOnly:true,inlineSyntheticRows:3,results},null,2));
  console.log(id,response.status,JSON.stringify(errors),'\n'+data.turn?.answer);
 }
 for(let i=0;i<cases.length;i+=2)await Promise.all(cases.slice(i,i+2).map(run));
