@@ -32,8 +32,8 @@ test('demo adapter attaches only requested fixture chart months and never calls 
   globalThis.localStorage={getItem:k=>state.get(k)||null,setItem:(k,v)=>state.set(k,v)};
   globalThis.window={DemoI18n:{language:'en'}};
   globalThis.fetch=async(url,options)=>{payload=JSON.parse(options.body);return Response.json({turn:{id:payload.requestId,user:payload.message,answer:'fixture reply'}});};
-  const adapter=demoChatAdapter({getIdentity:()=> 'test',getCatalog:()=>({bookings:[]}),getAdvisorRows:()=>advisorRowsFromBookings(bookings),getContext:()=>({role:'admin'}),saveBatch:()=>{}});
-  const turn=await adapter.send('global',{requestId:crypto.randomUUID(),message:'2026-09 month revenue'});
+  const adapter=demoChatAdapter({getIdentity:()=> 'test',getCatalog:()=>({bookings}),getAdvisorRows:()=>advisorRowsFromBookings(bookings),getContext:()=>({role:'admin'}),saveBatch:()=>{}});
+  const turn=await adapter.send('global',{requestId:crypto.randomUUID(),message:'2026-09 month revenue chart'});
   assert.deepEqual(turn.chartRows.map(r=>r.month),['2026-09']);
   assert.equal(turn.chartRows[0].amountCents,1968500);
   assert.equal(payload.mode,'demo');assert.equal(payload.advisorFixture.summary.total,300);
@@ -46,7 +46,7 @@ test('daily, cutoff and intersection questions never show a conflicting full-mon
   globalThis.location={search:""};
   globalThis.localStorage={getItem:()=>null,setItem:()=>{}};globalThis.window={DemoI18n:{language:'zh'}};
   let local=0,online=0;globalThis.fetch=async()=>{online++;return Response.json({turn:{answer:'精确日报'}})};
-  const adapter=demoChatAdapter({getIdentity:()=> 'report',getCatalog:()=>({bookings:[]}),getAdvisorRows:()=>advisorRowsFromBookings(bookings),getContext:()=>({role:'admin'}),saveBatch:()=>{},resolveLocal:()=>{local++;return {answer:'整月本地统计'}}});
+  const adapter=demoChatAdapter({getIdentity:()=> 'report',getCatalog:()=>({bookings}),getAdvisorRows:()=>advisorRowsFromBookings(bookings),getContext:()=>({role:'admin'}),saveBatch:()=>{},resolveLocal:()=>{local++;return {answer:'整月本地统计'}}});
   for(const message of ['今天收入日报','本月截至10月10日收入','9月Instagram婚礼收入','September Michelle revenue']){const t=await adapter.send('global',{requestId:crypto.randomUUID(),message});assert.equal(t.answer,'精确日报');assert.equal(t.chartRows,undefined);}
   assert.equal(local,0);assert.equal(online,4);
  }finally{globalThis.fetch=oldFetch;globalThis.localStorage=oldStorage;globalThis.window=oldWindow;globalThis.location=oldLocation;}

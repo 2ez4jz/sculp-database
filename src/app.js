@@ -2,7 +2,7 @@ import {renderAnalysisCharts} from "./components/analysis/charts.js";
 import {createSculpyDashboard} from "./components/analysis/sculpy-dashboard.js";
 import {mountDemoOrderEditor} from './pages/demo/order-editor.js';
 import {createChatPanel} from './components/chat/panel.js?v=analysis-visuals-20261011a';
-import {demoChatAdapter} from './services/chat.js?v=analysis-visuals-20261011a';
+import {demoChatAdapter} from './services/chat.js?v=sculpy-v22-20261014';
 import {searchCatalog} from './domain/sculpy.js';
 import {analyzeMonthlyQuestion,renderMonthlyChatChart} from './domain/monthly-chat.js';
 import {clientPreferences} from './domain/memory.js';

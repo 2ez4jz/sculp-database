@@ -4,6 +4,12 @@ import { advisorRowsFromBookings, advisorSnapshot } from "../domain/demo-workspa
 import { reportMonths } from "../domain/report-period.js";
 import { advisorMetrics } from "../domain/advisor-engine.js";
 import { boundedDemoRequest } from "../domain/chat-history.js";
+// Chat figures are opt-in; fixed Dashboard charts use a separate path.
+export function wantsChatVisual(message) {
+ const q=String(message||"");
+ return /饼图|圆环|图表|柱状|趋势图|分布图|排期图|日程图|画图|用图|chart|graph|visual|pie|donut|timeline/i.test(q)
+   && !/(?:不要|不用|不需要|别)(?:再)?(?:画|生成|显示)?(?:任何)?(?:图表|图)|no charts?|without (?:any )?(?:charts?|graphs?)/i.test(q);
+}
 export async function chatRequest(body, supabase) {
   const headers = { "content-type": "application/json" };
   if (supabase) {
@@ -98,11 +104,11 @@ export function demoChatAdapter({
           turns: history.slice(-12),
           preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\n") },
         }));
-      if (!scopedReport && !preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
+      if (wantsChatVisual(body.message) && !scopedReport && !preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {
         result.turn.chartKey = "monthly-analytics";
         result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));
       }
-      if(scope === "global" && getContext().role === "admin") {
+      if(wantsChatVisual(body.message) && scope === "global" && getContext().role === "admin" && (!result.turn.chartKey || result.turn.demoReportSources?.length)) {
         result.turn.analysisCharts=buildAnalysisCharts({message:body.message,bookings:catalog.bookings,reports:result.turn.demoReportSources||[],previousReports:[...history].reverse().find(t=>t.demoReportSources?.length)?.demoReportSources||[],previousMessage:[...history].reverse().find(t=>t.demoReportSources?.length)?.user||''});
         if(result.turn.analysisCharts.length){delete result.turn.chartKey;delete result.turn.chartRows;}
       }
