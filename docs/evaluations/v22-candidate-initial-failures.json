@@ -1,0 +1,810 @@
+{
+  "version": "candidate",
+  "fictionalOnly": true,
+  "at": "2026-10-15T00:07:17.968Z",
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "寒暄",
+      "messages": [
+        "你好，今天有点累。",
+        "别分析工作，随便聊两句。"
+      ],
+      "turns": [
+        {
+          "message": "你好，今天有点累。",
+          "status": 200,
+          "ms": 7375,
+          "turn": {
+            "id": "344a12a5-927a-437e-8cf5-ecebda8cbbae",
+            "user": "你好，今天有点累。",
+            "answer": "辛苦啦。要不要先歇一会儿、喝点水？如果有件事让你特别累，也可以跟我说说。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:06:28.505Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "别分析工作，随便聊两句。",
+          "status": 200,
+          "ms": 4183,
+          "turn": {
+            "id": "580d9f34-bef3-4d35-a3cf-76b75d7cf597",
+            "user": "别分析工作，随便聊两句。",
+            "answer": "好，不聊工作。今天就放空一下吧——如果现在能瞬间去一个地方待半小时，你想去海边、山里，还是窝在家里？",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [
+              "b0",
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "b9",
+              "b10",
+              "b11",
+              "b12",
+              "b13",
+              "b14",
+              "b15",
+              "b16",
+              "b17",
+              "b18",
+              "b19",
+              "b20",
+              "b21",
+              "b22",
+              "b23",
+              "b24",
+              "b25",
+              "b26",
+              "b27",
+              "b28",
+              "b29"
+            ],
+            "usage": {
+              "input_tokens": 8177,
+              "output_tokens": 42,
+              "calls": 1
+            },
+            "skillsUsed": [
+              "business"
+            ],
+            "engine": "legacy",
+            "agentFallback": true,
+            "createdAt": "2026-10-15T00:06:32.697Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "能力说明",
+      "messages": [
+        "你能帮我做什么？两句话就好。",
+        "你会自动帮我改订单吗？"
+      ],
+      "turns": [
+        {
+          "message": "你能帮我做什么？两句话就好。",
+          "status": 200,
+          "ms": 3611,
+          "turn": {
+            "id": "97178e40-2743-4314-a80b-923bc0f86a1f",
+            "user": "你能帮我做什么？两句话就好。",
+            "answer": "我可以帮你查订单、看虚构模拟报表，梳理经营数据并给出可核查的建议。需要记录或修改订单时，我可以准备待确认的建议卡片，但不能直接改动正式数据。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:06:36.305Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "你会自动帮我改订单吗？",
+          "status": 200,
+          "ms": 1912,
+          "turn": {
+            "id": "c9d3aa6e-d840-4b36-a3a7-ac25e81c3195",
+            "user": "你会自动帮我改订单吗？",
+            "answer": "不会。我不能直接改订单；只有你明确提出修改要求，我才会准备建议卡片，仍需你点击确认。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [
+              "b0",
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "b9",
+              "b10",
+              "b11",
+              "b12",
+              "b13",
+              "b14",
+              "b15",
+              "b16",
+              "b17",
+              "b18",
+              "b19",
+              "b20",
+              "b21",
+              "b22",
+              "b23",
+              "b24",
+              "b25",
+              "b26",
+              "b27",
+              "b28",
+              "b29"
+            ],
+            "usage": {
+              "input_tokens": 8059,
+              "output_tokens": 31,
+              "calls": 1
+            },
+            "skillsUsed": [],
+            "engine": "legacy",
+            "agentFallback": true,
+            "createdAt": "2026-10-15T00:06:38.219Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "简短偏好",
+      "messages": [
+        "后面请尽量简短。",
+        "解释一下到账和收入有什么区别，一句话。"
+      ],
+      "turns": [
+        {
+          "message": "后面请尽量简短。",
+          "status": 200,
+          "ms": 2239,
+          "turn": {
+            "id": "8de7d131-2ec5-4dcf-8cce-3554f29ca72a",
+            "user": "后面请尽量简短。",
+            "answer": "好，后面我会尽量简短。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:06:40.452Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "解释一下到账和收入有什么区别，一句话。",
+          "status": 200,
+          "ms": 3031,
+          "turn": {
+            "id": "ae451897-c99f-4960-b851-edd0819f726e",
+            "user": "解释一下到账和收入有什么区别，一句话。",
+            "answer": "在这份虚构数据里，“收入”指按服务日期统计的已完成订单金额，“到账”指按收款日期统计的收款原额，二者不一定发生在同一个月。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [
+              "b0",
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "b9",
+              "b10",
+              "b11",
+              "b12",
+              "b13",
+              "b14",
+              "b15",
+              "b16",
+              "b17",
+              "b18",
+              "b19",
+              "b20",
+              "b21",
+              "b22",
+              "b23",
+              "b24",
+              "b25",
+              "b26",
+              "b27",
+              "b28",
+              "b29"
+            ],
+            "usage": {
+              "input_tokens": 8155,
+              "output_tokens": 49,
+              "calls": 1
+            },
+            "skillsUsed": [
+              "finance"
+            ],
+            "engine": "legacy",
+            "agentFallback": true,
+            "createdAt": "2026-10-15T00:06:43.491Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "改口",
+      "messages": [
+        "我说的负责人是 Miranda。",
+        "不是 Miranda，是 Mira，她们是一个人吗？"
+      ],
+      "turns": [
+        {
+          "message": "我说的负责人是 Miranda。",
+          "status": 200,
+          "ms": 3400,
+          "turn": {
+            "id": "6917ba37-fd54-4d7e-8d8f-3bdc900ba9aa",
+            "user": "我说的负责人是 Miranda。",
+            "answer": "明白，你说的负责人是 Miranda，不是 Mira。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:06:46.892Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "不是 Miranda，是 Mira，她们是一个人吗？",
+          "status": 200,
+          "ms": 3604,
+          "turn": {
+            "id": "26e9b6d9-f2ff-4677-9b19-6fa32f921852",
+            "user": "不是 Miranda，是 Mira，她们是一个人吗？",
+            "answer": "抱歉，我刚才理解错了。Mira 和 Miranda 是不同的人；你说的负责人是 Mira。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [
+              "b0",
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "b9",
+              "b10",
+              "b11",
+              "b12",
+              "b13",
+              "b14",
+              "b15",
+              "b16",
+              "b17",
+              "b18",
+              "b19",
+              "b20",
+              "b21",
+              "b22",
+              "b23",
+              "b24",
+              "b25",
+              "b26",
+              "b27",
+              "b28",
+              "b29"
+            ],
+            "usage": {
+              "input_tokens": 8017,
+              "output_tokens": 52,
+              "calls": 1
+            },
+            "skillsUsed": [],
+            "engine": "legacy",
+            "agentFallback": true,
+            "createdAt": "2026-10-15T00:06:50.495Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "英语",
+      "messages": [
+        "Please explain what you can do in two sentences.",
+        "Keep speaking English. What does gross receipt mean?"
+      ],
+      "turns": [
+        {
+          "message": "Please explain what you can do in two sentences.",
+          "status": 200,
+          "ms": 2720,
+          "turn": {
+            "id": "4225d5ef-c4f7-4fb1-88ae-8a5e1610e74e",
+            "user": "Please explain what you can do in two sentences.",
+            "answer": "I can look up booking details and analyze SCULP Studio’s fictional demo reports, including trends and comparisons. I can also help draft notes or changes for your confirmation, but I can’t save or apply them myself.",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:06:53.215Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "Keep speaking English. What does gross receipt mean?",
+          "status": 200,
+          "ms": 2980,
+          "turn": {
+            "id": "a093da88-e4f9-4e5a-bf95-2193f2734867",
+            "user": "Keep speaking English. What does gross receipt mean?",
+            "answer": "A **gross receipt** is the full amount received before deducting refunds or other adjustments. In these reports, gross receipts are counted by **payment date**, so they can differ from the value of services completed in the same month; they aren’t net receipts or profit.",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [
+              "b0",
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "b9",
+              "b10",
+              "b11",
+              "b12",
+              "b13",
+              "b14",
+              "b15",
+              "b16",
+              "b17",
+              "b18",
+              "b19",
+              "b20",
+              "b21",
+              "b22",
+              "b23",
+              "b24",
+              "b25",
+              "b26",
+              "b27",
+              "b28",
+              "b29"
+            ],
+            "usage": {
+              "input_tokens": 8190,
+              "output_tokens": 58,
+              "calls": 1
+            },
+            "skillsUsed": [
+              "finance"
+            ],
+            "engine": "legacy",
+            "agentFallback": true,
+            "createdAt": "2026-10-15T00:06:56.193Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "语音残句",
+      "messages": [
+        "那个她的订单就是上次那个……",
+        "我没说清楚，你需要我补充什么？"
+      ],
+      "turns": [
+        {
+          "message": "那个她的订单就是上次那个……",
+          "status": 200,
+          "ms": 2520,
+          "turn": {
+            "id": "a2d85e64-6fc4-498c-a748-1d4abe59cbc9",
+            "user": "那个她的订单就是上次那个……",
+            "answer": "你说的是谁的订单？给我她的名字或订单号，我就能帮你查。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:06:58.713Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "我没说清楚，你需要我补充什么？",
+          "status": 200,
+          "ms": 2844,
+          "turn": {
+            "id": "1891c62f-1a40-4a97-bd9b-fb529d286fdf",
+            "user": "我没说清楚，你需要我补充什么？",
+            "answer": "给我她的名字或订单号就行；如果记得日期或场地，也可以告诉我，我来帮你找。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [
+              "b0",
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "b9",
+              "b10",
+              "b11",
+              "b12",
+              "b13",
+              "b14",
+              "b15",
+              "b16",
+              "b17",
+              "b18",
+              "b19",
+              "b20",
+              "b21",
+              "b22",
+              "b23",
+              "b24",
+              "b25",
+              "b26",
+              "b27",
+              "b28",
+              "b29"
+            ],
+            "usage": {
+              "input_tokens": 8030,
+              "output_tokens": 32,
+              "calls": 1
+            },
+            "skillsUsed": [],
+            "engine": "legacy",
+            "agentFallback": true,
+            "createdAt": "2026-10-15T00:07:01.558Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "双月经营",
+      "messages": [
+        "比较2026年8月和9月完成金额和到账原额。",
+        "这能证明9月经营变差了吗？请说人话。"
+      ],
+      "turns": [
+        {
+          "message": "比较2026年8月和9月完成金额和到账原额。",
+          "status": 200,
+          "ms": 7141,
+          "turn": {
+            "id": "0b3ce1e0-d14f-42d3-b8fd-bb89eb42d155",
+            "user": "比较2026年8月和9月完成金额和到账原额。",
+            "answer": "按**虚构模拟数据**比较，2026 年 9 月两项金额都低于 8 月：\n\n| 口径 | 8 月 | 9 月 | 9 月较 8 月 |\n|---|---:|---:|---:|\n| 按服务日期统计的已完成金额 | CAD 26,025.00 | CAD 19,685.00 | 少 CAD 6,340.00 |\n| 按收款日期统计的到账原额 | CAD 21,235.00 | CAD 13,725.00 | 少 CAD 7,510.00 |\n\n8 月有 26 单已完成，9 月有 21 单。**到账原额不是净收款**，也不一定来自当月完成的服务；这两个口径不能直接相减当作未收款。可先核对 9 月的收款日期记录和付款安排，再判断到账下降是否涉及跨月付款。\n\n完成金额按服务日期、到账原额按收款日期统计，未扣退款；两者都不是利润，差额也不能直接认定为欠款。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 34,
+                "completed": 26,
+                "completedAmountCents": 2602500,
+                "grossReceivedCents": 2123500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:07:08.685Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "这能证明9月经营变差了吗？请说人话。",
+          "status": 200,
+          "ms": 9209,
+          "turn": {
+            "id": "251fecdb-2efd-41f5-9724-cde53d356c4b",
+            "user": "这能证明9月经营变差了吗？请说人话。",
+            "answer": "不能证明。**这份虚构模拟数据只能说明：9 月比 8 月做完的单更少（21 单对 26 单），完成金额和到账原额也都下降了。**\n\n但两个月的差别可能受服务组合、季节性和收款时间影响；到账少也不等于利润变差。最实在的下一步，是先按服务类型对比两个月，再核对 9 月的收款日期，看看少在哪里。",
+            "references": [],
+            "proposals": [],
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 34,
+                "completed": 26,
+                "completedAmountCents": 2602500,
+                "grossReceivedCents": 2123500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "sourceIds": [
+              "b0",
+              "b1",
+              "b2",
+              "b3",
+              "b4",
+              "b5",
+              "b6",
+              "b7",
+              "b8",
+              "b9",
+              "b10",
+              "b11",
+              "b12",
+              "b13",
+              "b14",
+              "b15",
+              "b16",
+              "b17",
+              "b18",
+              "b19",
+              "b20",
+              "b21",
+              "b22",
+              "b23",
+              "b24",
+              "b25",
+              "b26",
+              "b27",
+              "b28",
+              "b29",
+              "b119",
+              "b203",
+              "b240",
+              "b61",
+              "b65",
+              "b69",
+              "b73",
+              "b77",
+              "b107",
+              "b191",
+              "b269",
+              "b179",
+              "b241",
+              "b62",
+              "b66",
+              "b70",
+              "b74",
+              "b78",
+              "b289",
+              "b167",
+              "b242",
+              "b63",
+              "b67",
+              "b71",
+              "b75",
+              "b155",
+              "b277",
+              "b143",
+              "b243",
+              "b64",
+              "b156",
+              "b244",
+              "b144",
+              "b278",
+              "b79",
+              "b83",
+              "b87",
+              "b132",
+              "b245",
+              "b80",
+              "b84",
+              "b88",
+              "b120",
+              "b204",
+              "b246",
+              "b108",
+              "b192",
+              "b81",
+              "b85",
+              "b89",
+              "b180",
+              "b247",
+              "b168",
+              "b290",
+              "b82",
+              "b86",
+              "b90",
+              "b248"
+            ],
+            "usage": {
+              "input_tokens": 26259,
+              "output_tokens": 316,
+              "calls": 2
+            },
+            "skillsUsed": [
+              "business",
+              "finance"
+            ],
+            "engine": "legacy",
+            "agentFallback": true,
+            "createdAt": "2026-10-15T00:07:17.903Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    }
+  ]
+}

@@ -232,7 +232,7 @@ test('history hides previously authorized financial aggregates after role downgr
     globalThis.fetch=async url=>{
       if(url.endsWith('/auth/v1/user'))return Response.json({id:'00000000-0000-0000-0000-000000000002'});
       if(url.includes('/rpc/sculpy_context'))return Response.json({bookings:[],allowedBookingIds:[],actor:{role:'artist'}});
-      if(url.includes('sculpy_conversations'))return Response.json([{turns:[{id:'money',user:'收入',answer:'private financial aggregate',sourceIds:[],businessReport:true},{id:'safe',user:'hi',answer:'hello',sourceIds:[]}]}]);
+      if(url.includes('sculpy_conversations'))return Response.json([{turns:[{id:'money',user:'收入',answer:'private financial aggregate',sourceIds:[],businessReport:true},{id:'policy',user:'政策',answer:'private admin policy',sourceIds:[],operatingMemoryUsed:true},{id:'safe',user:'hi',answer:'hello',sourceIds:[]}]}]);
       return Response.json([]);
     };
     const response=await handleRequest(new Request('https://handler.test',{method:'POST',headers:{origin:'http://localhost:4173',authorization:'Bearer test-token'},body:JSON.stringify({action:'history'})}));
@@ -250,6 +250,7 @@ test('authenticated monthly chat uses caller token and canonical RPC, ignores fo
    if(url.includes('database.test'))assert.equal(opts.headers.authorization,'Bearer caller-token');
    if(url.endsWith('/auth/v1/user'))return Response.json({id:'00000000-0000-0000-0000-000000000003'});
    if(url.includes('/rpc/sculpy_context'))return Response.json({bookings:[],allowedBookingIds:[],actor:{role:'operations'}});
+   if(url.includes('/rpc/sculpy_search_memory'))return Response.json([{id:'test-policy',content:'测试已批准政策',revision:2}]);
    if(url.includes('/rpc/sculpy_monthly_report')){reportCalls++;assert.deepEqual(JSON.parse(opts.body),{p_month:'2026-09'});return Response.json({month:'2026-09',asOf:'2026-10-10T17:00:00Z',bookings:{completedAmountCents:'123456'},receipts:{grossAmountCents:'78900'}});}
    if(url.includes('sculpy_conversations')&&opts.method==='POST'){saved=JSON.parse(opts.body);return Response.json([saved]);}
    if(url.includes('database.test'))return Response.json([]);
@@ -262,7 +263,7 @@ test('authenticated monthly chat uses caller token and canonical RPC, ignores fo
   };
   const response=await handleRequest(new Request('https://handler.test',{method:'POST',headers:{origin:'http://localhost:4173',authorization:'Bearer caller-token'},body:JSON.stringify({requestId:crypto.randomUUID(),message:'上个月收入',advisorFixture:{fictional:true,summary:'forged-finance'},report:'forged-finance'})}));
   assert.equal(response.status,200);const {turn}=await response.json();
-  assert.equal(reportCalls,1);assert.equal(turn.businessReport,true);assert.equal(saved.turns[0].businessReport,true);
+  assert.equal(reportCalls,1);assert.equal(turn.businessReport,true);assert.equal(saved.turns[0].businessReport,true);assert.equal(turn.operatingMemoryUsed,true);assert.deepEqual(turn.memorySourceIds,['test-policy']);
  }finally{globalThis.fetch=old;}
 });
 

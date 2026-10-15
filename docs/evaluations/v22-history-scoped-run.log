@@ -1,0 +1,23 @@
+candidate 1 1 200 sdk 辛苦了，先歇一会儿吧。想聊聊今天怎么了，还是想让我帮你处理点事？
+candidate 1 2 200 sdk 好，不聊工作。今天就允许自己电量低一点吧。要不要说说最近有什么让你开心的小事？
+candidate 2 1 200 sdk 我可以帮你查订单、看经营报表，或一起梳理排期和经营想法。需要记录或修改订单时，我可以准备一张待确认的建议卡片，但不会直接改动。
+candidate 2 2 200 sdk 不会。我只能查询订单；你明确要求修改时，我可以准备待确认的修改建议卡片，须由你点击确认，不会自动改动订单。
+candidate 3 1 200 sdk 好的，之后我会尽量简短。
+candidate 3 2 200 sdk 到账是客户付款实际收到的钱；收入是按服务完成情况确认的金额，两者可能发生在不同月份。
+candidate 4 1 200 sdk 明白，你说的负责人是 Miranda，不是 Mira。你想查她负责的哪段时间、哪项数据？
+candidate 4 2 200 sdk 不是，Miranda 和 Mira 是不同的人。刚才我理解错了：你说的负责人是 **Mira**。
+candidate 5 1 200 sdk I can look up fictional demo bookings and reports, help explain the nu
+candidate 5 2 200 sdk A **gross receipt** is money received before subtracting refunds, fees
+candidate 6 1 200 sdk 你说的“她”是哪位？给我名字或订单号，我就能接着查。
+candidate 6 2 200 sdk 补充她的名字或订单号就行，我才能确定你说的是哪一单。
+candidate 7 1 200 sdk 在这份**虚构模拟数据**中，2026 年 9 月相比 8 月，两项金额都下降了：
+
+| 指标（加元） | 8 月 | 9 月 | 9 月较
+candidate 7 2 200 sdk 不能证明“经营变差了”。这份虚构模拟数据只能说明：**9 月做完的服务金额比 8 月少，9 月收到的款也更少**。但收款可能跨月；而且只比两
+candidate 8 1 200 sdk 按**婚礼服务完成日期**统计，这份虚构模拟数据的月度完成金额如下（加元，不是当月到账金额）：
+
+| 2026年 | 已完成婚礼 | 完成金
+candidate 8 2 200 sdk **还不够。**这份虚构模拟数据只显示，2026年6—8月每月完成了11—14单婚礼，完成金额为 CAD 17,870.00—CAD 23,
+candidate 9 1 200 sdk 按**2026年9月服务日期**统计的虚构模拟数据，记录数包含取消记录，完成金额仅计已完成服务：
+
+| 渠道 | 记录数 | 已完成金额 |

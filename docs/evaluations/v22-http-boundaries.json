@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-15T00:22:55.807Z",
+  "results": [
+    {
+      "name": "unauthenticated-cloud-history",
+      "status": 401,
+      "expected": 401,
+      "pass": true
+    },
+    {
+      "name": "forbidden-origin",
+      "status": 403,
+      "expected": 403,
+      "pass": true
+    },
+    {
+      "name": "get-rejected",
+      "status": 405,
+      "expected": 405,
+      "pass": true
+    },
+    {
+      "name": "invalid-request-id",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    }
+  ]
+}

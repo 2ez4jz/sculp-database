@@ -1,0 +1,418 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> test
+> node --test scripts/*.test.mjs
+
+✔ username normalization and internal mapping reject email inputs (1.114148ms)
+✔ unauthenticated, employee and disabled administrator cannot set passwords (6.336904ms)
+✔ admin creates account without sending email; provisioning failure removes auth orphan (1.607122ms)
+✔ admin password reset is audited without password; short password rejected (2.571149ms)
+✔ business/marketing/finance filter all (1.654972ms)
+✔ business/marketing/finance filter bridal (0.283466ms)
+✔ business/marketing/finance filter lesson (0.618138ms)
+✔ business/marketing/finance filter Google (0.500987ms)
+✔ business/marketing/finance filter June (0.303205ms)
+✔ business/marketing/finance filter bridal Google June (0.236608ms)
+✔ explicitly qualified commercial insights (1.115499ms)
+✔ knowledge cannot silently become business policy (0.356494ms)
+✔ 300 stable fictional orders, exact business mix (4.087017ms)
+✔ bridal summer concentration and monthly checksum (0.34022ms)
+✔ lessons use actual recurring dates, not random dates (0.546424ms)
+✔ report sums distinguish completed sales and received cash (0.202107ms)
+✔ records are isolated and cannot mutate subsequent fixture runs (1.069131ms)
+✖ two-step month comparison invokes separate exact reports and keeps chart sources (3.555756ms)
+✖ multi-step channel comparison preserves different scopes (1.056763ms)
+✖ rejects invalid date order and disallows non-demo contexts (1.018147ms)
+✖ Agent enforces six report calls and rejects analysis without verified sources (1.029033ms)
+✖ Agent SDK is explicitly opt in and fictional demo only (2.698366ms)
+✔ Agent tools access exact read only reports rather than arbitrary SQL (0.27917ms)
+✔ Analysis turns retain data sources for inline charts (0.361341ms)
+✔ automatic daily charts use exact full catalog figures and distinguish value from receipt dates (61.68016ms)
+✔ pie request inherits the previous exact intersection and never expands to the whole fixture (15.026876ms)
+✔ financial composition uses completed cents and calendar ranges anchored to supplied Toronto day (41.439846ms)
+✔ many artists choose readable bars, service composition chooses a donut, no ordinary chat decoration (26.60982ms)
+✔ different channel intersections compare together without implying revenue equals order count (66.91634ms)
+✔ same filter across periods chooses sorted trend with exact date metadata; unrelated filters do not (81.715862ms)
+✔ unknown prices, empty periods and future completion get explicit labels without fabricated values (53.345235ms)
+✔ schedule uses existing local times and labels unknown times rather than inventing a duration (1.55183ms)
+✔ rendering escapes labels, rejects invalid numeric values and supports English (13.556499ms)
+✔ receipt composition uses receipt dates and its own metric label (26.67093ms)
+✔ vague draw followup preserves receipt metric or status grouping from the previous question (32.879565ms)
+✔ charts show a grounded leading share and suggested check (3.141488ms)
+✔ financial double-metric chart does not claim a false category share (0.186695ms)
+✔ single category, empty and trend cases stay safe (20.349088ms)
+✔ comparable baseline is explained without invented causes (0.643986ms)
+✔ account RPCs enforce server roles, self-protection, revocation and audit (3665.287793ms)
+✔ HTTP boundary preserves origin, method, validation and rate responses (19.328138ms)
+✔ extraction and search retain structured output and filter unknown IDs (3.457782ms)
+✔ transcription preserves multipart model and response, rejects empty files (14.201203ms)
+✔ context extraction passes an explicit target and filters hallucinated destinations (7.696271ms)
+✔ entity intake has a separate review-only contract without requiring an existing target (0.977246ms)
+✔ channel catalog includes defaults and custom channels (0.983516ms)
+✔ unattributed booking never becomes an invented acquisition source (0.364967ms)
+✔ reject blank, too-short, and oversized channel names (0.213043ms)
+✔ cloud context enforces assignments, hides financial columns, isolates memory, respects inactive profiles (3258.375061ms)
+✔ conversation follows up through bounded tools and rejects invented references and save targets (6.272259ms)
+✔ failed query is an explicit unknown and tool loop stops (1.047139ms)
+✔ cloud handler verifies identity before DB and ignores client-supplied business context (41.49016ms)
+✔ cloud monthly tool reads and caches exact months without booking references (1.085335ms)
+✔ monthly tool is unavailable to artists and fictional demo; forged tool call cannot query (0.76869ms)
+✔ failed, malformed and filtered monthly requests never produce invented report sources (0.734409ms)
+✔ history hides previously authorized financial aggregates after role downgrade (11.756199ms)
+✔ authenticated monthly chat uses caller token and canonical RPC, ignores forged report context (4.048721ms)
+✔ follow-up derived from financial history retains access marker (0.391055ms)
+✔ full migration chain: canonical table access, role matrix, disabled accounts and source isolation (3524.80093ms)
+✔ confirmed edits preserve timestamps, reject stale writes, deduplicate retry and audit exact before/after (1587.368288ms)
+✔ cloud month report: Toronto boundaries, line totals, missing prices, gross receipts and refund limitations (1490.575151ms)
+﹣ two PostgreSQL connections: concurrent edits conflict; simultaneous retry executes only once (1418.694753ms) # Multi-connection locking requires SCULPY_TEST_DATABASE_URL; covered by PostgreSQL CI job.
+✔ cloud report formats integer cents exactly, including values beyond floating point precision (1.276517ms)
+✔ employee can annotate assigned entities and propose client preferences without opening CRM (1.974452ms)
+✔ unknown AI targets and wrong preference targets are ignored; financial change remains an application (0.274404ms)
+✔ failed browser write is atomic and retries do not duplicate the batch (0.426267ms)
+✔ cloud cannot silently fall back to local persistence (0.544039ms)
+✔ staff cannot read another employee pending management request (0.25881ms)
+✔ intake leaves ambiguous IDs and unknown fields empty; validates real calendar dates (1.81705ms)
+✔ entity and original source are persisted together or neither is saved (2.371656ms)
+✔ daily report, month-to-date cutoff and future completion quality use full 300 records (33.895158ms)
+✔ AND combinations and group totals distinguish artist participation from lead responsibility (52.368408ms)
+✔ receipts use actual receipt date independently; unknowns are not converted to priced zero (18.402532ms)
+✔ exact demo reports are unavailable in cloud and limited employee contexts; tool failures cannot become figures (4.937718ms)
+✔ basic visual answer uses exact tool cents even if AI invents totals or chart code (10.998195ms)
+✔ revenue includes both 30-day boundaries, excludes cancelled and old records, and does not mutate input (12.534903ms)
+✔ fixture anchor is opt-in; demo defaults to the real calendar (0.372377ms)
+✔ employee catalog excludes other bookings, notes, internal partner fields and global prices (0.988843ms)
+✔ cloud AI endpoint: unauthenticated/inactive/staff blocked before model; read-only extraction contract (16.586628ms)
+✔ cloud intake: atomic create, source fidelity, replay, duplicates, dates, RLS, cross-session read (3410.758444ms)
+✔ context memory SQL validates permissions, commits atomically, audits and deduplicates (3384.470431ms)
+✔ three-month question produces verified deterministic values and a chart (14.290354ms)
+✔ employee cannot see amounts (0.326961ms)
+✔ unrelated chat stays with AI (0.146866ms)
+✔ unknown months return zeros rather than invented income (0.560704ms)
+✔ this month and last month use the Toronto current calendar month (4.220132ms)
+✔ service revenue pie request preserves existing service chart route (0.222367ms)
+✔ monthly analysis shows expected demo September totals (16.056669ms)
+✔ artist cannot render global revenue analytics (0.245781ms)
+✔ empty dataset has no charts (0.149971ms)
+✔ cancelled not counted as active, and missing price is not invented (3.965458ms)
+✔ handles month boundaries, invalid dates and non-CAD amounts (0.374621ms)
+✔ 300-order September has 26 active records and 21 completed bookings totaling CAD 19685 (2.23855ms)
+✔ October 2026 has 19 active bookings, 14 completed (0.472134ms)
+✔ artist is denied global business figures (0.379097ms)
+✔ increase, decline and zero baseline do not invent growth (1.26572ms)
+✔ missing or invalid report cannot produce a confident recommendation (0.714801ms)
+✔ finance warning and unknown-price gate (0.341442ms)
+✔ recommendations remain proposals pending approval (0.431614ms)
+✔ calendar periods use Toronto current month, including empty months and year rollover (15.265717ms)
+✔ explicit months, ranges, years and quarters respect their requested calendar period (0.960281ms)
+✔ demo adapter attaches only requested fixture chart months and never calls cloud reporting (13.713776ms)
+✔ daily, cutoff and intersection questions never show a conflicting full-month chart or local answer (12.690932ms)
+(node:275) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ fallback chart dates honor last year, quarters and explicit cutoffs (137.692594ms)
+✔ period and trend charts retain missing-price caveats and real changes (126.965628ms)
+✔ AI summary does not invent CAD prices or receipt months for invalid data (2.622164ms)
+✔ visual analysis preserves the requested explanation instead of replacing it with a fixed summary (12.683331ms)
+✔ SDK routing keeps order queries, notes and record changes on the original flow (0.94609ms)
+✖ actual handler gates SDK by scope/fixture and safely falls back on runtime failure (36.110313ms)
+✔ saved report summaries exclude full samples/groups and keep follow-up payload bounded (5.66784ms)
+✔ large or old SDK histories trim oldest wire turns while keeping the visible history intact (87.734727ms)
+✔ legacy service chart uses the actual trailing 30 days and excludes invalid prices (0.642304ms)
+✔ dashboard always displays three fixed overview charts (18.889973ms)
+✔ conversation data never replaces fixed dashboard (12.591637ms)
+✔ restricted roles cannot see dashboard charts (4.383964ms)
+✔ sole 300-order baseline matches advisor fixture and all channel totals (29.061192ms)
+✔ confirmed edits update canonical reporting, actual receipt month, channels; replay and stale edits are safe (11.066736ms)
+✔ unknown price stays unknown; clearing a source does not restore the old source (0.705837ms)
+✔ old 24-order state and chats are deleted; reset only clears current fictional data (19.986084ms)
+✔ V2.1: model guidance defaults to evidence and everyday explanation, with a low-risk suggested check (1.182479ms)
+✔ V2.1: one-dimensional service and channel breakdowns reconcile on exact denominator (131.266239ms)
+✔ V2.1: explanations disclose scope, CAD, service value and receipt caveats (16.693855ms)
+✔ V2.1: negative amount and unpriced revenue are not fabricated into service value (4.831594ms)
+✔ V2.1: each calendar month independently reconciles order values and dated receipts (724.892409ms)
+✔ V2.1: collaborators do not double overall booking value (7.811796ms)
+✔ V2.1: no price or undocumented refunds can become net profit (4.140768ms)
+✔ Dashboard and Sculpy chat use separate routes with inline conversation charts (1.182789ms)
+✔ three default diagrams use the same full fictional catalog (161.345816ms)
+✔ V2.2 memory persists across conversations; approval/correction/revocation, audit and role boundaries (2066.041593ms)
+ℹ tests 129
+ℹ suites 0
+ℹ pass 122
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 8358.266651
+
+✖ failing tests:
+
+test at scripts/agent-multistep.test.mjs:32:1
+✖ two-step month comparison invokes separate exact reports and keeps chart sources (3.555756ms)
+  ReferenceError: conversationInstructions is not defined
+      at Object.runSculpyDemoAgent [as entry] (evalmachine.<anonymous>:35:28)
+      at TestContext.<anonymous> (file:///workspace/scratch/6a4cf4d051e2/sculp-database/scripts/agent-multistep.test.mjs:41:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at scripts/agent-multistep.test.mjs:49:1
+✖ multi-step channel comparison preserves different scopes (1.056763ms)
+  ReferenceError: conversationInstructions is not defined
+      at Object.runSculpyDemoAgent [as entry] (evalmachine.<anonymous>:35:28)
+      at TestContext.<anonymous> (file:///workspace/scratch/6a4cf4d051e2/sculp-database/scripts/agent-multistep.test.mjs:57:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at scripts/agent-multistep.test.mjs:60:1
+✖ rejects invalid date order and disallows non-demo contexts (1.018147ms)
+  ReferenceError: conversationInstructions is not defined
+      at Object.runSculpyDemoAgent [as entry] (evalmachine.<anonymous>:35:28)
+      at TestContext.<anonymous> (file:///workspace/scratch/6a4cf4d051e2/sculp-database/scripts/agent-multistep.test.mjs:65:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at scripts/agent-multistep.test.mjs:71:1
+✖ Agent enforces six report calls and rejects analysis without verified sources (1.029033ms)
+  ReferenceError: conversationInstructions is not defined
+      at Object.runSculpyDemoAgent [as entry] (evalmachine.<anonymous>:35:28)
+      at TestContext.<anonymous> (file:///workspace/scratch/6a4cf4d051e2/sculp-database/scripts/agent-multistep.test.mjs:77:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at scripts/agent-sdk-integration.test.mjs:7:1
+✖ Agent SDK is explicitly opt in and fictional demo only (2.698366ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /new URLSearchParams\(location\.search\)\.get\("agent"\) === "sdk"/. Input:
+  
+  'import {buildAnalysisCharts,wantsAnalysisVisual} from "../components/analysis/charts.js";\n' +
+    'import { config } from "../config.js";\n' +
+    'import { advisorRowsFromBookings, advisorSnapshot } from "../domain/demo-workspace.js";\n' +
+    'import { reportMonths } from "../domain/report-period.js";\n' +
+    'import { advisorMetrics } from "../domain/advisor-engine.js";\n' +
+    'import { boundedDemoRequest } from "../domain/chat-history.js";\n' +
+    'export async function chatRequest(body, supabase) {\n' +
+    '  const headers = { "content-type": "application/json" };\n' +
+    '  if (supabase) {\n' +
+    '    const { data, error } = await supabase.auth.getSession();\n' +
+    '    if (error || !data.session) throw Error("请重新登录。");\n' +
+    '    headers.authorization = `Bearer ${data.session.access_token}`;\n' +
+    '    headers.apikey = config.supabasePublishableKey;\n' +
+    '  }\n' +
+    '  const response = await fetch(\n' +
+    '    `${config.supabaseUrl}/functions/v1/sculpy-chat`,\n' +
+    '    {\n' +
+    '      method: "POST",\n' +
+    '      headers,\n' +
+    '      body: JSON.stringify(body),\n' +
+    '      signal: AbortSignal.timeout(180000),\n' +
+    '    },\n' +
+    '  );\n' +
+    '  const data = await response\n' +
+    '    .json()\n' +
+    '    .catch(() => ({ error: "服务未返回完整结果。" }));\n' +
+    '  if (!response.ok) throw Error(data.error || "请求失败，请重试。");\n' +
+    '  return data;\n' +
+    '}\n' +
+    'export function demoChatAdapter({\n' +
+    '  getIdentity,\n' +
+    '  getCatalog,\n' +
+    '  getContext,\n' +
+    '  getAdvisorRows,\n' +
+    '  saveBatch,\n' +
+    '  resolveLocal = () => null,\n' +
+    '}) {\n' +
+    '  const key = () => `sculpy-chat-300-v2:${getIdentity()}`;\n' +
+    '  const read = (storageKey = key()) => {\n' +
+    '    try {\n' +
+    '      return JSON.parse(localStorage.getItem(storageKey) || "{}");\n' +
+    '    } catch {\n' +
+    '      return {};\n' +
+    '    }\n' +
+    '  };\n' +
+    '  const write = (value, storageKey = key()) => {\n' +
+    '    localStorage.setItem(storageKey, JSON.stringify(value));\n' +
+    '  };\n' +
+    '  return {\n' +
+    '    mode: "demo",\n' +
+    '    identity: getIdentity,\n' +
+    '    async load(scope) {\n' +
+    '      const state = read();\n' +
+    '      return {\n' +
+    '        turns: state[scope] || [],\n' +
+    '        preferences: state.preferences || {\n' +
+    '          verbosity: "detailed",\n' +
+    '          instructions: "",\n' +
+    '        },\n' +
+    '      };\n' +
+    '    },\n' +
+    '    async preferences(value) {\n' +
+    '      const state = read();\n' +
+    '      write({ ...state, preferences: value });\n' +
+    '    },\n' +
+    '    async send(scope, body) {\n' +
+    '      const storageKey = key(),\n' +
+    '        state = read(storageKey),\n' +
+    '        history = state[scope] || [];\n' +
+    '      let result;\n' +
+    '      const catalog=getCatalog();\n' +
+    '      const rows = getAdvisorRows ? getAdvisorRows() : advisorRowsFromBookings(getCatalog().bookings);\n' +
+    '      const preserveChart = /(?:饼图|pie)/i.test(body.message) && !/(?:300|虚拟|虚构|fictional|fixture)/i.test(body.message);\n' +
+    '      const scopedReport = /(?:日报|daily|截至|as of|今日|[今昨明]天|组合|交叉|渠道|channel|婚礼|Wedding|化妆师|artist|Instagram|Google|Michelle|Miranda|Emily|Elaine|Giselle|Angelina|Yuki|Mira)/i.test(body.message);\n' +
+    '      const local = wantsAnalysisVisual(body.message) || scopedReport || !preserveChart && /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);\n' +
+    '      if (local) result = { turn: { ...local, id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };\n' +
+    '      else if (config.aiMode === "mock")\n' +
+    '        result = {\n' +
+    '          turn: {\n' +
+    '            id: body.requestId,\n' +
+    '            user: body.message,\n' +
+    '            answer:\n' +
+    '              "这是模拟聊天回复。连续对话和个人偏好已保留；在线模式会读取相关订单再回答。",\n' +
+    '            references: [],\n' +
+    '            proposals: [],\n' +
+    '            sourceIds: [],\n' +
+    '            createdAt: new Date().toISOString(),\n' +
+    '          },\n' +
+    '        };\n' +
+    '      else\n' +
+    '        result = await chatRequest(boundedDemoRequest({\n' +
+    '          mode: "demo",\n' +
+    '          agentMode: new URLSearchParams(location.search).get("agent") === "legacy" ? undefined : "sdk",\n' +
+    '          ...body,\n' +
+    '          bookingId: scope === "global" ? null : scope,\n' +
+    '          catalog,\n' +
+    '          advisorFixture: getContext().role === "admin" ? advisorSnapshot(rows) : null,\n' +
+    '          turns: history.slice(-12),\n' +
+    '          preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\\n") },\n' +
+    '        }));\n' +
+    '      if (!scopedReport && !preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {\n' +
+    '        result.turn.chartKey = "monthly-analytics";\n' +
+    '        result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));\n' +
+    '      }\n' +
+    '      if(scope === "global" && getContext().role === "admin") {\n' +
+    "        result.turn.analysisCharts=buildAnalysisCharts({message:body.message,bookings:catalog.bookings,reports:result.turn.demoReportSources||[],previousReports:[...history].reverse().find(t=>t.demoReportSources?.length)?.demoReportSources||[],previousMessage:[...history].reverse().find(t=>t.demoReportSources?.length)?.user||''});\n" +
+    '        if(result.turn.analysisCharts.length){delete result.turn.chartKey;delete result.turn.chartRows;}\n' +
+    '      }\n' +
+    '      const fresh = read(storageKey);\n' +
+    '      write(\n' +
+    '        {\n' +
+    '          ...fresh,\n' +
+    '          [scope]: [...(fresh[scope] || []), result.turn].slice(-100),\n' +
+    '        },\n' +
+    '        storageKey,\n' +
+    '      );\n' +
+    '      return result.turn;\n' +
+    '    },\n' +
+    '    async save(proposal, turn) {\n' +
+    '      const context = getContext();\n' +
+    '      return saveBatch({\n' +
+    '        id: proposal.id,\n' +
+    '        entityType: "booking",\n' +
+    '        entityId: proposal.bookingId,\n' +
+    '        rawText: turn.user,\n' +
+    '        inputType: "text",\n' +
+    '        createdBy:\n' +
+    '          context.role === "admin" ? context.adminPersona : context.artistId,\n' +
+    '        createdAt: new Date().toISOString(),\n' +
+    '        items: [\n' +
+    '          {\n' +
+    '            id: crypto.randomUUID(),\n' +
+    '            kind: proposal.kind,\n' +
+    '            entityType: "booking",\n' +
+    '            entityId: proposal.bookingId,\n' +
+    '            text: proposal.text,\n' +
+    '            status: proposal.kind === "change" ? "pending_review" : "confirmed",\n' +
+    '            dueDate: null,\n' +
+    '            assigneeId: null,\n' +
+    '          },\n' +
+    '        ],\n' +
+    '      });\n' +
+    '    },\n' +
+    '  };\n' +
+    '}\n' +
+    'export function cloudChatAdapter(supabase, profile) {\n' +
+    '  return {\n' +
+    '    memory: ["owner","operations"].includes(profile.role) ? {\n' +
+    '      async list(){const {data,error}=await supabase.from("sculpy_operating_memory").select("*").order("updated_at",{ascending:false}).limit(100);if(error)throw Error("经营记忆读取失败，请检查管理员权限。");return data;},\n' +
+    '      async manage({action,id,revision=null,content=null,supersedes=null}){const {data,error}=await supabase.rpc("sculpy_manage_memory",{p_action:action,p_id:id,p_revision:revision,p_content:content,p_supersedes:supersedes});if(error)throw Error("记忆操作未完成，可能权限不足或记录已变化，请重新读取核对。");return data;}\n' +
+    '    } : null,\n' +
+    '    mode: "cloud",\n' +
+    '    identity: () => profile.id,\n' +
+    '    async load(scope) {\n' +
+    '      return chatRequest(\n' +
+    '        { action: "history", bookingId: scope === "global" ? null : scope },\n' +
+    '        supabase,\n' +
+    '      );\n' +
+    '    },\n' +
+    '    async preferences(value) {\n' +
+    '      const { error } = await supabase\n' +
+    '        .from("sculpy_preferences")\n' +
+    '        .upsert({\n' +
+    '          user_id: profile.id,\n' +
+    '          ...value,\n' +
+    '          updated_at: new Date().toISOString(),\n' +
+    '        });\n' +
+    '      if (error) throw Error("偏好保存失败，请重试。");\n' +
+    '    },\n' +
+    '    async send(scope, body) {\n' +
+    '      return (\n' +
+    '        await chatRequest(\n' +
+    '          { ...body, bookingId: scope === "global" ? null : scope },\n' +
+    '          supabase,\n' +
+    '        )\n' +
+    '      ).turn;\n' +
+    '    },\n' +
+    '    async save(proposal, turn) {\n' +
+    '      const { data, error } = await supabase.rpc("save_context_memory", {\n' +
+    '        p_request_id: proposal.id,\n' +
+    '        p_entity_type: "booking",\n' +
+    '        p_entity_id: proposal.bookingId,\n' +
+    '        p_raw_text: turn.user,\n' +
+    '        p_input_type: "text",\n' +
+    '        p_items: [\n' +
+    '          {\n' +
+    '            kind: proposal.kind,\n' +
+    '            entityType: "booking",\n' +
+    '            entityId: proposal.bookingId,\n' +
+    '            text: proposal.text,\n' +
+    '            dueDate: null,\n' +
+    '            assigneeId: null,\n' +
+    '          },\n' +
+    '        ],\n' +
+    '      });\n' +
+    '      if (error || !data?.id)\n' +
+    '        throw Error("保存失败，内容仍保留，请检查权限后重试。");\n' +
+    '      return data;\n' +
+    '    },\n' +
+    '  };\n' +
+    '}\n'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/6a4cf4d051e2/sculp-database/scripts/agent-sdk-integration.test.mjs:10:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'import {buildAnalysisCharts,wantsAnalysisVisual} from "../components/analysis/charts.js";\nimport { config } from "../config.js";\nimport { advisorRowsFromBookings, advisorSnapshot } from "../domain/demo-workspace.js";\nimport { reportMonths } from "../domain/report-period.js";\nimport { advisorMetrics } from "../domain/advisor-engine.js";\nimport { boundedDemoRequest } from "../domain/chat-history.js";\nexport async function chatRequest(body, supabase) {\n  const headers = { "content-type": "application/json" };\n  if (supabase) {\n    const { data, error } = await supabase.auth.getSession();\n    if (error || !data.session) throw Error("请重新登录。");\n    headers.authorization = `Bearer ${data.session.access_token}`;\n    headers.apikey = config.supabasePublishableKey;\n  }\n  const response = await fetch(\n    `${config.supabaseUrl}/functions/v1/sculpy-chat`,\n    {\n      method: "POST",\n      headers,\n      body: JSON.stringify(body),\n      signal: AbortSignal.timeout(180000),\n    },\n  );\n  const data = await response\n    .json()\n    .catch(() => ({ error: "服务未返回完整结果。" }));\n  if (!response.ok) throw Error(data.error || "请求失败，请重试。");\n  return data;\n}\nexport function demoChatAdapter({\n  getIdentity,\n  getCatalog,\n  getContext,\n  getAdvisorRows,\n  saveBatch,\n  resolveLocal = () => null,\n}) {\n  const key = () => `sculpy-chat-300-v2:${getIdentity()}`;\n  const read = (storageKey = key()) => {\n    try {\n      return JSON.parse(localStorage.getItem(storageKey) || "{}");\n    } catch {\n      return {};\n    }\n  };\n  const write = (value, storageKey = key()) => {\n    localStorage.setItem(storageKey, JSON.stringify(value));\n  };\n  return {\n    mode: "demo",\n    identity: getIdentity,\n    async load(scope) {\n      const state = read();\n      return {\n        turns: state[scope] || [],\n        preferences: state.preferences || {\n          verbosity: "detailed",\n          instructions: "",\n        },\n      };\n    },\n    async preferences(value) {\n      const state = read();\n      write({ ...state, preferences: value });\n    },\n    async send(scope, body) {\n      const storageKey = key(),\n        state = read(storageKey),\n        history = state[scope] || [];\n      let result;\n      const catalog=getCatalog();\n      const rows = getAdvisorRows ? getAdvisorRows() : advisorRowsFromBookings(getCatalog().bookings);\n      const preserveChart = /(?:饼图|pie)/i.test(body.message) && !/(?:300|虚拟|虚构|fictional|fixture)/i.test(body.message);\n      const scopedReport = /(?:日报|daily|截至|as of|今日|[今昨明]天|组合|交叉|渠道|channel|婚礼|Wedding|化妆师|artist|Instagram|Google|Michelle|Miranda|Emily|Elaine|Giselle|Angelina|Yuki|Mira)/i.test(body.message);\n      const local = wantsAnalysisVisual(body.message) || scopedReport || !preserveChart && /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);\n      if (local) result = { turn: { ...local, id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };\n      else if (config.aiMode === "mock")\n        result = {\n          turn: {\n            id: body.requestId,\n            user: body.message,\n            answer:\n              "这是模拟聊天回复。连续对话和个人偏好已保留；在线模式会读取相关订单再回答。",\n            references: [],\n            proposals: [],\n            sourceIds: [],\n            createdAt: new Date().toISOString(),\n          },\n        };\n      else\n        result = await chatRequest(boundedDemoRequest({\n          mode: "demo",\n          agentMode: new URLSearchParams(location.search).get("agent") === "legacy" ? undefined : "sdk",\n          ...body,\n          bookingId: scope === "global" ? null : scope,\n          catalog,\n          advisorFixture: getContext().role === "admin" ? advisorSnapshot(rows) : null,\n          turns: history.slice(-12),\n          preferences: { ...state.preferences, instructions: [state.preferences?.instructions, window.DemoI18n?.language === "zh" ? "请用中文回复。" : "Please respond in English, including summaries and suggestions."].filter(Boolean).join("\\n") },\n        }));\n      if (!scopedReport && !preserveChart && scope === "global" && getContext().role === "admin" && /(?:月|month|季度|quarter|趋势|trend)/i.test(body.message)) {\n        result.turn.chartKey = "monthly-analytics";\n        result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));\n      }\n      if(scope === "global" && getContext().role === "admin") {\n        result.turn.analysisCharts=buildAnalysisCharts({message:body.message,bookings:catalog.bookings,reports:result.turn.demoReportSources||[],previousReports:[...history].reverse().find(t=>t.demoReportSources?.length)?.demoReportSources||[],previousMessage:[...history].reverse().find(t=>t.demoReportSources?.length)?.user||\'\'});\n        if(result.turn.analysisCharts.length){delete result.turn.chartKey;delete result.turn.chartRows;}\n      }\n      const fresh = read(storageKey);\n      write(\n        {\n          ...fresh,\n          [scope]: [...(fresh[scope] || []), result.turn].slice(-100),\n        },\n        storageKey,\n      );\n      return result.turn;\n    },\n    async save(proposal, turn) {\n      const context = getContext();\n      return saveBatch({\n        id: proposal.id,\n        entityType: "booking",\n        entityId: proposal.bookingId,\n        rawText: turn.user,\n        inputType: "text",\n        createdBy:\n          context.role === "admin" ? context.adminPersona : context.artistId,\n        createdAt: new Date().toISOString(),\n        items: [\n          {\n            id: crypto.randomUUID(),\n            kind: proposal.kind,\n            entityType: "booking",\n            entityId: proposal.bookingId,\n            text: proposal.text,\n            status: proposal.kind === "change" ? "pending_review" : "confirmed",\n            dueDate: null,\n            assigneeId: null,\n          },\n        ],\n      });\n    },\n  };\n}\nexport function cloudChatAdapter(supabase, profile) {\n  return {\n    memory: ["owner","operations"].includes(profile.role) ? {\n      async list(){const {data,error}=await supabase.from("sculpy_operating_memory").select("*").order("updated_at",{ascending:false}).limit(100);if(error)throw Error("经营记忆读取失败，请检查管理员权限。");return data;},\n      async manage({action,id,revision=null,content=null,supersedes=null}){const {data,error}=await supabase.rpc("sculpy_manage_memory",{p_action:action,p_id:id,p_revision:revision,p_content:content,p_supersedes:supersedes});if(error)throw Error("记忆操作未完成，可能权限不足或记录已变化，请重新读取核对。");return data;}\n    } : null,\n    mode: "cloud",\n    identity: () => profile.id,\n    async load(scope) {\n      return chatRequest(\n        { action: "history", bookingId: scope === "global" ? null : scope },\n        supabase,\n      );\n    },\n    async preferences(value) {\n      const { error } = await supabase\n        .from("sculpy_preferences")\n        .upsert({\n          user_id: profile.id,\n          ...value,\n          updated_at: new Date().toISOString(),\n        });\n      if (error) throw Error("偏好保存失败，请重试。");\n    },\n    async send(scope, body) {\n      return (\n        await chatRequest(\n          { ...body, bookingId: scope === "global" ? null : scope },\n          supabase,\n        )\n      ).turn;\n    },\n    async save(proposal, turn) {\n      const { data, error } = await supabase.rpc("save_context_memory", {\n        p_request_id: proposal.id,\n        p_entity_type: "booking",\n        p_entity_id: proposal.bookingId,\n        p_raw_text: turn.user,\n        p_input_type: "text",\n        p_items: [\n          {\n            kind: proposal.kind,\n            entityType: "booking",\n            entityId: proposal.bookingId,\n            text: proposal.text,\n            dueDate: null,\n            assigneeId: null,\n          },\n        ],\n      });\n      if (error || !data?.id)\n        throw Error("保存失败，内容仍保留，请检查权限后重试。");\n      return data;\n    },\n  };\n}\n',
+    expected: /new URLSearchParams\(location\.search\)\.get\("agent"\) === "sdk"/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at scripts/review-regressions.test.mjs:59:1
+✖ actual handler gates SDK by scope/fixture and safely falls back on runtime failure (36.110313ms)
+  TypeError: Cannot read properties of undefined (reading 'engine')
+      at TestContext.<anonymous> (file:///workspace/scratch/6a4cf4d051e2/sculp-database/scripts/review-regressions.test.mjs:69:37)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

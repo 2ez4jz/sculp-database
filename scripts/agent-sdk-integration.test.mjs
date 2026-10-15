@@ -4,10 +4,10 @@ import {readFileSync} from 'node:fs';
 const agent=readFileSync(new URL('../supabase/functions/sculpy-chat/agent.ts',import.meta.url),'utf8');
 const handler=readFileSync(new URL('../supabase/functions/sculpy-chat/handler.ts',import.meta.url),'utf8');
 const client=readFileSync(new URL('../src/services/chat.js',import.meta.url),'utf8');
-test('Agent SDK is explicitly opt in and fictional demo only',()=>{
+test('Agent SDK defaults on in fictional admin demo; legacy rollback remains available',()=>{
  assert.match(handler,/demo && env\("SCULPY_AGENT_DEMO_ENABLED"\) !== "false" && body\.agentMode === "sdk"/);
  assert.match(handler,/converse\(/);
- assert.match(client,/new URLSearchParams\(location\.search\)\.get\("agent"\) === "sdk"/);
+ assert.match(client,/new URLSearchParams\(location\.search\)\.get\("agent"\) === "legacy"/);
 });
 test('Agent tools access exact read only reports rather than arbitrary SQL',()=>{
  assert.match(agent,/from "npm:@openai\/agents@0\.20\.0"/);
