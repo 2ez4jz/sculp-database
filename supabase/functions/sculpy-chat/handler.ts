@@ -258,7 +258,7 @@ export async function handleRequest(req: Request) {
       id: body.requestId,
       user: message,
       ...result,
-      ...(context.operatingMemory?.length ? {operatingMemoryUsed:true,memorySourceIds:context.operatingMemory.map((m:any)=>m.id)} : {}),
+      ...((context.operatingMemory?.length || turns.some((t:any)=>t.operatingMemoryUsed)) ? {operatingMemoryUsed:true,memorySourceIds:(context.operatingMemory||[]).map((m:any)=>m.id)} : {}),
       createdAt: new Date().toISOString(),
     };
     if (!demo) {
