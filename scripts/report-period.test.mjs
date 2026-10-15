@@ -34,9 +34,8 @@ test('demo adapter attaches only requested fixture chart months and never calls 
   globalThis.fetch=async(url,options)=>{payload=JSON.parse(options.body);return Response.json({turn:{id:payload.requestId,user:payload.message,answer:'fixture reply'}});};
   const adapter=demoChatAdapter({getIdentity:()=> 'test',getCatalog:()=>({bookings}),getAdvisorRows:()=>advisorRowsFromBookings(bookings),getContext:()=>({role:'admin'}),saveBatch:()=>{}});
   const turn=await adapter.send('global',{requestId:crypto.randomUUID(),message:'2026-09 month revenue chart'});
-  assert(turn.analysisCharts.length>0);
-  assert(turn.analysisCharts.every(c=>c.from==='2026-09-01'&&c.to==='2026-09-30'));
-  assert(turn.analysisCharts.some(c=>c.current?.completedAmountCents===1968500));
+  assert.deepEqual(turn.chartRows.map(r=>r.month),['2026-09']);
+  assert.equal(turn.chartRows[0].amountCents,1968500);
   assert.equal(payload.mode,'demo');assert.equal(payload.advisorFixture.summary.total,300);
   assert.equal(payload.advisorFixture.byMonth[8].month,'2026-09');
  }finally{globalThis.fetch=oldFetch;globalThis.localStorage=oldStorage;globalThis.window=oldWindow;globalThis.location=oldLocation;}

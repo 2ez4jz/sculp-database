@@ -11,7 +11,7 @@ const assert=require("node:assert/strict");
   });
   await page.goto("http://localhost:4173/?demo=1#sculpy");
   await page.locator("#chat-input").waitFor();
-  await page.locator("#chat-input").fill("过去三个月收入和订单变化，分析一下");
+  await page.locator("#chat-input").fill("过去三个月收入和订单变化，用图分析一下");
   await page.locator("[data-send]").click();
   await page.locator(".chat-assistant .sculpy-monthly-chart").waitFor();
   const t=await page.locator(".chat-answer").last().innerText();

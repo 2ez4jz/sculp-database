@@ -108,7 +108,7 @@ export function demoChatAdapter({
         result.turn.chartKey = "monthly-analytics";
         result.turn.chartRows = reportMonths(body.message).map(month => ({month,amountCents:advisorMetrics(rows,{month}).completedCents}));
       }
-      if(wantsChatVisual(body.message) && scope === "global" && getContext().role === "admin") {
+      if(wantsChatVisual(body.message) && scope === "global" && getContext().role === "admin" && (!result.turn.chartKey || result.turn.demoReportSources?.length)) {
         result.turn.analysisCharts=buildAnalysisCharts({message:body.message,bookings:catalog.bookings,reports:result.turn.demoReportSources||[],previousReports:[...history].reverse().find(t=>t.demoReportSources?.length)?.demoReportSources||[],previousMessage:[...history].reverse().find(t=>t.demoReportSources?.length)?.user||''});
         if(result.turn.analysisCharts.length){delete result.turn.chartKey;delete result.turn.chartRows;}
       }
