@@ -79,10 +79,11 @@ export function demoChatAdapter({
       const preserveChart = /(?:饼图|pie)/i.test(body.message) && !/(?:300|虚拟|虚构|fictional|fixture)/i.test(body.message);
       const scopedReport = /(?:日报|daily|截至|as of|今日|[今昨明]天|组合|交叉|渠道|channel|婚礼|Wedding|化妆师|artist|Instagram|Google|Michelle|Miranda|Emily|Elaine|Giselle|Angelina|Yuki|Mira)/i.test(body.message);
       const local = wantsAnalysisVisual(body.message) || scopedReport || !preserveChart && /(?:300|虚拟|虚构|fictional|fixture|模拟|商业|获客|财务|利润|渠道|分析|analysis|analy[sz]e|profit|channel|acquisition|revenue|收入|营收|月|month)/i.test(body.message) ? null : resolveLocal(body.message);
-      if (local) result = { turn: { ...local, id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };
+      if (local) result = { turn: { ...local, engine:"local", id: body.requestId, user: body.message, createdAt: new Date().toISOString() } };
       else if (config.aiMode === "mock")
         result = {
           turn: {
+            engine:"mock",
             id: body.requestId,
             user: body.message,
             answer:

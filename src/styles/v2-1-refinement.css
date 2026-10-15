@@ -94,3 +94,12 @@ tbody tr:hover{background:#f7f8f4}
  .sculpy-dashboard-grid .analysis-line{display:block;width:100%;height:auto}
  .sculpy-dashboard-grid .analysis-legend>div{gap:7px}
 }
+
+.dashboard-date-form{display:flex;align-items:end;flex-wrap:wrap;gap:12px;padding:16px;margin:0 0 12px;border:1px solid var(--line);border-radius:var(--ui-radius);background:var(--paper)}
+.dashboard-date-form label{display:grid;gap:6px;font-size:12px;color:var(--muted);min-width:0}
+.dashboard-date-form input{box-sizing:border-box;min-width:0;max-width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fffdf9;color:var(--ink);font:inherit;font-size:14px;font-variant-numeric:tabular-nums}
+.dashboard-date-form button{min-height:40px;white-space:nowrap}
+.dashboard-date-presets{display:flex;flex-wrap:wrap;gap:8px}
+.dashboard-date-error{flex-basis:100%;margin:0;color:#9e392c;font-size:13px}
+.dashboard-date-scope{margin:0 0 18px;font-size:12px;line-height:1.7;color:var(--muted);font-variant-numeric:tabular-nums}
+@media(max-width:620px){.dashboard-date-form{gap:10px;padding:12px}.dashboard-date-form label{flex:1 1 130px}.dashboard-date-form>button{width:100%}.dashboard-date-presets{width:100%}.dashboard-date-presets button{flex:1;padding:8px}}
