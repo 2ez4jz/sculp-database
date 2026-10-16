@@ -2,6 +2,9 @@
 /* Stop accidental double-tap zoom across content as well as controls.
    Panning, deliberate pinch zoom and browser accessibility zoom remain available. */
 html{touch-action:manipulation}
+/* Keep the presentation mascot a surprise until the assistant is opened. */
+#nav a[href="#sculpy"]:not(.active) .sculpy-nav-avatar{background:linear-gradient(135deg,#fff9,#dce5daaa);border:1px solid #ffffff80;box-shadow:inset 0 0 8px #ffffff70}
+#nav a[href="#sculpy"]:not(.active) .sculpy-nav-avatar img{filter:blur(6px);opacity:.35}
 /* Cover dialogs, floating chat and landscape/touch devices too. Small form text
    can trigger Safari focus zoom even when the surrounding page fits the screen. */
 @media(max-width:850px),(hover:none) and (pointer:coarse){

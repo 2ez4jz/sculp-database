@@ -1,0 +1,16 @@
+.pwa-install-link{display:block;font-size:13px;border:1px solid #cbd5c5;background:#f7f9f1;color:#3e5148;border-radius:9px;padding:9px 13px;margin:0 0 18px;text-align:center}
+.auth-content>.pwa-install-link{align-self:flex-start;order:5;margin:18px 0 0}
+.pwa-install-link[hidden]{display:none}
+.pwa-settings-card{margin-top:22px}.pwa-settings-card p{font-size:14px;color:var(--muted)}
+.pwa-install-dialog{width:440px;max-width:calc(100vw - 28px);max-height:calc(100dvh - 28px);padding:28px;border-radius:22px;background:#fffefb;color:#292b26;overflow:auto;box-shadow:0 24px 80px #15221933}
+.pwa-install-dialog::backdrop{background:#1d2a2580;backdrop-filter:blur(5px)}
+.pwa-install-dialog .pwa-icon{width:64px;height:64px;border-radius:15px;margin:0 0 17px}
+.pwa-install-dialog h2{font-size:22px;line-height:1.4;margin:0 0 12px}
+.pwa-install-dialog>p{text-align:left;font-size:14px;line-height:1.7;margin:10px 0;overflow-wrap:anywhere}
+.pwa-install-dialog ol{padding-left:22px;margin:20px 0;line-height:1.8;font-size:15px}.pwa-install-dialog li{padding:0 0 10px 4px}
+.pwa-install-dialog .pwa-install-note{font-size:12px;background:#f1f3eb;color:#67715f;padding:12px;border-radius:10px}
+.pwa-install-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+.pwa-install-dialog button{min-height:42px;font-size:14px}
+.pwa-install-dialog .pwa-close{position:absolute;right:16px;top:16px;width:40px;padding:5px;border:0;background:transparent;font-size:18px}
+.pwa-install-dialog .demo-language-switch.in-dialog{margin:0 36px 18px auto}
+@media(max-width:600px){.pwa-install-dialog{padding:22px}.pwa-install-dialog h2{font-size:20px}.pwa-install-dialog ol{font-size:14px}}

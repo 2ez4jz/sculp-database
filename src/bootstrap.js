@@ -1,5 +1,7 @@
 import { config } from "./config.js";
+import {setupWebApp} from "./pwa/install.js?v=20261016";
 const demo = new URLSearchParams(location.search).get("demo") === "1";
+setupWebApp({demo:demo && config.environment === "demo"});
 if (demo && config.environment === "demo") {
   document.querySelector("#auth-root").remove();
   document.body.append(
