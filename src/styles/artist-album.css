@@ -5,6 +5,7 @@
 .artist-photo-drop p{font-size:14px;color:var(--muted);margin:7px 0 14px}
 .artist-photo-drop small{display:block;color:var(--muted);font-size:12px;margin-top:10px}
 .artist-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.artist-photo-grid>p{grid-column:1/-1;margin:0}
 .artist-photo-card{min-width:0}.artist-photo-card img{width:100%;aspect-ratio:4/5;object-fit:cover}
 .artist-photo-caption{display:flex;gap:7px;flex-wrap:wrap;font-size:12px;margin-top:8px;align-items:center}
 .artist-photo-caption>span{flex:1 0 100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
