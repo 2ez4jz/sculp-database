@@ -1,5 +1,5 @@
 // Bounded acceptance checks. These are transparent heuristics + exact data checks,
-// not an independent model judge or a claim of ChatGPT equivalence.
+// not an independent model judge or a claim of conversational quality equivalence.
 import {readFile,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const base=new URL('../docs/evaluations/',import.meta.url);
