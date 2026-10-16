@@ -1,4 +1,13 @@
 /* Compact phone workspace. Chat keeps its dedicated viewport layout. */
+/* Stop accidental double-tap zoom across content as well as controls.
+   Panning, deliberate pinch zoom and browser accessibility zoom remain available. */
+html{touch-action:manipulation}
+/* Cover dialogs, floating chat and landscape/touch devices too. Small form text
+   can trigger Safari focus zoom even when the surrounding page fits the screen. */
+@media(max-width:850px),(hover:none) and (pointer:coarse){
+ html body input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),
+ html body textarea,html body select{font-size:max(16px,1em)!important}
+}
 [data-mobile-filters]{display:none}
 @media(max-width:600px){
  body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
