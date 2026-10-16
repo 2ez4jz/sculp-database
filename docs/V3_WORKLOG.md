@@ -1,4 +1,4 @@
-# SCULPY / MEMORA V3.0 — HubSpot benchmark
+# SCULPY / MEMORA V3.0 — 功能与可靠性升级
 
 Status: release candidate in development, not V3.0 complete. Date: 2026-10-16.
 
@@ -16,7 +16,7 @@ Validation in progress: local regression, isolated live-model comparison, Postgr
 
 SCULPY local full suite: 165 passed, zero failed, one PostgreSQL-only concurrency test skipped locally. GitHub CI run 38964310161 passed its real PostgreSQL concurrency, full migration/role matrix, fictional backup/restore and browser regressions. MEMORA local suite: 33 passed; browser CI run 38965094388 passed on 390/768/1440 widths. Actual microphone hardware is not covered by these browser tests.
 
-50 multi-turn comparison groups ran against actual model endpoints with the two fictional 300-record datasets: 200 responses, followed by a 50-response MEMORA rerun after repairing review-card history, plus three successful extraction/date regressions. Baseline passed 96/100 defined contracts and final candidate passed 100/100. This is a contract-check rate, not a naturalness score, a production role test or proof of HubSpot parity. Original and repaired answers are retained in MEMORA's `docs/evaluations/v3/groups/`.
+50 multi-turn comparison groups ran against actual model endpoints with the two fictional 300-record datasets: 200 responses, followed by a 50-response MEMORA rerun after repairing review-card history, plus three successful extraction/date regressions. Baseline passed 96/100 defined contracts and final candidate passed 100/100. This is a contract-check rate, not a naturalness score, a production role test or proof of 完整商业验收. Original and repaired answers are retained in MEMORA's `docs/evaluations/v3/groups/`.
 
 The temporary evaluation endpoint is disabled with a 410 handler and JWT verification enabled. The SCULPY task-ledger migration remains unapplied to production; the stable page structure is unchanged. The rollback SQL was executed in the isolated database test, verifying that tasks remain while the new RPC is disabled.
 
