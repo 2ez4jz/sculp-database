@@ -52,7 +52,8 @@ export function createMemoryPanel({
     saving = false,
     identityKey = "",
     success = false,
-    opener = null;
+    opener = null,
+    newBookingIntent = false;
   const drafts = new Map();
   const targets = () => memoryTargets(data, getContext());
   const related = () => relatedTargets(root, targets(), data);
@@ -161,6 +162,8 @@ export function createMemoryPanel({
   function open() {
     if (dialog.open) return;
     opener = document.activeElement;
+    newBookingIntent = false;
+    $("#memory-title").textContent = "把这件事记下来";
     stop();
     saving = false;
     root = routeTarget(location.hash, targets());
@@ -176,6 +179,13 @@ export function createMemoryPanel({
     dialog.showModal();
     if (root) $("#memory-text").focus();
     else $("#memory-target").focus();
+  }
+  function openNewBooking() {
+    if (getContext().role !== "admin" || repository.mode !== "demo") return;
+    open();
+    newBookingIntent = true;
+    $("#memory-title").textContent = "新建订单";
+    entityForm("booking");
   }
   function close({ restore = true } = {}) {
     if (saving) return;
@@ -270,6 +280,14 @@ export function createMemoryPanel({
       pendingImages = [];
       clearEntityProposals();
       data[type==="client"?"clients":"bookings"].push(created);
+      if (type === "booking" && newBookingIntent) {
+        saving = false;
+        success = true;
+        close({ restore: false });
+        onSaved();
+        location.hash = "bookings/" + encodeURIComponent(created.id);
+        return;
+      }
       rawText = $("#memory-text")?.value || rawText;
       root = {type,id:created.id,label:type==="client"?created.name:`${data.clients.find(c=>c.id===created.clientId)?.name||"客户"} · ${created.date}`};
       items=[]; polishedText=""; draftId="";
@@ -595,5 +613,5 @@ export function createMemoryPanel({
     stash();
     stop();
   });
-  return { sync, open };
+  return { sync, open, openNewBooking };
 }

@@ -1,4 +1,4 @@
-import { mountCloudIntake } from './intake.js';
+import { mountCloudIntake } from './intake.js?v=orders-album-20261016';
 import { mountOrderEditor } from './order-editor.js';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
@@ -22,7 +22,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     getScope: () => current,
     onReference: (id) => { void openOrder(id).catch(()=>{}); },
   });
-  root.innerHTML = `<div data-intake-root></div><section data-order-detail hidden></section><button class="auth-primary" data-global>与 Sculpy 聊一聊 ↗</button><section class="cloud-orders"><h3>我的订单</h3><p class="cloud-note">仅显示当前账户有权限查看的云端订单。</p><form data-search><input aria-label="搜索云端订单" placeholder="单号、客户、日期、场地或化妆师"><button class="auth-secondary">查找订单</button></form><p data-order-status role="status"></p><div data-orders></div><div><button data-prev>上一页</button> <button data-next>下一页</button></div></section>${["operations", "owner"].includes(profile.role) ? '<details class="company-rules"><summary>公司角色与工作规则</summary><p class="cloud-note">所有人的对话都会读取；请勿填写密码或限制共享的资料。</p><textarea maxlength="8000" aria-label="公司角色与工作规则"></textarea><button data-save-rules>保存公司规则</button><p data-rules-status role="status"></p></details>' : ""}`;
+  root.innerHTML = `<div class="cloud-workspace-actions">${businessAdmin?'<button type="button" class="auth-primary" data-new-booking>新建订单</button>':''}<button class="auth-secondary" data-global>与 Sculpy 聊一聊 ↗</button></div><div data-intake-root></div><section data-order-detail hidden></section><section class="cloud-orders"><h3>我的订单</h3><p class="cloud-note">仅显示当前账户有权限查看的云端订单。</p><form data-search><input aria-label="搜索云端订单" placeholder="单号、客户、日期、场地或化妆师"><button class="auth-secondary">查找订单</button></form><p data-order-status role="status"></p><div data-orders></div><div><button data-prev>上一页</button> <button data-next>下一页</button></div></section>${["operations", "owner"].includes(profile.role) ? '<details class="company-rules"><summary>公司角色与工作规则</summary><p class="cloud-note">所有人的对话都会读取；请勿填写密码或限制共享的资料。</p><textarea maxlength="8000" aria-label="公司角色与工作规则"></textarea><button data-save-rules>保存公司规则</button><p data-rules-status role="status"></p></details>' : ""}`;
   const $ = (s) => root.querySelector(s);
   $("[data-global]").onclick = () => {
     current = { id: "global", label: "全局工作助手" };
@@ -60,6 +60,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     }
   }
   const intake = ["operations","owner"].includes(profile.role) ? mountCloudIntake({root:$("[data-intake-root]"),supabase,onSaved:async id=>{await load();await openOrder(id)}}) : null;
+  if (businessAdmin) $("[data-new-booking]").onclick = () => intake.open();
   async function load() {
     const mine = ++version;
     $("[data-order-status]").textContent = "正在读取订单…";

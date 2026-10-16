@@ -1,0 +1,15 @@
+.artist-album{margin:0 0 24px}
+.booking-work-note{display:inline-flex;align-items:center;padding:7px 11px;min-height:38px;border:1px solid var(--line);border-radius:6px;font-size:13px}
+.artist-photo-drop{border:1.5px dashed #a9b6a6;border-radius:12px;background:#f3f6ee;text-align:center;padding:24px 16px;margin-bottom:12px;transition:background .15s,border-color .15s}
+.artist-photo-drop.dragging{background:#e1ebdc;border-color:#3e5148;outline:2px solid #3e5148;outline-offset:2px}
+.artist-photo-drop p{font-size:14px;color:var(--muted);margin:7px 0 14px}
+.artist-photo-drop small{display:block;color:var(--muted);font-size:12px;margin-top:10px}
+.artist-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.artist-photo-grid>p{grid-column:1/-1;margin:0}
+.artist-photo-card{min-width:0}.artist-photo-card img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.artist-photo-caption{display:flex;gap:7px;flex-wrap:wrap;font-size:12px;margin-top:8px;align-items:center}
+.artist-photo-caption>span{flex:1 0 100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.artist-photo-caption a{color:var(--green);text-decoration:underline}.artist-photo-caption button{padding:3px 9px;font-size:12px;min-height:30px}
+[data-album-preview]{max-width:94vw;padding:14px}[data-album-preview] img{max-width:85vw;max-height:75vh}[data-album-preview]>button{display:block;margin:0 0 10px auto}
+.cloud-workspace-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+@media(max-width:600px){.artist-photo-drop{padding:17px 12px}.artist-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.artist-photo-caption button{min-height:36px!important}.artist-album{margin-bottom:14px}}

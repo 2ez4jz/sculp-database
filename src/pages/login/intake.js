@@ -61,5 +61,5 @@ export function mountCloudIntake({root,supabase,onSaved}){
   try{const result=await identifyCloudIntake(supabase,source.value);if(destroyed||mine!==version)return;if(!result.isNewBooking){status(result.warnings.join('；')||'未识别到明确的新订单需求，请核对或手动填写。');return;}await review(result.draft,result.warnings);}
   catch(e){if(!destroyed&&mine===version)status(e.message)}finally{if(!destroyed&&!saving)button.disabled=false;}
  };
- return {destroy(){destroyed=true;version++;root.replaceChildren();}};
+ return {open(){if(destroyed)return;$('details').open=true;source.focus();},destroy(){destroyed=true;version++;root.replaceChildren();}};
 }

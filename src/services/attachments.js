@@ -52,3 +52,15 @@ export async function getAttachment(id) {
     });
   } finally { db.close(); }
 }
+export async function removeAttachment(id) {
+  const db = await openAttachmentStore();
+  try {
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction("images", "readwrite");
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error || Error("图片移除取消"));
+      tx.objectStore("images").delete(id);
+    });
+  } finally { db.close(); }
+}

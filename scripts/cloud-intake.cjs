@@ -42,6 +42,7 @@ const assert=require('node:assert/strict');
   const supabase={rpc:async(name)=>({data:{bookings:[booking],total:1,intake:name==='sculpy_order_detail'?{rawText:'  <script>unsafe</script> 原文  ',recordedAt:'2026-10-08T15:00:00Z',savedAt:'2026-10-08T15:01:00Z'}:undefined}}),from:()=>({select:()=>({eq:()=>({single:async()=>({data:{content:''}})})})})};
   window.workspace=mountCloudWorkspace({root:document.querySelector('#test-root'),supabase,profile:{id:'owner',role:'operations'}});
  });
+ await page.locator('[data-new-booking]').click();assert.equal(await page.locator('[data-intake-root] details').evaluate(el=>el.open),true);assert.equal(await page.locator('[data-source]').evaluate(el=>el===document.activeElement),true);
  await page.locator('[data-booking=order1]').click();await page.locator('[data-order-detail]').getByText('预算：1800 CAD · 成交价：未确定').waitFor();
  await page.locator('[data-order-detail] summary').click();assert.equal(await page.locator('[data-order-detail] pre').textContent(),'  <script>unsafe</script> 原文  ');assert.equal(await page.locator('[data-order-detail] script').count(),0);
  await page.evaluate(()=>window.workspace.destroy());
