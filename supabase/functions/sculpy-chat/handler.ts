@@ -1,4 +1,5 @@
 import {catalogHistoryFrom} from "./period-policy.js";
+import {readBoundedJSON} from "./tool-policy.js";
 import {demoReport} from "./demo-report.ts";
 import { converse } from "./core.ts";
 import { structuredIntent } from "./skills.js";
@@ -33,10 +34,7 @@ export async function handleRequest(req: Request) {
     return new Response(null, { status: 204, headers });
   if (req.method !== "POST") return reply({ error: "POST required" }, 405);
   try {
-    const raw = await req.text();
-    if (new TextEncoder().encode(raw).length > 180000)
-      return reply({ error: "本次内容太多，请分段发送。" }, 413);
-    const body = JSON.parse(raw);
+    const body = await readBoundedJSON(req);
     const demo = body.mode === "demo";
     const token = req.headers.get("authorization") || "";
     const rest = async (path: string, options: any = {}) => {
@@ -299,7 +297,7 @@ export async function handleRequest(req: Request) {
     );
     return reply(
       { error: error instanceof Error ? error.message : "请求失败，请重试。" },
-      500,
+      [400,413].includes(error?.status) ? error.status : 500,
     );
   }
 }

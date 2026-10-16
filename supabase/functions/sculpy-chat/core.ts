@@ -1,4 +1,5 @@
 import {sculpStudioTone} from "./studio-tone.js";
+import {validateBookingQuery} from "./tool-policy.js";
 import {analysisPeriodInstructions} from "./period-policy.js";
 import {conversationInstructions,structuredIntent,selectSkills} from "./skills.js";
 import {demoVisualSummary,compactDemoReport,compareDemoReports} from "./demo-report.js";
@@ -147,7 +148,7 @@ export async function converse({
               const current=demoReports.get(key);
               output={...current,comparisons:[...demoReports.values()].filter(r=>r!==current).map(peer=>compareDemoReports(current,peer))};
             }
-            else output = await query(args);
+            else output = await query(validateBookingQuery(args));
             for (const b of Array.isArray(output.bookings) ? output.bookings : Array.isArray(output.recordsSample) ? output.recordsSample : []) {
               seen.set(b.id, b);
               sourceIds.add(b.id);
@@ -179,7 +180,7 @@ export async function converse({
     return {
       ...(typeof response.model==='string'?{modelProfile:{model:response.model}}:{}),
       answer: demoReports.size&&/(饼图|圆环|占比|图表|柱状|趋势图|画图|用图|pie|donut|chart|graph|visual)/i.test(message)&&!/(分析|解释|建议|为什么|原因|analy|explain|suggest|why)/i.test(message) ? [...demoReports.values()].slice(0,3).map(r=>demoVisualSummary(r,/(渠道|channel|化妆师|artist|服务|service|状态|status|收入|金额|到账|收款|revenue|value|receipt)/i.test(message)?message:message+" "+([...turns].reverse().find((t:any)=>t.demoReportSources?.length)?.user||""),!/\p{Script=Han}/u.test(result.answer))).join("\n\n") : result.answer.slice(0, 16000),
-      references: (result.references || [])
+      references: (Array.isArray(result.references) ? result.references : [])
         .filter((id: any) => seen.has(id))
         .slice(0, 8)
         .map((id: any) => ({
@@ -187,7 +188,7 @@ export async function converse({
           label:
             (seen.get(id) as any).label || (seen.get(id) as any).client || id,
         })),
-      proposals: (result.proposals || [])
+      proposals: (Array.isArray(result.proposals) ? result.proposals : [])
         .filter(
           (p: any) =>
             seen.has(p.bookingId) &&
@@ -198,7 +199,9 @@ export async function converse({
         )
         .slice(0, 8)
         .map((p: any) => ({
-          ...p,
+          bookingId: p.bookingId,
+          kind: p.kind,
+          text: p.text,
           id: crypto.randomUUID(),
           label:
             (seen.get(p.bookingId) as any).label ||
