@@ -1,13 +1,39 @@
 {
+  "id": "./",
   "name": "Sculpy · SCULP Studio",
   "short_name": "Sculpy",
-  "description": "SCULP Studio internal memory and decision companion.",
-  "start_url": "./#bookings",
+  "description": "SCULP Studio 团队工作空间",
+  "lang": "zh-CN",
+  "start_url": "./?app=1#bookings",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f6f4ef",
   "theme_color": "#435647",
+  "prefer_related_applications": false,
   "icons": [
-    {"src": "assets/sculpy-app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    {
+      "src": "assets/sculpy-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/sculpy-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/sculpy-icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/sculpy-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
