@@ -191,7 +191,7 @@ export async function converse({
       proposals: (Array.isArray(result.proposals) ? result.proposals : [])
         .filter(
           (p: any) =>
-            seen.has(p.bookingId) &&
+            p && typeof p === "object" && seen.has(p.bookingId) &&
             ["note", "task", "change"].includes(p.kind) &&
             typeof p.text === "string" &&
             p.text.trim() &&

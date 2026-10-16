@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {validateBookingQuery,readBoundedJSON} from '../supabase/functions/sculpy-chat/tool-policy.js';
 import {converse} from '../supabase/functions/sculpy-chat/core.ts';
@@ -21,4 +22,5 @@ test('V3 tasks: complete migration chain, role matrix, exact replay, CAS and ret
  assert.equal((await db.query("select count(*)::int as n from audit_events where entity_type='crm_task'")).rows[0].n,4);
  await as(2);assert.equal((await db.query('select count(*)::int as n from crm_tasks')).rows[0].n,2);await assert.rejects(()=>command(request,'create_task',p),e=>e.code==='23505');
  await as(1);await assert.rejects(()=>command(crypto.randomUUID(),'run_workflows',{today:'2099-01-01'}),/server controlled/);
+ await db.exec('reset role');await db.exec(readFileSync(new URL('../docs/SCULPY_V3_ROLLBACK.sql',import.meta.url),'utf8'));await as(1);await assert.rejects(()=>command(crypto.randomUUID(),'run_workflows',{}),/permission denied/);assert.equal((await db.query('select count(*)::int n from crm_tasks')).rows[0].n,2);
  }finally{await db.close();}});
