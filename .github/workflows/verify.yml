@@ -42,6 +42,7 @@ jobs:
           node scripts/analysis-charts.cjs
           node scripts/context-memory.cjs
           node scripts/intake.cjs
+          node scripts/booking-album.cjs
           node scripts/cloud-intake.cjs
           node scripts/cloud-operations.cjs
       - name: Save visual checks
