@@ -146,3 +146,12 @@ test('technical acceptance probes remain outside business views and every enquir
   await as(db,null,'anon');await assert.rejects(()=>db.query('select * from website_enquiries_business'));
  }finally{await db.close();}
 });
+
+test('a manually recorded same-day lead can link a contract already confirmed today',async()=>{
+ const db=await createDatabase();try{
+  const service=await fixture(db),b=await booking(db,53,service);const today=(await db.query("select to_char(now() at time zone 'America/Toronto','YYYY-MM-DD') d")).rows[0].d;
+  await confirm(db,b,2000,today);
+  const r=await command(db,'save_lead',{name:'Same-day fictional enquiry',contact:'WeChat fixture',email:null,service:'Bridal',serviceType:'wedding',source:'wechat',status:'won',bookingId:b,firstContact:today});
+  assert(r.leadId);await db.exec('reset role');const lead=(await db.query('select first_contact_at<=converted_at chronological from website_enquiries where id=$1',[r.leadId])).rows[0];assert.equal(lead.chronological,true);
+ }finally{await db.close();}
+});
