@@ -1,3 +1,4 @@
+import { mountWebsiteEnquiries } from './enquiries.js?v=20261018';
 import { mountCloudIntake } from './intake.js?v=orders-album-20261016';
 import { mountOrderEditor } from './order-editor.js';
 import { mountMonthlyReport } from './monthly-report.js';
@@ -34,6 +35,9 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     root.append(reportRoot);
     report = mountMonthlyReport({root:reportRoot,supabase});
   }
+  const enquiriesRoot=document.createElement('div');
+  let enquiries=null;
+  if(businessAdmin){root.prepend(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase});}
   let detailVersion = 0;
   async function openOrder(id) {
     if (editor && !editor.canLeave()) {
@@ -144,6 +148,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       destroyed = true;
       version++;
       detailVersion++;
+      enquiries?.destroy();
       intake?.destroy();
       editor?.destroy();
       report?.destroy();
