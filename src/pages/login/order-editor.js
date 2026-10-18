@@ -11,13 +11,13 @@ const fields = [
 export function mountOrderEditor({root, supabase, bookingId, edit, onSaved}) {
   let destroyed = false, pending = null, saving = false, review = null, saved = false;
   root.innerHTML = `<details class="cloud-intake"><summary>修改订单</summary>
-    <p class="cloud-note">先修改，再核对前后内容。金额、付款、客户和人员分配不在此处修改。</p>
-    <p class="cloud-note">待确认需求须先确认才能完成。已完成或取消的订单，须先重新设为待确认需求才能再次确认。</p>
+    <p class="cloud-note">先修改，再核对前后内容。合同确认、取消及收退款请使用上方「合同与收款」。</p>
+    <p class="cloud-note">此处可改日期、地点、需求，或将已确认服务标为完成；签约事件始终保留。</p>
     <form data-edit-form><div class="intake-fields">${fields.map(([key,label,type]) =>
       `<label>${label}${type==='textarea'
         ? `<textarea name="${key}" maxlength="2000">${esc(edit[key])}</textarea>`
         : `<input name="${key}" type="${type}" value="${esc(edit[key])}" ${key==='location'?'maxlength="500"':''} ${['date','time'].includes(key)?'required':''}>`}</label>`).join('')}
-      <label>订单状态<select name="status">${Object.entries(statuses).map(([key,label])=>
+      <label>订单状态<select name="status">${Object.entries(statuses).filter(([key])=>key===edit.status || (edit.status==='confirmed' && key==='completed')).map(([key,label])=>
         `<option value="${key}" ${edit.status===key?'selected':''}>${label}</option>`).join('')}</select></label></div>
     <label>修改依据或原因<textarea name="reason" maxlength="2000" required></textarea></label>
     <button type="submit" class="auth-secondary">核对修改</button></form>

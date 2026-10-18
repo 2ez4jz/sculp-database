@@ -92,7 +92,7 @@ const assert=require('node:assert/strict');
         supabase:{rpc:async(name,args)=>{
           if(name==='sculpy_confirm_booking_change'){window.workspaceCalls.push(args);booking.venue=args.p_payload.location;return {data:{bookingId:'order1'}};}
           return {data:{bookings:[booking],total:1,edit:name==='sculpy_order_detail'?{...window.base,version:window.workspaceCalls.length+1,location:booking.venue}:undefined}};
-        },from:()=>({select:()=>({eq:()=>({single:async()=>({data:{content:''}})})})})}});
+        },from:()=>{const q={select:()=>q,eq:()=>q,in:()=>q,order:()=>q,limit:async()=>({data:[]}),single:async()=>({data:{content:''}}),then:resolve=>Promise.resolve({data:[]}).then(resolve)};return q;}}});
     });
     await page.locator('[data-booking=order1]').click();await page.locator('[data-order-detail]').getByText('修改订单',{exact:true}).click();
     await page.locator('[data-edit-form] [name=location]').fill('Richmond Hill');await page.locator('[data-edit-form] [name=reason]').fill('Workspace integration');

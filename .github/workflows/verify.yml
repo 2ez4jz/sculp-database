@@ -46,6 +46,7 @@ jobs:
           node scripts/booking-album.cjs
           node scripts/cloud-intake.cjs
           node scripts/cloud-operations.cjs
+          node scripts/wedding-v23-browser.cjs
       - name: Save visual checks
         if: always()
         uses: actions/upload-artifact@v4

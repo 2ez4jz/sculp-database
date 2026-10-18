@@ -1,3 +1,4 @@
+import {weddingReportTool,validateWeddingQuery,weddingInstructions} from './wedding-tools.js';
 import {sculpStudioTone} from "./studio-tone.js";
 import {validateBookingQuery} from "./tool-policy.js";
 import {analysisPeriodInstructions} from "./period-policy.js";
@@ -74,6 +75,7 @@ export async function converse({
   query,
   callModel,
   monthlyReport,
+  weddingReport,
   demoReport,
 }: any) {
   const seen = new Map((context.bookings || []).map((b: any) => [b.id, b]));
@@ -97,6 +99,8 @@ export async function converse({
     },
     { role: "user", content: message },
   ];
+  const weddingReports = new Map<string, any>();
+  const canWeddingReport = typeof weddingReport === "function" && ["owner","operations"].includes(context.actor?.role) && context.mode !== "fictional_demo";
   const reports = new Map<string, any>();
   const demoReports = new Map<string, any>();
   const canReport = typeof monthlyReport === "function" && ["owner", "operations"].includes(context.actor?.role);
@@ -104,9 +108,9 @@ export async function converse({
   const usage = { input_tokens: 0, output_tokens: 0, calls: 0 };
   for (let round = 0; round < 4; round++) {
     const response = await callModel({
-      instructions: instructions + "\n" + conversationInstructions(message,turns) + "\n" + analysisPeriodInstructions(message,turns,context) + "\n" + reportingInstructions + (canDemoReport ? "\n" + demoReportingInstructions : ""),
+      instructions: instructions + "\n" + conversationInstructions(message,turns) + "\n" + analysisPeriodInstructions(message,turns,context) + "\n" + (canWeddingReport ? weddingInstructions : reportingInstructions) + (canDemoReport ? "\n" + demoReportingInstructions : ""),
       input,
-      tools: round < 3 ? [queryTool, ...(canReport ? [monthlyReportTool] : []), ...(canDemoReport ? [demoReportTool] : [])] : [],
+      tools: round < 3 ? [queryTool, ...(canWeddingReport ? [weddingReportTool] : canReport ? [monthlyReportTool] : []), ...(canDemoReport ? [demoReportTool] : [])] : [],
       ...(structuredIntent(message) ? {text: {
         format: {
           type: "json_schema",
@@ -128,12 +132,17 @@ export async function converse({
       input.push(...response.output);
       for (const call of calls) {
         let output: any;
-        if (!["query_bookings", ...(canReport ? ["query_monthly_report"] : []), ...(canDemoReport ? ["query_demo_report"] : [])].includes(call.name) || calls.length > 12)
+        if (!["query_bookings", ...(canWeddingReport ? ["query_wedding_intelligence"] : canReport ? ["query_monthly_report"] : []), ...(canDemoReport ? ["query_demo_report"] : [])].includes(call.name) || calls.length > 12)
           output = { error: "Unsupported tool or too many queries" };
         else {
           try {
             const args = JSON.parse(call.arguments);
-            if (call.name === "query_monthly_report") {
+            if (call.name === "query_wedding_intelligence") {
+              const validated=validateWeddingQuery(args),key=JSON.stringify(validated);
+              if(!weddingReports.has(key)){if(weddingReports.size>=6)throw Error('Too many wedding queries');weddingReports.set(key,await weddingReport(validated));}
+              output=weddingReports.get(key);
+              if(output.source!=="canonical_wedding_intelligence_v23")throw Error('Invalid wedding report source');
+            } else if (call.name === "query_monthly_report") {
               if (!/^20[0-9]{2}-(0[1-9]|1[0-2])$/.test(args.month) || Object.keys(args).some(k => k !== "month")) throw Error("Invalid report month");
               if (!reports.has(args.month)) {
                 if (reports.size >= 12) throw Error("Too many months");
@@ -208,8 +217,9 @@ export async function converse({
             (seen.get(p.bookingId) as any).client ||
             p.bookingId,
         })),
-      ...((reports.size || canReport && turns.some((t: any) => t.businessReport)) ? { businessReport: true, reportSources: [...reports.values()].map(r => ({month: r.month, asOf: r.asOf, source: "canonical_cloud_monthly_report"})) } : {}),
+      ...((weddingReports.size || reports.size || (canReport || canWeddingReport) && turns.some((t: any) => t.businessReport)) ? { businessReport: true, reportSources: [...reports.values()].map(r => ({month: r.month, asOf: r.asOf, source: "canonical_cloud_monthly_report"})) } : {}),
       ...(demoReports.size ? {demoReportSources:[...demoReports.values()].map(compactDemoReport)} : {}),
+      ...(weddingReports.size?{weddingReportSources:[...weddingReports.values()].map(r=>({source:r.source,period:r.period,asOf:r.asOf,coverage:r.coverage}))}:{}),
       sourceIds: [...sourceIds],
       usage,
       skillsUsed: selectSkills(message,turns).map(s=>s.name),

@@ -1,0 +1,378 @@
+{
+  "fictional": true,
+  "expected": {
+    "signedCents": "200000",
+    "changeCents": "50000",
+    "cashNetCents": "230000",
+    "outstandingCents": "20000",
+    "futureCents": "250000",
+    "won": 1,
+    "leadCount": 1
+  },
+  "report": {
+    "asOf": "2026-10-18T15:13:15.427-04:00",
+    "cash": {
+      "netCents": "230000",
+      "creditCents": "0",
+      "refundCents": "20000",
+      "balanceCents": "190000",
+      "depositCents": "60000",
+      "pendingMonths": [
+        {
+          "month": "2027-07",
+          "amount_cents": "20000"
+        }
+      ],
+      "outstandingCents": "20000",
+      "outstandingUnknownCount": 0,
+      "unclassifiedReceiptCount": 0
+    },
+    "leads": {
+      "won": 1,
+      "lost": 0,
+      "open": 0,
+      "count": 1,
+      "quoted": 0,
+      "invalid": 0,
+      "sources": [
+        {
+          "won": 1,
+          "open": 0,
+          "leads": 1,
+          "source": "instagram",
+          "contracts": 1,
+          "signed_cents": "200000",
+          "average_cents": "200000",
+          "conversion_percent": 100
+        }
+      ],
+      "contacted": 1,
+      "lostReasons": [],
+      "signedCents": "200000",
+      "averageDaysToWon": 42,
+      "conversionPercent": 100,
+      "distinctContracts": 1
+    },
+    "sales": {
+      "count": 1,
+      "changeCents": "50000",
+      "signedCents": "200000",
+      "averageCents": "200000",
+      "cancelledCents": "0",
+      "netChangeCents": "250000",
+      "unknownAmountCount": 0
+    },
+    "period": {
+      "to": "2026-10-18",
+      "from": "2026-08-01",
+      "sourceFilter": null,
+      "serviceFilter": null
+    },
+    "source": "canonical_wedding_intelligence_v23",
+    "trends": [
+      {
+        "month": "2025-11",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2025-12",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-01",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-02",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-03",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-04",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-05",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-06",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-07",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-08",
+        "sales": {
+          "count": 0,
+          "changeCents": "0",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "0",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "0"
+      },
+      {
+        "month": "2026-09",
+        "sales": {
+          "count": 1,
+          "changeCents": "0",
+          "signedCents": "200000",
+          "averageCents": "200000",
+          "cancelledCents": "0",
+          "netChangeCents": "200000",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "60000"
+      },
+      {
+        "month": "2026-10",
+        "sales": {
+          "count": 0,
+          "changeCents": "50000",
+          "signedCents": "0",
+          "averageCents": null,
+          "cancelledCents": "0",
+          "netChangeCents": "50000",
+          "unknownAmountCount": 0
+        },
+        "cash_cents": "170000"
+      }
+    ],
+    "forward": {
+      "count": 1,
+      "months": [
+        {
+          "count": 1,
+          "month": "2027-07",
+          "amount_cents": "250000",
+          "unknown_amount_count": 0
+        }
+      ],
+      "amountCents": "250000",
+      "serviceYear": 2027,
+      "unknownAmountCount": 0
+    },
+    "coverage": {
+      "note": "历史覆盖前的空值不代表零业务；报价不计合同额；金额仅 CAD 已知部分。渠道及服务筛选用于询盘批次；服务筛选另用于签约趋势，现金与未来婚礼保持全局。",
+      "nonCadPayments": 0,
+      "totalContracts": 1,
+      "historyStartsAt": "2026-10-18T15:13:15.344-04:00",
+      "comparisonComplete": false,
+      "legacyRefundReviewCount": 0,
+      "unknownConfirmationDates": 0,
+      "undatedSuccessfulPayments": 0
+    },
+    "timezone": "America/Toronto",
+    "bookingPace": {
+      "peer": {
+        "comparable": false,
+        "observation": "2025-10-18T15:13:15.427-04:00",
+        "serviceYear": 2026
+      },
+      "current": {
+        "count": 1,
+        "months": [
+          {
+            "count": 1,
+            "month": "07",
+            "amount_cents": "250000"
+          }
+        ],
+        "comparable": true,
+        "amountCents": "250000",
+        "observation": "2026-10-18T15:13:15.427-04:00",
+        "serviceYear": 2027,
+        "averageCents": "250000",
+        "unknownAmountCount": 0
+      },
+      "comparable": false,
+      "countDelta": null,
+      "amountDeltaCents": null
+    },
+    "comparisons": {
+      "lastYear": {
+        "count": 0,
+        "changeCents": "0",
+        "signedCents": "0",
+        "averageCents": null,
+        "cancelledCents": "0",
+        "netChangeCents": "0",
+        "unknownAmountCount": 0
+      },
+      "previousTo": "2026-07-31",
+      "yearPercent": null,
+      "previousFrom": "2026-05-14",
+      "previousKind": "equal_previous_window",
+      "previousWindow": {
+        "count": 0,
+        "changeCents": "0",
+        "signedCents": "0",
+        "averageCents": null,
+        "cancelledCents": "0",
+        "netChangeCents": "0",
+        "unknownAmountCount": 0
+      },
+      "yearDeltaCents": "200000",
+      "previousPercent": null,
+      "previousDeltaCents": "200000"
+    }
+  },
+  "detail": {
+    "status": "confirmed",
+    "history": [
+      {
+        "id": 1,
+        "delta": 2000,
+        "state": "confirmed",
+        "amount": 2000,
+        "evidence": "Fictional acceptance fixture",
+        "event_type": "confirmation",
+        "service_at": "2027-07-10T10:00:00-04:00",
+        "recorded_at": "2026-10-18T15:13:15.393-04:00",
+        "effective_at": "2026-09-12T00:00:00-04:00"
+      },
+      {
+        "id": 2,
+        "delta": 500,
+        "state": "confirmed",
+        "amount": 2500,
+        "evidence": "Fictional acceptance fixture",
+        "event_type": "amendment",
+        "service_at": "2027-07-10T10:00:00-04:00",
+        "recorded_at": "2026-10-18T15:13:15.412-04:00",
+        "effective_at": "2026-10-02T00:00:00-04:00"
+      }
+    ],
+    "version": 4,
+    "currency": "CAD",
+    "parentId": null,
+    "payments": [
+      {
+        "id": "613f3c61-f69b-450a-baae-86bb019add8a",
+        "amount": 600,
+        "status": "succeeded",
+        "paid_at": "2026-09-20T00:00:00-04:00",
+        "refund_of": null,
+        "invoice_id": "cecf74d6-7289-408b-8bb3-599047b59241",
+        "payment_kind": "deposit",
+        "external_reference": null
+      },
+      {
+        "id": "7ba2f5ff-2182-4187-8670-150acc0b8b3d",
+        "amount": 1900,
+        "status": "succeeded",
+        "paid_at": "2026-10-05T00:00:00-04:00",
+        "refund_of": null,
+        "invoice_id": "cecf74d6-7289-408b-8bb3-599047b59241",
+        "payment_kind": "balance",
+        "external_reference": null
+      },
+      {
+        "id": "203b2087-d541-4504-ab6e-97bb43891178",
+        "amount": 200,
+        "status": "succeeded",
+        "paid_at": "2026-10-10T00:00:00-04:00",
+        "refund_of": "613f3c61-f69b-450a-baae-86bb019add8a",
+        "invoice_id": "cecf74d6-7289-408b-8bb3-599047b59241",
+        "payment_kind": "refund",
+        "external_reference": null
+      }
+    ],
+    "bookingId": "23000000-0000-4000-8000-000000000040",
+    "amountCents": "250000",
+    "confirmedAt": "2026-09-12T00:00:00-04:00",
+    "dateQuality": "verified",
+    "contractRole": "contract",
+    "receivedCents": "230000",
+    "outstandingCents": "20000"
+  }
+}
