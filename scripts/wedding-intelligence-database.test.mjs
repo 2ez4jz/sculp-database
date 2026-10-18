@@ -137,3 +137,12 @@ test('priced service breakdown stays one contract; unknown prices stay incomplet
   await as(db,owner);await assert.rejects(()=>command(db,'record_payment',{bookingId:b,kind:'balance',amount:100,paidAt:'2026-10-05',method:'cash',invoiceId:id(60)}),/币种/);
  }finally{await db.close();}
 });
+
+test('technical acceptance probes remain outside business views and every enquiry metric',async()=>{
+ const db=await createDatabase();try{
+  await fixture(db);await db.query("insert into website_enquiries(submission_id,name,email,service,details) values($1,'SCULPY V2.3 internal acceptance','sculpy-v23-acceptance@example.test','Bridal','Synthetic API acceptance probe; not a customer')",[crypto.randomUUID()]);
+  await as(db,owner);assert.equal((await db.query('select count(*)::int n from website_enquiries_business')).rows[0].n,0);
+  const r=await report(db);assert.equal(r.leads.count,0);assert.equal(r.leads.invalid,0);assert.equal(r.leads.won,0);
+  await as(db,null,'anon');await assert.rejects(()=>db.query('select * from website_enquiries_business'));
+ }finally{await db.close();}
+});
