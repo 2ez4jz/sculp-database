@@ -1,52 +1,28 @@
-export function mountWebsiteEnquiries({root,supabase}) {
-  root.innerHTML = `<section class="cloud-orders" id="website-enquiries"><h3>官网询盘 · 待处理</h3><p class="cloud-note">官网提交会先进入这里，不会自动生成已成交订单。来源可以在确认客户后补充。</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><select data-filter aria-label="询盘状态"><option value="open">待处理和跟进中</option><option value="all">全部询盘</option><option value="won">已成交</option><option value="lost">未成交</option></select><button type="button" data-refresh>刷新询盘</button></div><p data-status role="status"></p><div data-list></div></section>`;
-  const $=s=>root.querySelector(s);
-  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  let alive=true;
-  async function load(){
-    $('[data-status]').textContent='正在读取真实询盘…';
-    let q=supabase.from('website_enquiries').select('*').order('created_at',{ascending:false}).limit(150);
-    const filter=$('[data-filter]').value;
-    if(filter==='open')q=q.in('status',['pending','contacted','qualified']);
-    if(filter==='won'||filter==='lost')q=q.eq('status',filter);
-    const {data,error}=await q;
-    if(!alive)return;
-    if(error){$('[data-status]').textContent='读取失败：请确认管理员权限或重新登录。';return;}
-    $('[data-status]').textContent=`共 ${data.length} 条（最多显示最新150条）`;
-    $('[data-list]').innerHTML=data.map(lead=>`<article class="cloud-order" style="display:block;text-align:left;padding:14px;margin:10px 0">
-      <strong>${esc(lead.name)} · ${esc(lead.service)}</strong>
-      <p style="margin:6px 0">${esc(new Date(lead.created_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · ${esc(lead.event_date||'日期待定')} · ${esc(lead.location)}</p>
-      <p style="margin:6px 0"><a href="mailto:${encodeURIComponent(lead.email)}">${esc(lead.email)}</a> · ${esc(lead.contact||'无其他联系方式')} · ${esc(lead.artist||'')}</p>
-      <details><summary>查看原始需求与来源记录</summary><p style="white-space:pre-wrap">${esc(lead.details)}</p><small>官网入口：${esc(lead.entry_channel)} · UTM: ${esc(lead.utm_source)} / ${esc(lead.utm_medium)} / ${esc(lead.utm_campaign)} · Referrer: ${esc(lead.landing_referrer)}</small></details>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0">
-        <label>进展<select data-field="status"><option value="pending">待处理</option><option value="contacted">已联系</option><option value="qualified">跟进中</option><option value="won">已成交</option><option value="lost">未成交</option><option value="spam">无效询盘</option></select></label>
-        <label>实际获客来源<select data-field="attribution_source"><option value="unknown">尚未确认</option><option value="instagram">Instagram</option><option value="google">Google 搜索</option><option value="xiaohongshu">小红书</option><option value="wechat">微信</option><option value="referral">熟人/客户推荐</option><option value="planner">婚礼策划师推荐</option><option value="direct">直接访问官网</option><option value="other">其他</option></select></label>
-        <label>来源补充<input data-field="attribution_detail" maxlength="300" placeholder="推荐人、账号、活动名称"></label>
-        <label>对应正式订单 UUID<input data-field="booking_id" placeholder="成交后可关联订单 ID"></label>
-      </div>
-      <label>跟进记录<textarea data-field="notes" maxlength="4000" rows="2" style="width:100%" placeholder="什么时候回复、报价、未成交原因"></textarea></label>
-      <div style="display:flex;gap:10px;align-items:center"><button type="button" data-save>保存进展</button><span data-result role="status"></span></div>
-    </article>`).join('');
-    const cards=[...root.querySelectorAll('article')];
-    cards.forEach((card,i)=>{
-      const lead=data[i],get=k=>card.querySelector('[data-field="'+k+'"]');
-      for(const k of ['status','attribution_source','attribution_detail','notes','booking_id'])get(k).value=lead[k]??'';
-      card.querySelector('[data-save]').onclick=async()=>{
-        const button=card.querySelector('[data-save]'),msg=card.querySelector('[data-result]');
-        const patch={status:get('status').value,attribution_source:get('attribution_source').value,attribution_detail:get('attribution_detail').value.trim(),notes:get('notes').value.trim(),booking_id:get('booking_id').value.trim()||null,updated_at:new Date().toISOString()};
-        if(patch.status==='won'&&!lead.converted_at)patch.converted_at=new Date().toISOString();
-        if(patch.status!=='won')patch.converted_at=null;
-        button.disabled=true;msg.textContent='保存中…';
-        const {error}=await supabase.from('website_enquiries').update(patch).eq('id',lead.id).select('id').single();
-        msg.textContent=error?'保存失败，请检查订单 ID 和权限':'已保存';
-        button.disabled=false;
-        if(!error)setTimeout(()=>{if(alive)void load()},450);
-      };
-    });
-  }
-  $('[data-refresh]').onclick=()=>void load();
-  $('[data-filter]').onchange=()=>void load();
-  void load();
-  return {destroy(){alive=false;}};
+import {intakeRpc} from '../../services/cloud-intake.js';
+import {esc,today} from './wedding-dashboard.js';
+const sources={unknown:'尚未确认',instagram:'Instagram',google:'Google 搜索',xiaohongshu:'小红书',wechat:'微信',referral:'熟人/客户推荐',planner:'婚礼策划师推荐',direct:'直接访问',other:'其他'};
+const states={pending:'待处理',contacted:'已联系',qualified:'跟进中',quoted:'已报价',won:'已成交',lost:'明确未成交',spam:'无效询盘'};
+const services={wedding:'婚礼',trial:'试妆',event:'活动',personal:'个人造型',commercial:'商业',photoshoot:'拍摄',education:'课程'};
+export function mountWebsiteEnquiries({root,supabase}){
+ let alive=true,version=0,owners=[];
+ root.innerHTML=`<section class="cloud-orders" id="website-enquiries"><h3>询盘管理</h3><p class="cloud-note">官网自动保存；微信、电话及其他渠道可手动补录。成交后保留询盘，并关联老板已确认的正式合同。</p><div class="w23-actions"><button type="button" data-new-lead>手动新增询盘</button><select data-filter aria-label="询盘状态"><option value="open">待处理和跟进中</option><option value="all">全部</option><option value="won">已成交</option><option value="lost">明确未成交</option><option value="spam">无效</option></select><button type="button" data-refresh>刷新</button></div><div data-new></div><p data-status role="status"></p><div data-list></div></section>`;
+ const $=s=>root.querySelector(s);
+ async function load(){const mine=++version;$('[data-status]').textContent='正在读取真实询盘…';let q=supabase.from('website_enquiries_business').select('*').eq('is_test',false).order('first_contact_at',{ascending:false}).limit(150);const filter=$('[data-filter]').value;if(filter==='open')q=q.in('status',['pending','contacted','qualified','quoted']);else if(filter!=='all')q=q.eq('status',filter);
+ try{const {data,error}=await q;if(!alive||mine!==version)return;if(error)throw error;$('[data-status]').textContent=`${data.length} 条（最新 150 条以内）`;$('[data-list]').replaceChildren();for(const lead of data){const card=document.createElement('article');card.className='cloud-intake';$('[data-list]').append(card);renderForm(card,lead);}}
+ catch(e){if(alive&&mine===version)$('[data-status]').textContent='读取失败：'+e.message;}}
+ function renderForm(card,lead={}){
+  const isNew=!lead.id;
+  card.innerHTML=`<details ${isNew?'open':''}><summary>${isNew?'新增其他渠道询盘':`${esc(lead.name)} · ${esc(states[lead.status])} · ${esc(lead.service)}`}</summary>${!isNew?`<p>${esc(new Date(lead.first_contact_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 提交渠道 ${esc(lead.entry_channel)}</p><details><summary>原始提交信息与来源证据</summary><p style="white-space:pre-wrap">${esc(lead.original_details??lead.details)}</p><p>UTM ${esc(lead.utm_source)} / ${esc(lead.utm_medium)} / ${esc(lead.utm_campaign)} · Referrer ${esc(lead.landing_referrer)}</p></details>`:''}<form><div class="intake-fields"><label>姓名<input name="name" required maxlength="160" value="${esc(lead.name)}"></label><label>邮箱（或填写其他联系方式）<input name="email" type="email" maxlength="254" value="${esc(lead.email)}"></label><label>微信 / 电话<input name="contact" maxlength="240" value="${esc(lead.contact)}"></label><label>原始服务需求<input name="service" maxlength="120" required value="${esc(lead.service||'婚礼')}"></label><label>服务分类<select name="serviceType"><option value="">待分类</option>${Object.entries(services).map(([k,v])=>`<option value="${k}" ${lead.service_type===k?'selected':''}>${v}</option>`).join('')}</select></label><label>婚礼 / 服务日期<input name="eventDate" type="date" value="${esc(lead.event_date)}"></label><label>首次询盘日期<input name="firstContact" type="date" max="${today()}" value="${esc((lead.first_contact_at?new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto'}).format(new Date(lead.first_contact_at)):today()))}" required></label><label>进展<select name="status">${Object.entries(states).map(([k,v])=>`<option value="${k}" ${lead.status===k?'selected':''}>${v}</option>`).join('')}</select></label><label>实际获客来源<select name="source">${Object.entries(sources).map(([k,v])=>`<option value="${k}" ${lead.attribution_source===k?'selected':''}>${v}</option>`).join('')}</select></label><label>来源补充<input name="sourceDetail" maxlength="300" value="${esc(lead.attribution_detail)}"></label><label>报价 CAD<input name="quote" type="number" min="0" step="0.01" value="${esc(lead.quoted_amount)}"></label><label>负责人<select name="owner"><option value="">待分配</option>${owners.map(o=>`<option value="${esc(o.id)}" ${lead.handled_by===o.id?'selected':''}>${esc(o.display_name)}</option>`).join('')}</select></label><label>最后联系日期<input name="lastContact" type="date" max="${today()}" value="${lead.last_contact_at?esc(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto'}).format(new Date(lead.last_contact_at))):''}"></label><label>未成交原因<input name="lostReason" maxlength="1000" value="${esc(lead.lost_reason)}"></label></div><label>原始需求<textarea name="details" maxlength="4500">${esc(lead.details)}</textarea></label><div class="w23-actions"><input data-order-query aria-label="查找正式订单" placeholder="输入单号或客户姓名"><button type="button" data-find-order>查找正式订单</button></div><label>关联正式合同<select name="bookingId"><option value="">未关联</option>${lead.booking_id?`<option value="${esc(lead.booking_id)}" selected>已关联 ${esc(lead.booking_id)}</option>`:''}</select></label><p data-order-result class="cloud-note">已成交必须关联已确认的正式合同；同客户多笔订单请分别核对。</p><label>跟进记录 / 本次操作依据<textarea name="reason" maxlength="2000" required>${esc(lead.notes)}</textarea></label><label class="intake-consent"><input type="checkbox" name="confirmed" required>已核对询盘进展及订单关联</label><button type="submit" data-save-lead>保存询盘</button><p data-result role="status"></p></form></details>`;
+  const form=card.querySelector('form'),msg=card.querySelector('[data-result]');let pending=null,saving=false,searchVersion=0;
+  form.oninput=()=>form.elements.confirmed.checked=false;form.elements.confirmed.oninput=e=>e.stopPropagation();
+  card.querySelector('[data-find-order]').onclick=async()=>{const mine=++searchVersion,query=card.querySelector('[data-order-query]').value.trim();try{const r=await intakeRpc(supabase,'sculpy_context',{p_booking_id:null,p_query:query,p_offset:0});if(!alive||mine!==searchVersion)return;form.elements.bookingId.innerHTML='<option value="">未关联</option>'+r.bookings.filter(b=>['confirmed','completed'].includes(b.status)).map(b=>`<option value="${esc(b.id)}">${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)} · ${esc(b.starts_at.slice(0,10))}</option>`).join('');card.querySelector('[data-order-result]').textContent='请选择对应合同（最多显示30条，必要时按单号细查）。';}catch(e){if(alive)card.querySelector('[data-order-result]').textContent=e.message;}};
+  form.onsubmit=async e=>{e.preventDefault();if(saving)return;if(!pending){const values=Object.fromEntries(new FormData(form));const p={confirmed:true,...Object.fromEntries(['name','email','contact','service','serviceType','source','sourceDetail','status','reason','lostReason'].map(k=>[k,values[k]||null])),quote:values.quote||null,eventDate:values.eventDate||null,owner:values.owner||null,lastContact:values.lastContact||null,firstContact:values.firstContact||null,bookingId:values.bookingId||null,details:values.details||'',...(lead.id?{id:lead.id,revision:lead.revision}:{})};pending={p_request_id:crypto.randomUUID(),p_action:'save_lead',p_payload:p};}
+   saving=true;form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=true);msg.textContent='保存中…';try{await intakeRpc(supabase,'sculpy_wedding_command',pending);pending=null;if(isNew)$('[data-new]').replaceChildren();await load();}
+   catch(error){if(!alive)return;if(/^(22|23|42|P0)/.test(error.code||'')){pending=null;form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=false);form.elements.confirmed.checked=false;msg.textContent=error.message;}else{form.querySelector('[data-save-lead]').disabled=false;msg.textContent='未收到成功确认，请重试同一笔询盘。';}}
+   finally{saving=false;}
+  };
+ }
+ $('[data-new-lead]').onclick=()=>renderForm($('[data-new]'));$('[data-refresh]').onclick=()=>void load();$('[data-filter]').onchange=()=>void load();
+ supabase.from('profiles').select('id,display_name,role,active').in('role',['owner','operations']).eq('active',true).then(({data})=>{if(alive){owners=data||[];void load();}}).catch(()=>{if(alive)void load();});
+ return {refresh:load,destroy(){alive=false;version++;}};
 }

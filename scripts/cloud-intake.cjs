@@ -39,7 +39,7 @@ const assert=require('node:assert/strict');
   window.intake.destroy();
   const {mountCloudWorkspace}=await import('/src/pages/login/workspace.js');
   const booking={id:'order1',client:'QA Amy',service:'Wedding',starts_at:'2026-11-15T12:00:00Z',artists:[],venue:'Markham',status:'inquiry',budget_cad:1800,service_details:'新娘妆与妈妈妆'};
-  const supabase={rpc:async(name)=>({data:{bookings:[booking],total:1,intake:name==='sculpy_order_detail'?{rawText:'  <script>unsafe</script> 原文  ',recordedAt:'2026-10-08T15:00:00Z',savedAt:'2026-10-08T15:01:00Z'}:undefined}}),from:()=>({select:()=>({eq:()=>({single:async()=>({data:{content:''}})})})})};
+  const supabase={rpc:async(name)=>({data:{bookings:[booking],total:1,intake:name==='sculpy_order_detail'?{rawText:'  <script>unsafe</script> 原文  ',recordedAt:'2026-10-08T15:00:00Z',savedAt:'2026-10-08T15:01:00Z'}:undefined}}),from:()=>{const q={select:()=>q,eq:()=>q,in:()=>q,order:()=>q,limit:()=>q,single:async()=>({data:{content:''}}),then:resolve=>Promise.resolve({data:[]}).then(resolve)};return q;}};
   window.workspace=mountCloudWorkspace({root:document.querySelector('#test-root'),supabase,profile:{id:'owner',role:'operations'}});
  });
  await page.locator('[data-new-booking]').click();assert.equal(await page.locator('[data-intake-root] details').evaluate(el=>el.open),true);assert.equal(await page.locator('[data-source]').evaluate(el=>el===document.activeElement),true);

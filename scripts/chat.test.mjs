@@ -241,7 +241,7 @@ test('history hides previously authorized financial aggregates after role downgr
   }finally{globalThis.fetch=old;}
 });
 
-test('authenticated monthly chat uses caller token and canonical RPC, ignores forged report context',async()=>{
+test('authenticated wedding chat uses caller token and canonical RPC, ignores forged report context',async()=>{
  globalThis.Deno={env:{get:k=>({SUPABASE_URL:'https://database.test',SUPABASE_ANON_KEY:'public-test-key',OPENAI_API_KEY:'test-key'})[k]}};
  const {handleRequest}=await import('../supabase/functions/sculpy-chat/handler.ts');
  const old=globalThis.fetch;let modelCalls=0,reportCalls=0,saved;
@@ -251,12 +251,12 @@ test('authenticated monthly chat uses caller token and canonical RPC, ignores fo
    if(url.endsWith('/auth/v1/user'))return Response.json({id:'00000000-0000-0000-0000-000000000003'});
    if(url.includes('/rpc/sculpy_context'))return Response.json({bookings:[],allowedBookingIds:[],actor:{role:'operations'}});
    if(url.includes('/rpc/sculpy_search_memory'))return Response.json([{id:'test-policy',content:'测试已批准政策',revision:2}]);
-   if(url.includes('/rpc/sculpy_monthly_report')){reportCalls++;assert.deepEqual(JSON.parse(opts.body),{p_month:'2026-09'});return Response.json({month:'2026-09',asOf:'2026-10-10T17:00:00Z',bookings:{completedAmountCents:'123456'},receipts:{grossAmountCents:'78900'}});}
+   if(url.includes('/rpc/sculpy_wedding_report')){reportCalls++;assert.equal(JSON.parse(opts.body).p_from,'2026-09-01');return Response.json({source:'canonical_wedding_intelligence_v23',period:{from:'2026-09-01',to:'2026-09-30'},asOf:'2026-10-10T17:00:00Z',cash:{netCents:'123456'},coverage:{}});}
    if(url.includes('sculpy_conversations')&&opts.method==='POST'){saved=JSON.parse(opts.body);return Response.json([saved]);}
    if(url.includes('database.test'))return Response.json([]);
    if(url.includes('api.openai.com')){
     const body=JSON.parse(opts.body);assert(!JSON.stringify(body).includes('forged-finance'));
-    if(++modelCalls===1)return Response.json({output:[{type:'function_call',name:'query_monthly_report',call_id:'cloud-month',arguments:'{"month":"2026-09"}'}]});
+    if(++modelCalls===1)return Response.json({output:[{type:'function_call',name:'query_wedding_intelligence',call_id:'cloud-wedding',arguments:JSON.stringify({from:'2026-09-01',to:'2026-09-30',observation:'2026-10-10',serviceYear:2027,source:null,service:null})}]});
     assert(body.input.some(i=>i.type==='function_call_output'&&i.output.includes('123456')));
     return Response.json({output_text:JSON.stringify({answer:'CAD 1,234.56',references:[],proposals:[]})});
    }throw Error('unexpected request');

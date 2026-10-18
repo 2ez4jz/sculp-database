@@ -94,7 +94,7 @@ export async function handleRequest(req: Request) {
         (t: any) =>
           Array.isArray(t.sourceIds) &&
           t.sourceIds.every((id: any) => allowed.has(id)) &&
-          (!t.businessReport || ["owner", "operations"].includes(context.actor?.role)) &&
+          (!(t.businessReport || t.weddingReportSources?.length) || ["owner", "operations"].includes(context.actor?.role)) &&
           (!t.operatingMemoryUsed || ["owner", "operations"].includes(context.actor?.role)),
       );
     } else {
@@ -218,6 +218,8 @@ export async function handleRequest(req: Request) {
         delete result.allowedBookingIds;
         return result;
       },
+      weddingReport: !demo && ["owner","operations"].includes(context.actor?.role)
+        ? (args:any) => rpc("sculpy_wedding_report", args) : undefined,
       monthlyReport: !demo && ["owner", "operations"].includes(context.actor?.role)
         ? (month: string) => rpc("sculpy_monthly_report", { p_month: month }) : undefined,
       demoReport: demo && context.advisorFixture ? (args:any)=>demoReport(demoCatalog,args,context.localDate) : undefined,

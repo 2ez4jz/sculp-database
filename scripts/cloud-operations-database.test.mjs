@@ -104,12 +104,10 @@ test('confirmed edits preserve timestamps, reject stale writes, deduplicate retr
     assert.equal((await detail(db)).edit.version,edit.version);assert.equal((await detail(db)).edit.details,edit.details);
     await db.exec('reset role;drop trigger fail_change on booking_changes;');
     await as(db,owner);
-    const reopened=await change(db,crypto.randomUUID(),b1,edit.version,{...payload(edit),status:'inquiry'});
-    assert.equal(reopened.version,3);
-    const v3=(await detail(db)).edit;
-    await assert.rejects(()=>change(db,crypto.randomUUID(),b1,3,{...payload(v3),status:'completed'}),/先重新打开或确认/);
-    await change(db,crypto.randomUUID(),b1,3,{...payload(v3),status:'confirmed',date:'2026-10-06',endDate:'2026-10-06'});
-    assert.equal((await report(db,'2026-10')).bookings.confirmed,2);
+    // V2.3 preserves signing history: old status editor cannot reopen/reconfirm.
+    await assert.rejects(()=>change(db,crypto.randomUUID(),b1,edit.version,{...payload(edit),status:'inquiry'}),/真实日期/);
+    await change(db,crypto.randomUUID(),b1,edit.version,{...payload(edit),date:'2026-10-06',endDate:'2026-10-06'});
+    assert.equal((await report(db,'2026-10')).bookings.completed,1);
     const updated=(await detail(db)).edit;
     await db.exec(`reset role;insert into bookings(id,client_id,service_id,starts_at,status)
       values('${id(46)}','${client}','${service}','2026-10-16T12:00:00Z','confirmed');`);
@@ -117,7 +115,7 @@ test('confirmed edits preserve timestamps, reject stale writes, deduplicate retr
     await assert.rejects(()=>change(db,crypto.randomUUID(),b1,updated.version,
       {...payload(updated),date:'2026-10-16',endDate:'2026-10-16'}),/当天已有同类订单/);
     assert.equal((await detail(db)).edit.version,updated.version);
-    await change(db,crypto.randomUUID(),b1,updated.version,{...payload(updated),status:'cancelled'});
+    await db.query('select sculpy_wedding_command($1,$2,$3)',[crypto.randomUUID(),'cancel_contract',{confirmed:true,reason:'Fixture cancellation',bookingId:b1,version:updated.version,effectiveAt:'2026-10-18'}]);
     assert.equal((await report(db,'2026-10')).bookings.cancelled,1);
   } finally {await db.close();}
 });
@@ -126,6 +124,8 @@ test('cloud month report: Toronto boundaries, line totals, missing prices, gross
   const db=await createDatabase();
   try {
     await seed(db);
+    // Preserve pre-V2.3 problematic legacy receipts for coverage warnings.
+    await db.exec('alter table payments disable trigger validate_payment_v23');
     await db.exec(`insert into bookings(id,client_id,starts_at,status,price_cad,currency) values
       ('${id(42)}','${client}','2026-10-01T03:59:59Z','completed',null,'CAD'),
       ('${id(43)}','${client}','2026-10-01T04:00:00Z','completed',50,'CAD'),
@@ -144,6 +144,7 @@ test('cloud month report: Toronto boundaries, line totals, missing prices, gross
       ('${id(60)}',10,'USD','cash','succeeded','2026-09-20T12:00:00Z');
       insert into invoices(id,booking_id,subtotal,deleted_at) values('${id(61)}','${b1}',500,now());
       insert into payments(invoice_id,amount,method,status,paid_at) values('${id(61)}',500,'cash','succeeded','2026-09-20T12:00:00Z');`);
+    await db.exec('alter table payments enable trigger validate_payment_v23');
     await as(db,owner);
     const sept=await report(db);assert.equal(sept.timezone,'America/Toronto');
     assert.equal(sept.bookings.completed,4);assert.equal(sept.bookings.completedAmountCents,'100030');

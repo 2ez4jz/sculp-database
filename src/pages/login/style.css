@@ -299,3 +299,19 @@
 }
 
 .cloud-intake{margin:20px 0;padding:18px;border:1px solid #d8c8d0;border-radius:16px;background:#fff}.cloud-intake summary{font-weight:650;cursor:pointer}.cloud-intake label{display:grid;gap:7px;margin:12px 0;font-size:14px}.cloud-intake input,.cloud-intake textarea,.cloud-intake select{box-sizing:border-box;min-width:0;width:100%;font:inherit;padding:10px;border:1px solid #c9c4c7;border-radius:8px;background:#fff}.cloud-intake textarea{min-height:100px;resize:vertical}.cloud-intake button{font:inherit;padding:10px 14px;border-radius:8px;cursor:pointer}.intake-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.intake-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.cloud-intake .intake-consent{display:flex;align-items:center;gap:10px}.intake-consent input{width:auto}.cloud-intake [data-status]{line-height:1.6;font-size:15px}.cloud-intake button:disabled{opacity:.6;cursor:wait}[data-order-detail]{padding:18px;border:1px solid #bdb2bc;border-radius:14px;margin:16px 0;background:#fff}[data-order-detail] pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}[data-order-detail] p{overflow-wrap:anywhere;line-height:1.6}@media(max-width:600px){.intake-fields{grid-template-columns:1fr}}
+
+/* Wedding intelligence: compact business cards, explicit date bases. */
+.w23-dashboard { margin: 18px 0; padding: 20px; border: 1px solid #dddcd5; border-radius: 18px; background: #fafbf8; }
+.w23-heading { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:16px; }
+.w23-heading h3 { margin:4px 0; }.w23-heading small,.w23-heading>span { color:#686e64; font-size:12px; }
+.w23-actions { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+.w23-headline,.w23-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:12px; margin:16px 0; }
+.w23-headline>div { padding:18px; background:white; border-radius:12px; border:1px solid #e2e4dd; }
+.w23-headline dt,.w23-metrics dt { font-size:12px; color:#62695e; }.w23-headline dd { font-size:25px; margin:8px 0; font-weight:600; font-variant-numeric:tabular-nums; }
+.w23-metrics dd { margin:5px 0 0; font-weight:600; }.w23-headline small { font-size:11px;color:#74796e; }
+.w23-section { padding:18px 0; border-top:1px solid #dedfd8; }.w23-section>summary { font-size:16px; font-weight:600; cursor:pointer; }
+.w23-section p { line-height:1.7; }.w23-coverage { font-size:12px; line-height:1.7; background:#f0ede5; color:#625c4d; padding:12px; border-radius:8px; }
+.w23-chart { margin:14px 0; }.w23-bar { display:grid; grid-template-columns:68px minmax(36px,1fr) 120px; gap:10px; align-items:center; margin:8px 0; font-size:12px; }.w23-bar>div { height:16px; background:#eceee8; border-radius:3px; overflow:hidden; }.w23-bar i { display:block; min-width:0; height:100%; border-radius:3px; }.w23-bar strong { text-align:right; font-size:12px; font-weight:500; font-variant-numeric:tabular-nums; }
+.w23-table { max-width:100%; overflow:auto; }.w23-table table { width:100%; border-collapse:collapse; text-align:left; font-size:12px; white-space:nowrap; }.w23-table th,.w23-table td { padding:10px; border-bottom:1px solid #e3e3db; }
+.w23-business input[type=checkbox] { width:auto; }[hidden] { display:none!important; }
+@media(max-width:600px){.w23-dashboard{padding:14px 10px;border-radius:12px}.w23-heading{display:block}.w23-headline{grid-template-columns:1fr}.w23-headline>div{padding:14px}.w23-headline dd{font-size:26px}.w23-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.w23-bar{grid-template-columns:55px minmax(20px,1fr) 98px;gap:6px;font-size:11px}.w23-bar strong{font-size:11px}.w23-actions button{flex:1 0 40%}}

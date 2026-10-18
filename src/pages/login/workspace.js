@@ -1,3 +1,5 @@
+import {mountBookingBusiness} from './booking-business.js?v=23';
+import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
 import { mountWebsiteEnquiries } from './enquiries.js?v=20261018';
 import { mountCloudIntake } from './intake.js?v=orders-album-20261016';
 import { mountOrderEditor } from './order-editor.js';
@@ -30,22 +32,22 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     panel.open();
   };
   const reportRoot = document.createElement('section');
-  let report = null, editor = null;
+  let report = null, editor = null, business = null;
   if (businessAdmin) {
-    root.append(reportRoot);
-    report = mountMonthlyReport({root:reportRoot,supabase});
+    root.prepend(reportRoot);
+    report = mountWeddingDashboard({root:reportRoot,supabase});
   }
   const enquiriesRoot=document.createElement('div');
   let enquiries=null;
-  if(businessAdmin){root.prepend(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase});}
+  if(businessAdmin){reportRoot.after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase});}
   let detailVersion = 0;
   async function openOrder(id) {
-    if (editor && !editor.canLeave()) {
+    if ((editor && !editor.canLeave()) || (business && !business.canLeave())) {
       const status = root.querySelector('[data-edit-status]');
       if(status)status.textContent='修改仍在保存或尚未收到确认，请先重试同一笔修改。';
       return;
     }
-    editor?.destroy(); editor=null;
+    editor?.destroy(); editor=null; business?.destroy();business=null;
     const mine = ++detailVersion;
     const detail = $("[data-order-detail]");
     detail.hidden = false;
@@ -58,6 +60,8 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     detail.innerHTML=`<h3>${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)}</h3><p>${esc(new Date(b.starts_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 多伦多时间</p><p>${esc(b.venue||'地点待定')} · ${esc(b.artists.join(' / ')||'人员待定')}</p><p>服务需求：${esc(b.service_details||'待补充')}</p>${['operations','owner'].includes(profile.role)?`<p>预算：${b.budget_cad==null?'未填写':esc(b.budget_cad)+' CAD'} · 成交价：${b.price_cad==null?'未确定':esc(b.price_cad)+' CAD'}</p>`:''}<p>状态：${esc({inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'}[b.status]||b.status)}</p>${data.intake?`<details><summary>查看原始记录与时间</summary><p>录入：${esc(new Date(data.intake.recordedAt).toLocaleString('zh-CN'))} · 保存：${esc(new Date(data.intake.savedAt).toLocaleString('zh-CN'))}</p><pre>${esc(data.intake.rawText)}</pre></details>`:''}<button type="button" data-discuss>与 Sculpy 讨论这笔订单</button>`;
     detail.querySelector('[data-discuss]').onclick=()=>{current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};panel.open()};
     if(businessAdmin && data.edit) {
+      const businessRoot=document.createElement('div');detail.append(businessRoot);
+      business=mountBookingBusiness({root:businessRoot,supabase,bookingId:id,onSaved:async savedId=>{business?.destroy();business=null;await load();await openOrder(savedId);void report?.refresh();}});
       const editRoot=document.createElement('div');detail.append(editRoot);
       editor=mountOrderEditor({root:editRoot,supabase,bookingId:id,edit:data.edit,
         onSaved:async savedId=>{await load();await openOrder(savedId);}});
@@ -151,6 +155,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       enquiries?.destroy();
       intake?.destroy();
       editor?.destroy();
+      business?.destroy();
       report?.destroy();
       panel.destroy();
     },

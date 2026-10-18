@@ -1,4 +1,4 @@
-import { mountCloudWorkspace } from "./workspace.js?v=orders-album-20261016";
+import { mountCloudWorkspace } from "./workspace.js?v=wedding-v23-20261018";
 import { accountIdentifier, normalizeUsername } from "../../domain/accounts.js";
 import { config } from "../../config.js";
 import {
