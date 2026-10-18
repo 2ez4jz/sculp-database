@@ -25,7 +25,10 @@ jobs:
         run: npm run test:database
       - name: Verify interactions and responsive layouts
         run: |
+          mkdir -p qa-screens
+          exec > >(tee qa-screens/browser-check.log) 2>&1
           python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
+          node scripts/wedding-v23-browser.cjs
           node scripts/order-numbers.cjs
           node scripts/unified-demo.cjs
           node scripts/monthly-browser.cjs
@@ -46,7 +49,6 @@ jobs:
           node scripts/booking-album.cjs
           node scripts/cloud-intake.cjs
           node scripts/cloud-operations.cjs
-          node scripts/wedding-v23-browser.cjs
       - name: Save visual checks
         if: always()
         uses: actions/upload-artifact@v4

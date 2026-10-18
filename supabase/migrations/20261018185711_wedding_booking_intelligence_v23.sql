@@ -514,7 +514,6 @@ begin
   on conflict(bucket) do update set n=case when enquiry_limits.window_start=window_time then enquiry_limits.n+1 else 1 end,window_start=window_time returning enquiry_limits.n into n;
   if n>(case when bucket_key like 'ip:%' then 10 else 3 end) then raise exception 'Rate limit exceeded' using errcode='P0429';end if;
  end loop;
- delete from sculpy_private.enquiry_limits where window_start<now()-interval '2 days';
  insert into public.website_enquiries(submission_id,name,email,service,service_type,contact,contact_method,artist,event_date,location,party_size,timing,details,original_details,submission_fingerprint,utm_source,utm_medium,utm_campaign,landing_referrer)
  values((p_payload->>'submission_id')::uuid,p_payload->>'name',lower(p_payload->>'email'),p_payload->>'service',
  case p_payload->>'service' when 'Bridal' then 'wedding' when 'Event Styling' then 'event' when 'Personal Styling' then 'personal' when 'Commercial Beauty' then 'commercial' when 'Photoshoot Styling' then 'photoshoot' when '1-on-1 Styling Lesson' then 'education' when 'Group Styling Class' then 'education' end,
