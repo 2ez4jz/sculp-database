@@ -1,4 +1,4 @@
-const origins=new Set(['https://sculpstudio.ca','https://www.sculpstudio.ca']);
+const origins=new Set(['https://sculpstudio.ca','https://www.sculpstudio.ca','https://2ez4jz.github.io']);
 export function makeEnquiryHandler(submit){return async req=>{
  const origin=req.headers.get('origin')||'',headers={'Content-Type':'application/json','Access-Control-Allow-Origin':origins.has(origin)?origin:'https://sculpstudio.ca','Access-Control-Allow-Methods':'POST,OPTIONS','Access-Control-Allow-Headers':'content-type','Vary':'Origin','Cache-Control':'no-store'};
  const reply=(body,status=200)=>new Response(JSON.stringify(body),{status,headers});
