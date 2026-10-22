@@ -1,5 +1,7 @@
 # Sculpy — SCULP Studio internal app
 
+Current release: **V2.3.1 (2026-10-22)**. Cloud write retries and acknowledgment handling are hardened; the assistant knows its current capabilities, task boundaries and recent release changes. Existing workflows remain intact. See [release evidence and acceptance boundaries](docs/V231_RELEASE.md).
+
 Every SCULP booking becomes a record connecting the client, artist, venue, partners, notes and photos.
 
 ## Run

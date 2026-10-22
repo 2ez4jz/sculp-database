@@ -288,11 +288,11 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     for(const tool of body.tools||[])assert(toolCapabilities[tool.name],`Missing capability contract: ${tool.name}`);
     const marker='可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n';
     const knowledge=JSON.parse(body.instructions.split(marker)[1].split('\n')[0]);
-    assert.equal(knowledge.latestBusinessRelease.version,'V2.3');
-    assert.equal(knowledge.latestBusinessRelease.date,'2026-10-18');
+    assert.equal(knowledge.latestBusinessRelease.version,'V2.3.1');
+    assert.equal(knowledge.latestBusinessRelease.date,'2026-10-22');
     assert.equal(knowledge.includedBackendUpdate.name,'功能与更新自知');
     assert(knowledge.availableTools.includes(expected));assert(!knowledge.availableTools.includes(missing));
-    assert(knowledge.notReleased.some(x=>x.includes('未核实发布')));
+    assert.equal(knowledge.latestBusinessRelease.status,'deployed');assert.equal(knowledge.notReleased.length,0);
     assert.match(body.instructions,/不让用户上传已有更新日志/);
     assert.match(body.instructions,/历史回答说不知道功能或更新时/);
     if(context.actor?.role==='artist')assert(knowledge.applicationFeatures.some(x=>x.includes('不对当前角色开放')));
