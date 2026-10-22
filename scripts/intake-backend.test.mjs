@@ -20,3 +20,17 @@ test('cloud AI endpoint: unauthenticated/inactive/staff blocked before model; re
   const result=await handleRequest(request({rawText:'我是Amy，11月15日结婚，联系过Miranda，预算1800。'}));assert.equal(result.status,200);assert.equal((await result.json()).draft.date,'');assert.equal(modelCalls,1);
  }finally{globalThis.fetch=original}
 });
+
+import {cloudWriteFailure,intakeRpc} from '../src/services/cloud-intake.js';
+
+test('lost acknowledgments retain replay identity even when message mentions business fields',async()=>{
+ for(const error of [Error('客户日期保存后网络断开'),{code:'08006'},{code:'57014'},{code:'PGRST000'},{code:'XX000'}])
+  assert.equal(cloudWriteFailure(error),'uncertain');
+ for(const code of ['22023','23505','P0001'])assert.equal(cloudWriteFailure({code}),'rejected');
+ for(const code of ['40001','42501'])assert.equal(cloudWriteFailure({code}),'refresh');
+});
+
+test('RPC propagates database conflict codes and does not invent an acknowledgment',async()=>{
+ await assert.rejects(()=>intakeRpc({rpc:async()=>({error:{code:'40001',message:'Changed elsewhere'}})},'command',{}),e=>e.code==='40001');
+ await assert.rejects(()=>intakeRpc({rpc:async()=>({data:null})},'command',{}),/未返回结果/);
+});

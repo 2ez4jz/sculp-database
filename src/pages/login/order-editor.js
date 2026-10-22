@@ -1,4 +1,4 @@
-import { intakeRpc } from '../../services/cloud-intake.js';
+import { intakeRpc, cloudWriteFailure } from '../../services/cloud-intake.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c =>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const statuses = {inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'};
@@ -59,11 +59,11 @@ export function mountOrderEditor({root, supabase, bookingId, edit, onSaved}) {
       catch { status('修改已保存，但重新读取失败。请重新查询订单。'); }
     } catch(error) {
       if(destroyed)return;
-      if(error.code==='40001') {
-        status('另一窗口已修改订单。请重新查询订单，按最新内容核对；本次未保存。');
+      if(cloudWriteFailure(error)==='refresh') {
+        status(error.code==='40001'?'另一窗口已修改订单。请重新查询订单，按最新内容核对；本次未保存。':'权限已变化，请重新登录并查询订单；本次未保存。');
         // Require a fresh detail read, never automatically overwrite a conflict.
         $('[data-change-review]').replaceChildren(); pending=null; review=null;
-      } else if (/^(22|23|42|P0)/.test(error.code||'')) {
+      } else if (cloudWriteFailure(error)==='rejected') {
         pending=null;review=null;freeze(false);$('[data-change-review]').replaceChildren();status(error.message);
       } else {
         status('尚未收到成功确认。'+error.message+' 请重试同一笔修改。');

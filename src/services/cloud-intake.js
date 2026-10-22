@@ -10,3 +10,12 @@ export async function intakeRpc(supabase,name,args){
  if(error){const e=Error(error.message||'云端操作失败，请重试。');e.code=error.code;throw e;}
  if(!data)throw Error('云端未返回结果，请重试。');return data;
 }
+
+// A transport failure does not prove that the transaction rolled back. Preserve
+// its exact replay key unless the database explicitly rejected the command.
+export function cloudWriteFailure(error) {
+ const code=String(error?.code||'');
+ if(code==='40001'||code==='42501')return 'refresh';
+ if(/^(22|23|42|P0)/.test(code))return 'rejected';
+ return 'uncertain';
+}

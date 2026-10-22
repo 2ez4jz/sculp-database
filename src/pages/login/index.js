@@ -91,6 +91,10 @@ async function showWorkspace() {
     profile,
   });
   root.querySelector("#logout").onclick = async () => {
+    if(workspace && !workspace.canLeave()) {
+      message('操作仍在保存或尚未收到确认，请先重试同一笔操作，再退出登录。');
+      return;
+    }
     const { error } = await supabase.auth.signOut({ scope: "local" });
     if (error) {
       message("退出失败，请检查网络后重试。");

@@ -1,5 +1,5 @@
 import { config } from '../../config.js';
-import {identifyCloudIntake,intakeRpc} from '../../services/cloud-intake.js';
+import {identifyCloudIntake,intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountCloudIntake({root,supabase,onSaved}){
  let destroyed=false,version=0,recordedAt=null,requestId=null,pending=null,saving=false,lookupVersion=0;
@@ -36,6 +36,7 @@ export function mountCloudIntake({root,supabase,onSaved}){
     try{
      const result=await intakeRpc(supabase,'sculpy_confirm_intake',pending);
      if(destroyed||mine!==version)return;
+     pending=null;
      status('已保存到云端。正在重新读取订单…');
      $('[data-new]').hidden=false;$('[data-new]').disabled=false;
      try{await onSaved(result.bookingId);status('已保存并重新读取云端订单。其他设备登录后可查询。');}catch{status('订单已保存，但重新读取失败。请刷新查询，勿重复建单。');}
@@ -44,7 +45,8 @@ export function mountCloudIntake({root,supabase,onSaved}){
      status(error.message+' 若网络中断，请点击重试；尚未收到成功确认。');
      const submit=form.querySelector('[type=submit]');submit.disabled=false;submit.textContent='重试同一笔保存';
      // Database validation failures are definitive. Allow corrections with a fresh key.
-     if(/^(22|23|42|P0)/.test(error.code||'') || /同名|重复|年份|日期|时间|预算|客户资料|字段|服务类型|化妆师|原文|请求已使用/.test(error.message)){
+     if(cloudWriteFailure(error)==='refresh'){pending=null;submit.disabled=true;status('权限或订单状态已变化，请重新登录或查询后核对；本次未保存。');}
+     else if(cloudWriteFailure(error)==='rejected'){
       pending=null;requestId=crypto.randomUUID();source.disabled=false;$('[data-identify]').disabled=false;$('[data-manual]').disabled=false;
       form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=false);form.elements.confirmed.checked=false;submit.textContent='确认保存到云端';
      }
@@ -61,5 +63,5 @@ export function mountCloudIntake({root,supabase,onSaved}){
   try{const result=await identifyCloudIntake(supabase,source.value);if(destroyed||mine!==version)return;if(!result.isNewBooking){status(result.warnings.join('；')||'未识别到明确的新订单需求，请核对或手动填写。');return;}await review(result.draft,result.warnings);}
   catch(e){if(!destroyed&&mine===version)status(e.message)}finally{if(!destroyed&&!saving)button.disabled=false;}
  };
- return {open(){if(destroyed)return;$('details').open=true;source.focus();},destroy(){destroyed=true;version++;root.replaceChildren();}};
+ return {canLeave:()=>!saving&&!pending,open(){if(destroyed)return;$('details').open=true;source.focus();},destroy(){destroyed=true;version++;root.replaceChildren();}};
 }

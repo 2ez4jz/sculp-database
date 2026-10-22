@@ -34,7 +34,7 @@ test('separate signing, service, receipts; partial refunds, amendments, replay a
   d=await detail(db,b);assert.equal(d.amountCents,'250000');assert.equal(d.receivedCents,'230000');assert.equal(d.outstandingCents,'20000');assert.equal(d.payments.length,3);
   const sept=await report(db,'2026-09-01','2026-09-30');assert.equal(sept.sales.count,1);assert.equal(sept.sales.signedCents,'200000');assert.equal(sept.cash.netCents,'60000');
   const oct=await report(db);assert.equal(oct.sales.count,0);assert.equal(oct.sales.changeCents,'50000');assert.equal(oct.cash.netCents,'170000');assert.equal(oct.forward.amountCents,'250000');assert.equal(oct.forward.months[0].month,'2027-07');assert.equal(oct.bookingPace.comparable,false);assert(!('count' in oct.bookingPace.peer));
-  await db.exec('reset role');assert.equal((await db.query('select confirmed_at::date d from bookings where id=$1',[b])).rows[0].d.toISOString().slice(0,10),'2026-09-12');
+  await db.exec('reset role');assert.equal((await db.query("select to_char(confirmed_at at time zone 'America/Toronto','YYYY-MM-DD') d from bookings where id=$1",[b])).rows[0].d,'2026-09-12');
   await assert.rejects(()=>db.query('update booking_business_events set amount=0 where booking_id=$1',[b]),/append-only/);
   await assert.rejects(()=>db.query("update payments set amount=1 where id=$1",[p.paymentId]),/不可覆盖/);
  }finally{await db.close();}

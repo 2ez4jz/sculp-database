@@ -1,3 +1,4 @@
+import {productKnowledgeInstructions} from "./product-knowledge.js";
 import {allowsIllustrativeNumbers} from "./agent-routing.js";
 import {analysisPeriodInstructions} from "./period-policy.js";
 // Opt-in demo-only Agent SDK adapter. Never passes SQL or unrestricted database access to the model.
@@ -42,7 +43,7 @@ export async function runSculpyDemoAgent({message,context,turns=[],preferences={
   name:"Sculpy Operating Analyst",
   model,
   modelSettings:{store:false,maxTokens:5000,reasoning:{effort}},
-  instructions:instructions+"\n"+conversationInstructions(message,turns)+"\n"+analysisPeriodInstructions(message,turns,context)+"\n"+demoReportingInstructions+"\nUse query_demo_report for exact business numbers; comparisons require separate periods. For ordinary conversation or conceptual questions, answer naturally without reports. Tools are read-only. Never claim a write or a confirmed policy. Keep explanations proportionate to the question.",
+  instructions:instructions+"\n"+productKnowledgeInstructions({context,toolNames:["query_demo_report",...(queryBookings?["query_bookings"]:[])]})+"\n"+conversationInstructions(message,turns)+"\n"+analysisPeriodInstructions(message,turns,context)+"\n"+demoReportingInstructions+"\nUse query_demo_report for exact business numbers; comparisons require separate periods. For ordinary conversation or conceptual questions, answer naturally without reports. Tools are read-only. Never claim a write or a confirmed policy. Keep explanations proportionate to the question.",
   tools:queryBookings?[report,bookings]:[report]
  });
  // SDK-native session keeps user/assistant roles distinct; durable source remains the
