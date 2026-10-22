@@ -1,4 +1,4 @@
-import { intakeRpc, cloudWriteFailure } from '../../services/cloud-intake.js';
+import { intakeRpc, cloudWriteFailure } from '../../services/cloud-intake.js?v=cloud-write-20261022';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c =>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const statuses = {inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'};

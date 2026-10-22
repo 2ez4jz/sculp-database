@@ -1,8 +1,8 @@
-import {mountBookingBusiness} from './booking-business.js?v=23';
+import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
-import { mountWebsiteEnquiries } from './enquiries.js?v=20261018';
-import { mountCloudIntake } from './intake.js?v=orders-album-20261016';
-import { mountOrderEditor } from './order-editor.js';
+import { mountWebsiteEnquiries } from './enquiries.js?v=cloud-write-20261022';
+import { mountCloudIntake } from './intake.js?v=cloud-write-20261022';
+import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";

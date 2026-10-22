@@ -1,4 +1,4 @@
-import {intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js';
+import {intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js?v=cloud-write-20261022';
 import {esc,money,today} from './wedding-dashboard.js';
 export function mountBookingBusiness({root,supabase,bookingId,onSaved}){
  let alive=true,pending=null,saving=false,saved=false,needsRefresh=false;

@@ -1,4 +1,4 @@
-import {intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js';
+import {intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js?v=cloud-write-20261022';
 import {esc,today} from './wedding-dashboard.js';
 const sources={unknown:'尚未确认',instagram:'Instagram',google:'Google 搜索',xiaohongshu:'小红书',wechat:'微信',referral:'熟人/客户推荐',planner:'婚礼策划师推荐',direct:'直接访问',other:'其他'};
 const states={pending:'待处理',contacted:'已联系',qualified:'跟进中',quoted:'已报价',won:'已成交',lost:'明确未成交',spam:'无效询盘'};

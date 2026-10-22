@@ -1,5 +1,5 @@
 import { config } from '../../config.js';
-import {identifyCloudIntake,intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js';
+import {identifyCloudIntake,intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js?v=cloud-write-20261022';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountCloudIntake({root,supabase,onSaved}){
  let destroyed=false,version=0,recordedAt=null,requestId=null,pending=null,saving=false,lookupVersion=0;
