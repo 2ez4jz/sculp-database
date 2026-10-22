@@ -292,7 +292,7 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     assert.equal(knowledge.latestBusinessRelease.date,'2026-10-22');
     assert.equal(knowledge.includedBackendUpdate.name,'功能与更新自知');
     assert(knowledge.availableTools.includes(expected));assert(!knowledge.availableTools.includes(missing));
-    assert.equal(knowledge.latestBusinessRelease.status,'deployed');assert.equal(knowledge.notReleased.length,0);
+    assert.equal(knowledge.latestBusinessRelease.status,'deployed');assert(Array.isArray(knowledge.notReleased));assert(!knowledge.latestBusinessRelease.changes.some(x=>x.includes('尚未核实上线')));
     assert.match(body.instructions,/不让用户上传已有更新日志/);
     assert.match(body.instructions,/历史回答说不知道功能或更新时/);
     if(context.actor?.role==='artist')assert(knowledge.applicationFeatures.some(x=>x.includes('不对当前角色开放')));

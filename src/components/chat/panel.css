@@ -504,3 +504,33 @@ body.sculpy-chat-page #main.sculpy-reveal { animation: none; }
 @media(max-width:600px){
  .chat-inline #chat-voice.is-recording{background:#f9e5e0;color:#aa453c;box-shadow:0 0 0 3px #aa453c13}
 }
+
+/* Desktop: reserve the viewport for the transcript instead of a tall intro. */
+@media(min-width:601px){
+ body.sculpy-chat-page{overflow:hidden}
+ body.sculpy-chat-page .shell{height:100dvh;display:flex;flex-direction:column}
+ body.sculpy-chat-page .topbar{height:60px;min-height:60px;flex-shrink:0;padding-top:6px;padding-bottom:6px}
+ body.sculpy-chat-page #main{flex:1;min-height:0;width:100%;display:flex;flex-direction:column}
+ body.sculpy-chat-page .demo-data-notice{flex-shrink:0;margin:0;padding:4px 16px;font-size:11px;line-height:18px}
+ body.sculpy-chat-page .tour-banner{flex-shrink:0}
+ body.sculpy-chat-page #sculpy-chat-root{display:flex;flex-direction:column;flex:1;min-height:0}
+ body.sculpy-chat-page .chat-inline{display:flex;flex-direction:column;flex:1;min-height:0}
+ body.sculpy-chat-page .chat-inline .chat-dialog{flex:1;min-height:0;height:auto;overflow:hidden}
+ .chat-inline .chat-header{flex-shrink:0;padding:8px 16px;gap:10px}
+ .chat-inline .chat-header img{width:32px;height:32px}
+ .chat-inline .chat-header>div{display:flex;align-items:center;flex-wrap:wrap;column-gap:12px;row-gap:2px}
+ .chat-inline .chat-header h2{font-size:22px;line-height:28px;margin:0}
+ .chat-inline .chat-header .chat-scope{font-size:12px;line-height:18px;margin:0}
+ .chat-inline .chat-header .chat-model-status{margin:0;font-size:11px;line-height:18px}
+ .chat-inline .chat-preferences{flex-shrink:0;padding:0 16px 4px;font-size:12px;line-height:20px}
+ .chat-inline .chat-preferences>summary{padding:0;line-height:20px}
+ .chat-inline .chat-preferences[open]{max-height:30%;padding:10px 16px}
+ .chat-inline .chat-messages{min-height:0;min-width:0;padding-top:12px;padding-bottom:16px}
+ .chat-inline .chat-status:empty{display:none}
+ .chat-inline .chat-composer{flex-shrink:0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:10px 12px;margin:6px auto 12px}
+ .chat-inline .chat-composer textarea{grid-column:1/-1;height:48px;min-height:48px;max-height:160px;font-size:16px;line-height:24px;padding:0 4px;resize:none}
+ .chat-inline .chat-composer>div{grid-column:1/-1}
+ .chat-inline .chat-composer button{padding:6px 12px;font-size:13px;line-height:20px}
+ .chat-inline .chat-composer small{margin:0;font-size:10px;line-height:14px}
+ .chat-inline .chat-keyboard-hint{text-align:right}
+}
