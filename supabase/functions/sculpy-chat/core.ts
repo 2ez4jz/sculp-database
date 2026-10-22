@@ -1,3 +1,4 @@
+import {productKnowledgeInstructions} from './product-knowledge.js';
 import {weddingReportTool,validateWeddingQuery,weddingInstructions} from './wedding-tools.js';
 import {sculpStudioTone} from "./studio-tone.js";
 import {validateBookingQuery} from "./tool-policy.js";
@@ -108,7 +109,7 @@ export async function converse({
   const usage = { input_tokens: 0, output_tokens: 0, calls: 0 };
   for (let round = 0; round < 4; round++) {
     const response = await callModel({
-      instructions: instructions + "\n" + conversationInstructions(message,turns) + "\n" + analysisPeriodInstructions(message,turns,context) + "\n" + (canWeddingReport ? weddingInstructions : reportingInstructions) + (canDemoReport ? "\n" + demoReportingInstructions : ""),
+      instructions: instructions + "\n" + productKnowledgeInstructions({context,canPropose:context.mode==='fictional_demo'||['owner','operations','artist'].includes(context.actor?.role),toolNames:['query_bookings',...(canWeddingReport?['query_wedding_intelligence']:canReport?['query_monthly_report']:[]),...(canDemoReport?['query_demo_report']:[])]}) + "\n" + conversationInstructions(message,turns) + "\n" + analysisPeriodInstructions(message,turns,context) + "\n" + (canWeddingReport ? weddingInstructions : reportingInstructions) + (canDemoReport ? "\n" + demoReportingInstructions : ""),
       input,
       tools: round < 3 ? [queryTool, ...(canWeddingReport ? [weddingReportTool] : canReport ? [monthlyReportTool] : []), ...(canDemoReport ? [demoReportTool] : [])] : [],
       ...(structuredIntent(message) ? {text: {

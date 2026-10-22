@@ -13,7 +13,7 @@ const assert=require('node:assert/strict');
   window.intake=mountCloudIntake({root:document.querySelector('#test-root'),supabase:{rpc:async(name,args)=>{
    if(name==='sculpy_intake_lookup')return {data:{clients:args.p_name==='Existing'?[{id:'client1',display_name:'Existing',city:'Toronto'}]:[],services:[{id:'service1',code:'wedding',name:'Wedding'}],artists:[]}};
    window.calls.push(args);window.saved=1;
-   if(window.loseResponse){window.loseResponse=false;throw Error('Network failed')}
+   if(window.loseResponse){window.loseResponse=false;throw Error('客户日期已提交，网络确认丢失')}
    return {data:{bookingId:'booking1',clientId:'client1',savedAt:new Date().toISOString()}};
   }},onSaved:async id=>{window.reloaded=id}});
  });
@@ -26,7 +26,9 @@ const assert=require('node:assert/strict');
  await page.locator('[name=confirmed]').check();await page.locator('[type=submit]').click();
  await page.getByRole('button',{name:'重试同一笔保存'}).waitFor();
  assert.equal(await page.locator('[data-source]').isDisabled(),true);
+ assert.equal(await page.evaluate(()=>window.intake.canLeave()),false);
  await page.getByRole('button',{name:'重试同一笔保存'}).click();await page.getByText('已保存并重新读取云端订单。其他设备登录后可查询。').waitFor();
+ assert.equal(await page.evaluate(()=>window.intake.canLeave()),true);
  const result=await page.evaluate(()=>({calls:window.calls,reloaded:window.reloaded,saved:window.saved}));
  assert.equal(result.saved,1);assert.equal(result.calls.length,2);assert.deepEqual(result.calls[0],result.calls[1]);assert.equal(result.calls[0].p_raw_text,raw);assert.equal(result.reloaded,'booking1');
  await page.locator('[data-new]').click();assert.equal(await page.locator('[data-source]').inputValue(),'');

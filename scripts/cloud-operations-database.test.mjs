@@ -115,8 +115,9 @@ test('confirmed edits preserve timestamps, reject stale writes, deduplicate retr
     await assert.rejects(()=>change(db,crypto.randomUUID(),b1,updated.version,
       {...payload(updated),date:'2026-10-16',endDate:'2026-10-16'}),/当天已有同类订单/);
     assert.equal((await detail(db)).edit.version,updated.version);
-    await db.query('select sculpy_wedding_command($1,$2,$3)',[crypto.randomUUID(),'cancel_contract',{confirmed:true,reason:'Fixture cancellation',bookingId:b1,version:updated.version,effectiveAt:'2026-10-18'}]);
-    assert.equal((await report(db,'2026-10')).bookings.cancelled,1);
+    const cancellationDay=(await db.query("select to_char(now() at time zone 'America/Toronto','YYYY-MM-DD') d")).rows[0].d;
+    await db.query('select sculpy_wedding_command($1,$2,$3)',[crypto.randomUUID(),'cancel_contract',{confirmed:true,reason:'Fixture cancellation',bookingId:b1,version:updated.version,effectiveAt:cancellationDay}]);
+    assert.equal((await report(db,cancellationDay.slice(0,7))).bookings.cancelled,1);
   } finally {await db.close();}
 });
 

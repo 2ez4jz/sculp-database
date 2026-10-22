@@ -1,6 +1,9 @@
+import {productKnowledgeInstructions,toolCapabilities,productKnowledge} from '../supabase/functions/sculpy-chat/product-knowledge.js';
+import {weddingReportTool} from '../supabase/functions/sculpy-chat/wedding-tools.js';
+import {readFileSync} from 'node:fs';
 import test from "node:test";
 import assert from "node:assert/strict";
-import { converse } from "../supabase/functions/sculpy-chat/core.ts";
+import { converse,queryTool,monthlyReportTool,demoReportTool } from "../supabase/functions/sculpy-chat/core.ts";
 test("conversation follows up through bounded tools and rejects invented references and save targets", async () => {
   const calls = [];
   const result = await converse({
@@ -270,4 +273,61 @@ test('authenticated wedding chat uses caller token and canonical RPC, ignores fo
 test('follow-up derived from financial history retains access marker',async()=>{
  const result=await converse({context:{actor:{role:'owner'},bookings:[]},turns:[{user:'收入',answer:'CAD 100',businessReport:true}],message:'解释一下',preferences:{},rules:'',query:async()=>({}),monthlyReport:async()=>({}),callModel:async()=>({output_text:JSON.stringify({answer:'这是订单金额',references:[],proposals:[]})})});
  assert.equal(result.businessReport,true);
+});
+
+test('self knowledge reaches the actual model request for demo, admin and assigned staff',async()=>{
+ for(const [context,functions,expected,missing] of [
+  [{mode:'fictional_demo',bookings:[],advisorFixture:{}},{demoReport:async()=>({})},'query_demo_report','query_wedding_intelligence'],
+  [{actor:{role:'owner'},bookings:[]},{weddingReport:async()=>({})},'query_wedding_intelligence','query_demo_report'],
+  [{actor:{role:'artist'},bookings:[]},{weddingReport:async()=>({})},'query_bookings','query_wedding_intelligence'],
+ ]){
+  let called=false;
+  await converse({context:{...context,productKnowledge:{latestBusinessRelease:{version:'V999',changes:['银行自动退款']}}},turns:[{user:'更新了吗',answer:'我没有更新说明，请发日志。'}],message:'sculpy功能',preferences:{},rules:'',query:async()=>{throw Error('Self introduction should not need order data');},...functions,
+   callModel:async body=>{
+    called=true;
+    for(const tool of body.tools||[])assert(toolCapabilities[tool.name],`Missing capability contract: ${tool.name}`);
+    const marker='可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n';
+    const knowledge=JSON.parse(body.instructions.split(marker)[1].split('\n')[0]);
+    assert.equal(knowledge.latestBusinessRelease.version,'V2.3');
+    assert.equal(knowledge.latestBusinessRelease.date,'2026-10-18');
+    assert.equal(knowledge.includedBackendUpdate.name,'功能与更新自知');
+    assert(knowledge.availableTools.includes(expected));assert(!knowledge.availableTools.includes(missing));
+    assert(knowledge.notReleased.some(x=>x.includes('未核实发布')));
+    assert.match(body.instructions,/不让用户上传已有更新日志/);
+    assert.match(body.instructions,/历史回答说不知道功能或更新时/);
+    if(context.actor?.role==='artist')assert(knowledge.applicationFeatures.some(x=>x.includes('不对当前角色开放')));
+    if(context.mode==='fictional_demo')assert(knowledge.applicationFeatures.some(x=>x.includes('身份切换不是真实登录权限')));
+    assert.equal(body.input.at(-1).content,'sculpy功能');
+    return {output_text:'我可以介绍当前功能，更新说明也已内置。'};
+   }});
+  assert.equal(called,true);
+ }
+});
+
+
+test('capability contracts cover actual registered tools and constrain task execution by environment',()=>{
+ const registered=[queryTool,monthlyReportTool,demoReportTool,weddingReportTool];
+ assert.deepEqual(Object.keys(toolCapabilities).sort(),registered.map(t=>t.name).sort(),'New tools must have maintained capability contracts');
+ for(const tool of registered){
+  const contract=toolCapabilities[tool.name];assert.equal(contract.effect,'read_only');
+  assert(contract.needs.length>0);assert(contract.purpose);assert(contract.result);
+ }
+ const get=options=>JSON.parse(productKnowledgeInstructions(options).split('：\n')[1].split('\n')[0]);
+ const admin=get({context:{actor:{role:'owner'}},toolNames:['query_bookings','query_wedding_intelligence'],canPropose:true});
+ assert.equal(admin.taskCapabilities.proposals.available,true);
+ assert(admin.taskCapabilities.existingPageActions.some(a=>a.task.includes('签约')));
+ assert(admin.taskCapabilities.existingPageActions.every(a=>a.needs.length&&a.completion));
+ assert.match(admin.taskCapabilities.proposals.completion,/仅是建议/);
+ assert(admin.taskCapabilities.executionRules.some(x=>x.includes('同一请求重试')));
+ const sdk=get({context:{mode:'fictional_demo'},toolNames:['query_demo_report']});
+ assert.equal(sdk.taskCapabilities.proposals.available,false);
+ assert.equal(sdk.taskCapabilities.existingPageActions.length,0);
+ assert.deepEqual(sdk.taskCapabilities.directlyExecutable.map(x=>x.tool),['query_demo_report']);
+ const staff=get({context:{actor:{role:'artist'}},toolNames:['query_bookings'],canPropose:true});
+ assert.equal(staff.taskCapabilities.existingPageActions.length,0);
+ assert(staff.taskCapabilities.unsupported.includes('银行资金操作'));
+ // Release descriptions must point to checked-in deployment evidence, not a future plan.
+ const releaseEvidence=readFileSync(new URL('../'+productKnowledge.latestBusinessRelease.evidence,import.meta.url),'utf8');
+ assert(releaseEvidence.includes(productKnowledge.latestBusinessRelease.version));
+ assert(releaseEvidence.includes(productKnowledge.latestBusinessRelease.date));
 });

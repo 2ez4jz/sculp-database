@@ -1,8 +1,8 @@
-import {mountBookingBusiness} from './booking-business.js?v=23';
+import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
-import { mountWebsiteEnquiries } from './enquiries.js?v=20261018';
-import { mountCloudIntake } from './intake.js?v=orders-album-20261016';
-import { mountOrderEditor } from './order-editor.js';
+import { mountWebsiteEnquiries } from './enquiries.js?v=cloud-write-20261022';
+import { mountCloudIntake } from './intake.js?v=cloud-write-20261022';
+import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
@@ -40,10 +40,13 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   const enquiriesRoot=document.createElement('div');
   let enquiries=null;
   if(businessAdmin){reportRoot.after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase});}
+  const canLeave=()=>[editor,business,intake,enquiries].every(part=>!part?.canLeave||part.canLeave());
+  const beforeUnload=event=>{if(!canLeave()){event.preventDefault();event.returnValue='';}};
+  window.addEventListener('beforeunload',beforeUnload);
   let detailVersion = 0;
   async function openOrder(id) {
     if ((editor && !editor.canLeave()) || (business && !business.canLeave())) {
-      const status = root.querySelector('[data-edit-status]');
+      const status = business && !business.canLeave()?root.querySelector('[data-business-status]'):root.querySelector('[data-edit-status]');
       if(status)status.textContent='修改仍在保存或尚未收到确认，请先重试同一笔修改。';
       return;
     }
@@ -148,8 +151,10 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       $("[data-order-status]").textContent = "网络异常，请重新查询。";
   });
   return {
+    canLeave,
     destroy() {
       destroyed = true;
+      window.removeEventListener('beforeunload',beforeUnload);
       version++;
       detailVersion++;
       enquiries?.destroy();
