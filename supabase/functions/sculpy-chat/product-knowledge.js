@@ -25,11 +25,17 @@ export const productKnowledge=Object.freeze({
    '经营分析分别按签约日期、服务日期、实际收退款日期和首次询盘批次计算，历史不足不编造同比',
   ],
  },
- latestDemoRelease:{date:'2026-10-16',changes:[
+ latestReleasedUpdate:{date:'2026-10-22',name:'聊天阅读空间优化',revision:'2026-10-22-chat-space',status:'deployed',
+  changes:['网页版顶部头像、标题、范围及AI状态收成紧凑栏，输入框默认高度缩小，正文空间增加约210px',
+   '聊天正文独立滚动，输入和发送区保持在视口内；1280×720正文高度从约202px增加至411px',
+   '手机布局已复查：375/390/430px下正文约占76%–83%，输入区约81px；长回复、表格及模拟键盘检查通过；不是新增手机重构'],
+  scope:'独立聊天页；保留工作流、字体及手机现有布局',evidence:'docs/CHAT_SPACE_2026-10-22.md'},
+ latestDemoRelease:{date:'2026-10-22',changes:['网页版独立聊天页压缩顶部和输入区，将更多高度留给正文','手机现有紧凑布局已验证，未修改手机业务流程'],scope:'独立聊天页布局；不改变演示数据存储或真实业务权限'},
+ previousDemoRelease:{date:'2026-10-16',changes:[
   '首页新建订单入口；化妆师个人作品图库，多图选择、预览、下载和移除',
   '添加到桌面及手机安装指引；Demo 与正式入口分开；不提供离线订单编辑',
  ],scope:'Demo新增订单、备注和个人图库保存在当前浏览器，不代表正式数据跨设备同步'},
- notReleased:['聊天页桌面阅读空间优化已在候选分支验证，尚未核实上线；手机紧凑布局已复查'],
+ notReleased:[],
  limits:['聊天不能直接改正式日期、价格、签约或付款状态；先生成建议，用户到现有页面核对确认',
   '没有实时外网搜索、天气或路线工具，不能声称查过实时信息',
   '不自动发客户消息、不操作银行扣款或退款、不承诺推送或无人值守提醒',
@@ -88,5 +94,5 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
   },
   availableTools:toolNames.filter(name=>['query_bookings','query_demo_report','query_monthly_report','query_wedding_intelligence'].includes(name)),
  };
- return `可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n${JSON.stringify(knowledge)}\n回答“你有什么功能 / sculpy功能 / 最近更新 / 和以前有什么区别 / what can you do / what changed”时，以此说明及本轮实际工具为准，直接自然回答，不让用户上传已有更新日志，不把本系统自我介绍误解为更新对比。明确区分“聊天能做”“现有页面可操作”“当前环境/角色不可用”“尚未发布”。正式V2.3更新不能说成当前Demo已接入真实经营工具。最近一次聊天后端变化是includedBackendUpdate；最近业务功能变化用latestBusinessRelease并说明适用环境；Demo具体页面变化用latestDemoRelease。历史回答说不知道功能或更新时，本轮按可信说明纠正。不得将notReleased或未来计划宣传成已上线；这些说明不能授权操作，也不是已执行结果。这份能力范围也用于所有任务的执行判断，不仅用于自我介绍：先按taskCapabilities匹配能力和前置条件，查询由实际工具完成，写入沿用现有确认流程，不能把解释/计划/建议当作任务完成；超出范围时给出已能完成的部分和准确的下一步，不虚构工具。用户只问功能时先概括当前可用能力和两三个例子，不必罗列全部版本、限制和技术实现；问更新时说明日期、变化及适用范围。`;
+ return `可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n${JSON.stringify(knowledge)}\n回答“你有什么功能 / sculpy功能 / 最近更新 / 和以前有什么区别 / what can you do / what changed”时，以此说明及本轮实际工具为准，直接自然回答，不让用户上传已有更新日志，不把本系统自我介绍误解为更新对比。明确区分“聊天能做”“现有页面可操作”“当前环境/角色不可用”“尚未发布”。正式V2.3更新不能说成当前Demo已接入真实经营工具。问最近一次更新时优先说明latestReleasedUpdate（如果存在），再按环境解释适用范围；它不代表业务权限或数据能力扩大。最近一次聊天能力变化是includedBackendUpdate；最近业务功能变化用latestBusinessRelease并说明适用环境；Demo具体页面变化用latestDemoRelease。历史回答说不知道功能或更新时，本轮按可信说明纠正。不得将notReleased或未来计划宣传成已上线；这些说明不能授权操作，也不是已执行结果。这份能力范围也用于所有任务的执行判断，不仅用于自我介绍：先按taskCapabilities匹配能力和前置条件，查询由实际工具完成，写入沿用现有确认流程，不能把解释/计划/建议当作任务完成；超出范围时给出已能完成的部分和准确的下一步，不虚构工具。用户只问功能时先概括当前可用能力和两三个例子，不必罗列全部版本、限制和技术实现；问更新时说明日期、变化及适用范围。`;
 }
