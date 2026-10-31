@@ -7,7 +7,7 @@ export function setupWebApp({demo}) {
   const host = document.createElement('div');
   host.id = 'pwa-install-host';
   host.dataset.i18nIgnore = '';
-  host.innerHTML = `<dialog class="pwa-install-dialog" aria-labelledby="pwa-install-title"><button type="button" class="pwa-close" data-pwa-close aria-label="关闭安装说明">✕</button><img class="pwa-icon" src="assets/sculpy-icon-192.png" alt="Sculpy"><h2 id="pwa-install-title"></h2><p data-pwa-intro></p><ol data-pwa-steps></ol><p class="pwa-install-note" data-pwa-note></p><div class="pwa-install-actions"><button type="button" class="primary" data-pwa-confirm hidden></button><button type="button" data-pwa-close>知道了</button></div><p role="status" aria-live="polite" data-pwa-status></p></dialog>`;
+  host.innerHTML = `<dialog class="pwa-install-dialog" aria-labelledby="pwa-install-title"><button type="button" class="pwa-close" data-pwa-close aria-label="关闭安装说明">✕</button><img class="pwa-icon" src="assets/sculpy-icon-192.png?v=sculpy-sprite-20261031" alt="Sculpy"><h2 id="pwa-install-title"></h2><p data-pwa-intro></p><ol data-pwa-steps></ol><p class="pwa-install-note" data-pwa-note></p><div class="pwa-install-actions"><button type="button" class="primary" data-pwa-confirm hidden></button><button type="button" data-pwa-close>知道了</button></div><p role="status" aria-live="polite" data-pwa-status></p></dialog>`;
   document.body.append(host);
   const dialog = host.querySelector('dialog');
   const $ = selector => host.querySelector(selector);

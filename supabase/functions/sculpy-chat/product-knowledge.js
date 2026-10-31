@@ -35,7 +35,7 @@ export const productKnowledge=Object.freeze({
   '首页新建订单入口；化妆师个人作品图库，多图选择、预览、下载和移除',
   '添加到桌面及手机安装指引；Demo 与正式入口分开；不提供离线订单编辑',
  ],scope:'Demo新增订单、备注和个人图库保存在当前浏览器，不代表正式数据跨设备同步'},
- notReleased:[],
+ notReleased:[{date:'2026-10-31',name:'Sculpy 精灵应用图标',status:'frontend-deployment-pending',scope:'正式与Demo安装图标、iOS主屏幕图标及浏览器图标',changes:['使用现有奶油色3D精灵形象制作方形应用图标','安装入口及所有图标引用带新资源版本；现有iOS主屏幕快捷方式可能需要重新添加'],evidence:'docs/SCULPY_APP_ICON_2026-10-31.md'}],
  limits:['聊天不能直接改正式日期、价格、签约或付款状态；先生成建议，用户到现有页面核对确认',
   '没有实时外网搜索、天气或路线工具，不能声称查过实时信息',
   '不自动发客户消息、不操作银行扣款或退款、不承诺推送或无人值守提醒',
