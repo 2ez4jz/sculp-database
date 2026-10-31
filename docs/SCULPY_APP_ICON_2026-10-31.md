@@ -9,3 +9,7 @@ Replaced the simplified mark with a square icon adapted from the existing cream 
 Updated 180px Apple touch icon, 192/512/1024px app icons, maskable 512px icon with additional safe padding, 64px browser favicon and legacy SVG entry. Both production and Demo manifests retain their existing identities and launch URLs. Installation dialog shares the updated artwork. Versioned URLs refresh cached assets.
 
 Validation: PNG dimensions and opacity, both manifest asset references, unchanged installation identities/launch URLs, syntax and product-knowledge regression checks. No live business data changes or backend deployment. Existing iOS home-screen shortcuts may need removal and re-addition to refresh the icon.
+
+## iOS follow-up
+
+User reported a letter S after reinstalling. Live HTML and original PNG endpoints return 200, and repository PNG bytes match the intended sprite. Exact device-side cause is unconfirmed. Added a new filename for the explicitly declared iOS icon, truecolor RGB PNG encoding, project-absolute paths, and standard root fallback filenames. iPhone home-screen rendering still requires device confirmation.
