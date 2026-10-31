@@ -1,6 +1,8 @@
 # Sculpy app icon · 2026-10-31
 
-Status: implementation validated; Pages deployment pending.
+Status: deployed. GitHub Pages workflow 41241445050 completed successfully for commit a54cda48b4ba3cfb0e674a261d11b6a2128249ed. URL: https://2ez4jz.github.io/sculp-database/.
+
+The release record updates source product knowledge; the existing chat Edge Function was not redeployed for this icon-only release.
 
 Replaced the simplified mark with a square icon adapted from the existing cream porcelain Sculpy sprite in assets/sculpy.webp. Generated with the built-in image tool, preserving the head curl, eyes, cheeks, body and warm beige background. Prompt: center the existing character in a square app icon, whole body visible, no text, border or new objects.
 
