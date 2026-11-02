@@ -104,7 +104,7 @@
 /* Account greeting editor: one inline panel beside account management. */
 .studio-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-shrink:0}
 .studio-content #edit-welcome{min-height:36px;padding:7px 12px;font-size:12px;white-space:nowrap}
-.studio-content #edit-welcome[aria-expanded=true]{background:var(--ui-soft);border-color:#bdceb5;color:var(--ui-accent)}
+.studio-content #manage-accounts[aria-expanded=true],.studio-content #edit-welcome[aria-expanded=true]{background:var(--ui-soft);border-color:#bdceb5;color:var(--ui-accent)}
 .studio-content #welcome-editor:not([hidden]){padding:22px 24px;margin:0 0 24px;border:1px solid var(--ui-line);border-radius:10px;background:#fff}
 .welcome-editor-heading h3{margin:0;font-size:18px;font-weight:650}.welcome-editor-heading p{margin:5px 0 16px;font-size:12px;color:var(--ui-muted)}
 .studio-content #welcome-editor form{max-width:760px}.studio-content #welcome-editor label{display:grid;gap:6px;margin:14px 0 8px}
@@ -115,3 +115,7 @@
 .welcome-editor-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.welcome-editor-actions small{font-size:11px;color:var(--ui-muted);margin-left:auto}
 .studio-content #welcome-editor [data-status]{font-size:12px;line-height:1.65;margin:10px 0 0}
 @media(max-width:760px){.studio-page-header{flex-wrap:wrap}.studio-header-actions{width:100%;justify-content:flex-start}.studio-content #manage-accounts,.studio-content #edit-welcome{min-height:44px!important;font-size:12px!important}.studio-content #welcome-editor:not([hidden]){padding:18px 15px;margin-bottom:18px}.studio-content #welcome-editor textarea{font-size:16px}.welcome-preview p{font-size:19px}.welcome-editor-actions .auth-primary{flex-basis:100%;min-height:44px}.welcome-editor-actions .auth-secondary{min-height:44px}}
+
+.studio-content #account-list[hidden]{display:none}
+.enquiry-pending{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border:1px solid #eae5d9;border-radius:5px;background:#f7f5ee;color:#776c50;font-size:11px;font-weight:500;line-height:1.45;vertical-align:middle;white-space:nowrap}
+.enquiry-pending:before{content:"";width:4px;height:4px;flex:none;border-radius:50%;background:#a59670}

@@ -1,7 +1,7 @@
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=24';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
-import { mountWebsiteEnquiries } from './enquiries.js?v=24';
+import { mountWebsiteEnquiries } from './enquiries.js?v=pending-marker-20261102';
 import { mountCloudIntake } from './intake.js?v=24';
 import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';

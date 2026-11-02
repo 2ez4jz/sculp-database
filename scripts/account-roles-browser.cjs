@@ -5,7 +5,21 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   const context=await browser.newContext({viewport:{width:1440,height:900}});const errors=[];
   await context.route('**/src/vendor/supabase.js',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('scripts/fixtures/communication-sdk.js','utf8')}));
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://localhost:4173/');await page.locator('#manage-accounts').click();await page.locator('.account-summary').first().waitFor();
+  await page.goto('http://localhost:4173/');
+  const toggle=page.locator('#manage-accounts'),accounts=page.locator('#account-list');
+  assert.equal(await toggle.getAttribute('aria-expanded'),'false');assert(!await accounts.isVisible());
+  const closedColor=await toggle.evaluate(el=>getComputedStyle(el).backgroundColor);
+  await toggle.click();await page.locator('.account-summary').first().waitFor();
+  await page.waitForFunction(color=>getComputedStyle(document.querySelector('#manage-accounts')).backgroundColor!==color,closedColor);
+  assert.equal(await toggle.getAttribute('aria-expanded'),'true');assert.notEqual(await toggle.evaluate(el=>getComputedStyle(el).backgroundColor),closedColor);
+  await page.locator('.account-summary').first().click();
+  const draft=accounts.locator('.account-form').first().locator('[name=displayName]');await draft.fill('Fictional draft retained');
+  await toggle.click();assert(!await accounts.isVisible());assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+  await page.waitForFunction(color=>getComputedStyle(document.querySelector('#manage-accounts')).backgroundColor===color,closedColor);
+  assert.equal(await toggle.evaluate(el=>getComputedStyle(el).backgroundColor),closedColor);
+  await toggle.click();assert(await accounts.isVisible());assert.equal(await draft.inputValue(),'Fictional draft retained');
+  assert.equal(await page.evaluate(()=>window.qaCalls.filter(x=>x.name==='list_managed_accounts').length),1,'reopening must not reload and erase drafts');
+  assert.equal(await page.locator('.enquiry-pending').count(),0,'follow-up enquiries do not get a pending marker');
   assert.equal(await page.locator('.studio-page-header h2').innerText(),'业务工作台');
   assert.equal(await page.locator('.studio-sidebar nav button').first().getAttribute('data-studio-nav'),'#website-enquiries');
   assert(await page.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
@@ -13,6 +27,12 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   for(const s of await selects.all()){assert.deepEqual(await s.locator('option').evaluateAll(xs=>xs.map(x=>x.value)),['operations','owner','artist','read_only']);assert.equal(await s.locator('option[value=admin]').count(),0);}
   assert.equal(await page.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
   await page.screenshot({path:'qa-screens/account-roles-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});await toggle.click();assert(!await accounts.isVisible());await toggle.click();assert(await accounts.isVisible());assert.equal(await draft.inputValue(),'Fictional draft retained');
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  const pending=await context.newPage();pending.on('pageerror',e=>errors.push(e.message));await pending.setViewportSize({width:390,height:844});
+  await pending.goto('http://localhost:4173/?qa_pending=1');await pending.locator('.enquiry-pending').waitFor();
+  assert.equal(await pending.locator('.enquiry-pending').innerText(),'待处理');assert.equal(await pending.locator('.enquiry-pending').count(),1);
+  assert(await pending.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await pending.screenshot({path:'qa-screens/enquiry-pending-phone.png',fullPage:false});
   const owner=await context.newPage();owner.on('pageerror',e=>errors.push(e.message));await owner.setViewportSize({width:390,height:844});
   await owner.goto('http://localhost:4173/?qa_role=owner');await owner.locator('.w23-headline').waitFor();
   assert.equal(await owner.locator('.studio-page-header h2').innerText(),'业务工作台');

@@ -1,4 +1,4 @@
-import { mountCloudWorkspace } from "./workspace.js?v=241";
+import { mountCloudWorkspace } from "./workspace.js?v=account-toggle-20261102";
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import { config } from "../../config.js";
@@ -81,7 +81,7 @@ async function showWorkspace() {
   const personalWelcome = Boolean(profile.welcome_message?.trim());
   const heading = profile.welcome_message?.trim() || "业务工作台";
   frame(
-    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<div class="studio-header-actions"><button class="auth-secondary" id="manage-accounts">账户管理 <span>↗</span></button><button type="button" class="auth-secondary" id="edit-welcome" aria-expanded="false" aria-controls="welcome-editor">编辑欢迎语</button></div>' : ""}</header>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户"></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<div class="studio-header-actions"><button class="auth-secondary" id="manage-accounts" type="button" aria-expanded="false" aria-controls="account-list">账户管理 <span>↗</span></button><button type="button" class="auth-secondary" id="edit-welcome" aria-expanded="false" aria-controls="welcome-editor">编辑欢迎语</button></div>' : ""}</header>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户" hidden></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
   workspace?.destroy();
   welcomeEditor?.destroy();
@@ -128,9 +128,22 @@ async function showWorkspace() {
     }
     await showLogin();
   };
-  root
-    .querySelector("#manage-accounts")
-    ?.addEventListener("click", () => loadAccounts(profile));
+  let accountsLoading = false;
+  root.querySelector("#manage-accounts")?.addEventListener("click", async event => {
+    const container = root.querySelector("#account-list");
+    container.hidden = !container.hidden;
+    event.currentTarget.setAttribute("aria-expanded", String(!container.hidden));
+    // Keep the mounted forms and their drafts when collapsed; load only once.
+    if (container.hidden || container.childElementCount || accountsLoading) return;
+    accountsLoading = true;
+    try {
+      await loadAccounts(profile);
+    } catch {
+      if (container.isConnected) message("无法读取账户，请稍后重新打开重试。");
+    } finally {
+      accountsLoading = false;
+    }
+  });
   if (!subscription)
     subscription = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") void showLogin();
