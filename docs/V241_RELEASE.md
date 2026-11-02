@@ -8,6 +8,7 @@ Status: implementation and verification; publication pending.
 - Owner and operations can view the business dashboard and manage enquiries, bookings and communication records. Only operations can list/manage login accounts, create identities, change roles/active state and reset passwords. Existing human confirmation steps remain in place.
 - Remove every in-app installation entry on desktop, phone, sign-in, authenticated workspace, Demo navigation and Settings. No installation instructions dialog or programmatic install prompt remains. Users add the app manually through the browser menu.
 - Put enquiries first for both operations and owner, including the first sidebar item. Reports follow the order list.
+- Show “欢迎最美化妆师Miranda亲临工作室指导工作” only for the verified `sculp_miranda` profile. Other accounts keep the standard workspace heading; the personal heading wraps on phone screens.
 - Refine the authenticated desktop/tablet/phone workspace toward a professional business application: consistent system typography, restrained green accents, clearer page/data hierarchy, compact spacing, smaller corner radii, aligned controls and stronger information density. Account management becomes a concise member list with expandable editing; empty financial trends use a compact empty state instead of twelve blank bars. Phone inputs retain 16 px text and primary touch controls remain large.
 
 ## Implementation and compatibility

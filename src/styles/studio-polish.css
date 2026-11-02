@@ -20,6 +20,8 @@
 .studio-page-header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px;min-height:84px}
 .studio-page-header .auth-eyebrow{font-size:9px;letter-spacing:1.8px;font-weight:600;color:#69756b}
 .studio-page-header h2{font-size:26px;line-height:1.35;font-weight:650;letter-spacing:-.6px;margin:8px 0 5px}
+.studio-page-header>div{min-width:0}
+.studio-page-header h2.studio-personal-welcome{max-width:740px;line-height:1.55;overflow-wrap:anywhere;text-wrap:pretty}
 .studio-page-header .auth-muted{margin:0;font-size:12px;color:var(--ui-muted)}
 .studio-page-header .auth-muted span{margin:0 5px;color:#b4bcb0}
 .studio-page-header #manage-accounts{background:#fff;min-height:36px;padding:7px 12px;font-size:12px;display:flex;gap:22px;border-color:#d6dfd1}

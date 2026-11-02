@@ -185,3 +185,5 @@ User requested removal of the ordinary legacy admin role and all in-app Add to H
 Added the requested UI refinement to this release: system-font hierarchy, compact professional workspace spacing, aligned dashboard/form controls, member rows with expandable account management, clearer original/summary layouts, restrained neutral surfaces and compact financial empty states. Phone uses larger input/touch targets and responsive stacking.
 
 Follow-up priority: operations and owner now see enquiry management as the first business section and first navigation item; the dashboard is placed below orders. Browser regression checks assert this order for both roles.
+
+- Follow-up: personalised the verified sculp_miranda account welcome with the user’s exact wording; retained the standard heading for other accounts and added phone overflow verification.

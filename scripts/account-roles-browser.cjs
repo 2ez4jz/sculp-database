@@ -6,6 +6,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   await context.route('**/src/vendor/supabase.js',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('scripts/fixtures/communication-sdk.js','utf8')}));
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://localhost:4173/');await page.locator('#manage-accounts').click();await page.locator('.account-summary').first().waitFor();
+  assert.equal(await page.locator('.studio-page-header h2').innerText(),'业务工作台');
   assert.equal(await page.locator('.studio-sidebar nav button').first().getAttribute('data-studio-nav'),'#website-enquiries');
   assert(await page.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   const selects=page.locator('#account-list select[name=role]');
@@ -14,6 +15,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   await page.screenshot({path:'qa-screens/account-roles-desktop.png',fullPage:true});
   const owner=await context.newPage();owner.on('pageerror',e=>errors.push(e.message));await owner.setViewportSize({width:390,height:844});
   await owner.goto('http://localhost:4173/?qa_role=owner');await owner.locator('.w23-headline').waitFor();
+  assert.equal(await owner.locator('.studio-page-header h2').innerText(),'业务工作台');
   assert(await owner.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   assert.equal(await owner.locator('#manage-accounts').count(),0);assert.equal(await owner.locator('#account-list').count(),0);
   assert(await owner.locator('[data-new-booking]').isVisible());assert(await owner.locator('[data-quick-lead]').isVisible());
@@ -22,6 +24,10 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   assert.equal(await owner.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
   assert(await owner.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await owner.screenshot({path:'qa-screens/account-owner-mobile.png',fullPage:true});
+  await owner.goto('http://localhost:4173/?qa_role=owner&qa_username=sculp_miranda');
+  await owner.getByRole('heading',{name:'欢迎最美化妆师Miranda亲临工作室指导工作',exact:true}).waitFor();
+  assert(await owner.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await owner.screenshot({path:'qa-screens/miranda-welcome-mobile.png',fullPage:true});
   assert.deepEqual(errors,[]);console.log('Production roles UI: retired role absent; operations account controls present; owner business/communication editing available with no account management; installation UI absent on desktop and phone.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

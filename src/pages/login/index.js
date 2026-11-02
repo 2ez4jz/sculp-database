@@ -1,11 +1,11 @@
-import { mountCloudWorkspace } from "./workspace.js?v=24";
+import { mountCloudWorkspace } from "./workspace.js?v=241";
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { config } from "../../config.js";
 import {
   authConfigured,
   getAuthClient,
   verifiedProfile,
-} from "../../services/auth.js";
+} from "../../services/auth.js?v=241";
 const root = document.querySelector("#auth-root");
 const esc = (value) =>
   String(value ?? "").replace(
@@ -75,8 +75,12 @@ async function showWorkspace() {
     return;
   }
   document.title = "工作台 · Sculpy";
+  const mirandaWelcome = profile.username === "sculp_miranda";
+  const heading = mirandaWelcome
+    ? "欢迎最美化妆师Miranda亲临工作室指导工作"
+    : "业务工作台";
   frame(
-    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2>业务工作台</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<button class="auth-secondary" id="manage-accounts">账户管理 <span>↗</span></button>' : ""}</header>${profile.role === "operations" ? '<section id="account-list" aria-label="团队账户"></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${mirandaWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<button class="auth-secondary" id="manage-accounts">账户管理 <span>↗</span></button>' : ""}</header>${profile.role === "operations" ? '<section id="account-list" aria-label="团队账户"></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
   workspace?.destroy();
   const layout=root.querySelector('.auth-layout');
