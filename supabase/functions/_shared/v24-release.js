@@ -1,5 +1,6 @@
 // Shared release facts for main and the preserved, newer production chat runtime.
 export const v24ReleaseFacts={
+ pendingV25:{status:'not_published',evidence:'docs/V25_RELEASE.md',scope:'P0通知设置、标准Web Push、新官网询盘及24小时提醒；没有免打扰；真实iPhone验收未完成，P1内部通知未实施'},
  knowledgeRevision:'2026-11-02-account-toggle-pending',
  latestBusinessRelease:{version:'V2.4.1',date:'2026-11-02',status:'deployed',evidence:'docs/V241_RELEASE.md',
   scope:'正式owner/operations工作台、账户角色与站内安装入口；沿用V2.4沟通流程，不扩大聊天工具权限',

@@ -1,7 +1,7 @@
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=24';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
-import { mountWebsiteEnquiries } from './enquiries.js?v=pending-marker-20261102';
+import { mountWebsiteEnquiries } from './enquiries.js?v=push-links-v25-20261102';
 import { mountCloudIntake } from './intake.js?v=24';
 import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
@@ -165,6 +165,13 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   });
   return {
     canLeave,
+    async openNotificationTarget(target){
+      if(!target||!['lead','booking'].includes(target.type))throw Error('无效通知目标');
+      if(!canLeave())throw Error('请先完成当前保存');
+      if(target.type==='lead'){
+        if(!enquiries||await enquiries.openLead(target.id)===false)throw Error('询盘当前不可查看');
+      }else await openOrder(target.id);
+    },
     destroy() {
       destroyed = true;
       window.removeEventListener('beforeunload',beforeUnload);

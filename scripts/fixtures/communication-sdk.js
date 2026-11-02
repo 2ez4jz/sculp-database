@@ -15,7 +15,26 @@ const records=[{id:'24000000-0000-4000-8000-000000000031',enquiry_id:leadId,book
 const summaries=[],files=new Map(),replays=new Map();
 const aiContent={needs:['全天婚礼妆发，包含晚宴时段（待核对）'],confirmed:['客户提供日期：2027年7月24日'],pending:['确认套餐覆盖时长、报价及化妆师档期'],changes:['从半天需求变为希望覆盖晚宴'],followUp:['向客户确认准备开始时间和晚宴结束时间']};
 const originalFetch=globalThis.fetch;
-globalThis.fetch=async(url,options)=>String(url).includes('/functions/v1/sculpy-intake?action=communication-')?Response.json(String(url).includes('communication-voice')?{text:'虚构转写：客户希望全天跟妆，报价待确认。'}:{content:aiContent,sourceIds:JSON.parse(options.body).sourceIds,requiresConfirmation:true,provider:'mock'}):originalFetch(url,options);
+const noticeId='35000000-0000-4000-8000-000000000201',testNoticeId='35000000-0000-4000-8000-000000000202',deviceId='35000000-0000-4000-8000-000000000301';
+const pushFixtureKey='sculpy-fictional-push-'+profile.id;
+const pushState=JSON.parse(localStorage.getItem(pushFixtureKey)||'null')||{preferences:{enabled:false,new_enquiry:true,overdue:true},devices:[],items:[],config:{enabled:true,overdueHours:24,repeatHours:0,schedulerInstalled:true,lastTickAt:'2026-11-02T17:00:00Z'}};
+globalThis.fetch=async(url,options)=>{
+ if(String(url).includes('/functions/v1/sculpy-notifications')){
+  const {action,data={}}=JSON.parse(options.body);(globalThis.qaPushCalls??=[]).push({action,data});
+  let value={ok:true};
+  if(action==='state')value={preferences:pushState.preferences,devices:pushState.devices,publicKey:'B'.repeat(87),systemEnabled:pushState.config.enabled,config:profile.role==='operations'?pushState.config:null};
+  else if(action==='history')value={items:pushState.items};
+  else if(action==='diagnostics')value={queue:{accepted:pushState.items.length},errors:[]};
+  else if(action==='subscribe'){pushState.preferences.enabled=true;pushState.devices=[{id:deviceId,label:'Fictional browser',active:true,currentSession:true}];value={ok:true,deviceId};}
+  else if(action==='unsubscribe'||action==='logout')pushState.devices.forEach(d=>d.active=false);
+  else if(action==='preferences'){pushState.preferences=data;if(!data.enabled)pushState.devices.forEach(d=>d.active=false);}
+  else if(action==='global'){if(profile.role!=='operations')return Response.json({error:'无权限'},{status:403});Object.assign(pushState.config,data);}
+  else if(action==='test'){pushState.items.unshift({id:testNoticeId,kind:'test',title:'Sculpy 推送测试',created_at:new Date().toISOString(),read_at:null,deliveries:[{status:'accepted',attempts:1,code:null}]});value={ok:true,id:testNoticeId};}
+  else if(action==='open'){if(profile.role!=='operations'&&profile.role!=='owner')return Response.json({error:'无权限'},{status:403});value={type:data.id===noticeId?'lead':'settings',id:leadId};}
+  localStorage.setItem(pushFixtureKey,JSON.stringify(pushState));return Response.json(value);
+ }
+ return String(url).includes('/functions/v1/sculpy-intake?action=communication-')?Response.json(String(url).includes('communication-voice')?{text:'虚构转写：客户希望全天跟妆，报价待确认。'}:{content:aiContent,sourceIds:JSON.parse(options.body).sourceIds,requiresConfirmation:true,provider:'mock'}):originalFetch(url,options);
+};
 const booking={id:bookingId,order_number:'612358',client:'Fictional Avery',service:'Wedding Day Styling',starts_at:'2027-07-24T14:00:00Z',venue:'Fictional Toronto venue',artists:['Miranda'],status:'inquiry',service_details:'套餐待确认',price_cad:null,budget_cad:null};
 export function createClient(){return {
  auth:{getSession:async()=>({data:{session:{access_token:'fictional-ui-session'}}}),getUser:async()=>({data:{user:{id:owner}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),signOut:async()=>({})},
