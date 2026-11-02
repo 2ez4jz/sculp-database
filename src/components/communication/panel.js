@@ -5,19 +5,21 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const time=v=>new Date(v).toLocaleString('zh-CN',{timeZone:'America/Toronto',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 export function mountCommunicationPanel({root,supabase,type,id,onChange=()=>{}}){
  let alive=true,busy=false,working=false,pending=null,summaryPending=null,draft=null,files=[],records=[],data=null,userId=null,voiceUsed=false,recording=false;
- let loading=false;
+ let loading=false,dragDepth=0;
  const urls=new Set();
  root.className='communication-panel';
- root.innerHTML=`<header class="comm-header"><div><h4>沟通记录</h4><p>记录原话，保留完整上下文。</p></div><span data-pending class="comm-badge">读取中</span></header><div class="comm-layout"><div class="comm-original"><form data-compose><label class="sr-only" for="comm-${esc(id)}">客户沟通内容</label><textarea id="comm-${esc(id)}" data-text rows="4" placeholder="记录客户原话、需求变化或待办事项…"></textarea><div data-files class="comm-files"></div><div class="comm-compose-actions"><button type="button" data-voice>语音</button><label class="comm-file-button">＋ 截图 / 录音<input type="file" data-upload accept="image/png,image/jpeg,image/webp,audio/*" multiple></label><button type="submit" class="auth-primary" data-save>保存记录</button></div><p data-voice-status role="status"></p></form><p data-status role="status" aria-live="polite"></p><div class="comm-toolbar"><h5>原始记录</h5><button type="button" data-refresh>刷新</button><label><input type="checkbox" data-only-pending>只看待整理</label></div><button type="button" data-older hidden>查看更早记录</button><div data-timeline></div></div><aside class="comm-review"><div class="comm-toolbar"><h5>整理与归档</h5><span data-selection></span></div><p class="cloud-note">勾选原文后整理。截图与语音会发送给现有AI服务；审核确认后才归档。</p><button type="button" data-ai>AI 整理所选记录</button><p data-ai-status role="status"></p><div data-draft></div><div data-summaries></div></aside></div>`;
+ root.innerHTML=`<header class="comm-header"><div><h4>沟通记录</h4><p>记录原话，保留完整上下文。</p></div><span data-pending class="comm-badge">读取中</span></header><div class="comm-layout"><div class="comm-original"><form data-compose><div class="comm-dropzone" role="group" aria-label="截图添加区域"><label class="sr-only" for="comm-${esc(id)}">客户沟通内容</label><textarea id="comm-${esc(id)}" data-text rows="4" aria-describedby="comm-drop-hint-${esc(id)}" placeholder="记录客户原话、需求变化或待办事项…"></textarea><p class="comm-drop-hint" id="comm-drop-hint-${esc(id)}" data-drop-hint>截图可直接拖入此处 · 支持多张</p><div data-files class="comm-files"></div></div><div class="comm-compose-actions"><button type="button" data-voice>语音</button><label class="comm-file-button">＋ 截图 / 录音<input type="file" data-upload accept="image/png,image/jpeg,image/webp,audio/*" multiple></label><button type="submit" class="auth-primary" data-save>保存记录</button></div><p data-voice-status role="status"></p></form><p data-status role="status" aria-live="polite"></p><div class="comm-toolbar"><h5>原始记录</h5><button type="button" data-refresh>刷新</button><label><input type="checkbox" data-only-pending>只看待整理</label></div><button type="button" data-older hidden>查看更早记录</button><div data-timeline></div></div><aside class="comm-review"><div class="comm-toolbar"><h5>整理与归档</h5><span data-selection></span></div><p class="cloud-note">勾选原文后整理。截图与语音会发送给现有AI服务；审核确认后才归档。</p><button type="button" data-ai>AI 整理所选记录</button><p data-ai-status role="status"></p><div data-draft></div><div data-summaries></div></aside></div>`;
  const $=s=>root.querySelector(s),status=t=>{if(alive)$('[data-status]').textContent=t;};
  const dirty=()=>!!$('[data-text]')?.value.trim()||files.length>0||draft!==null||recording;
  const canLeave=()=>!busy&&!working&&!pending&&!summaryPending&&!dirty();
+ const canAddFiles=()=>alive&&!busy&&!working&&!pending&&!recording;
+ function dragFeedback(active){root.classList.toggle('is-file-dragging',active);if(alive)$('[data-drop-hint]').textContent=active?'松开即可添加截图':'截图可直接拖入此处 · 支持多张';}
  const voice=createVoiceCapture({$:s=>s==='#voice-button'?$('[data-voice]'):s==='#voice-status'?$('[data-voice-status]'):s==='#sculpy-text'?$('[data-text]'):null,config:{aiMode:'openai'},transcribeAudio:async blob=>{
   working=true;recording=false;lock();
   try{const f=await prepareCommunicationFile(new File([blob],'沟通录音',{type:blob.type}));f.file=new File([f.file],`沟通录音.${f.extension}`,{type:f.file.type});files.push(f);voiceUsed=true;renderFiles();const form=new FormData();form.append('audio',f.file,f.file.name);return await communicationAI(supabase,'voice',form);}
   finally{working=false;lock();}
  }});
- function lock(){if(!alive)return;const frozen=busy||!!pending;root.querySelectorAll('[data-compose] textarea,[data-compose] input,[data-compose] button').forEach(x=>x.disabled=frozen||working);$('[data-save]').disabled=busy||working||recording;$('[data-ai]').disabled=busy||working||!!pending||!!draft;$('[data-refresh]').disabled=!canLeave();$('[data-older]').disabled=busy||working;}
+ function lock(){if(!alive)return;const frozen=busy||!!pending;root.querySelectorAll('[data-compose] textarea,[data-compose] input,[data-compose] button').forEach(x=>x.disabled=frozen||working);$('[data-upload]').disabled=!canAddFiles();$('[data-save]').disabled=busy||working||recording;$('[data-ai]').disabled=busy||working||!!pending||!!draft;$('[data-refresh]').disabled=!canLeave();$('[data-older]').disabled=busy||working;$('.comm-dropzone').setAttribute('aria-disabled',String(!canAddFiles()));if(!canAddFiles()){dragDepth=0;dragFeedback(false);}}
  function renderFiles(){if(!alive)return;$('[data-files]').innerHTML=files.map((a,i)=>`<span>${esc(a.file.name)} <button type="button" data-remove="${i}" aria-label="移除${esc(a.file.name)}">×</button></span>`).join('');root.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(busy||pending||working)return;files.splice(Number(b.dataset.remove),1);renderFiles();lock();});}
  function selected(){return [...root.querySelectorAll('[data-select]:checked')].map(x=>x.value);}
  function selection(){if(alive)$('[data-selection]').textContent=`已选 ${selected().length} 条`;}
@@ -36,7 +38,29 @@ export function mountCommunicationPanel({root,supabase,type,id,onChange=()=>{}})
   renderTimeline();renderSummaries();status(`云端共 ${d.total} 条记录 · 显示 ${records.length} 条`);
  }catch(e){status('读取失败：'+e.message);}finally{loading=false;lock();}}
  $('[data-text]').oninput=lock;
- $('[data-upload]').onchange=async e=>{if(busy||pending||working)return;working=true;lock();try{for(const file of e.target.files){if(files.length>=20)throw Error('每次最多20个附件，请先保存这一批。');const item=await prepareCommunicationFile(file);if(!alive)return;files.push(item);}renderFiles();status('附件已选择，点击保存后上传至云端。');}catch(e){status(e.message);renderFiles();}finally{working=false;if(alive)e.target.value='';lock();}};
+ async function addFiles(incoming){
+  if(!canAddFiles())return;
+  const batch=Array.from(incoming);if(!batch.length)return status('没有可添加的文件，请直接拖入截图文件。');
+  working=true;lock();let added=0,rejected=0;const issues=new Set();
+  try{for(let i=0;i<batch.length;i++){
+   if(files.length>=20){rejected+=batch.length-i;issues.add('每次最多20个附件，请先保存这一批。');break;}
+   try{const item=await prepareCommunicationFile(batch[i]);if(!alive)return;files.push(item);added++;}
+   catch(error){rejected++;issues.add(error.message);}
+  }
+  if(!alive)return;renderFiles();status([added?`已添加 ${added} 个附件，点击保存后上传至云端。`:'',rejected?`${rejected} 个附件未添加：${[...issues].join(' ')}`:''].filter(Boolean).join(' '));
+  }finally{working=false;lock();}
+ }
+ $('[data-upload]').onchange=e=>{const batch=Array.from(e.target.files);e.target.value='';void addFiles(batch);};
+ const fileDrag=e=>[...(e.dataTransfer?.types||[])].includes('Files')||e.dataTransfer?.files?.length>0;
+ root.ondragenter=e=>{if(!fileDrag(e))return;e.preventDefault();dragDepth++;dragFeedback(canAddFiles());};
+ root.ondragover=e=>{if(!fileDrag(e))return;e.preventDefault();e.dataTransfer.dropEffect=canAddFiles()?'copy':'none';dragFeedback(canAddFiles());};
+ root.ondragleave=()=>{if(dragDepth>0&&--dragDepth===0)dragFeedback(false);};
+ root.ondragend=()=>{dragDepth=0;dragFeedback(false);};
+ root.ondrop=e=>{if(!fileDrag(e))return;e.preventDefault();e.stopPropagation();dragDepth=0;dragFeedback(false);
+  if(!canAddFiles())return status(pending?'请先重试保存当前记录，再添加附件。':recording?'请先结束录音，再添加附件。':'正在处理，请稍后再添加附件。');
+  // Copy before awaiting: browsers expose the drag data store only during this event.
+  void addFiles(Array.from(e.dataTransfer.files));
+ };
  $('[data-voice]').onclick=async()=>{if(busy||pending||working)return;recording=!recording;lock();await voice.toggle();if(!String($('[data-voice-status]')?.textContent).includes('正在聆听'))recording=false;lock();};
  $('[data-compose]').onsubmit=async e=>{e.preventDefault();if(busy||working||recording)return;
   busy=true;lock();
@@ -61,5 +85,5 @@ export function mountCommunicationPanel({root,supabase,type,id,onChange=()=>{}})
  $('[data-ai]').onclick=async()=>{if(busy||working||draft)return;const sourceIds=selected();if(!sourceIds.length)return status('请先勾选要整理的原始记录。');busy=true;lock();$('[data-ai-status]').textContent='正在读取所选原文、截图和语音…';try{const result=await communicationAI(supabase,'summary',{type,id,sourceIds});if(!alive)return;draft=result;renderDraft();$('[data-ai-status]').textContent='摘要待审核，尚未归档。';}catch(e){if(alive)$('[data-ai-status]').textContent=e.message;}finally{busy=false;lock();}};
  $('[data-refresh]').onclick=()=>void load();$('[data-older]').onclick=()=>void load(true);$('[data-only-pending]').onchange=renderTimeline;
  void load();
- return {canLeave,refresh:load,destroy(){alive=false;voice.dispose();urls.forEach(x=>URL.revokeObjectURL(x));root.replaceChildren();}};
+ return {canLeave,refresh:load,destroy(){alive=false;root.ondragenter=root.ondragover=root.ondragleave=root.ondragend=root.ondrop=null;root.classList.remove('is-file-dragging');voice.dispose();urls.forEach(x=>URL.revokeObjectURL(x));root.replaceChildren();}};
 }
