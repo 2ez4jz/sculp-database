@@ -1,4 +1,4 @@
-import { mountCloudWorkspace } from "./workspace.js?v=communication-drop-20261102";
+import { mountCloudWorkspace } from "./workspace.js?v=communication-drop-box-20261102";
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import {mountNotificationSettings} from "./notification-settings.js?v=25";

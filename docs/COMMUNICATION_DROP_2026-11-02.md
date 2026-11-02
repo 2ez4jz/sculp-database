@@ -15,3 +15,8 @@ Local syntax and 18 focused chat/multistep/communication checks passed. Checked-
 ## Release and rollback
 
 PR [#43](https://github.com/2ez4jz/sculp-database/pull/43) passed checked-head CI and merged as 4495e0aa75f543d283516a1fce97fc9900c6c7a4. Existing Pages deployment [41529319802](https://github.com/2ez4jz/sculp-database/actions/runs/41529319802) succeeded. All seven changed public frontend files were downloaded and matched released bytes: index, bootstrap, login, workspace, enquiries, communication panel JS and CSS. Code merge and test fixtures alone were not used as proof of publication. Restore the prior frontend resources to roll back; no database migration or data deletion is needed. sculpy-chat v51 is ACTIVE. Only the shared release/capability facts changed; all 16 other v50 files, including long-term-memory and model execution code, are preserved byte-for-byte. All 17 deployed files were read back and matched. Final chat/multistep/communication checks: 18/18 pass after the knowledge update. No existing push acceptance status is changed. Desktop screenshot uses fictional data: [attachment staging](screenshots/communication-drop-desktop-20261102.jpg). Native file-manager/WeChat drag behavior on the team’s own devices remains a normal business acceptance check; CI exercises real browser DataTransfer/File objects, not a physical OS drag gesture.
+
+
+## Prominent top drop frame — 2026-11-02
+
+Follow-up requested a clearly visible drag frame above the text input. Adds a full-width muted green dashed frame with upload icon, “拖拽截图到这里” and a click-to-choose shortcut before the textarea. Existing mobile picker, staging, limits, explicit save and retry guards are retained. Implementation/verification/publication pending.

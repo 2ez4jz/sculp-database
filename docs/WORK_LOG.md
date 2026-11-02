@@ -231,3 +231,8 @@ User requested dragging screenshots directly into communication records. Reused 
 ### Communication screenshot drag/drop: verified publication — 2026-11-02
 
 PR #43 passed checked-head browser/PostgreSQL checks (41528784478), merged as 4495e0a and published through the existing Pages workflow (41529319802). All seven changed frontend resources match released source. Multi-image drops in both Lead/Booking, invalid file handling, shared picker, limits/removal, immutable retry, image readback, AI confirmation and conversion history passed browser regression across 320–1920px. Desktop and 390px phone UI inspected with fictional data; two PNG fixtures were selected through the real chooser. No schema, Storage/RLS, business-field or AI memory behavior changes. Release knowledge updated after publication; original P0 push real-iPhone acceptance remains pending. Evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
+
+
+### Prominent communication drop frame — 2026-11-02
+
+User requested a more obvious drop box at the top. Added an independent dashed upload frame above the textarea, with an icon, clear drag instruction and a direct file-picker shortcut. Existing file staging/save/permissions unchanged. Browser acceptance now checks the clickable frame and its position/size on desktop and phone. Verification/publication pending; evidence: docs/COMMUNICATION_DROP_2026-11-02.md.

@@ -1,5 +1,6 @@
 // Shared release facts for main and the preserved, newer production chat runtime.
 export const v24ReleaseFacts={
+ pendingVisibleDropFrame:{status:'not_published',scope:'沟通输入框上方增加明显的虚线截图拖拽框，支持直接点击选择；沿用现有暂存、人工保存和权限'},
  communicationAttachmentInput:{status:'deployed',evidence:'docs/COMMUNICATION_DROP_2026-11-02.md',scope:'正式有效owner/operations的Lead与Booking沟通记录',input:'可直接拖入多张截图，也保留手机或键盘点选附件；支持移除',limits:'沿用PNG/JPEG/WebP单图10MB、每条记录最多20个附件及原语音规则',confirmation:'拖入仅暂存；本人点击保存记录、服务器回执并重读后才算云端保存；未确认保存期间禁止追加附件',chat:'聊天没有拖入、上传或保存沟通附件工具'},
  knowledgeRevision:'2026-11-02-communication-drop',
  latestBusinessRelease:{version:'V2.5',date:'2026-11-02',status:'deployed',acceptance:'pending_real_iphone',evidence:'docs/V25_RELEASE.md',
