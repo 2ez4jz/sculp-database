@@ -47,3 +47,8 @@ Rollback: pause push_config.enabled, unschedule sculpy-push-worker and restore t
 4. Verify notifications stop after disabling; verify normal order, finance, communication and AI work on the actual business devices. Record phone/iOS version, time and actual outcomes.
 
 Until these physical-device checks are recorded, acceptance remains pending_real_iphone and P1 colleague-to-colleague reminders remain not implemented. No claim of end-to-end iPhone delivery is made.
+
+
+## Post-publication regression correction
+
+A repeat run (41501950755) exposed an existing order-number test flake: a randomly allocated value can already equal the fixed replacement 610000, so expecting that no-op update to be rejected was incorrect. [PR #42](https://github.com/2ez4jz/sculp-database/pull/42) chooses a replacement guaranteed to differ and retains the immutability assertions. The two focused tests passed locally. The production number-allocation SQL and all notification/runtime files are unchanged; final checked-head CI is available on that PR. This repeat-run failure is recorded separately from the successful P0 release checks above.
