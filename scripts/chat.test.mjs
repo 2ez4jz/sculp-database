@@ -288,7 +288,8 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     for(const tool of body.tools||[])assert(toolCapabilities[tool.name],`Missing capability contract: ${tool.name}`);
     const marker='可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n';
     const knowledge=JSON.parse(body.instructions.split(marker)[1].split('\n')[0]);
-    assert.equal(knowledge.latestBusinessRelease.version,'V2.4.1');
+    assert.equal(knowledge.latestBusinessRelease.version,'V2.5');
+    assert.equal(knowledge.latestBusinessRelease.acceptance,'pending_real_iphone');assert.equal(knowledge.pushNotifications.quietHours,false);
     assert.equal(knowledge.latestBusinessRelease.date,'2026-11-02');
     assert.equal(knowledge.includedBackendUpdate.name,'功能与更新自知');
     assert(knowledge.availableTools.includes(expected));assert(!knowledge.availableTools.includes(missing));
@@ -330,6 +331,7 @@ test('capability contracts cover actual registered tools and constrain task exec
  assert.equal(sdk.taskCapabilities.existingPageActions.length,0);
  assert.deepEqual(sdk.taskCapabilities.directlyExecutable.map(x=>x.tool),['query_demo_report']);
  const staff=get({context:{actor:{role:'artist'}},toolNames:['query_bookings'],canPropose:true});
+ assert.equal(staff.taskCapabilities.personalPageActions.length,1);assert.equal(sdk.taskCapabilities.personalPageActions.length,0);
  assert.equal(staff.taskCapabilities.existingPageActions.length,0);
  assert(staff.taskCapabilities.unsupported.includes('银行资金操作'));
  // Release descriptions must point to checked-in deployment evidence, not a future plan.

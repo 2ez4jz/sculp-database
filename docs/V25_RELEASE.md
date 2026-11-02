@@ -1,6 +1,6 @@
 # SCULPY V2.5 P0 — Web Push and enquiry reminders — 2026-11-02
 
-Status: implementation; not published. Real iPhone acceptance not yet performed. P1 internal messaging is intentionally deferred until P0 passes actual phone acceptance.
+Status: P0 deployed and source/schema/scheduler verified on 2026-11-02. Real iPhone acceptance not yet performed. P1 internal messaging is intentionally deferred until P0 passes actual phone acceptance.
 
 ## Baseline inspection
 
@@ -28,4 +28,22 @@ Rollback: pause push_config.enabled, unschedule sculpy-push-worker and restore t
 
 ## Verification/deployment evidence
 
-Pending implementation, automated checks, actual deployed-source/schema/scheduler readback and manual iPhone acceptance. No passing test or merge is a release claim.
+- PR [#41](https://github.com/2ez4jz/sculp-database/pull/41), feature commits 2ba3250 / b8fe2da / 1123011; merge 8b7813395c151404576f0e3e2e9a8e19a064df37.
+- Checked-head CI [41500721083](https://github.com/2ez4jz/sculp-database/actions/runs/41500721083): 106/106 unit checks; ephemeral database 26 passed, 3 PostgreSQL-only checks skipped there; real PostgreSQL 25/25 with no skips, concurrent leases and backup/recovery passed. Browser regression passed, including 320/390/768px settings, direct user activation, operations/owner/staff boundaries, no unsolicited prompt or quiet-hour controls and protected deep links. Existing order, financial, AI, communication and PWA browser regressions passed.
+- Full main suite [41501315676](https://github.com/2ez4jz/sculp-database/actions/runs/41501315676): 197 tests, 194 passed, 3 PostgreSQL-only skips; no failures. Financial/chart checks passed three repeated runs. Final local chat/multistep capability checks 16/16 after release-knowledge update. Mocked model checks are not a live model quality evaluation.
+- Existing Pages deployment [41501315725](https://github.com/2ez4jz/sculp-database/actions/runs/41501315725) succeeded. All nine changed public frontend resources were downloaded and matched local released bytes: index, Service Worker, bootstrap, login, workspace, enquiry reader, notification settings/client/CSS. This source check, rather than merge alone, establishes frontend publication.
+- Both additive push migrations applied to production. All six private push tables have RLS and no anonymous/authenticated direct read; both public push wrappers are invokers and executable only by service_role. Existing website write function/roles were not replaced.
+- sculpy-notifications v1 ACTIVE; all three deployed files match source. Unauthorized worker/API probes rejected. Vault-backed VAPID initialization and encryption self-test succeeded on the actual Edge runtime; no outbound message is used by that self-test.
+- pg_cron job sculpy-push-worker is active every minute. pg_net worker invocation returned HTTP 200; last_tick_at advances, no push errors. Global defaults: 24 elapsed hours, once per enquiry/recipient, no quiet hours. At verification there are **0 devices, 0 opted-in users, 0 notifications and 0 deliveries**; no real user was enabled or notified.
+- Security advisor comparison: existing authenticated-definer/password warnings unchanged. Six new RLS-without-policy INFO entries are intentional private service-only tables. Hosted pg_net installs with non-relocatable public extension metadata and adds one extension_in_public WARN; its net request/response tables are revoked from web roles and no new push RPC is web-executable. Do not drop/reinstall a running extension just to hide metadata lint.
+- sculpy-chat v50 ACTIVE: only shared release facts and product-knowledge descriptions changed; all **15 other files** from the newer v49 runtime are byte-for-byte preserved, including long-term memory. All 17 deployed files were read back and compared. No new chat tool or AI memory behavior was introduced.
+- Desktop and 390px phone layouts inspected with fictional data. Screenshots: [desktop](screenshots/v25-notifications-desktop-20261102.jpg), [phone viewport](screenshots/v25-notifications-mobile-20261102.jpg). The non-HTTPS local preview correctly cannot receive Web Push; browser transport fixtures are explicitly fictional.
+
+## Manual acceptance still required
+
+1. On an actual iPhone, use the existing manual Safari menu to add Sculpy to the Home Screen. Open that app, sign in, Settings → Notifications → enable this device and explicitly grant permission.
+2. Send a test to that device; close/background the app, verify an actual lock-screen notification and tap it. A queue or service-accepted receipt alone is insufficient.
+3. With explicitly opted-in JZ and Miranda test devices, submit a **fictional** website enquiry through a protected test workflow, verify each intended recipient, exact enquiry navigation and no replay duplicates. Verify a controlled overdue fixture, then handled/closed cancellation, logout, disabled-account and permission boundaries. Do not put real customer information in Demo or lock-screen payloads.
+4. Verify notifications stop after disabling; verify normal order, finance, communication and AI work on the actual business devices. Record phone/iOS version, time and actual outcomes.
+
+Until these physical-device checks are recorded, acceptance remains pending_real_iphone and P1 colleague-to-colleague reminders remain not implemented. No claim of end-to-end iPhone delivery is made.
