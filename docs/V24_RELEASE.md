@@ -1,6 +1,6 @@
 # SCULPY V2.4 — 2026-11-02
 
-Status: migration and sculpy-intake v2 deployed; frontend publication pending CI.
+Status: production frontend, database and sculpy-intake v2 deployed and verified; physical-device and authenticated live-model acceptance remains open.
 
 ## Changes
 
@@ -35,3 +35,19 @@ Record migration, Edge version, merged PR/SHA, Pages workflow conclusion and pro
 
 
 Production backend verification: private bucket/RLS/grants inspected; transactional Lead→record→edited summary→conversion/replay→unauthorized read probe passed and rolled back. Counts remained 0 bookings, 0 clients, 4 pre-existing enquiries, 0 communication records/summaries. Existing live sculpy-chat v45 contains native long-term-memory changes beyond main; preserve that runtime when updating release knowledge rather than redeploying older main chat code.
+
+
+## Verified release evidence
+
+- PR #37 merged after both browser and PostgreSQL checks succeeded: `bb212fbf18fd9d6fe7e22a3e75e900ecef44bfd2`, CI run `41438030432`.
+- Squash merge: `3bd9f7321fed06c9e601cdaa95152ae24f6466ed`.
+- Pages deployment run `41438356984` completed successfully. Production index, studio CSS, communication panel and authenticated entrypoint returned HTTP 200 with byte-for-byte matches to the deployed source. URL: https://2ez4jz.github.io/sculp-database/
+- Additive production migration applied successfully; all three public tables have RLS, anonymous RPC access is revoked, public wrappers are SECURITY INVOKER, and the file bucket is private.
+- `sculpy-intake` v2 is ACTIVE. Summary/voice endpoints reject unauthenticated requests with HTTP 401. The existing API secret remains server-side.
+- Local suite: 183 passed, 2 PostgreSQL-only concurrency tests skipped. PostgreSQL CI and backup/recovery passed. Fictional UI fixtures exercised six viewport widths and two real-format PNG uploads, lost-response replay, manual summary edits and conversion history.
+- Formal database transactional smoke passed and rolled back; business row counts returned to their exact prior values. This does not establish real account cross-device operation or model/transcription quality.
+- The two checked-in screenshots are fictional UI acceptance views, not real business data.
+
+[Desktop view](screenshots/v24-desktop-20261102.jpg) · [390px phone view](screenshots/v24-mobile-20261102.jpg)
+
+Chat release knowledge: sculpy-chat v46 deployed ACTIVE and re-read successfully. All 15 non-knowledge files from live v45 remain byte-for-byte unchanged, including native long-term memory and diagnostics; only release knowledge and the shared V2.4 facts module changed. Main remains behind those earlier live-only implementations: reconcile that pre-existing drift before any future full chat deployment.

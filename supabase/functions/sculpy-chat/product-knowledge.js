@@ -1,3 +1,4 @@
+import {v24ReleaseFacts,v24FeatureDescription,v24PageAction} from '../_shared/v24-release.js';
 // Maintained with releases, shipped with the backend, never supplied by a browser
 // catalog or business memory. A source commit is not evidence of a deployment.
 export const productKnowledge=Object.freeze({
@@ -33,12 +34,13 @@ export const productKnowledge=Object.freeze({
   '首页新建订单入口；化妆师个人作品图库，多图选择、预览、下载和移除',
   '添加到桌面及手机安装指引；Demo 与正式入口分开；不提供离线订单编辑',
  ],scope:'Demo新增订单、备注和个人图库保存在当前浏览器，不代表正式数据跨设备同步'},
- notReleased:['V2.4沟通记录、私有附件、审核摘要、询盘转订单及宽屏工作台：代码包含，部署与真实账号验收以docs/V24_RELEASE.md为准。'],
+ notReleased:[],
  limits:['聊天不能直接改正式日期、价格、签约或付款状态；先生成建议，用户到现有页面核对确认',
   '没有实时外网搜索、天气或路线工具，不能声称查过实时信息',
   '不自动发客户消息、不操作银行扣款或退款、不承诺推送或无人值守提醒',
   '没有真实成本和工时等数据时不编造利润、ROI或人员利用率',
   '真实账号跨设备、实体手机录音和真实跨天使用仍需人工验收'],
+ ...v24ReleaseFacts,
 });
 
 export const toolCapabilities=Object.freeze({
@@ -72,7 +74,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    '现有管理员页面管理询盘、签约、合同改价/取消、人工收退款；聊天只查数据或给待确认建议',
    '经营记忆面板：提出、管理员确认、更正、撤销、审计；仅已确认且当前有效的记录供后续回答使用，不是讨论自动永久记住',
    '个人回复偏好、按权限保存的对话、手机布局及添加到桌面',
-   'V2.4新增页面能力的部署状态见notReleased；聊天无沟通记录写入或摘要确认工具，不可声称已代用户归档',
+   v24FeatureDescription,
   ]:[
    '按当前账号分配范围查看订单和工作记录，保留个人回复偏好与对话',
    '全局财务、公司经营记忆和管理员业务操作不对当前角色开放',
@@ -83,6 +85,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
     preconditions:['用户明确要求记录；未说先别改','目标订单已查询且身份明确','当前路径支持确认卡；后端再次校验权限'],
     completion:'生成卡片只算待确认；用户确认且服务器返回保存成功后才算已保存。日期、金额及付款变更卡仅是建议，不等于正式字段已修改'},
    existingPageActions:admin?[
+    v24PageAction,
     {task:'新建订单或录入时分配人员',where:'现有录入新订单表单',needs:['客户原文','明确年份的服务日期和开始时间','客户匹配与服务类型','人工核对确认'],completion:'保存成功后重新读取同一云端订单'},
     {task:'修改正式日期、地点或需求',where:'订单详情→修改订单',needs:['最新订单版本','修改依据','核对前后内容','人工确认'],completion:'服务器确认并按最新记录复查；冲突则重新读取，不能覆盖'},
     {task:'签约、改价、取消或人工记录收退款',where:'订单详情→合同与收款',needs:['具体订单','实际金额及业务日期','依据与人工核对','退款明确关联原收款'],completion:'以服务器返回及合同/收款明细为准；不等于银行资金已移动'},
