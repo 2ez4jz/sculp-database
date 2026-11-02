@@ -1,6 +1,8 @@
-import { mountCloudWorkspace } from "./workspace.js?v=account-toggle-20261102";
+import { mountCloudWorkspace } from "./workspace.js?v=web-push-v25-20261102";
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
+import {mountNotificationSettings} from "./notification-settings.js?v=25";
+import {notificationApi,logoutPush,localPushCleanup} from "../../pwa/notifications.js?v=25";
 import { config } from "../../config.js";
 import {
   authConfigured,
@@ -17,7 +19,16 @@ const esc = (value) =>
       ],
   );
 const roles = accountRoles;
-let supabase, subscription, workspace, welcomeEditor;
+let supabase, subscription, workspace, welcomeEditor, notificationSettings, openNotification;
+const noticePattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+navigator.serviceWorker?.addEventListener("message",event=>{
+  const source=event.source?.scriptURL;
+  if(!source||new URL(source).pathname!==new URL("../../../sw.js",import.meta.url).pathname)return;
+  if(event.data?.type==="sculpy-open-notification"&&noticePattern.test(event.data.id||"")){
+    const url=new URL(location.href);url.searchParams.set("notification",event.data.id);history.replaceState(null,"",url);
+    if(openNotification)void openNotification(event.data.id);else message("请登录后查看工作通知。");
+  }
+});
 function frame(content) {
   root.innerHTML = `<div class="auth-layout"><section class="auth-story"><a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO COMPANION</span></a><div class="auth-story-copy"><span class="auth-eyebrow">YOUR STUDIO, REMEMBERED.</span><h1>每一场工作，<br>都值得被记住。</h1><p>让订单、灵感与每一个细节，<br>在同一个工作空间里相遇。</p><img src="assets/sculpy.webp" alt="Sculpy 工作室助手"></div><small>SCULP STUDIO · 团队工作空间</small></section><section class="auth-content">${content}</section></div>`;
 }
@@ -27,6 +38,9 @@ function message(text) {
 export async function showLogin() {
   workspace?.destroy();
   welcomeEditor?.destroy();
+  notificationSettings?.destroy();
+  notificationSettings = null;
+  openNotification = null;
   welcomeEditor = null;
   workspace = null;
   document.title = "登录 · Sculpy";
@@ -73,6 +87,7 @@ async function showWorkspace() {
     profile = await verifiedProfile(supabase);
   } catch (error) {
     await supabase.auth.signOut({ scope: "local" });
+    void localPushCleanup();
     await showLogin();
     message(error.message);
     return;
@@ -80,25 +95,58 @@ async function showWorkspace() {
   document.title = "工作台 · Sculpy";
   const personalWelcome = Boolean(profile.welcome_message?.trim());
   const heading = profile.welcome_message?.trim() || "业务工作台";
+  const headerActions = `<div class="studio-header-actions">${profile.role==='operations'?'<button class="auth-secondary" id="manage-accounts" type="button" aria-expanded="false" aria-controls="account-list">账户管理 <span>↗</span></button><button type="button" class="auth-secondary" id="edit-welcome" aria-expanded="false" aria-controls="welcome-editor">编辑欢迎语</button>':''}<button type="button" class="auth-secondary" id="workspace-settings" aria-expanded="false" aria-controls="notification-settings">设置</button></div>`;
   frame(
-    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<div class="studio-header-actions"><button class="auth-secondary" id="manage-accounts" type="button" aria-expanded="false" aria-controls="account-list">账户管理 <span>↗</span></button><button type="button" class="auth-secondary" id="edit-welcome" aria-expanded="false" aria-controls="welcome-editor">编辑欢迎语</button></div>' : ""}</header>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户" hidden></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${headerActions}</header><section id="notification-settings" aria-label="通知设置" hidden></section>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户" hidden></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
   workspace?.destroy();
   welcomeEditor?.destroy();
+  notificationSettings?.destroy();
+  notificationSettings = null;
+  openNotification = null;
   welcomeEditor = null;
   const layout=root.querySelector('.auth-layout');
   layout.className='studio-layout';
   const story=layout.querySelector('.auth-story');
   story.className='studio-sidebar';
-  story.innerHTML=`<a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?'<button type="button" data-studio-nav="#website-enquiries" aria-current="page">客户询盘</button><button type="button" data-studio-nav="[data-orders-section]">订单管理</button><button type="button" data-studio-nav=".comm-inbox">待整理记录</button><button type="button" data-studio-nav=".w23-dashboard">经营概览</button>':'<button type="button" data-studio-nav="[data-orders-section]" aria-current="page">我的订单</button>'}</nav><small>SCULP Studio 团队工作区<br>SCULPY V2.4.1</small>`;
+  story.innerHTML=`<a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?'<button type="button" data-studio-nav="#website-enquiries" aria-current="page">客户询盘</button><button type="button" data-studio-nav="[data-orders-section]">订单管理</button><button type="button" data-studio-nav=".comm-inbox">待整理记录</button><button type="button" data-studio-nav=".w23-dashboard">经营概览</button>':'<button type="button" data-studio-nav="[data-orders-section]" aria-current="page">我的订单</button>'}</nav><small>SCULP Studio 团队工作区<br>SCULPY V2.5</small>`;
   layout.querySelector('.auth-content').classList.add('studio-content');
-  root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>{root.querySelectorAll('[data-studio-nav]').forEach(b=>b.removeAttribute('aria-current'));button.setAttribute('aria-current','page');root.querySelector(button.dataset.studioNav)?.scrollIntoView({behavior:'smooth',block:'start'});});
+  root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>{if(!setSettings(false))return;root.querySelectorAll('[data-studio-nav]').forEach(b=>b.removeAttribute('aria-current'));button.setAttribute('aria-current','page');root.querySelector(button.dataset.studioNav)?.scrollIntoView({behavior:'smooth',block:'start'});});
   workspace = mountCloudWorkspace({
     root: root.querySelector("#cloud-workspace"),
     supabase,
     profile,
   });
+  let settingsMode=false;
+  function setSettings(open) {
+    if(open===settingsMode)return true;
+    if(!workspace.canLeave()||(welcomeEditor&&!welcomeEditor.canLeave())||(notificationSettings&&!notificationSettings.canLeave())){message("请先完成当前保存，再切换页面。");return false;}
+    settingsMode=open;
+    root.querySelector("#notification-settings").hidden=!open;
+    root.querySelector("#cloud-workspace").hidden=open;
+    root.querySelector("#workspace-settings").setAttribute("aria-expanded",String(open));
+    const title=root.querySelector(".studio-page-header h2");
+    title.textContent=open?"设置":profile.welcome_message?.trim()||"业务工作台";
+    title.classList.toggle("studio-personal-welcome",!open&&Boolean(profile.welcome_message?.trim()));
+    if(open){
+      for(const [id,button] of [["account-list","manage-accounts"],["welcome-editor","edit-welcome"]]){const el=root.querySelector("#"+id);if(el)el.hidden=true;root.querySelector("#"+button)?.setAttribute("aria-expanded","false");}
+      if(!notificationSettings)notificationSettings=mountNotificationSettings({root:root.querySelector("#notification-settings"),supabase,profile,onBack:()=>setSettings(false),onOpen:async target=>{if(target.type==='settings')return;if(!setSettings(false))return;await workspace.openNotificationTarget(target);}});
+    }
+    return true;
+  }
+  root.querySelector("#workspace-settings").onclick=()=>setSettings(!settingsMode);
+  openNotification=async id=>{
+    if(!workspace.canLeave()||(welcomeEditor&&!welcomeEditor.canLeave())||(notificationSettings&&!notificationSettings.canLeave())){message("请先完成当前保存，再到通知记录查看这条提醒。");return;}
+    try{
+      const target=await notificationApi(supabase,"open",{id});
+      if(target.type==='settings')setSettings(true);else{setSettings(false);await workspace.openNotificationTarget(target);}
+    }catch{message("此通知当前不可查看，请检查登录账户或到通知设置查看记录。");}
+    finally{const url=new URL(location.href);url.searchParams.delete("notification");history.replaceState(null,"",url);}
+  };
+  const initialNotice=new URL(location.href).searchParams.get("notification");
+  if(noticePattern.test(initialNotice||""))void openNotification(initialNotice);
   root.querySelector("#edit-welcome")?.addEventListener("click", event => {
+    if(!setSettings(false))return;
     const editorRoot = root.querySelector("#welcome-editor");
     editorRoot.hidden = !editorRoot.hidden;
     event.currentTarget.setAttribute("aria-expanded", String(!editorRoot.hidden));
@@ -113,6 +161,7 @@ async function showWorkspace() {
     });
   });
   root.querySelector("#logout").onclick = async () => {
+    if(notificationSettings&&!notificationSettings.canLeave()){message("通知设置正在保存，请稍后退出。");return;}
     if (welcomeEditor && !welcomeEditor.canLeave()) {
       message("欢迎语尚未保存或正在保存，请先保存或取消修改。");
       return;
@@ -121,6 +170,7 @@ async function showWorkspace() {
       message('操作仍在保存或尚未收到确认，请先重试同一笔操作，再退出登录。');
       return;
     }
+    await logoutPush(supabase,profile);
     const { error } = await supabase.auth.signOut({ scope: "local" });
     if (error) {
       message("退出失败，请检查网络后重试。");
@@ -130,6 +180,7 @@ async function showWorkspace() {
   };
   let accountsLoading = false;
   root.querySelector("#manage-accounts")?.addEventListener("click", async event => {
+    if(!setSettings(false))return;
     const container = root.querySelector("#account-list");
     container.hidden = !container.hidden;
     event.currentTarget.setAttribute("aria-expanded", String(!container.hidden));
@@ -146,7 +197,7 @@ async function showWorkspace() {
   });
   if (!subscription)
     subscription = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") void showLogin();
+      if (event === "SIGNED_OUT") {void localPushCleanup();void showLogin();}
     }).data.subscription;
 }
 async function loadAccounts(profile) {

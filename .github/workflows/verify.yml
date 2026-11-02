@@ -30,6 +30,7 @@ jobs:
           python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
           node scripts/account-roles-browser.cjs
           node scripts/welcome-editor-browser.cjs
+          node scripts/notifications-browser.cjs
           node scripts/communication-browser.cjs
           node scripts/wedding-v23-browser.cjs
           node scripts/order-numbers.cjs
