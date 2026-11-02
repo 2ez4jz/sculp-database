@@ -1,5 +1,6 @@
 // Shared release facts for main and the preserved, newer production chat runtime.
 export const v24ReleaseFacts={
+ pendingCommunicationDrop:{status:'not_published',evidence:'docs/COMMUNICATION_DROP_2026-11-02.md',scope:'正式owner/operations的Lead与Booking沟通记录支持多文件拖入；沿用现有附件校验、人工保存、私有云端存储和重试保护；聊天不能拖入或保存附件'},
  knowledgeRevision:'2026-11-02-web-push-v25',
  latestBusinessRelease:{version:'V2.5',date:'2026-11-02',status:'deployed',acceptance:'pending_real_iphone',evidence:'docs/V25_RELEASE.md',
   scope:'正式账号P0通知基础设施、个人设置、新官网询盘与24小时未处理提醒；真实iPhone送达尚未验收，P1未实施',

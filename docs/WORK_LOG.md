@@ -221,3 +221,8 @@ PR #41 passed checked-head browser/PostgreSQL CI (41500721083), merged as 8b7813
 ### Regression test correction — 2026-11-02
 
 The post-publication repeat exposed a pre-existing random-value test flake: a generated order reference could already be 610000, making the attempted update a valid no-op. PR #42 guarantees a different replacement while retaining the rejection and unchanged-value checks; two focused database tests pass locally. No production SQL or UI changes; see PR checks for the checked-head regression result. Original P0 release evidence remains recorded in docs/V25_RELEASE.md.
+
+
+### Communication screenshot drag/drop — 2026-11-02
+
+User requested dragging screenshots directly into communication records. Reused the shared Lead/Booking panel, attachment validator/staging/removal, private upload and immutable retry flow. Added a small drop hint and muted hover state; preserved mobile file selection and explicit 保存记录. Mixed invalid files, 20-file cap and frozen-save drops are handled. No schema, RLS or business-field changes. Local focused checks pass; browser/visual/publication verification pending. Evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
