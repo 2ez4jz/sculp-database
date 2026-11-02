@@ -5,7 +5,7 @@ const fixture=await fetch(new URL('../../scripts/fixtures/wedding-v23.json',impo
 const owner='24000000-0000-4000-8000-000000000001';
 const leadId='24000000-0000-4000-8000-000000000011';
 const bookingId='24000000-0000-4000-8000-000000000021';
-const profile={id:owner,display_name:'Jz · 虚构验收',role:'operations',active:true};
+const profile={id:owner,display_name:'Jz · 虚构验收',role:new URLSearchParams(location.search).get('qa_role')||'operations',active:true};
 const leads=[{id:leadId,name:'Fictional Avery',email:'avery@example.test',contact:'fixture_wechat',service:'Wedding',service_type:'wedding',status:'qualified',entry_channel:'manual',first_contact_at:'2026-11-01T14:00:00Z',event_date:'2027-07-24',revision:2,attribution_source:'instagram',details:'客户希望清透妆感，套餐待确认。',notes:'虚构验收记录',is_test:false}];
 const records=[{id:'24000000-0000-4000-8000-000000000031',enquiry_id:leadId,booking_id:null,raw_text:'第一次咨询：想了解半天套餐，日期2027年7月24日。后来改口希望覆盖晚宴，价格尚未确认。',author:'Miranda · 虚构',author_id:owner,created_at:'2026-11-02T10:00:00Z',attachments:[],reviewed:false}];
 const summaries=[],files=new Map(),replays=new Map();
@@ -19,6 +19,7 @@ export function createClient(){return {
  from:table=>{const q={select:()=>q,eq:()=>q,in:()=>q,order:()=>q,limit:()=>q,update:()=>q,single:async()=>({data:table==='profiles'?profile:table==='sculpy_company_rules'?{content:'虚构验收规则'}:{}}),then:resolve=>Promise.resolve({data:table==='website_enquiries_business'?leads:table==='profiles'?[profile]:[]}).then(resolve)};return q;},
  rpc:async(name,args={})=>{
   (globalThis.qaCalls??=[]).push({name,args:structuredClone(args)});
+  if(name==='list_managed_accounts')return {data:[{...profile,username:'sculp_jz'},{id:'24000000-0000-4000-8000-000000000002',display_name:'Fictional Miranda',username:'sculp_miranda',role:'owner',active:true}]};
   if(name==='sculpy_wedding_report')return {data:fixture.report};
   if(name==='sculpy_context')return {data:{bookings:[booking],total:1}};
   if(name==='sculpy_order_detail')return {data:{bookings:[booking]}};

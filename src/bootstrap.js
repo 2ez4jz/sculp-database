@@ -1,7 +1,7 @@
 import { config } from "./config.js";
-import {setupWebApp} from "./pwa/install.js?v=20261016";
+import {setupWebApp} from "./pwa/install.js?v=manual-install-20261102";
 const demo = new URLSearchParams(location.search).get("demo") === "1";
-setupWebApp({demo:demo && config.environment === "demo"});
+setupWebApp();
 if (demo && config.environment === "demo") {
   document.querySelector("#auth-root").remove();
   document.body.append(
@@ -16,5 +16,5 @@ if (demo && config.environment === "demo") {
   await import("./app.js?v=orders-album-20261016");
 } else {
   document.querySelector("#demo-template").remove();
-  await import("./pages/login/index.js?v=24");
+  await import("./pages/login/index.js?v=roles-manual-install-20261102");
 }

@@ -1,6 +1,7 @@
 // Shared release facts for main and the preserved, newer production chat runtime.
 export const v24ReleaseFacts={
  knowledgeRevision:'2026-11-02-v24',
+ pendingInterfaceUpdate:{revision:'roles-manual-install-20261102',status:'not_published',evidence:'docs/V241_RELEASE.md',changes:['普通管理员不再可分配；负责人保留全量业务编辑，只有系统管理员管理账号与密码','移除所有桌面和手机站内安装入口，统一通过浏览器菜单手工添加']},
  latestBusinessRelease:{version:'V2.4',date:'2026-11-02',status:'deployed',evidence:'docs/V24_RELEASE.md',
   scope:'正式owner/operations页面与专属摘要接口；不扩大聊天工具权限',
   changes:['Lead和Booking共用云端沟通记录，保存原文、作者、时间、多张截图与语音',

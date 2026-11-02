@@ -1,5 +1,5 @@
 import { mountCloudWorkspace } from "./workspace.js?v=24";
-import { accountIdentifier, normalizeUsername } from "../../domain/accounts.js";
+import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { config } from "../../config.js";
 import {
   authConfigured,
@@ -15,13 +15,7 @@ const esc = (value) =>
         c
       ],
   );
-const roles = {
-  operations: "系统管理员 · Jz",
-  owner: "工作室负责人",
-  admin: "管理员",
-  artist: "员工",
-  read_only: "只读账户",
-};
+const roles = accountRoles;
 let supabase, subscription, workspace;
 function frame(content) {
   root.innerHTML = `<div class="auth-layout"><section class="auth-story"><a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO COMPANION</span></a><div class="auth-story-copy"><span class="auth-eyebrow">YOUR STUDIO, REMEMBERED.</span><h1>每一场工作，<br>都值得被记住。</h1><p>让订单、灵感与每一个细节，<br>在同一个工作空间里相遇。</p><img src="assets/sculpy.webp" alt="Sculpy 工作室助手"></div><small>SCULP STUDIO · 团队工作空间</small></section><section class="auth-content">${content}</section></div>`;
@@ -34,7 +28,7 @@ export async function showLogin() {
   workspace = null;
   document.title = "登录 · Sculpy";
   frame(
-    `<div class="auth-card"><span class="auth-eyebrow">WELCOME BACK</span><h2>欢迎回到工作室</h2><p class="auth-muted">使用你的团队账户登录 Sculpy。</p><form id="login-form"><label for="username">账号</label><input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="例如 sculp_jz" required minlength="7" maxlength="32" pattern="[sS][cC][uU][lL][pP]_[a-zA-Z0-9][a-zA-Z0-9_]{0,25}"><label for="password">密码</label><div class="auth-password"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button type="button" id="toggle-password" aria-label="显示密码" aria-pressed="false">显示</button></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-primary" id="login-submit" type="submit">登录工作空间 <span>↗</span></button></form><p class="auth-help">需要开通账户或重置密码？请联系管理员 Jz。</p>${config.environment === "demo" ? '<div class="auth-divider"></div><a class="auth-demo" href="?demo=1#bookings">先浏览演示空间 →</a><p class="auth-muted auth-small">演示使用虚构数据，记录仅保存在当前浏览器。</p>' : ""}</div><small class="auth-footer">SCULP STUDIO · 仅供团队成员使用</small>`,
+    `<div class="auth-card"><span class="auth-eyebrow">WELCOME BACK</span><h2>欢迎回到工作室</h2><p class="auth-muted">使用你的团队账户登录 Sculpy。</p><form id="login-form"><label for="username">账号</label><input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="例如 sculp_jz" required minlength="7" maxlength="32" pattern="[sS][cC][uU][lL][pP]_[a-zA-Z0-9][a-zA-Z0-9_]{0,25}"><label for="password">密码</label><div class="auth-password"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button type="button" id="toggle-password" aria-label="显示密码" aria-pressed="false">显示</button></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-primary" id="login-submit" type="submit">登录工作空间 <span>↗</span></button></form><p class="auth-help">需要开通账号或重置密码？请联系系统管理员 Jz。</p>${config.environment === "demo" ? '<div class="auth-divider"></div><a class="auth-demo" href="?demo=1#bookings">先浏览演示空间 →</a><p class="auth-muted auth-small">演示使用虚构数据，记录仅保存在当前浏览器。</p>' : ""}</div><small class="auth-footer">SCULP STUDIO · 仅供团队成员使用</small>`,
   );
   const form = root.querySelector("form");
   const button = root.querySelector("#login-submit");
@@ -80,20 +74,18 @@ async function showWorkspace() {
     message(error.message);
     return;
   }
-  document.title = "账户空间 · Sculpy";
+  document.title = "工作台 · Sculpy";
   frame(
-    `<div class="auth-card auth-workspace"><span class="auth-eyebrow">STUDIO WORKSPACE</span><h2>你好，${esc(profile.display_name)}</h2><p class="auth-muted">${esc(roles[profile.role] || "团队成员")}</p><div class="auth-notice">账户已验证。通过 Sculpy 查询订单、继续对话并确认工作记录。</div>${profile.role === "operations" ? '<button class="auth-primary" id="manage-accounts">账户管理 <span>→</span></button><div id="account-list"></div>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2>业务工作台</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<button class="auth-secondary" id="manage-accounts">账户管理 <span>↗</span></button>' : ""}</header>${profile.role === "operations" ? '<section id="account-list" aria-label="团队账户"></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
   workspace?.destroy();
   const layout=root.querySelector('.auth-layout');
   layout.className='studio-layout';
   const story=layout.querySelector('.auth-story');
   story.className='studio-sidebar';
-  story.innerHTML=`<a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?'<button type="button" data-studio-nav=".comm-inbox">待整理记录</button><button type="button" data-studio-nav=".w23-dashboard">经营概览</button><button type="button" data-studio-nav="#website-enquiries">客户询盘</button>':''}<button type="button" data-studio-nav="[data-orders-section]">订单管理</button></nav><small>每一场工作，都值得被记住。<br>SCULPY V2.4</small>`;
+  story.innerHTML=`<a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?'<button type="button" data-studio-nav=".comm-inbox">待整理记录</button><button type="button" data-studio-nav=".w23-dashboard">经营概览</button><button type="button" data-studio-nav="#website-enquiries">客户询盘</button>':''}<button type="button" data-studio-nav="[data-orders-section]">订单管理</button></nav><small>SCULP Studio 团队工作区<br>SCULPY V2.4.1</small>`;
   layout.querySelector('.auth-content').classList.add('studio-content');
-  root.querySelector('.auth-notice').remove();
-  root.querySelector('.auth-eyebrow').textContent='YOUR STUDIO, IN VIEW';
-  root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>root.querySelector(button.dataset.studioNav)?.scrollIntoView({behavior:'smooth',block:'start'}));
+  root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>{root.querySelectorAll('[data-studio-nav]').forEach(b=>b.removeAttribute('aria-current'));button.setAttribute('aria-current','page');root.querySelector(button.dataset.studioNav)?.scrollIntoView({behavior:'smooth',block:'start'});});
   workspace = mountCloudWorkspace({
     root: root.querySelector("#cloud-workspace"),
     supabase,
@@ -129,11 +121,11 @@ async function loadAccounts(profile) {
   }
   message("");
   container.innerHTML =
-    `<h3>团队账户 <span>${data.length}</span></h3>` +
+    `<div class="account-section-heading"><div><h3>团队账户</h3><p>管理成员访问权限与登录信息</p></div><span class="account-count">${data.length} 位成员</span></div><div class="account-table-heading"><span>成员 / 账号</span><span>角色</span><span>状态</span><span>操作</span></div>` +
     data
       .map(
         (account) =>
-          `<form class="account-form" data-id="${esc(account.id)}"><p>${esc(account.username || "尚未绑定账号")}</p><label>姓名<input name="displayName" value="${esc(account.display_name)}" required maxlength="80"></label><label>角色<select name="role" ${account.id === profile.id ? "disabled" : ""}>${Object.entries(
+          `<details class="account-entry"><summary class="account-summary"><span class="account-member"><span class="account-avatar" aria-hidden="true">${esc(account.display_name?.slice(0,1)||"S")}</span><span><strong>${esc(account.display_name)}</strong><small>${esc(account.username || "尚未绑定账号")}${account.id===profile.id?" · 当前账号":""}</small></span></span><span class="account-role-badge">${esc(roles[account.role]||"团队成员")}</span><span class="account-state ${account.active?"is-active":""}">${account.active?"已启用":"已停用"}</span><span class="account-manage-label">管理 <span aria-hidden="true">⌄</span></span></summary><form class="account-form" data-id="${esc(account.id)}"><label>姓名<input name="displayName" value="${esc(account.display_name)}" required maxlength="80"></label><label>角色<select name="role" ${account.id === profile.id ? "disabled" : ""}>${Object.entries(
             roles,
           )
             .map(
@@ -142,7 +134,7 @@ async function loadAccounts(profile) {
             )
             .join(
               "",
-            )}</select></label><label class="account-active"><input type="checkbox" name="active" ${account.active ? "checked" : ""} ${account.id === profile.id ? "disabled" : ""}>账户启用${account.id === profile.id ? "（当前账户）" : ""}</label><button class="auth-secondary" type="submit">保存修改</button><p class="account-result" role="status"></p><details class="password-reset"><summary>设置新密码</summary><label>新密码<input name="newPassword" type="password" autocomplete="new-password" minlength="8" maxlength="128" placeholder="至少 8 位"></label><button type="button" class="auth-secondary reset-password">确认重置密码</button><p class="password-result" role="status"></p></details></form>`,
+            )}</select></label><p class="auth-muted">负责人可查看经营看板并编辑业务；系统管理员另可管理账号、权限和密码。</p><label class="account-active"><input type="checkbox" name="active" ${account.active ? "checked" : ""} ${account.id === profile.id ? "disabled" : ""}>账户启用${account.id === profile.id ? "（当前账户）" : ""}</label><button class="auth-secondary" type="submit">保存修改</button><p class="account-result" role="status"></p><details class="password-reset"><summary>设置新密码</summary><label>新密码<input name="newPassword" type="password" autocomplete="new-password" minlength="8" maxlength="128" placeholder="至少 8 位"></label><button type="button" class="auth-secondary reset-password">确认重置密码</button><p class="password-result" role="status"></p></details></form></details>`,
       )
       .join("");
   container.querySelectorAll(".account-form").forEach(
@@ -181,8 +173,9 @@ async function loadAccounts(profile) {
       )
       .join(
         "",
-      )}</select></label><button class="auth-primary" type="submit">创建账户</button><p role="status" class="create-result"></p></form></details>`,
+      )}</select></label><p class="auth-muted">负责人可查看经营看板并编辑业务；系统管理员另可管理账号、权限和密码。</p><button class="auth-primary" type="submit">创建账户</button><p role="status" class="create-result"></p></form></details>`,
   );
+  container.querySelector('.account-section-heading').after(container.querySelector('.account-create'));
   const create = container.querySelector("#create-account");
   create.onsubmit = async (event) => {
     event.preventDefault();

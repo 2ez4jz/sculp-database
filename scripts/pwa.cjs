@@ -9,7 +9,7 @@ const base = process.env.SCULPY_PWA_TEST_BASE || 'http://localhost:4173/';
     page.on('pageerror',error=>errors.push(error.message));
     await page.addInitScript(()=>localStorage.setItem('memora-demo-language','zh'));
     await page.goto(base);await page.locator('#login-form').waitFor();
-    assert.equal(await page.locator('.auth-content [data-pwa-open]').count(),1);
+    assert.equal(await page.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
     const manifest = await page.evaluate(async()=>{
       const url=document.querySelector('link[rel=manifest]').href;
       return {url,data:await (await fetch(url)).json()};
@@ -25,32 +25,25 @@ const base = process.env.SCULPY_PWA_TEST_BASE || 'http://localhost:4173/';
     // Inspect the actual parsed Chromium manifest, independently of JSON parsing.
     const cdp=await context.newCDPSession(page);
     const parsed=await cdp.send('Page.getAppManifest');assert.deepEqual(parsed.errors,[]);
-    await page.goto(base+'?demo=1&lang=zh#settings');await page.locator('[data-pwa-card]').waitFor();
+    await page.goto(base+'?demo=1&lang=zh#settings');await page.locator('#main h1').waitFor();assert.equal(await page.locator('[data-pwa-card]').count(),0);
     const demoManifest = await page.evaluate(async()=>{const url=document.querySelector('link[rel=manifest]').href;return {url,data:await (await fetch(url)).json()};});
     assert.notEqual(demoManifest.data.id,manifest.data.id);
     const launch=new URL(demoManifest.data.start_url,demoManifest.url);
     assert.equal(launch.searchParams.get('demo'),'1');assert.equal(launch.hash,'#bookings');
     await page.goto(launch.href);await page.locator('[data-action=new-booking]').waitFor();
-    // Only an explicit button action may invoke the retained browser prompt.
+    // The app never opens an install prompt or injects installation UI.
     await page.evaluate(()=>{
       window.installCalls=0;
       const event=new Event('beforeinstallprompt',{cancelable:true});
       event.prompt=async()=>{window.installCalls++;};event.userChoice=Promise.resolve({outcome:'dismissed'});
       window.dispatchEvent(event);window.installPrevented=event.defaultPrevented;
+      window.dispatchEvent(new Event('appinstalled'));
     });
     assert.equal(await page.evaluate(()=>window.installCalls),0);
-    await page.locator('#menu').click();await page.locator('.sidebar-end [data-pwa-open]').click();
-    await page.locator('.pwa-install-dialog').waitFor();
-    assert.match(await page.locator('[data-pwa-intro]').innerText(),/演示/);
-    await page.locator('[data-pwa-confirm]').click();
-    await page.getByText('已取消安装，仍可继续使用网页版。',{exact:true}).waitFor();
-    assert.equal(await page.evaluate(()=>window.installCalls),1);
     assert.equal(await page.evaluate(()=>window.installPrevented),true);
-    assert(await page.locator('.pwa-install-dialog').evaluate(el=>el.scrollWidth<=innerWidth));
-    await page.screenshot({path:'qa-screens/pwa-guide-mobile.png'});
-    await page.evaluate(()=>window.dispatchEvent(new Event('appinstalled')));
-    assert.equal(await page.locator('.pwa-install-dialog').evaluate(el=>el.open),false);
-    assert.equal(await page.locator('.sidebar-end [data-pwa-open]').isVisible(),false);
+    await page.locator('#menu').click();
+    assert.equal(await page.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
+    await page.screenshot({path:'qa-screens/pwa-manual-only-mobile.png'});
     // A worker on a GitHub project subpath must only cache its data-free fallback.
     const scope=await page.evaluate(async()=>{await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));return (await navigator.serviceWorker.getRegistration()).scope;});
     assert.equal(scope,base);
@@ -66,16 +59,15 @@ const base = process.env.SCULPY_PWA_TEST_BASE || 'http://localhost:4173/';
     assert.deepEqual(cached,[new URL('offline.html',base).href]);
     const ios=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'});
     const phone=await ios.newPage();await phone.addInitScript(()=>localStorage.setItem('memora-demo-language','zh'));
-    await phone.goto(base+'?demo=1&lang=zh#settings');await phone.locator('[data-pwa-card] [data-pwa-open]').click();
-    assert.match(await phone.locator('[data-pwa-steps]').innerText(),/分享[\s\S]*添加到主屏幕/);
-    assert.equal(await phone.locator('[data-pwa-confirm]').isVisible(),false);
-    await phone.screenshot({path:'qa-screens/pwa-ios-instructions.png'});
+    await phone.goto(base+'?demo=1&lang=zh#settings');await phone.locator('#main h1').waitFor();
+    assert.equal(await phone.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
+    await phone.screenshot({path:'qa-screens/pwa-ios-manual-only.png'});
     await ios.close();
     // Simulate standalone detection, without claiming OS installation was automated.
     const standalone=await browser.newContext();await standalone.addInitScript(()=>Object.defineProperty(navigator,'standalone',{value:true}));
     const app=await standalone.newPage();await app.goto(base);await app.locator('#login-form').waitFor();
     assert.equal(await app.locator('[data-pwa-open]:visible').count(),0);await standalone.close();
     assert.deepEqual(errors,[]);await context.close();
-    console.log('PWA: icons/parsed manifest, separate production/demo launches, user-triggered prompt/cancel, iPhone instructions, standalone detection, scoped worker, offline/reconnect and no business caches passed.');
+    console.log('PWA: icons/parsed manifest, separate production/demo launches, no app installation controls/prompts on desktop/mobile/iPhone, scoped worker, offline/reconnect and no business caches passed.');
   } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1)});

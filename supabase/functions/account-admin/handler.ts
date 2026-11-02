@@ -1,8 +1,9 @@
 import {
   accountIdentifier,
   normalizeUsername,
+  accountRoles,
 } from "../../../src/domain/accounts.js";
-const roles = new Set(["operations", "owner", "admin", "artist", "read_only"]);
+const roles = new Set(Object.keys(accountRoles));
 // Dependencies are injected so authorization and failure cases can be tested without secrets.
 export function accountHandler({ callerFor, admin, allowedOrigins }: any) {
   return async (request: Request) => {
@@ -44,7 +45,7 @@ export function accountHandler({ callerFor, admin, allowedOrigins }: any) {
         .eq("id", user.id)
         .single();
       if (profileError || !profile?.active || profile.role !== "operations")
-        return reply({ error: "仅系统管理员可管理密码。" }, 403);
+        return reply({ error: "仅系统管理员可管理账号及密码。" }, 403);
       const raw = await request.text();
       if (raw.length > 4096) return reply({ error: "请求过大。" }, 413);
       let body;

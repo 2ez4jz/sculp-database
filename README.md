@@ -61,13 +61,10 @@ Open `?demo=1#bookings` for the fictional workspace. First visits default to Eng
 Authenticated owner/operations chat can query the canonical cloud monthly report. Service-month completed booking value and receipt-month gross original receipts remain separate CAD measures; missing prices and refund limitations are surfaced. Demo lists, profiles, channels, reports and AI share one editable 300-order baseline. Prior 24-order browser state and chat caches are removed. Changes persist in this browser; reset restores 300 orders. Unknown prices stay blank; completed value and gross receipts remain separate. Real-account and two-device acceptance remains outstanding.
 
 
-## Install on a phone or computer (2026-10-16)
+## Install on a phone or computer (updated 2026-11-02)
 
-Use **添加到桌面** in the workspace menu, Settings, or the sign-in page. Supporting Chromium browsers can open their native installation prompt after a user action; iPhone/iPad and Safari receive platform-specific menu instructions. Installation is never triggered automatically.
+Add Sculpy manually through the browser menu. On iPhone/iPad, open Safari → Share → Add to Home Screen. Desktop and Android users use their browser's installation menu. The app does not inject installation buttons, settings cards, instructions dialogs or prompt controls into the sign-in page, workspace or Demo, and suppresses automatic install promotion.
 
-- The regular `manifest.webmanifest` launches the authenticated workspace entry. Demo links select `manifest-demo.webmanifest`, with a distinct app identity and a stable Chinese fictional-data start URL. A demo installation is named **Sculpy Demo**.
-- Opaque 180/192/512/1024px icons and a padded maskable icon are rendered from the existing SVG mascot. Standalone windows hide redundant install controls.
-- The scoped service worker only caches `offline.html`, a public connection/retry message. Application documents remain network-first with no cached business fallback; API responses, credentials, orders, chat and photos are not cached by this worker.
-- Demo records/photos remain local to their browser/app storage and may not transfer when installed. Installation does not add cross-device photo synchronization, push notifications or offline order editing.
-- `scripts/pwa.cjs` checks manifest/icon validity, separate launch URLs, prompt/cancel behavior, simulated iPhone guidance/standalone mode, scoped offline/reconnect behavior, and the data-free cache. Physical OS installation still requires user confirmation on the target device.
-- Presentation navigation frosts the Sculpy mascot before the assistant route is opened; the active assistant page reveals it.
+The existing regular/Demo manifests, distinct launch URLs, sprite icons and data-free offline/retry service worker remain available. Application/business data is not cached for offline editing. Existing installations continue using their saved icons and launch URLs.
+
+`scripts/pwa.cjs` verifies manifests/icons, separate launches, absence of app installation controls across desktop/mobile/iPhone views, no script-triggered install prompt, scoped offline/reconnect behavior and the data-free cache. Physical OS installation is a manual browser action.
