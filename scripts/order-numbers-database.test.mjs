@@ -19,7 +19,8 @@ test('migration backfills existing rows once, preserves UUID and rejects number 
   assert.deepEqual((await db.query('select id from bookings order by id')).rows,before);
   const rows=(await db.query('select id,order_number from bookings')).rows;
   assert.equal(new Set(rows.map(b=>b.order_number)).size,50);assert(rows.every(b=>/^61[012356789]{4}$/.test(b.order_number)));
-  await assert.rejects(()=>db.query("update bookings set order_number='610000' where id=$1",[rows[0].id]),/不能修改/);
+  const changedNumber=rows[0].order_number==='610000'?'610001':'610000';
+  await assert.rejects(()=>db.query('update bookings set order_number=$1 where id=$2',[changedNumber,rows[0].id]),/不能修改/);
   await assert.rejects(()=>db.query("insert into bookings(id,order_number) values(gen_random_uuid(),'644444')"),/系统自动生成/);
   assert.equal((await db.query('select order_number from bookings where id=$1',[rows[0].id])).rows[0].order_number,rows[0].order_number);
  }finally{await db.close();}

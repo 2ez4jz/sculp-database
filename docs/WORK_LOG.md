@@ -216,3 +216,8 @@ Inspected current main e1125ed (V2.4.1), PWA/Service Worker, profiles, Auth sess
 ### V2.5 P0: verified publication, physical iPhone acceptance pending — 2026-11-02
 
 PR #41 passed checked-head browser/PostgreSQL CI (41500721083), merged as 8b78133, and published by the existing Pages workflow (41501315725). All nine changed frontend resources match the released source. Both additive migrations applied; notification Edge v1 is ACTIVE, Vault identity and actual-runtime crypto self-test passed, cron runs every minute and the worker returns HTTP 200 with zero errors. No devices or real accounts have been opted in; no real push was sent. No quiet-hour UI or backend rule exists. Full suite 197 tests: 194 pass / 3 PostgreSQL-only skips; real PostgreSQL 25/25, backup/recovery and browser regression passed. Final capability/multistep checks 16/16. sculpy-chat v50 updates only product/release knowledge and preserves all 15 other v49 implementation files, including long-term memory. Real iPhone background receipt/click and business-device acceptance are still required; P1 internal messaging is not implemented. Evidence and manual acceptance steps: docs/V25_RELEASE.md.
+
+
+### Regression test correction — 2026-11-02
+
+The post-publication repeat exposed a pre-existing random-value test flake: a generated order reference could already be 610000, making the attempted update a valid no-op. PR #42 guarantees a different replacement while retaining the rejection and unchanged-value checks; two focused database tests pass locally. No production SQL or UI changes; see PR checks for the checked-head regression result. Original P0 release evidence remains recorded in docs/V25_RELEASE.md.
