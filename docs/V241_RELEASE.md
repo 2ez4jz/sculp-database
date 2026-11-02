@@ -51,3 +51,7 @@ Sign in with JZ and Miranda on actual devices, inspect the greeting and enquiry-
 ### Published follow-up: editable account welcomes
 
 The fixed Miranda heading is now seeded in cloud profile data. JZ can edit any account’s welcome from the header beside account management, with preview, reset-to-default, audit, conflict and retry protection. Verified deployment and test evidence: [editable account welcomes](WELCOME_EDITOR_2026-11-02.md).
+
+### Published follow-up: account disclosure and subtle pending labels
+
+Account management now toggles open/closed with selected-color feedback and retains form drafts. Pending enquiries show a small muted dot/tag. Verified checks and actual deployment evidence: [account disclosure and pending markers](ACCOUNT_TOGGLE_PENDING_2026-11-02.md).

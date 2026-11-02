@@ -203,3 +203,7 @@ PR #39 passed PostgreSQL/browser CI (41447255658), merged as 71d1292 and publish
 ### Account-panel disclosure and subtle pending markers — 2026-11-02
 
 User reported account management could not be closed and requested the same selected-color/toggle behavior as the welcome editor. Preserved account forms while collapsing/reopening and deduplicated initial reads. Added a small muted dot/tag only for pending enquiries, following the request to avoid strong highlighting. Existing permissions/status workflows are unchanged. Verification/publication pending; evidence: docs/ACCOUNT_TOGGLE_PENDING_2026-11-02.md.
+
+### Account disclosure and pending markers: verified publication — 2026-11-02
+
+PR #40 passed browser/PostgreSQL checks (41451708676), merged as f3db936, and published through the existing Pages workflow (41452202361). Six live frontend resources match the released source. Desktop/phone fictional QA confirms same-button collapse, selected-color feedback and a small muted pending-only tag; drafts survive reopening and account reads are not repeated. Release knowledge updated in sculpy-chat v49 with all 16 other runtime files preserved; 16 chat/multi-step checks passed. No schema, role, password or business-data changes. Evidence: docs/ACCOUNT_TOGGLE_PENDING_2026-11-02.md.
