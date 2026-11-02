@@ -35,12 +35,12 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   const reportRoot = document.createElement('section');
   let report = null, editor = null, business = null, communication = null;
   if (businessAdmin) {
-    $('[data-intake-root]').after(reportRoot);
+    $('[data-orders-section]').after(reportRoot);
     report = mountWeddingDashboard({root:reportRoot,supabase});
   }
   const enquiriesRoot=document.createElement('div');
   let enquiries=null;
-  if(businessAdmin){reportRoot.after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox});
+  if(businessAdmin){$('.cloud-workspace-actions').after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox});
     const quick=document.createElement('button');quick.type='button';quick.className='auth-primary';quick.dataset.quickLead='';quick.textContent='新建客户询盘';quick.onclick=()=>enquiries.openNew();$('.cloud-workspace-actions').prepend(quick);void refreshInbox();}
   const canLeave=()=>[editor,business,intake,enquiries,communication].every(part=>!part?.canLeave||part.canLeave());
   const beforeUnload=event=>{if(!canLeave()){event.preventDefault();event.returnValue='';}};

@@ -5,13 +5,16 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   const context=await browser.newContext({viewport:{width:1440,height:900}});const errors=[];
   await context.route('**/src/vendor/supabase.js',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('scripts/fixtures/communication-sdk.js','utf8')}));
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://localhost:4173/');await page.locator('#manage-accounts').click();await page.locator('.account-form').first().waitFor();
+  await page.goto('http://localhost:4173/');await page.locator('#manage-accounts').click();await page.locator('.account-summary').first().waitFor();
+  assert.equal(await page.locator('.studio-sidebar nav button').first().getAttribute('data-studio-nav'),'#website-enquiries');
+  assert(await page.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   const selects=page.locator('#account-list select[name=role]');
   for(const s of await selects.all()){assert.deepEqual(await s.locator('option').evaluateAll(xs=>xs.map(x=>x.value)),['operations','owner','artist','read_only']);assert.equal(await s.locator('option[value=admin]').count(),0);}
   assert.equal(await page.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
   await page.screenshot({path:'qa-screens/account-roles-desktop.png',fullPage:true});
   const owner=await context.newPage();owner.on('pageerror',e=>errors.push(e.message));await owner.setViewportSize({width:390,height:844});
   await owner.goto('http://localhost:4173/?qa_role=owner');await owner.locator('.w23-headline').waitFor();
+  assert(await owner.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   assert.equal(await owner.locator('#manage-accounts').count(),0);assert.equal(await owner.locator('#account-list').count(),0);
   assert(await owner.locator('[data-new-booking]').isVisible());assert(await owner.locator('[data-quick-lead]').isVisible());
   await owner.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await owner.locator('.communication-panel [data-text]').waitFor();
