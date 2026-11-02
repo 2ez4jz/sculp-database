@@ -1,3 +1,4 @@
+import {communication} from './communication.ts';
 const env = (k: string) => Deno.env.get(k) || '';
 const limits = new Map<string, {n:number,time:number}>();
 export async function handleRequest(req: Request) {
@@ -20,6 +21,8 @@ export async function handleRequest(req: Request) {
   const now=Date.now(),previous=limits.get(user.id),limit=previous&&now-previous.time<60000?previous:{n:0,time:now};
   limit.n++;limits.set(user.id,limit);if(limits.size>5000)limits.clear();
   if(limit.n>12)return reply({error:'请求较多，请稍后重试。'},429);
+  const action=new URL(req.url).searchParams.get('action');
+  if(action==='communication-summary'||action==='communication-voice')return await communication(req,authHeaders,reply);
   const raw=await req.text();if(raw.length>20000)return reply({error:'内容过长，请分段录入。'},413);
   let body;try{body=JSON.parse(raw)}catch{return reply({error:'请求格式无效。'},400)}
   if(typeof body.rawText!=='string'||!body.rawText.trim()||body.rawText.length>12000)return reply({error:'请输入1–12000字原文。'},400);

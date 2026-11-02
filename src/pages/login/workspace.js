@@ -1,7 +1,8 @@
+import {mountCommunicationPanel} from '../../components/communication/panel.js?v=24';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
-import { mountWebsiteEnquiries } from './enquiries.js?v=cloud-write-20261022';
-import { mountCloudIntake } from './intake.js?v=cloud-write-20261022';
+import { mountWebsiteEnquiries } from './enquiries.js?v=24';
+import { mountCloudIntake } from './intake.js?v=24';
 import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
@@ -25,32 +26,33 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     getScope: () => current,
     onReference: (id) => { void openOrder(id).catch(()=>{}); },
   });
-  root.innerHTML = `<div class="cloud-workspace-actions">${businessAdmin?'<button type="button" class="auth-primary" data-new-booking>新建订单</button>':''}<button class="auth-secondary" data-global>与 Sculpy 聊一聊 ↗</button></div><div data-intake-root></div><section data-order-detail hidden></section><section class="cloud-orders"><h3>我的订单</h3><p class="cloud-note">仅显示当前账户有权限查看的云端订单。</p><form data-search><input aria-label="搜索云端订单" placeholder="单号、客户、日期、场地或化妆师"><button class="auth-secondary">查找订单</button></form><p data-order-status role="status"></p><div data-orders></div><div><button data-prev>上一页</button> <button data-next>下一页</button></div></section>${["operations", "owner"].includes(profile.role) ? '<details class="company-rules"><summary>公司角色与工作规则</summary><p class="cloud-note">所有人的对话都会读取；请勿填写密码或限制共享的资料。</p><textarea maxlength="8000" aria-label="公司角色与工作规则"></textarea><button data-save-rules>保存公司规则</button><p data-rules-status role="status"></p></details>' : ""}`;
+  root.innerHTML = `<div class="cloud-workspace-actions">${businessAdmin?'<button type="button" class="auth-primary" data-new-booking>新建订单</button>':''}<button class="auth-secondary" data-global>与 Sculpy 聊一聊 ↗</button></div><div class="comm-inbox" hidden><h3>待整理沟通</h3><p class="cloud-note">最新100位客户的待整理记录；打开后可对照原文审核。</p><div class="comm-inbox-list" data-inbox></div></div><div data-intake-root></div><section data-order-detail hidden></section><section class="cloud-orders" data-orders-section><h3>我的订单</h3><p class="cloud-note">仅显示当前账户有权限查看的云端订单。</p><form data-search><input aria-label="搜索云端订单" placeholder="单号、客户、日期、场地或化妆师"><button class="auth-secondary">查找订单</button></form><p data-order-status role="status"></p><div data-orders></div><div><button data-prev>上一页</button> <button data-next>下一页</button></div></section>${["operations", "owner"].includes(profile.role) ? '<details class="company-rules"><summary>公司角色与工作规则</summary><p class="cloud-note">所有人的对话都会读取；请勿填写密码或限制共享的资料。</p><textarea maxlength="8000" aria-label="公司角色与工作规则"></textarea><button data-save-rules>保存公司规则</button><p data-rules-status role="status"></p></details>' : ""}`;
   const $ = (s) => root.querySelector(s);
   $("[data-global]").onclick = () => {
     current = { id: "global", label: "全局工作助手" };
     panel.open();
   };
   const reportRoot = document.createElement('section');
-  let report = null, editor = null, business = null;
+  let report = null, editor = null, business = null, communication = null;
   if (businessAdmin) {
-    root.prepend(reportRoot);
+    $('[data-intake-root]').after(reportRoot);
     report = mountWeddingDashboard({root:reportRoot,supabase});
   }
   const enquiriesRoot=document.createElement('div');
   let enquiries=null;
-  if(businessAdmin){reportRoot.after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase});}
-  const canLeave=()=>[editor,business,intake,enquiries].every(part=>!part?.canLeave||part.canLeave());
+  if(businessAdmin){reportRoot.after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox});
+    const quick=document.createElement('button');quick.type='button';quick.className='auth-primary';quick.dataset.quickLead='';quick.textContent='新建客户询盘';quick.onclick=()=>enquiries.openNew();$('.cloud-workspace-actions').prepend(quick);void refreshInbox();}
+  const canLeave=()=>[editor,business,intake,enquiries,communication].every(part=>!part?.canLeave||part.canLeave());
   const beforeUnload=event=>{if(!canLeave()){event.preventDefault();event.returnValue='';}};
   window.addEventListener('beforeunload',beforeUnload);
   let detailVersion = 0;
   async function openOrder(id) {
-    if ((editor && !editor.canLeave()) || (business && !business.canLeave())) {
+    if ((editor && !editor.canLeave()) || (business && !business.canLeave()) || (communication && !communication.canLeave())) {
       const status = business && !business.canLeave()?root.querySelector('[data-business-status]'):root.querySelector('[data-edit-status]');
       if(status)status.textContent='修改仍在保存或尚未收到确认，请先重试同一笔修改。';
       return;
     }
-    editor?.destroy(); editor=null; business?.destroy();business=null;
+    editor?.destroy(); editor=null; business?.destroy();business=null;communication?.destroy();communication=null;
     const mine = ++detailVersion;
     const detail = $("[data-order-detail]");
     detail.hidden = false;
@@ -62,6 +64,8 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};
     detail.innerHTML=`<h3>${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)}</h3><p>${esc(new Date(b.starts_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 多伦多时间</p><p>${esc(b.venue||'地点待定')} · ${esc(b.artists.join(' / ')||'人员待定')}</p><p>服务需求：${esc(b.service_details||'待补充')}</p>${['operations','owner'].includes(profile.role)?`<p>预算：${b.budget_cad==null?'未填写':esc(b.budget_cad)+' CAD'} · 成交价：${b.price_cad==null?'未确定':esc(b.price_cad)+' CAD'}</p>`:''}<p>状态：${esc({inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'}[b.status]||b.status)}</p>${data.intake?`<details><summary>查看原始记录与时间</summary><p>录入：${esc(new Date(data.intake.recordedAt).toLocaleString('zh-CN'))} · 保存：${esc(new Date(data.intake.savedAt).toLocaleString('zh-CN'))}</p><pre>${esc(data.intake.rawText)}</pre></details>`:''}<button type="button" data-discuss>与 Sculpy 讨论这笔订单</button>`;
     detail.querySelector('[data-discuss]').onclick=()=>{current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};panel.open()};
+    if(businessAdmin){const commRoot=document.createElement('div');detail.append(commRoot);communication=mountCommunicationPanel({root:commRoot,supabase,type:'booking',id,onChange:refreshInbox});}
+    detail.scrollIntoView({block:'start',behavior:'smooth'});
     if(businessAdmin && data.edit) {
       const businessRoot=document.createElement('div');detail.append(businessRoot);
       business=mountBookingBusiness({root:businessRoot,supabase,bookingId:id,onSaved:async savedId=>{business?.destroy();business=null;await load();await openOrder(savedId);void report?.refresh();}});
@@ -70,8 +74,17 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
         onSaved:async savedId=>{await load();await openOrder(savedId);}});
     }
   }
-  const intake = ["operations","owner"].includes(profile.role) ? mountCloudIntake({root:$("[data-intake-root]"),supabase,onSaved:async id=>{await load();await openOrder(id)}}) : null;
+  const intake = ["operations","owner"].includes(profile.role) ? mountCloudIntake({root:$("[data-intake-root]"),supabase,onSaved:async id=>{await load();await openOrder(id);void enquiries?.refresh();void refreshInbox();}}) : null;
   if (businessAdmin) $("[data-new-booking]").onclick = () => intake.open();
+  async function refreshInbox(){
+    if(!businessAdmin||destroyed)return;
+    try{const {data,error}=await supabase.rpc('sculpy_communication_inbox',{});
+    if(destroyed)return;const host=$('[data-inbox]');host.parentElement.hidden=false;
+    if(error||!Array.isArray(data)){host.textContent='待整理列表暂时无法读取，请稍后刷新。';return;}
+    host.innerHTML=data.length?data.map(x=>`<button type="button" data-inbox-id="${esc(x.id)}" data-inbox-type="${esc(x.type)}">${esc(x.label)} · ${x.pending} 条待整理 ↗</button>`).join(''):'<p class="cloud-note">暂无待整理记录。可以从客户询盘或订单详情留下第一条沟通。</p>';
+    host.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.inboxType==='lead'?void enquiries.openLead(b.dataset.inboxId):void openOrder(b.dataset.inboxId).catch(()=>{}));
+    }catch{if(!destroyed){$('[data-inbox]').parentElement.hidden=false;$('[data-inbox]').textContent='待整理列表暂时无法读取，请稍后刷新。';}}
+  }
   async function load() {
     const mine = ++version;
     $("[data-order-status]").textContent = "正在读取订单…";
@@ -161,6 +174,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       intake?.destroy();
       editor?.destroy();
       business?.destroy();
+      communication?.destroy();
       report?.destroy();
       panel.destroy();
     },

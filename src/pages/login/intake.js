@@ -2,7 +2,7 @@ import { config } from '../../config.js';
 import {identifyCloudIntake,intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js?v=cloud-write-20261022';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountCloudIntake({root,supabase,onSaved}){
- let destroyed=false,version=0,recordedAt=null,requestId=null,pending=null,saving=false,lookupVersion=0;
+ let destroyed=false,version=0,recordedAt=null,requestId=null,pending=null,saving=false,lookupVersion=0,conversion=null;
  root.innerHTML=`<details class="cloud-intake"><summary>录入新订单</summary><p class="cloud-note">粘贴客户原话，逐项核对。确认后保存为待确认需求，预算不会作为成交价。</p><label>客户原话<textarea data-source maxlength="12000" placeholder="粘贴微信内容或语音转写"></textarea></label><small data-time></small><div class="intake-actions"><button type="button" data-identify>识别订单</button><button type="button" data-manual>填写确认卡片</button></div><p data-status role="status" aria-live="polite"></p><div data-review></div></details>`;
  const $=s=>root.querySelector(s),status=t=>{if(!destroyed)$('[data-status]').textContent=t};
  const source=$('[data-source]');
@@ -24,17 +24,17 @@ export function mountCloudIntake({root,supabase,onSaved}){
    $('[data-match]').onclick=async()=>{const name=form.elements.clientName.value.trim(),lookup=++lookupVersion;try{const result=await intakeRpc(supabase,'sculpy_intake_lookup',{p_name:name});if(destroyed||mine!==version||lookup!==lookupVersion||form.elements.clientName.value.trim()!==name)return;matches(result.clients);matchedName=name;status('客户查找完成。');}catch(e){status(e.message)}};
    form.oninput=()=>{form.elements.confirmed.checked=false;};
    form.elements.confirmed.oninput=e=>e.stopPropagation();
-   $('[data-new]').onclick=()=>{source.disabled=false;source.value='';recordedAt=null;invalidate();$('[data-identify]').disabled=false;$('[data-manual]').disabled=false;status('可以录入下一单。');};
+   $('[data-new]').onclick=()=>{source.disabled=false;source.value='';recordedAt=null;conversion=null;invalidate();$('[data-identify]').disabled=false;$('[data-manual]').disabled=false;status('可以录入下一单。');};
    form.onsubmit=async e=>{
     e.preventDefault();if(saving||destroyed)return;
     if(matchedName===null||matchedName.trim()!==form.elements.clientName.value.trim()){status('姓名已变化，请先按姓名查找已有客户。');return;}
     const payload=Object.fromEntries([...fields.map(f=>f[0]),'clientId','serviceId','artistId'].map(k=>[k,form.elements[k].value.trim()]));
     // Freeze the exact request after sending; retry a lost response with the same key/body.
-    pending??={p_request_id:requestId,p_payload:payload,p_raw_text:source.value,p_recorded_at:recordedAt};
+    pending??=conversion?{p_request_id:requestId,p_action:'convert_lead',p_payload:{leadId:conversion.id,revision:conversion.revision,draft:payload,rawText:source.value,recordedAt,confirmed:true}}:{p_request_id:requestId,p_payload:payload,p_raw_text:source.value,p_recorded_at:recordedAt};
     saving=true;source.disabled=true;$('[data-identify]').disabled=true;$('[data-manual]').disabled=true;
     form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=true);status('正在保存到云端…');
     try{
-     const result=await intakeRpc(supabase,'sculpy_confirm_intake',pending);
+     const result=await intakeRpc(supabase,conversion?'sculpy_communication_command':'sculpy_confirm_intake',pending);
      if(destroyed||mine!==version)return;
      pending=null;
      status('已保存到云端。正在重新读取订单…');
@@ -63,5 +63,5 @@ export function mountCloudIntake({root,supabase,onSaved}){
   try{const result=await identifyCloudIntake(supabase,source.value);if(destroyed||mine!==version)return;if(!result.isNewBooking){status(result.warnings.join('；')||'未识别到明确的新订单需求，请核对或手动填写。');return;}await review(result.draft,result.warnings);}
   catch(e){if(!destroyed&&mine===version)status(e.message)}finally{if(!destroyed&&!saving)button.disabled=false;}
  };
- return {canLeave:()=>!saving&&!pending,open(){if(destroyed)return;$('details').open=true;source.focus();},destroy(){destroyed=true;version++;root.replaceChildren();}};
+ return {canLeave:()=>!saving&&!pending,open(options={}){if(destroyed||saving||pending)return;conversion=options.lead||null;source.disabled=false;$('[data-identify]').disabled=false;$('[data-manual]').disabled=false;invalidate();if(conversion){source.value=conversion.original_details||conversion.details||`${conversion.name} · ${conversion.service}`;recordedAt=new Date().toISOString();void review({clientName:conversion.name,date:conversion.event_date||'',serviceCode:conversion.service_type||'',location:conversion.location||'',details:conversion.details||''},['由询盘建立待确认订单；确认签约后再标记成交。']);}$('details').open=true;root.scrollIntoView({block:'start',behavior:'smooth'});source.focus();},destroy(){destroyed=true;version++;root.replaceChildren();}};
 }

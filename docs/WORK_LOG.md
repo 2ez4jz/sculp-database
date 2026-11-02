@@ -169,3 +169,8 @@
 - [旧版真实回复](../scripts/fixtures/conversation-baseline.json)、[新版真实回复](../scripts/fixtures/conversation-v3.json)
 
 补充说明：之前 Mem0 的试用结果来自前序工作记录；本轮没有重新测试或接入。自动长期记忆是**尚未实现**，不能写成仅仅“尚未测试”。
+
+
+## 2026-11-02 — V2.4 implementation
+
+Implemented unified authenticated Lead/Booking communication records, private attachment persistence, server-scoped multimodal summary draft and human confirmation, atomic Lead-to-Booking conversion, pending inbox and separated wide desktop/tablet/mobile workspace layout. Reused existing intake, audio, business confirmation and Pages deployment paths. Database/transport tests and fictional browser acceptance were added; existing regression checks remain required. Production is not claimed from local code or tests. See [V24_RELEASE.md](V24_RELEASE.md) for validation limits, deployment evidence and [V24_ROLLBACK.md](V24_ROLLBACK.md) for non-destructive rollback.
