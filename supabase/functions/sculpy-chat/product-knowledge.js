@@ -2,7 +2,7 @@
 // catalog or business memory. A source commit is not evidence of a deployment.
 export const productKnowledge=Object.freeze({
  product:'SCULPY · SCULP Studio 工作助手',
- knowledgeRevision:'2026-10-22',
+ knowledgeRevision:'2026-11-02',
  includedBackendUpdate:{
   date:'2026-10-22',name:'功能与更新自知',
   changes:['回答时内置可信功能清单和最近更新说明','区分当前演示/正式环境、当前可调用工具、页面操作及权限边界','不再让用户提供本系统已有的功能或更新说明；新问题优先于旧对话中的误解'],
@@ -33,7 +33,7 @@ export const productKnowledge=Object.freeze({
   '首页新建订单入口；化妆师个人作品图库，多图选择、预览、下载和移除',
   '添加到桌面及手机安装指引；Demo 与正式入口分开；不提供离线订单编辑',
  ],scope:'Demo新增订单、备注和个人图库保存在当前浏览器，不代表正式数据跨设备同步'},
- notReleased:[],
+ notReleased:['V2.4沟通记录、私有附件、审核摘要、询盘转订单及宽屏工作台：代码包含，部署与真实账号验收以docs/V24_RELEASE.md为准。'],
  limits:['聊天不能直接改正式日期、价格、签约或付款状态；先生成建议，用户到现有页面核对确认',
   '没有实时外网搜索、天气或路线工具，不能声称查过实时信息',
   '不自动发客户消息、不操作银行扣款或退款、不承诺推送或无人值守提醒',
@@ -72,6 +72,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    '现有管理员页面管理询盘、签约、合同改价/取消、人工收退款；聊天只查数据或给待确认建议',
    '经营记忆面板：提出、管理员确认、更正、撤销、审计；仅已确认且当前有效的记录供后续回答使用，不是讨论自动永久记住',
    '个人回复偏好、按权限保存的对话、手机布局及添加到桌面',
+   'V2.4新增页面能力的部署状态见notReleased；聊天无沟通记录写入或摘要确认工具，不可声称已代用户归档',
   ]:[
    '按当前账号分配范围查看订单和工作记录，保留个人回复偏好与对话',
    '全局财务、公司经营记忆和管理员业务操作不对当前角色开放',

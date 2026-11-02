@@ -117,7 +117,8 @@ test('confirmed edits preserve timestamps, reject stale writes, deduplicate retr
     assert.equal((await detail(db)).edit.version,updated.version);
     const cancellationDay=(await db.query("select to_char(now() at time zone 'America/Toronto','YYYY-MM-DD') d")).rows[0].d;
     await db.query('select sculpy_wedding_command($1,$2,$3)',[crypto.randomUUID(),'cancel_contract',{confirmed:true,reason:'Fixture cancellation',bookingId:b1,version:updated.version,effectiveAt:cancellationDay}]);
-    assert.equal((await report(db,cancellationDay.slice(0,7))).bookings.cancelled,1);
+    // Monthly booking status is grouped by service month, not the wall-clock cancellation month.
+    assert.equal((await report(db,updated.date.slice(0,7))).bookings.cancelled,1);
   } finally {await db.close();}
 });
 

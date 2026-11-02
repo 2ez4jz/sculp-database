@@ -1,4 +1,4 @@
-import { mountCloudWorkspace } from "./workspace.js?v=cloud-write-20261022";
+import { mountCloudWorkspace } from "./workspace.js?v=24";
 import { accountIdentifier, normalizeUsername } from "../../domain/accounts.js";
 import { config } from "../../config.js";
 import {
@@ -85,6 +85,15 @@ async function showWorkspace() {
     `<div class="auth-card auth-workspace"><span class="auth-eyebrow">STUDIO WORKSPACE</span><h2>你好，${esc(profile.display_name)}</h2><p class="auth-muted">${esc(roles[profile.role] || "团队成员")}</p><div class="auth-notice">账户已验证。通过 Sculpy 查询订单、继续对话并确认工作记录。</div>${profile.role === "operations" ? '<button class="auth-primary" id="manage-accounts">账户管理 <span>→</span></button><div id="account-list"></div>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
   workspace?.destroy();
+  const layout=root.querySelector('.auth-layout');
+  layout.className='studio-layout';
+  const story=layout.querySelector('.auth-story');
+  story.className='studio-sidebar';
+  story.innerHTML=`<a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?'<button type="button" data-studio-nav=".comm-inbox">待整理记录</button><button type="button" data-studio-nav=".w23-dashboard">经营概览</button><button type="button" data-studio-nav="#website-enquiries">客户询盘</button>':''}<button type="button" data-studio-nav="[data-orders-section]">订单管理</button></nav><small>每一场工作，都值得被记住。<br>SCULPY V2.4</small>`;
+  layout.querySelector('.auth-content').classList.add('studio-content');
+  root.querySelector('.auth-notice').remove();
+  root.querySelector('.auth-eyebrow').textContent='YOUR STUDIO, IN VIEW';
+  root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>root.querySelector(button.dataset.studioNav)?.scrollIntoView({behavior:'smooth',block:'start'}));
   workspace = mountCloudWorkspace({
     root: root.querySelector("#cloud-workspace"),
     supabase,
