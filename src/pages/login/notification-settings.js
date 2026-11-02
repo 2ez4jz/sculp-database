@@ -10,7 +10,7 @@ export function mountNotificationSettings({root,supabase,profile,onOpen,onBack})
  function controls(){
   const device=state?.devices?.find(d=>d.id===currentDeviceId(profile.id)),active=device?.active;
   const permission='Notification' in window?Notification.permission:'unsupported';
-  $('[data-permission]').textContent=!('Notification' in window)?'不支持':({granted:'已允许',denied:'已拒绝',default:'尚未申请'}[Notification.permission]||'未知');
+  $('[data-permission]').textContent=!support.supported?'暂不可用':({granted:'已允许',denied:'已拒绝',default:'尚未申请'}[Notification.permission]||'未知');
   $('[data-device]').textContent=active?(device.currentSession&&subscription?'已登记此设备':'需要重新连接'):'尚未登记或已关闭';
   if(support.supported&&permission==='denied')$('[data-support]').textContent='通知权限已关闭，请在系统或浏览器的网站设置中允许通知，再返回刷新状态。';
   $('[data-enable]').disabled=busy||!support.supported||!registration||!state?.publicKey||!state?.systemEnabled||permission==='denied';
@@ -33,7 +33,8 @@ export function mountNotificationSettings({root,supabase,profile,onOpen,onBack})
   state=await notificationApi(supabase,'state');if(!alive)return;
   const p=state.preferences;for(const key of ['enabled','new_enquiry','overdue'])if(prefs.elements[key])prefs.elements[key].checked=p[key];
   if(profile.role==='operations'){
-   const f=$('[data-global]');f.elements.enabled.checked=state.config.enabled;f.elements.overdueHours.value=state.config.overdueHours;f.elements.repeatHours.value=String(state.config.repeatHours);
+   const f=$('[data-global]');f.elements.enabled.checked=state.config.enabled;f.elements.overdueHours.value=state.config.overdueHours;
+   const repeat=String(state.config.repeatHours);if(![...f.elements.repeatHours.options].some(o=>o.value===repeat)){const option=document.createElement('option');option.value=repeat;option.textContent=`每 ${repeat} 小时`;f.elements.repeatHours.append(option);}f.elements.repeatHours.value=repeat;
    $('[data-scheduler]').textContent=`定时检查：${state.config.schedulerInstalled?'已配置':'尚未配置'}${state.config.lastTickAt?' · 最近运行 '+new Date(state.config.lastTickAt).toLocaleString('zh-CN',{timeZone:'America/Toronto'}):''}`;
   }
   if(!state.systemEnabled)status('业务推送服务当前暂停；你的偏好可以正常保存。');
