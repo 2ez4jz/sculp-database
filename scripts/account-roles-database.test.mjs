@@ -56,6 +56,6 @@ test('cloud welcome editing: operations-only, audited, replay-safe, versioned an
   await db.exec('reset role');
   const audit=(await db.query("select actor_id,before_value,after_value from audit_events where action='welcome_update' order by created_at,id")).rows;
   assert.equal(audit.length,2);assert(audit.every(x=>x.actor_id===id(11)));
-  assert.equal((await db.query('select welcome_revision from profiles where id=$1',[id(12)])).rows[0].welcome_revision,2);
+  assert.equal(BigInt((await db.query('select welcome_revision from profiles where id=$1',[id(12)])).rows[0].welcome_revision),2n);
  }finally{await db.close();}
 });
