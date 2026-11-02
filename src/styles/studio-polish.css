@@ -39,6 +39,9 @@
 .studio-content .comm-inbox h3{font-size:14px;font-weight:650;margin:0;color:#394a30}.studio-content .comm-inbox>.cloud-note{margin:5px 0 10px;font-size:12px}
 .studio-content .comm-inbox-list{gap:6px 12px}.studio-content .comm-inbox-list button{margin:0;min-height:38px;border-radius:7px;border:1px solid #e6ebe3;background:#f8faf6;padding:9px 12px;font-size:12px}
 .studio-content .comm-inbox-list>.cloud-note{margin:0;font-size:12px;color:#69756b}
+.studio-content #website-enquiries>.w23-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:18px 0 8px}
+.studio-content #website-enquiries>.w23-actions select{width:auto;min-width:200px;margin-left:auto;min-height:36px}
+.studio-content #website-enquiries>[data-status]{font-size:11px;color:var(--ui-muted);margin:8px 0 14px}
 .studio-content .w23-dashboard,.studio-content .cloud-orders{border-color:var(--ui-line);border-radius:var(--ui-radius);background:#fff;margin:20px 0;padding:22px 24px;box-shadow:0 1px 3px #20302003}
 .studio-content .w23-heading{align-items:flex-start;margin-bottom:18px;gap:20px}.studio-content .w23-heading small{font-size:10px;font-weight:600;color:#69756b;letter-spacing:.5px}.studio-content .w23-heading h3,.studio-content .cloud-orders>h3{font-size:20px;letter-spacing:-.4px;font-weight:650;line-height:1.4;margin:4px 0}.studio-content .w23-heading>span{font-size:11px;color:#69756b;padding-top:6px}
 .studio-content [data-w23-filter]{padding-bottom:14px;border-bottom:1px solid #edf0e9;margin-top:0}
@@ -89,6 +92,7 @@
  .account-section-heading{padding:18px 16px 14px}.account-section-heading h3{font-size:17px}.account-section-heading p{font-size:11px;line-height:1.7}.account-count{font-size:10px}.account-table-heading{display:none}.account-summary{padding:15px 16px;grid-template-columns:minmax(0,1fr) auto;gap:7px 12px}.account-member{grid-row:1/3;gap:9px}.account-avatar{flex-basis:31px;height:31px;border-radius:7px;font-size:12px}.account-member strong{font-size:13px}.account-member small{font-size:10px;line-height:1.6}.account-role-badge{font-size:10px;text-align:right}.account-state{font-size:9px;text-align:right}.account-manage-label{display:none}.studio-content .account-form{grid-template-columns:1fr;padding:16px;gap:0}.studio-content .account-form>.auth-muted{font-size:10px}.studio-content .account-create{padding:13px 16px}.studio-content .account-create>summary{font-size:12px;padding:9px 12px;min-height:40px}.studio-content .account-create .auth-primary{width:100%;min-height:44px}.studio-content .password-reset{padding:12px}.studio-content .account-form>.auth-secondary{min-height:42px}.studio-content .account-form .reset-password{min-height:42px}
 }
 @media(max-width:380px){.studio-content [data-w23-filter]>.intake-fields{grid-template-columns:1fr}.studio-page-header h2{font-size:21px}.studio-content .w23-headline dd{font-size:23px}.account-member small{max-width:150px;overflow-wrap:anywhere}}
+@media(max-width:760px){.studio-content #website-enquiries>.w23-actions [data-new-lead]{flex-basis:100%;text-align:center}.studio-content #website-enquiries>.w23-actions select{flex:1;min-width:0;max-width:100%;margin-left:0;min-height:44px}.studio-content #website-enquiries>.w23-actions [data-refresh]{min-height:44px}.studio-page-header h2.studio-personal-welcome{font-size:21px;letter-spacing:-.3px}}
 /* Account creation belongs to the member-list header, not a separate empty row. */
 .studio-content #account-list:not(:empty){position:relative}
 .studio-content .account-section-heading{padding-right:174px}
