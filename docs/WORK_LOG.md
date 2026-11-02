@@ -176,3 +176,14 @@
 Implemented unified authenticated Lead/Booking communication records, private attachment persistence, server-scoped multimodal summary draft and human confirmation, atomic Lead-to-Booking conversion, pending inbox and separated wide desktop/tablet/mobile workspace layout. Reused existing intake, audio, business confirmation and Pages deployment paths. Database/transport tests and fictional browser acceptance were added; existing regression checks remain required. Production is not claimed from local code or tests. See [V24_RELEASE.md](V24_RELEASE.md) for validation limits, deployment evidence and [V24_ROLLBACK.md](V24_ROLLBACK.md) for non-destructive rollback.
 
 V2.4 release verified: PR #37 merged as 3bd9f73 after CI 41438030432 passed browser and PostgreSQL checks. Pages deployment 41438356984 succeeded; production index/CSS/panel/auth entry bytes matched. Production migration and sculpy-intake v2 deployed; transactional smoke rolled back without retained test rows; unauthenticated summary/voice return 401. sculpy-chat v46 is deployed and re-read verified; only release knowledge and shared V2.4 facts changed, with all 15 prior non-knowledge runtime files unchanged, including long-term memory. Physical phone, authenticated two-device and live model quality acceptance remain open.
+
+
+## 2026-11-02 — V2.4.1 role and installation cleanup
+
+User requested removal of the ordinary legacy admin role and all in-app Add to Home Screen/Desktop entry points. Implemented shared assignable-role definitions, account Edge validation and database assignment constraint. Owner retains business viewing/editing, while operations alone manages accounts/passwords. Installation is now browser-menu-only with no app controls/dialogs/prompts. Existing system/owner accounts were inspected; no password or role is changed. Validation and publication are tracked in docs/V241_RELEASE.md.
+
+Added the requested UI refinement to this release: system-font hierarchy, compact professional workspace spacing, aligned dashboard/form controls, member rows with expandable account management, clearer original/summary layouts, restrained neutral surfaces and compact financial empty states. Phone uses larger input/touch targets and responsive stacking.
+
+Follow-up priority: operations and owner now see enquiry management as the first business section and first navigation item; the dashboard is placed below orders. Browser regression checks assert this order for both roles.
+
+- Follow-up: personalised the verified sculp_miranda account welcome with the user’s exact wording; retained the standard heading for other accounts and added phone overflow verification.

@@ -8,7 +8,8 @@ async function seed(db) {
   for(const [user,role,active] of [[jz,'operations',true],[owner,'owner',true],[staff,'artist',true],
     [other,'artist',true],[inactive,'artist',false],[reader,'read_only',true],[legacy,'admin',true]]) {
     await db.query('insert into auth.users(id,email) values($1,$2)',[user,`${user}@example.test`]);
-    await db.query('insert into profiles(id,display_name,role,active) values($1,$2,$3,$4)',[user,role,role,active]);
+    const insert=()=>db.query('insert into profiles(id,display_name,role,active) values($1,$2,$3,$4)',[user,role,role,active]);
+    if(role==='admin')await assert.rejects(insert,e=>e.code==='23514');else await insert();
   }
   await db.exec(`insert into artists(id,slug,profile_id,name,level) values('${artist}','qa_artist','${staff}','QA Artist','Senior');
     insert into artists(id,slug,profile_id,name,level) values('${id(21)}','qa_inactive','${inactive}','Inactive','Senior');

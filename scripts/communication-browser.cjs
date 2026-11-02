@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');const fs=require('node:fs');
  try{
   const page=await browser.newPage({viewport:{width:1920,height:1080}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/src/vendor/supabase.js',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('scripts/fixtures/communication-sdk.js','utf8')}));
-  await page.goto('http://localhost:4173/');await page.getByRole('heading',{name:'你好，Jz · 虚构验收'}).waitFor();await page.locator('.w23-headline').waitFor();
+  await page.goto('http://localhost:4173/');await page.getByRole('heading',{name:'业务工作台'}).waitFor();await page.locator('.w23-headline').waitFor();
   assert.equal(await page.locator('.auth-story').count(),0);
   for(const width of [1920,1440,1024,768,390,360]){
    await page.setViewportSize({width,height:900});

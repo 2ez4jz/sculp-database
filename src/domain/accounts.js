@@ -1,3 +1,11 @@
+// Assignable production roles. Demo's internal identity names are separate.
+export const accountRoles = Object.freeze({
+  operations: "系统管理员",
+  owner: "工作室负责人",
+  artist: "员工",
+  read_only: "只读账户",
+});
+
 export function normalizeUsername(value) {
   const username = String(value ?? "")
     .trim()

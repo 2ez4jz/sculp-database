@@ -31,3 +31,8 @@ The temporary token-protected bootstrap function has been replaced with a perman
 
 SDK: bundled @supabase/supabase-js 2.117.3. Rebuild with esbuild (browser platform, ESM, bundle and minify); license accompanies the bundle.
 References: https://supabase.com/docs/reference/javascript/auth-admin-createuser and https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid
+
+
+## Role cleanup — 2026-11-02
+
+V2.4.1 retires ordinary `admin` assignment. System administrators (`operations`) manage accounts and passwords; studio owners (`owner`) retain all business dashboard and reviewed-edit capabilities. The role selector and account-create Edge Function use the shared supported-role map, and profiles reject the retired role at the database boundary. The historical enum token remains for migration compatibility. See [V241_RELEASE.md](V241_RELEASE.md) for publication evidence.

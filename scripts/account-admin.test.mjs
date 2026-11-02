@@ -4,6 +4,7 @@ import { accountHandler } from "../supabase/functions/account-admin/handler.ts";
 import {
   accountIdentifier,
   normalizeUsername,
+  accountRoles,
 } from "../src/domain/accounts.js";
 const origin = "https://studio.test",
   id = "00000000-0000-0000-0000-000000000002";
@@ -93,8 +94,8 @@ test("username normalization and internal mapping reject email inputs", () => {
   ])
     assert.throws(() => normalizeUsername(value));
 });
-test("unauthenticated, employee and disabled administrator cannot set passwords", async () => {
-  for (const options of [{ role: "artist" }, { active: false }]) {
+test("only active system administrators can create accounts or set passwords", async () => {
+  for (const options of [{ role: "owner" }, { role: "admin" }, { role: "artist" }, { role: "read_only" }, { active: false }]) {
     const f = fixture(options);
     assert.equal(
       (
@@ -107,10 +108,20 @@ test("unauthenticated, employee and disabled administrator cannot set passwords"
       403,
     );
     assert.deepEqual(f.calls, []);
+    assert.equal((await f.request({action:'create',username:'sculp_fixture',displayName:'Fixture',role:'owner',password:'password123'})).status,403);
+    assert.deepEqual(f.calls, []);
   }
   const f = fixture();
   assert.equal((await f.request({}, "")).status, 401);
   assert.deepEqual(f.calls, []);
+});
+test("retired admin is not assignable and fails before any Auth identity is created", async () => {
+  assert.deepEqual(Object.keys(accountRoles),['operations','owner','artist','read_only']);
+  const f=fixture();
+  assert.equal((await f.request({action:'create',username:'sculp_fixture',displayName:'Fixture',role:'admin',password:'password123'})).status,400);
+  assert.deepEqual(f.calls,[]);
+  assert.equal((await f.request({action:'create',username:'sculp_fixture',displayName:'Fixture',role:'owner',password:'password123'})).status,201);
+  assert.equal(f.calls.find(c=>c[0]==='rpc')[2].p_role,'owner');
 });
 test("admin creates account without sending email; provisioning failure removes auth orphan", async () => {
   for (const provisionError of [false, true]) {
