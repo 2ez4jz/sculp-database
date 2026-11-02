@@ -10,6 +10,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   assert.equal(await toggle.getAttribute('aria-expanded'),'false');assert(!await accounts.isVisible());
   const closedColor=await toggle.evaluate(el=>getComputedStyle(el).backgroundColor);
   await toggle.click();await page.locator('.account-summary').first().waitFor();
+  await page.waitForFunction(color=>getComputedStyle(document.querySelector('#manage-accounts')).backgroundColor!==color,closedColor);
   assert.equal(await toggle.getAttribute('aria-expanded'),'true');assert.notEqual(await toggle.evaluate(el=>getComputedStyle(el).backgroundColor),closedColor);
   await page.locator('.account-summary').first().click();
   const draft=accounts.locator('.account-form').first().locator('[name=displayName]');await draft.fill('Fictional draft retained');
