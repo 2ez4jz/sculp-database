@@ -10,7 +10,7 @@ const assert=require('node:assert/strict');const fs=require('node:fs');
   for(const width of [1920,1440,1024,768,390,360]){
    await page.setViewportSize({width,height:900});
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Workspace overflow at ${width}`);
-   if(width>=1440){assert((await page.locator('.auth-workspace').boundingBox()).width>1000);assert.equal(await page.locator('.w23-section').evaluate(el=>getComputedStyle(el.parentElement).gridTemplateColumns.split(' ').length),2);}
+   if(width>=1440){assert((await page.locator('.auth-workspace').boundingBox()).width>1000);assert.equal(await page.locator('.w23-section').first().evaluate(el=>getComputedStyle(el.parentElement).gridTemplateColumns.split(' ').length),2);}
    await page.screenshot({path:`qa-screens/v24-workspace-${width}.png`,fullPage:true});
   }
   await page.setViewportSize({width:1440,height:1000});
