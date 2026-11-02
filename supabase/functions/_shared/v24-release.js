@@ -1,6 +1,7 @@
 // Shared release facts for main and the preserved, newer production chat runtime.
 export const v24ReleaseFacts={
  knowledgeRevision:'2026-11-02-welcome-editor',
+ pendingWorkspacePolish:{status:'not_published',evidence:'docs/ACCOUNT_TOGGLE_PENDING_2026-11-02.md',changes:['账户管理支持同按钮展开/收起与选中态，保留表单草稿；待处理询盘显示克制的小圆点标签，不改变状态或触发推送']},
  latestBusinessRelease:{version:'V2.4.1',date:'2026-11-02',status:'deployed',evidence:'docs/V241_RELEASE.md',
   scope:'正式owner/operations工作台、账户角色与站内安装入口；沿用V2.4沟通流程，不扩大聊天工具权限',
   changes:['系统管理员可在账户管理旁编辑各账户的云端欢迎语、预览并保存；其他设备刷新生效',
