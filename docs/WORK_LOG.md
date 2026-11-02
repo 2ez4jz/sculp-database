@@ -236,3 +236,8 @@ PR #43 passed checked-head browser/PostgreSQL checks (41528784478), merged as 44
 ### Prominent communication drop frame — 2026-11-02
 
 User requested a more obvious drop box at the top. Added an independent dashed upload frame above the textarea, with an icon, clear drag instruction and a direct file-picker shortcut. Existing file staging/save/permissions unchanged. Browser acceptance now checks the clickable frame and its position/size on desktop and phone. Verification/publication pending; evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
+
+
+### Prominent drop frame: verified publication — 2026-11-02
+
+PR #44 passed browser/PostgreSQL CI 41532351613, merged as 94ace33 and published through Pages 41532838440. All seven changed frontend files byte-matched production. Desktop and 390px phone review confirms the independent dashed upload frame sits above the textarea, with clear instruction/icon and direct picker action. Existing drop, staging, limits, explicit save and retry behavior retained. No database or permission changes. Release knowledge updated after publication; evidence: docs/COMMUNICATION_DROP_2026-11-02.md.

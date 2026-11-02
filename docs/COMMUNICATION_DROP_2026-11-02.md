@@ -4,7 +4,7 @@ Status: deployed and public-source verified on 2026-11-02. Baseline main 4012a81
 
 ## Change
 
-The existing Lead and Booking communication composer now accepts dropped files anywhere within that communication panel. A small composer hint and muted green hover state identify the destination. Nested child drag events retain the highlight. Ordinary text drags keep native browser behavior; file drops are prevented from navigating away, including while the record is saving or awaiting retry.
+The existing Lead and Booking communication composer now accepts dropped files anywhere within that communication panel. A separate full-width dashed upload frame above the textarea, an upload icon and muted green hover state identify the destination. The frame also opens the existing file chooser when clicked. Nested child drag events retain the highlight. Ordinary text drags keep native browser behavior; file drops are prevented from navigating away, including while the record is saving or awaiting retry.
 
 Dropped files and the retained mobile/keyboard file picker share the existing staging list, remove controls and prepareCommunicationFile validation. Screenshots remain PNG/JPEG/WebP up to 10 MB each, voice retains the existing rules, and the whole draft remains limited to 20 attachments. Invalid, empty and oversized files are reported; valid files in a mixed batch are retained. Nothing is uploaded or saved automatically: the user still clicks 保存记录. An uncertain save keeps the exact request and attachment payload frozen for retry. No changes to database, Storage permissions, AI interpretation or business fields.
 
@@ -19,4 +19,6 @@ PR [#43](https://github.com/2ez4jz/sculp-database/pull/43) passed checked-head C
 
 ## Prominent top drop frame — 2026-11-02
 
-Follow-up requested a clearly visible drag frame above the text input. Adds a full-width muted green dashed frame with upload icon, “拖拽截图到这里” and a click-to-choose shortcut before the textarea. Existing mobile picker, staging, limits, explicit save and retry guards are retained. Implementation/verification/publication pending.
+Follow-up requested a clearly visible drag frame above the text input. Adds a full-width muted green dashed frame with upload icon, “拖拽截图到这里” and a click-to-choose shortcut before the textarea. Existing mobile picker, staging, limits, explicit save and retry guards are retained. Published via PR #44, checked-head CI 41532351613 and Pages deployment 41532838440. Merge: 94ace33a20bdfd7519ea5cba902a3c50448dcfe9. All seven changed public resources matched released bytes. Local 18 focused checks and the full browser/PostgreSQL regression passed; browser checks include clicking the frame and verifying its position/height above the textarea on 320–1440px widths. Desktop and 390px phone views were visually inspected. No schema, permission, attachment-save or AI behavior changes. [Updated frame screenshot, fictional data](screenshots/communication-drop-box-20261102.jpg).
+
+Shared product/release facts are deployed in sculpy-chat v52; the other 16 v51 files were preserved byte-for-byte. All 17 deployed files read back identically. Final focused chat/multistep/communication checks: 18 passed. This visual update does not change the pending real-iPhone acceptance of P0 notifications.
