@@ -1,6 +1,6 @@
 # SCULPY V2.4 — 2026-11-02
 
-Status: implementation and local validation; production deployment not yet verified.
+Status: migration and sculpy-intake v2 deployed; frontend publication pending CI.
 
 ## Changes
 
@@ -32,3 +32,6 @@ Miranda's physical phone microphone permission/audio quality and camera-roll sel
 ## Deployment evidence
 
 Record migration, Edge version, merged PR/SHA, Pages workflow conclusion and production resource checks here after verification. A merge alone is not release evidence.
+
+
+Production backend verification: private bucket/RLS/grants inspected; transactional Lead→record→edited summary→conversion/replay→unauthorized read probe passed and rolled back. Counts remained 0 bookings, 0 clients, 4 pre-existing enquiries, 0 communication records/summaries. Existing live sculpy-chat v45 contains native long-term-memory changes beyond main; preserve that runtime when updating release knowledge rather than redeploying older main chat code.

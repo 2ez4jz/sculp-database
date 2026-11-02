@@ -17,7 +17,7 @@ export function mountCommunicationPanel({root,supabase,type,id,onChange=()=>{}})
   try{const f=await prepareCommunicationFile(new File([blob],'沟通录音',{type:blob.type}));f.file=new File([f.file],`沟通录音.${f.extension}`,{type:f.file.type});files.push(f);voiceUsed=true;renderFiles();const form=new FormData();form.append('audio',f.file,f.file.name);return await communicationAI(supabase,'voice',form);}
   finally{working=false;lock();}
  }});
- function lock(){if(!alive)return;const frozen=busy||!!pending;root.querySelectorAll('[data-compose] textarea,[data-compose] input,[data-compose] button').forEach(x=>x.disabled=frozen||working);$('[data-ai]').disabled=busy||working||!!pending||!!draft;$('[data-refresh]').disabled=!canLeave();$('[data-older]').disabled=busy||working;}
+ function lock(){if(!alive)return;const frozen=busy||!!pending;root.querySelectorAll('[data-compose] textarea,[data-compose] input,[data-compose] button').forEach(x=>x.disabled=frozen||working);$('[data-save]').disabled=busy||working||recording;$('[data-ai]').disabled=busy||working||!!pending||!!draft;$('[data-refresh]').disabled=!canLeave();$('[data-older]').disabled=busy||working;}
  function renderFiles(){if(!alive)return;$('[data-files]').innerHTML=files.map((a,i)=>`<span>${esc(a.file.name)} <button type="button" data-remove="${i}" aria-label="移除${esc(a.file.name)}">×</button></span>`).join('');root.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(busy||pending||working)return;files.splice(Number(b.dataset.remove),1);renderFiles();lock();});}
  function selected(){return [...root.querySelectorAll('[data-select]:checked')].map(x=>x.value);}
  function selection(){if(alive)$('[data-selection]').textContent=`已选 ${selected().length} 条`;}
