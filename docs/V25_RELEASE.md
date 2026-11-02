@@ -52,3 +52,8 @@ Until these physical-device checks are recorded, acceptance remains pending_real
 ## Post-publication regression correction
 
 A repeat run (41501950755) exposed an existing order-number test flake: a randomly allocated value can already equal the fixed replacement 610000, so expecting that no-op update to be rejected was incorrect. [PR #42](https://github.com/2ez4jz/sculp-database/pull/42) chooses a replacement guaranteed to differ and retains the immutability assertions. The two focused tests passed locally. The production number-allocation SQL and all notification/runtime files are unchanged; final checked-head CI is available on that PR. This repeat-run failure is recorded separately from the successful P0 release checks above.
+
+
+## Incremental communication input update — 2026-11-02
+
+[PR #43](https://github.com/2ez4jz/sculp-database/pull/43) adds direct multi-image drag/drop to the shared Lead/Booking communication composer, retaining mobile file selection, explicit cloud save and existing attachment/retry rules. Published by the existing Pages workflow and seven public resources byte-verified. No database, permissions or AI-memory behavior changes; the P0 real-iPhone acceptance and P1 status above remain unchanged. Detailed checks and rollback: [communication drop release](COMMUNICATION_DROP_2026-11-02.md).

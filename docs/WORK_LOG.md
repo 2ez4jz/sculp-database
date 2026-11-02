@@ -226,3 +226,8 @@ The post-publication repeat exposed a pre-existing random-value test flake: a ge
 ### Communication screenshot drag/drop — 2026-11-02
 
 User requested dragging screenshots directly into communication records. Reused the shared Lead/Booking panel, attachment validator/staging/removal, private upload and immutable retry flow. Added a small drop hint and muted hover state; preserved mobile file selection and explicit 保存记录. Mixed invalid files, 20-file cap and frozen-save drops are handled. No schema, RLS or business-field changes. Local focused checks pass; browser/visual/publication verification pending. Evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
+
+
+### Communication screenshot drag/drop: verified publication — 2026-11-02
+
+PR #43 passed checked-head browser/PostgreSQL checks (41528784478), merged as 4495e0a and published through the existing Pages workflow (41529319802). All seven changed frontend resources match released source. Multi-image drops in both Lead/Booking, invalid file handling, shared picker, limits/removal, immutable retry, image readback, AI confirmation and conversion history passed browser regression across 320–1920px. Desktop and 390px phone UI inspected with fictional data; two PNG fixtures were selected through the real chooser. No schema, Storage/RLS, business-field or AI memory behavior changes. Release knowledge updated after publication; original P0 push real-iPhone acceptance remains pending. Evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
