@@ -26,6 +26,13 @@ export function mountWebsiteEnquiries({root,supabase,onConvert,onOpenBooking,onC
    button.onclick=()=>{if(!canLeave())return;lead.booking_id?onOpenBooking?.(lead.booking_id):onConvert?.(lead);};convert.append(button);
   }
   const form=card.querySelector('form'),msg=card.querySelector('[data-result]');let pending=null,saving=false,searchVersion=0,saved=false,needsRefresh=false;
+  if(isNew){
+   const advanced=document.createElement('details');advanced.className='comm-lead-profile';advanced.innerHTML='<summary>补充日期、来源与负责人（可稍后填写）</summary>';
+   const grid=document.createElement('div');grid.className='intake-fields';
+   [...form.querySelector('.intake-fields').children].slice(4).forEach(el=>grid.append(el));advanced.append(grid);form.querySelector('.intake-fields').after(advanced);
+   advanced.append(card.querySelector('[data-find-order]').parentElement,form.elements.bookingId.closest('label'),card.querySelector('[data-order-result]'));
+   form.elements.reason.value='手动新增询盘';
+  }
   const writeToken={};
   form.oninput=()=>form.elements.confirmed.checked=false;form.elements.confirmed.oninput=e=>e.stopPropagation();
   card.querySelector('[data-find-order]').onclick=async()=>{const mine=++searchVersion,query=card.querySelector('[data-order-query]').value.trim();try{const r=await intakeRpc(supabase,'sculpy_context',{p_booking_id:null,p_query:query,p_offset:0});if(!alive||!card.isConnected||mine!==searchVersion||saving||pending||saved||needsRefresh||card.querySelector('[data-order-query]').value.trim()!==query)return;form.elements.confirmed.checked=false;form.elements.bookingId.innerHTML='<option value="">未关联</option>'+r.bookings.filter(b=>['confirmed','completed'].includes(b.status)).map(b=>`<option value="${esc(b.id)}">${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)} · ${esc(b.starts_at.slice(0,10))}</option>`).join('');card.querySelector('[data-order-result]').textContent='请选择对应合同（最多显示30条，必要时按单号细查）。';}catch(e){if(alive)card.querySelector('[data-order-result]').textContent=e.message;}};
