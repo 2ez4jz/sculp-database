@@ -1,6 +1,7 @@
 // Shared release facts for main and the preserved, newer production chat runtime.
 export const v24ReleaseFacts={
  knowledgeRevision:'2026-11-02-v241',
+ pendingWelcomeEditor:{status:'not_published',evidence:'docs/WELCOME_EDITOR_2026-11-02.md',changes:['系统管理员在账户管理旁选择账户、预览及保存云端欢迎语；负责人和员工不能修改；当前仍待上线核验']},
  latestBusinessRelease:{version:'V2.4.1',date:'2026-11-02',status:'deployed',evidence:'docs/V241_RELEASE.md',
   scope:'正式owner/operations工作台、账户角色与站内安装入口；沿用V2.4沟通流程，不扩大聊天工具权限',
   changes:['系统管理员和负责人均以询盘为首个业务区，订单及经营看板依次往下排列',

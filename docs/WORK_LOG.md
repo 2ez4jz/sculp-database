@@ -191,3 +191,7 @@ Follow-up priority: operations and owner now see enquiry management as the first
 ### V2.4.1 verified publication — 2026-11-02
 
 PR #38 passed browser/PostgreSQL checks (41443912438) and merged as 3cc9f71. Existing Pages workflow 41444359487 completed successfully; seven live frontend files matched released source byte for byte. Production legacy-admin constraint is validated and account-admin v2 source was read back. JZ and Miranda accounts remain unchanged. The live sculpy-chat v47 deployment updates release descriptions only, preserving all 15 newer runtime implementation files from v46. Desktop and phone fictional screenshots confirm Miranda’s exact requested welcome, enquiry-first layout and no app installation controls. Full evidence and remaining real-device/live-AI acceptance are in docs/V241_RELEASE.md.
+
+### Editable account welcomes — 2026-11-02
+
+User requested a greeting editor beside JZ’s account management. Added an operations-only inline account selector/editor with preview, cloud persistence, default restoration, existing Miranda greeting migration, revision conflict protection, audit and uncertain-response retry. Existing business layout and account permissions remain unchanged. Implementation/local database verification completed; PR, browser checks and actual publication pending. Evidence: docs/WELCOME_EDITOR_2026-11-02.md.

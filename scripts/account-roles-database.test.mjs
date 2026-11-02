@@ -26,3 +26,36 @@ test('production account roles: owner has business edit access; only operations 
   assert.equal((await db.query('select role::text from profiles where id=$1',[id(2)])).rows[0].role,'owner');
  }finally{await db.close();}
 });
+
+test('cloud welcome editing: operations-only, audited, replay-safe, versioned and readable through existing profile RLS',async()=>{
+ const db=await createDatabase();try{
+  for(const [n,role,active] of [[11,'operations',true],[12,'owner',true],[13,'artist',true],[14,'read_only',true],[15,'operations',false]]){
+   await db.query('insert into auth.users(id) values($1)',[id(n)]);
+   await db.query('insert into profiles(id,display_name,role,active) values($1,$2,$3,$4)',[id(n),`Fictional welcome ${n}`,role,active]);
+  }
+  await as(db,11);assert.equal((await db.query('select * from list_account_welcomes()')).rows.length,5);
+  const save=async(message,revision)=>db.query('select set_account_welcome($1,$2,$3) value',[id(12),message,revision]);
+  const saved=(await save('  欢迎 Miranda  ',0)).rows[0].value;
+  assert.equal(saved.welcome_message,'欢迎 Miranda');assert.equal(saved.welcome_revision,1);
+  assert.deepEqual((await save('欢迎 Miranda',0)).rows[0].value,saved,'lost acknowledgment retry is a no-op');
+  await assert.rejects(()=>save('Stale draft',0),e=>e.code==='40001');
+  await assert.rejects(()=>save('x'.repeat(161),1),e=>e.code==='22023');
+  await assert.rejects(()=>save(null,1),e=>e.code==='22023');
+  await assert.rejects(()=>save('Welcome',null),e=>e.code==='22023');
+  await assert.rejects(()=>db.query('select set_account_welcome($1,$2,$3)',[id(99),'Missing',0]),e=>e.code==='P0002');
+  for(const n of [12,13,14,15]){
+   await as(db,n);
+   await assert.rejects(()=>db.query('select * from list_account_welcomes()'),e=>e.code==='42501');
+   await assert.rejects(()=>save('Unauthorized',1),e=>e.code==='42501');
+   await assert.rejects(()=>db.query('update profiles set welcome_message=$1 where id=$2',['Bypass',id(12)]),e=>e.code==='42501');
+  }
+  await as(db,0,'anon');await assert.rejects(()=>save('Anonymous',1),e=>e.code==='42501');
+  await as(db,12);assert.equal((await db.query('select welcome_message from profiles where id=$1',[id(12)])).rows[0].welcome_message,'欢迎 Miranda');
+  await as(db,13);assert.equal((await db.query('select id from profiles')).rows.length,1,'employee profile reads remain scoped');
+  await as(db,11);assert.equal((await save('',1)).rows[0].value.welcome_message,'');
+  await db.exec('reset role');
+  const audit=(await db.query("select actor_id,before_value,after_value from audit_events where action='welcome_update' order by created_at,id")).rows;
+  assert.equal(audit.length,2);assert(audit.every(x=>x.actor_id===id(11)));
+  assert.equal((await db.query('select welcome_revision from profiles where id=$1',[id(12)])).rows[0].welcome_revision,2);
+ }finally{await db.close();}
+});
