@@ -1,11 +1,12 @@
 import { mountCloudWorkspace } from "./workspace.js?v=241";
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
+import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import { config } from "../../config.js";
 import {
   authConfigured,
   getAuthClient,
   verifiedProfile,
-} from "../../services/auth.js?v=241";
+} from "../../services/auth.js?v=welcome-20261102";
 const root = document.querySelector("#auth-root");
 const esc = (value) =>
   String(value ?? "").replace(
@@ -16,7 +17,7 @@ const esc = (value) =>
       ],
   );
 const roles = accountRoles;
-let supabase, subscription, workspace;
+let supabase, subscription, workspace, welcomeEditor;
 function frame(content) {
   root.innerHTML = `<div class="auth-layout"><section class="auth-story"><a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO COMPANION</span></a><div class="auth-story-copy"><span class="auth-eyebrow">YOUR STUDIO, REMEMBERED.</span><h1>每一场工作，<br>都值得被记住。</h1><p>让订单、灵感与每一个细节，<br>在同一个工作空间里相遇。</p><img src="assets/sculpy.webp" alt="Sculpy 工作室助手"></div><small>SCULP STUDIO · 团队工作空间</small></section><section class="auth-content">${content}</section></div>`;
 }
@@ -25,6 +26,8 @@ function message(text) {
 }
 export async function showLogin() {
   workspace?.destroy();
+  welcomeEditor?.destroy();
+  welcomeEditor = null;
   workspace = null;
   document.title = "登录 · Sculpy";
   frame(
@@ -75,14 +78,14 @@ async function showWorkspace() {
     return;
   }
   document.title = "工作台 · Sculpy";
-  const mirandaWelcome = profile.username === "sculp_miranda";
-  const heading = mirandaWelcome
-    ? "欢迎最美化妆师Miranda亲临工作室指导工作"
-    : "业务工作台";
+  const personalWelcome = Boolean(profile.welcome_message?.trim());
+  const heading = profile.welcome_message?.trim() || "业务工作台";
   frame(
-    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${mirandaWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<button class="auth-secondary" id="manage-accounts">账户管理 <span>↗</span></button>' : ""}</header>${profile.role === "operations" ? '<section id="account-list" aria-label="团队账户"></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${profile.role === "operations" ? '<div class="studio-header-actions"><button class="auth-secondary" id="manage-accounts">账户管理 <span>↗</span></button><button type="button" class="auth-secondary" id="edit-welcome" aria-expanded="false" aria-controls="welcome-editor">编辑欢迎语</button></div>' : ""}</header>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户"></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
   workspace?.destroy();
+  welcomeEditor?.destroy();
+  welcomeEditor = null;
   const layout=root.querySelector('.auth-layout');
   layout.className='studio-layout';
   const story=layout.querySelector('.auth-story');
@@ -95,7 +98,25 @@ async function showWorkspace() {
     supabase,
     profile,
   });
+  root.querySelector("#edit-welcome")?.addEventListener("click", event => {
+    const editorRoot = root.querySelector("#welcome-editor");
+    editorRoot.hidden = !editorRoot.hidden;
+    event.currentTarget.setAttribute("aria-expanded", String(!editorRoot.hidden));
+    if (!welcomeEditor) welcomeEditor = mountWelcomeEditor({
+      root: editorRoot, supabase, profile,
+      onCurrentChange(value) {
+        profile.welcome_message = value;
+        const title = root.querySelector(".studio-page-header h2");
+        title.textContent = value.trim() || "业务工作台";
+        title.classList.toggle("studio-personal-welcome", Boolean(value.trim()));
+      },
+    });
+  });
   root.querySelector("#logout").onclick = async () => {
+    if (welcomeEditor && !welcomeEditor.canLeave()) {
+      message("欢迎语尚未保存或正在保存，请先保存或取消修改。");
+      return;
+    }
     if(workspace && !workspace.canLeave()) {
       message('操作仍在保存或尚未收到确认，请先重试同一笔操作，再退出登录。');
       return;

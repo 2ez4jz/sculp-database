@@ -27,7 +27,7 @@ export async function verifiedProfile(supabase) {
   if (error || !user) throw new Error("登录已失效，请重新登录。");
   const { data, error: profileError } = await supabase
     .from("profiles")
-    .select("id,username,display_name,role,active")
+    .select("id,username,display_name,role,active,welcome_message")
     .eq("id", user.id)
     .single();
   if (profileError || !data?.active)

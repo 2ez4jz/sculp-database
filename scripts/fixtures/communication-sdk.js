@@ -6,7 +6,10 @@ const owner='24000000-0000-4000-8000-000000000001';
 const leadId='24000000-0000-4000-8000-000000000011';
 const bookingId='24000000-0000-4000-8000-000000000021';
 const qaParams=new URLSearchParams(location.search);
-const profile={id:owner,username:qaParams.get('qa_username')||'sculp_jz',display_name:qaParams.get('qa_username')==='sculp_miranda'?'Miranda · 虚构验收':'Jz · 虚构验收',role:qaParams.get('qa_role')||'operations',active:true};
+const mirandaId='24000000-0000-4000-8000-000000000002';
+const welcomeKey='sculpy-fictional-qa-welcomes';
+const welcomes=JSON.parse(localStorage.getItem(welcomeKey)||'null')||[{id:owner,display_name:'Jz · 虚构验收',username:'sculp_jz',welcome_message:'',welcome_revision:0},{id:mirandaId,display_name:'Miranda · 虚构验收',username:'sculp_miranda',welcome_message:'欢迎最美化妆师Miranda亲临工作室指导工作',welcome_revision:1}];
+const profile={...welcomes.find(a=>a.username===(qaParams.get('qa_username')||'sculp_jz')),role:qaParams.get('qa_role')||'operations',active:true};
 const leads=[{id:leadId,name:'Fictional Avery',email:'avery@example.test',contact:'fixture_wechat',service:'Wedding',service_type:'wedding',status:'qualified',entry_channel:'manual',first_contact_at:'2026-11-01T14:00:00Z',event_date:'2027-07-24',revision:2,attribution_source:'instagram',details:'客户希望清透妆感，套餐待确认。',notes:'虚构验收记录',is_test:false}];
 const records=[{id:'24000000-0000-4000-8000-000000000031',enquiry_id:leadId,booking_id:null,raw_text:'第一次咨询：想了解半天套餐，日期2027年7月24日。后来改口希望覆盖晚宴，价格尚未确认。',author:'Miranda · 虚构',author_id:owner,created_at:'2026-11-02T10:00:00Z',attachments:[],reviewed:false}];
 const summaries=[],files=new Map(),replays=new Map();
@@ -20,6 +23,21 @@ export function createClient(){return {
  from:table=>{const q={select:()=>q,eq:()=>q,in:()=>q,order:()=>q,limit:()=>q,update:()=>q,single:async()=>({data:table==='profiles'?profile:table==='sculpy_company_rules'?{content:'虚构验收规则'}:{}}),then:resolve=>Promise.resolve({data:table==='website_enquiries_business'?leads:table==='profiles'?[profile]:[]}).then(resolve)};return q;},
  rpc:async(name,args={})=>{
   (globalThis.qaCalls??=[]).push({name,args:structuredClone(args)});
+  if(name==='list_account_welcomes'){
+   if(globalThis.qaFailWelcomeRead){globalThis.qaFailWelcomeRead=false;return {error:{message:'Fictional read failure'}};}
+   return {data:structuredClone(welcomes)};
+  }
+  if(name==='set_account_welcome'){
+   const row=welcomes.find(a=>a.id===args.p_id);
+   if(row.welcome_message!==args.p_message){
+    if(globalThis.qaWelcomeConflict){globalThis.qaWelcomeConflict=false;row.welcome_message='另一台设备的新欢迎语';row.welcome_revision++;}
+    if(row.welcome_revision!==args.p_revision)return {error:{code:'40001',message:'Fictional version conflict'}};
+    row.welcome_message=args.p_message;row.welcome_revision++;
+   }
+   localStorage.setItem(welcomeKey,JSON.stringify(welcomes));
+   if(globalThis.qaLoseWelcome){globalThis.qaLoseWelcome=false;return {error:{message:'Fictional lost acknowledgment'}};}
+   return {data:structuredClone(row)};
+  }
   if(name==='list_managed_accounts')return {data:[{...profile,username:'sculp_jz'},{id:'24000000-0000-4000-8000-000000000002',display_name:'Fictional Miranda',username:'sculp_miranda',role:'owner',active:true}]};
   if(name==='sculpy_wedding_report')return {data:fixture.report};
   if(name==='sculpy_context')return {data:{bookings:[booking],total:1}};
