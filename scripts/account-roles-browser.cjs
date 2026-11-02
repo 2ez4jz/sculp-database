@@ -14,6 +14,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   await page.locator('.account-summary').first().click();
   const draft=accounts.locator('.account-form').first().locator('[name=displayName]');await draft.fill('Fictional draft retained');
   await toggle.click();assert(!await accounts.isVisible());assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+  await page.waitForFunction(color=>getComputedStyle(document.querySelector('#manage-accounts')).backgroundColor===color,closedColor);
   assert.equal(await toggle.evaluate(el=>getComputedStyle(el).backgroundColor),closedColor);
   await toggle.click();assert(await accounts.isVisible());assert.equal(await draft.inputValue(),'Fictional draft retained');
   assert.equal(await page.evaluate(()=>window.qaCalls.filter(x=>x.name==='list_managed_accounts').length),1,'reopening must not reload and erase drafts');
