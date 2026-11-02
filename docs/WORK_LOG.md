@@ -187,3 +187,7 @@ Added the requested UI refinement to this release: system-font hierarchy, compac
 Follow-up priority: operations and owner now see enquiry management as the first business section and first navigation item; the dashboard is placed below orders. Browser regression checks assert this order for both roles.
 
 - Follow-up: personalised the verified sculp_miranda account welcome with the user’s exact wording; retained the standard heading for other accounts and added phone overflow verification.
+
+### V2.4.1 verified publication — 2026-11-02
+
+PR #38 passed browser/PostgreSQL checks (41443912438) and merged as 3cc9f71. Existing Pages workflow 41444359487 completed successfully; seven live frontend files matched released source byte for byte. Production legacy-admin constraint is validated and account-admin v2 source was read back. JZ and Miranda accounts remain unchanged. The live sculpy-chat v47 deployment updates release descriptions only, preserving all 15 newer runtime implementation files from v46. Desktop and phone fictional screenshots confirm Miranda’s exact requested welcome, enquiry-first layout and no app installation controls. Full evidence and remaining real-device/live-AI acceptance are in docs/V241_RELEASE.md.

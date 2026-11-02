@@ -288,7 +288,7 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     for(const tool of body.tools||[])assert(toolCapabilities[tool.name],`Missing capability contract: ${tool.name}`);
     const marker='可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n';
     const knowledge=JSON.parse(body.instructions.split(marker)[1].split('\n')[0]);
-    assert.equal(knowledge.latestBusinessRelease.version,'V2.4');
+    assert.equal(knowledge.latestBusinessRelease.version,'V2.4.1');
     assert.equal(knowledge.latestBusinessRelease.date,'2026-11-02');
     assert.equal(knowledge.includedBackendUpdate.name,'功能与更新自知');
     assert(knowledge.availableTools.includes(expected));assert(!knowledge.availableTools.includes(missing));
@@ -317,6 +317,10 @@ test('capability contracts cover actual registered tools and constrain task exec
  assert.equal(admin.taskCapabilities.proposals.available,true);
  assert(admin.taskCapabilities.existingPageActions.some(a=>a.task.includes('签约')));
  assert(admin.taskCapabilities.existingPageActions.every(a=>a.needs.length&&a.completion));
+ assert(!admin.taskCapabilities.existingPageActions.some(a=>a.task.includes('重置密码')));
+ const operations=get({context:{actor:{role:'operations'}},toolNames:['query_bookings']});
+ const accountAction=operations.taskCapabilities.existingPageActions.find(a=>a.task.includes('重置密码'));
+ assert(accountAction);assert.match(accountAction.completion,/聊天没有/);
  assert.match(admin.taskCapabilities.proposals.completion,/仅是建议/);
  assert(admin.taskCapabilities.executionRules.some(x=>x.includes('同一请求重试')));
  const sdk=get({context:{mode:'fictional_demo'},toolNames:['query_demo_report']});

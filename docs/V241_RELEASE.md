@@ -1,6 +1,6 @@
 # SCULPY V2.4.1 — 2026-11-02
 
-Status: implementation and verification; publication pending.
+Status: deployed and verified on 2026-11-02. Physical-device business acceptance remains open.
 
 ## Requested behavior
 
@@ -23,7 +23,9 @@ The PostgreSQL enum keeps its historical token so existing migrations/function s
 
 Focused tests cover server-side denial of account creation/password reset for owner, legacy admin, employee, read-only and inactive identities; retired-role rejection before Auth creation; database assignment rejection; owner business writes and operations-only account RPCs. Existing account creation/reset auditing and self-protection are retained.
 
-Local complete suite: 185 passed, 2 PostgreSQL-only concurrency checks skipped pending PostgreSQL CI. Fictional desktop preview was visually checked for the workspace and account list. Browser/PostgreSQL CI and final production checks are pending.
+Local complete suite: 185 passed, 2 PostgreSQL-only concurrency checks skipped locally. PostgreSQL CI subsequently passed 21 checks with concurrent edits and fixture backup/recovery. Browser CI passed 100 unit/handler contracts, 23 database checks and the complete interaction suite. Communication QA covered 6 viewport widths, multiple real-format PNG fixtures, lost-acknowledgement replay, manual AI-summary edits and lead conversion history. Account and PWA checks covered management boundaries, the exact Miranda greeting, enquiries-first ordering, and removal of installation UI.
+
+Fictional desktop and 390 × 844 phone previews were visually checked, including the long welcome heading and enquiry controls. No real customer data was written into Demo. The model, transcription and storage browser adapters are mocked; this is not a live model-quality or physical microphone test. Chat and multi-step capability checks passed 16/16 after updating release knowledge.
 
 Browser regression checks inspect every account role selector, operations account management, owner business/communication editing, and no installation UI on desktop, phone, iPhone, login, Demo, Settings or standalone mode. Existing manifest/icon, offline/reconnect and data-free cache checks remain.
 
@@ -33,4 +35,15 @@ Revert the frontend and account-admin function to the preceding source. Retainin
 
 ## Deployment evidence
 
-Record PR, checks, production migration/function versions, frontend deployment and resource verification after completion. Tests and merges alone do not prove publication.
+- Feature PR: [#38](https://github.com/2ez4jz/sculp-database/pull/38), final checked head `c58ed141f53f2f320dec24279809ba681b42e095`; merged as `3cc9f71bfb4df82105f4f9b485b89a8f7932f6b4`.
+- PR checks: [41443912438](https://github.com/2ez4jz/sculp-database/actions/runs/41443912438), browser-check and postgres-check both successful. No test failure was waived.
+- Existing Pages deployment: [41444359487](https://github.com/2ez4jz/sculp-database/actions/runs/41444359487), successful. Built-in Pages run [41444358416](https://github.com/2ez4jz/sculp-database/actions/runs/41444358416) also successful.
+- Live frontend: https://2ez4jz.github.io/sculp-database/ — HTTP 200 and byte-for-byte comparison passed for index.html, login/index.js, login/workspace.js, services/auth.js, studio-polish.css, pwa/install.js and domain/accounts.js after publication.
+- Production migration `20261102115423_retire_legacy_admin_role.sql` applied; `profiles_no_legacy_admin` read back with `convalidated = true`. No legacy-admin profiles existed. JZ operations and Miranda owner remain active; no existing account or password was changed.
+- Production `account-admin` v2 ACTIVE; all 3 deployed source files exactly match the release source. It authenticates the caller and checks the active operations profile before account operations.
+- Production `sculpy-chat` v47 ACTIVE; all 17 files read back and matched the deployment. Only product-knowledge.js and the shared release-facts module changed from v46; all 15 newer runtime implementation files were preserved. No new API key or model service was added.
+- Screenshots contain fictional QA data: [desktop](screenshots/v241-miranda-desktop-20261102.jpg) and [phone](screenshots/v241-miranda-mobile-20261102.jpg).
+
+## Human acceptance still required
+
+Sign in with JZ and Miranda on actual devices, inspect the greeting and enquiry-first layout, and perform normal business acceptance of recording, real speech transcription, screenshot interpretation and cross-device cloud reading. Automated UI tests and deployed resource checks do not prove live AI quality or physical-device usability. No requested feature is left as a plan; these are acceptance checks.
