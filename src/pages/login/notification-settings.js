@@ -12,7 +12,7 @@ export function mountNotificationSettings({root,supabase,profile,onOpen,onBack})
   const permission='Notification' in window?Notification.permission:'unsupported';
   $('[data-permission]').textContent=!('Notification' in window)?'不支持':({granted:'已允许',denied:'已拒绝',default:'尚未申请'}[Notification.permission]||'未知');
   $('[data-device]').textContent=active?(device.currentSession&&subscription?'已登记此设备':'需要重新连接'):'尚未登记或已关闭';
-  if(permission==='denied')$('[data-support]').textContent='通知权限已关闭，请在系统或浏览器的网站设置中允许通知，再返回刷新状态。';
+  if(support.supported&&permission==='denied')$('[data-support]').textContent='通知权限已关闭，请在系统或浏览器的网站设置中允许通知，再返回刷新状态。';
   $('[data-enable]').disabled=busy||!support.supported||!registration||!state?.publicKey||!state?.systemEnabled||permission==='denied';
   $('[data-disable]').disabled=busy||!active;$('[data-test]').disabled=busy||!active||!device.currentSession||!subscription||!state?.systemEnabled||permission!=='granted';
   root.querySelectorAll('form button').forEach(b=>b.disabled=busy||!state);
