@@ -1,4 +1,4 @@
-import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-20261102';
+import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js?v=cloud-write-20261022';
 import {esc,today} from './wedding-dashboard.js';
 const sources={unknown:'尚未确认',instagram:'Instagram',google:'Google 搜索',xiaohongshu:'小红书',wechat:'微信',referral:'熟人/客户推荐',planner:'婚礼策划师推荐',direct:'直接访问',other:'其他'};
