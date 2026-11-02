@@ -1,4 +1,4 @@
-import {v24ReleaseFacts,v24FeatureDescription,v24PageAction,v241AccountPageAction} from '../_shared/v24-release.js';
+import {v24ReleaseFacts,v24FeatureDescription,v24PageAction,v241AccountPageAction,welcomeEditorPageAction} from '../_shared/v24-release.js';
 // Maintained with releases, shipped with the backend, never supplied by a browser
 // catalog or business memory. A source commit is not evidence of a deployment.
 export const productKnowledge=Object.freeze({
@@ -85,7 +85,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
     preconditions:['用户明确要求记录；未说先别改','目标订单已查询且身份明确','当前路径支持确认卡；后端再次校验权限'],
     completion:'生成卡片只算待确认；用户确认且服务器返回保存成功后才算已保存。日期、金额及付款变更卡仅是建议，不等于正式字段已修改'},
    existingPageActions:admin?[
-    ...(context.actor?.role==='operations'?[v241AccountPageAction]:[]),
+    ...(context.actor?.role==='operations'?[v241AccountPageAction,welcomeEditorPageAction]:[]),
     v24PageAction,
     {task:'新建订单或录入时分配人员',where:'现有录入新订单表单',needs:['客户原文','明确年份的服务日期和开始时间','客户匹配与服务类型','人工核对确认'],completion:'保存成功后重新读取同一云端订单'},
     {task:'修改正式日期、地点或需求',where:'订单详情→修改订单',needs:['最新订单版本','修改依据','核对前后内容','人工确认'],completion:'服务器确认并按最新记录复查；冲突则重新读取，不能覆盖'},

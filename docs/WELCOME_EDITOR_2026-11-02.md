@@ -1,6 +1,6 @@
 # SCULPY editable account welcomes — 2026-11-02
 
-Status: implemented; production publication pending.
+Status: deployed and source-verified on 2026-11-02.
 
 ## Behavior
 
@@ -20,6 +20,17 @@ Rollback the frontend first, retain the additive columns and saved values, and r
 
 Local full-migration database tests passed for active-operations authorization, owner/employee/read-only/inactive/anonymous denial, direct-write rejection, existing profile read scope, length validation, stale revision, idempotent retry, blank/default restoration and audit attribution.
 
-Browser regression includes plain-text/XSS-safe preview and rendering, current-account heading updates, saved greetings after reload, lost acknowledgements, successful saves with failed rereads, retained conflict drafts and 320/390/768px layouts. Browser adapters use fictional data; PostgreSQL CI and live source/schema verification are recorded after publication.
+Browser regression includes plain-text/XSS-safe preview and rendering, current-account heading updates, saved greetings after reload, lost acknowledgements, successful saves with failed rereads, retained conflict drafts and 320/390/768px layouts. Browser adapters use fictional data. Local complete suite: 186 passed, 2 PostgreSQL-only tests skipped locally. PR PostgreSQL CI subsequently passed all 22 checks, including concurrency and backup/recovery; browser CI passed the complete regression suite. Final chat/multi-step capability checks passed 16/16. The initial PostgreSQL-only assertion compared a driver-returned bigint string with a number; the assertion was corrected without waiving a failure.
 
 Actual JZ/Miranda sign-in and real two-device greeting acceptance remain manual checks. Passing tests or a merge does not prove publication.
+
+## Verified deployment evidence
+
+- PR [#39](https://github.com/2ez4jz/sculp-database/pull/39), checked head `1ddc52ee321601438bfa84da5655ba6d09a3ee12`; merged as `71d129270ae98c680bfe1cc5b774899c609e63aa`. Both jobs in [41447255658](https://github.com/2ez4jz/sculp-database/actions/runs/41447255658) passed before merging.
+- Existing Pages publish workflow [41447916554](https://github.com/2ez4jz/sculp-database/actions/runs/41447916554) succeeded. All six live frontend resources (index, bootstrap, login, welcome-editor, auth service and polish stylesheet) returned HTTP 200 and exactly matched the released source.
+- Production additive migration applied successfully. Readback confirms JZ active operations with the default greeting, and Miranda active owner with the exact preserved welcome and revision 1. The live operations-authorized RPC was verified with the existing value in a rolled-back transaction; no new customer/test account, role or password was written.
+- Advisor review: existing notices remain; two additional authenticated SECURITY DEFINER RPC notices correspond to these deliberately exposed, operations-gated APIs. Both revoke PUBLIC/anon execution, derive the actor from auth.uid/current active profile and retain direct-table write denial. Authorization and bypass tests passed; these are not unrestricted profile writes.
+- Production sculpy-chat v48 ACTIVE; all 17 files read back and matched. Only the shared release facts and product knowledge changed from v47; all 15 newer implementation files were preserved. No model/API credentials changed.
+- Fictional visual QA: [desktop](screenshots/welcome-editor-desktop-20261102.jpg), [phone](screenshots/welcome-editor-mobile-20261102.jpg).
+
+No requested development item remains pending. Actual-device JZ/Miranda sign-in and two-device acceptance are still manual checks, separate from deployed code, database tests and fictional browser adapters.

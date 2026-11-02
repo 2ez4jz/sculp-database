@@ -47,3 +47,7 @@ Revert the frontend and account-admin function to the preceding source. Retainin
 ## Human acceptance still required
 
 Sign in with JZ and Miranda on actual devices, inspect the greeting and enquiry-first layout, and perform normal business acceptance of recording, real speech transcription, screenshot interpretation and cross-device cloud reading. Automated UI tests and deployed resource checks do not prove live AI quality or physical-device usability. No requested feature is left as a plan; these are acceptance checks.
+
+### Published follow-up: editable account welcomes
+
+The fixed Miranda heading is now seeded in cloud profile data. JZ can edit any account’s welcome from the header beside account management, with preview, reset-to-default, audit, conflict and retry protection. Verified deployment and test evidence: [editable account welcomes](WELCOME_EDITOR_2026-11-02.md).

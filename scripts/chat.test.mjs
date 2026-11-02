@@ -321,6 +321,8 @@ test('capability contracts cover actual registered tools and constrain task exec
  const operations=get({context:{actor:{role:'operations'}},toolNames:['query_bookings']});
  const accountAction=operations.taskCapabilities.existingPageActions.find(a=>a.task.includes('重置密码'));
  assert(accountAction);assert.match(accountAction.completion,/聊天没有/);
+ assert(operations.taskCapabilities.existingPageActions.some(a=>a.task.includes('欢迎语')));
+ assert(!admin.taskCapabilities.existingPageActions.some(a=>a.task.includes('欢迎语')));
  assert.match(admin.taskCapabilities.proposals.completion,/仅是建议/);
  assert(admin.taskCapabilities.executionRules.some(x=>x.includes('同一请求重试')));
  const sdk=get({context:{mode:'fictional_demo'},toolNames:['query_demo_report']});

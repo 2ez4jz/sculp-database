@@ -195,3 +195,7 @@ PR #38 passed browser/PostgreSQL checks (41443912438) and merged as 3cc9f71. Exi
 ### Editable account welcomes — 2026-11-02
 
 User requested a greeting editor beside JZ’s account management. Added an operations-only inline account selector/editor with preview, cloud persistence, default restoration, existing Miranda greeting migration, revision conflict protection, audit and uncertain-response retry. Existing business layout and account permissions remain unchanged. Implementation/local database verification completed; PR, browser checks and actual publication pending. Evidence: docs/WELCOME_EDITOR_2026-11-02.md.
+
+### Editable welcomes: verified publication — 2026-11-02
+
+PR #39 passed PostgreSQL/browser CI (41447255658), merged as 71d1292 and published through the existing Pages workflow (41447916554). Six live frontend files match released source. Production welcome migration/readback and the operations-gated RPC passed; existing roles/passwords remain unchanged and Miranda’s exact welcome is preserved. sculpy-chat v48 only updates release knowledge while preserving all 15 newer runtime implementation files. Local suite: 186 pass, 2 PostgreSQL-only checks subsequently passed in CI; PostgreSQL CI 22 pass; final chat/multi-step checks 16 pass. Desktop/phone fictional UI verified; actual-device account acceptance remains manual. Full evidence: docs/WELCOME_EDITOR_2026-11-02.md.
