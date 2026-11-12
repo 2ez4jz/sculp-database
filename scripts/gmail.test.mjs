@@ -68,11 +68,11 @@ test('OAuth callback exchanges on server, verifies mailbox/scope and stores encr
  assert.equal(r.status,303);assert.equal(new URL(r.headers.get('location')).origin,'https://app.test');const stored=calls.find(c=>c.p_action==='connect').p_data.cipher;assert(!stored.includes('refresh-fixture'));assert.equal((await unseal(stored,key)).refresh_token,'refresh-fixture');
 });
 test('OAuth rejects and revokes broader Gmail grants or a different mailbox before storing credentials',async()=>{
- for(const wrongScope of [true,false]){
+ for(const wrongScope of ['send','full',false]){
   const key=random(),calls=[],state=random(),cfg={GMAIL_CLIENT_ID:'client',GMAIL_CLIENT_SECRET:'secret',GMAIL_TOKEN_KEY:key,GMAIL_REDIRECT_URI:'https://project.test/functions/v1/sculpy-gmail?action=callback',GMAIL_APP_URL:'https://app.test/',GMAIL_EXPECTED_EMAIL:'studio@example.test',SUPABASE_URL:'https://project.test'};
   const h=gmailHandler({env:k=>cfg[k]||'',callerFor:()=>assert.fail(),model:()=>assert.fail(),admin:{rpc:async(name,{p_action})=>{assert.equal(p_action,'oauth_consume');return {data:{actor:'owner',verifier:await seal({verifier:random()},key)}};}},fetcher:async url=>{
    calls.push(String(url));if(String(url).includes('/revoke'))return new Response(null,{status:200});
-   if(String(url).includes('/token'))return Response.json({access_token:'access',refresh_token:'refresh',expires_in:3600,scope:READ_SCOPE+(wrongScope?' https://www.googleapis.com/auth/gmail.send':'')});
+   if(String(url).includes('/token'))return Response.json({access_token:'access',refresh_token:'refresh',expires_in:3600,scope:READ_SCOPE+(wrongScope==='send'?' https://www.googleapis.com/auth/gmail.send':wrongScope==='full'?' https://mail.google.com/':'')});
    return Response.json({emailAddress:'personal@example.test'});
   }});
   const r=await h(new Request('https://project.test/functions/v1/sculpy-gmail?action=callback&state='+state+'&code=fixture'));
