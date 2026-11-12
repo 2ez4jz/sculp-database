@@ -2,7 +2,7 @@
 
 ## 版本与更新
 
-- **最新开发候选：V3.0 Phase 2.5 Gmail（2026-11-12）**：只读 OAuth、业务邮件同步、客户/订单关联、AI 摘要与人工回复草稿。真实 Gmail 尚未授权，生产未发布。见 [开发日志](docs/V3.0_GMAIL_CHANGELOG.md)、[配置指南](docs/V3.0_GMAIL_SETUP_GUIDE.md)、[测试报告](docs/V3.0_GMAIL_TEST_REPORT.md)。
+- **最新开发候选：V3.0 Phase 2.5 Gmail（2026-11-12）**：只读 OAuth、业务邮件同步、客户/订单关联、AI 摘要与人工回复草稿。首轮 CI 已通过，最终补强复核中；真实 Gmail 尚未授权，生产未发布。见 [开发日志](docs/V3.0_GMAIL_CHANGELOG.md)、[配置指南](docs/V3.0_GMAIL_SETUP_GUIDE.md)、[测试报告](docs/V3.0_GMAIL_TEST_REPORT.md)。
 
 - **最近有部署记录的业务版本：V2.5 P0（2026-11-02）**，推送与询盘提醒已记录部署；真实 iPhone 送达仍待验收。见 [V2.5 发布记录](docs/V25_RELEASE.md)。
 - **当前开发候选：SCULP OS V3.0 Phase 1（2026-11-12）**，包含日常工作台、九区导航和客户/任务基础整合；未发布生产。见 [开发日志](docs/V3.0_PHASE1_CHANGELOG.md)与[测试及待验收项](docs/V3.0_TEST_REPORT.md)。

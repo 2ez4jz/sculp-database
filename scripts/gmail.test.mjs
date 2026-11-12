@@ -26,6 +26,13 @@ test('quota/network errors do not advance cursor; no known contacts means no mai
  await assert.rejects(()=>syncPage({api:{profile:async()=>{throw new MailError('rate_limit');}},account:{},contacts:[{email:'a@example.test'}],save:async()=>{assert.fail();}}),/rate_limit/);
  const r=await syncPage({api:{profile:()=>assert.fail()},account:{cursor:'100'},contacts:[],save:()=>assert.fail()});assert.equal(r.cursor,'100');
 });
+test('deleted, oversized and newly excluded mail cannot block a history batch or import a draft body',async()=>{
+ const saved=[];const api={history:async()=>({historyId:'200',history:[{messagesAdded:['deleted','large','draft'].map(id=>({message:{id}}))}]}),metadata:async id=>({...mail,id}),message:async id=>{
+  if(id==='deleted')throw new MailError('cursor_missing',404);if(id==='large')throw new MailError('message_too_large');return {...mail,id,labelIds:['DRAFT']};
+ }};
+ const r=await syncPage({api,account:{email:'studio@example.test',cursor:'100'},contacts:[{email:'avery@example.test'}],save:async m=>saved.push(...m)});
+ assert.equal(r.cursor,'200');assert.equal(saved.length,1);assert.equal(saved[0].id,'large');assert.match(saved[0].body,/超出同步上限/);
+});
 test('transport has read-only Gmail endpoints and exposes only safe failure codes',async()=>{
  const requests=[];const api=gmailTransport({token:'fixture',fetcher:async(url,opts)=>{requests.push({url:String(url),opts});return Response.json({messages:[]});}});
  await api.list('from:"a@example.test"');await api.metadata('abc');assert(requests.every(r=>r.url.startsWith('https://gmail.googleapis.com/')&&!r.opts.method));
@@ -58,4 +65,16 @@ test('OAuth callback exchanges on server, verifies mailbox/scope and stores encr
  }});
  const r=await h(new Request('https://project.test/functions/v1/sculpy-gmail?action=callback&state='+state+'&code=fixture-code'));
  assert.equal(r.status,303);assert.equal(new URL(r.headers.get('location')).origin,'https://app.test');const stored=calls.find(c=>c.p_action==='connect').p_data.cipher;assert(!stored.includes('refresh-fixture'));assert.equal((await unseal(stored,key)).refresh_token,'refresh-fixture');
+});
+test('OAuth rejects and revokes broader Gmail grants or a different mailbox before storing credentials',async()=>{
+ for(const wrongScope of [true,false]){
+  const key=random(),calls=[],state=random(),cfg={GMAIL_CLIENT_ID:'client',GMAIL_CLIENT_SECRET:'secret',GMAIL_TOKEN_KEY:key,GMAIL_REDIRECT_URI:'https://project.test/functions/v1/sculpy-gmail?action=callback',GMAIL_APP_URL:'https://app.test/',GMAIL_EXPECTED_EMAIL:'studio@example.test',SUPABASE_URL:'https://project.test'};
+  const h=gmailHandler({env:k=>cfg[k]||'',callerFor:()=>assert.fail(),model:()=>assert.fail(),admin:{rpc:async(name,{p_action})=>{assert.equal(p_action,'oauth_consume');return {data:{actor:'owner',verifier:await seal({verifier:random()},key)}};}},fetcher:async url=>{
+   calls.push(String(url));if(String(url).includes('/revoke'))return new Response(null,{status:200});
+   if(String(url).includes('/token'))return Response.json({access_token:'access',refresh_token:'refresh',expires_in:3600,scope:READ_SCOPE+(wrongScope?' https://www.googleapis.com/auth/gmail.send':'')});
+   return Response.json({emailAddress:'personal@example.test'});
+  }});
+  const r=await h(new Request('https://project.test/functions/v1/sculpy-gmail?action=callback&state='+state+'&code=fixture'));
+  assert.equal(r.status,400);assert.equal((await r.json()).error,wrongScope?'readonly_consent_required':'wrong_mailbox');assert(calls.some(x=>x.includes('/revoke')));
+ }
 });

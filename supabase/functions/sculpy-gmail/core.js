@@ -70,7 +70,15 @@ export async function syncPage({api,account,contacts,save}){
  for(const id of queue.slice(0,20)){
   if(Date.now()-started>35000)break;processed++;
   let meta;try{meta=await api.metadata(id);}catch(e){if(e.code==='cursor_missing')continue;throw e;}
-  if(inScope(meta,known,account.business_label))messages.push(parseMail(await api.message(id),[account.email,...(account.aliases||[])],account.business_label));
+  if(inScope(meta,known,account.business_label)){
+   let full;try{full=await api.message(id);}catch(e){
+    if(e.code==='cursor_missing')continue;
+    if(e.code!=='message_too_large')throw e;
+    const limited=parseMail(meta,[account.email,...(account.aliases||[])],account.business_label);
+    limited.body='邮件正文超出同步上限，请在 Gmail 中查看完整内容。';messages.push(limited);continue;
+   }
+   if(inScope(full,known,account.business_label))messages.push(parseMail(full,[account.email,...(account.aliases||[])],account.business_label));
+  }
  }
  await save(messages);const rest=queue.slice(processed);
  if(rest.length)return {scan:{...scan,queue:rest,next,end},cursor:account.cursor,count:messages.length};

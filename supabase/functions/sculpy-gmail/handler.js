@@ -48,7 +48,10 @@ export function gmailHandler({admin,callerFor,env,fetcher=fetch,model}){
     if(!code||url.searchParams.has('error'))throw new MailError('oauth_denied',400);
     const {verifier}=await unseal(stored.verifier,env('GMAIL_TOKEN_KEY'));
     const token=await transport().exchange(code,verifier);
-    if(!token.refresh_token||!token.access_token||!String(token.scope||'').split(' ').includes(READ_SCOPE)||String(token.scope).split(' ').some(x=>x.includes('/auth/gmail.')&&x!==READ_SCOPE))throw new MailError('readonly_consent_required',400);
+    if(!token.refresh_token||!token.access_token||!String(token.scope||'').split(' ').includes(READ_SCOPE)||String(token.scope).split(' ').some(x=>x.includes('/auth/gmail.')&&x!==READ_SCOPE)){
+     try{if(token.refresh_token||token.access_token)await transport().revoke(token.refresh_token||token.access_token);}catch{}
+     throw new MailError('readonly_consent_required',400);
+    }
     const profile=await transport(token.access_token).profile();
     if(profile.emailAddress.toLowerCase()!==env('GMAIL_EXPECTED_EMAIL').trim().toLowerCase()){
      try{await transport().revoke(token.refresh_token);}catch{}throw new MailError('wrong_mailbox',400);

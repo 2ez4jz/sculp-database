@@ -7,6 +7,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  await page.locator('[data-gmail-center] [data-mail-draft]').waitFor();assert.equal(await page.locator('[data-gmail-center] script').count(),0);assert.equal(await page.evaluate(()=>window.bad),undefined);
  await page.locator('[data-gmail-center] [data-ai=reply]').click();await page.waitForFunction(()=>document.querySelector('[data-gmail-center] [data-mail-draft]').value.startsWith('Thank you'));
  const draft=page.locator('[data-gmail-center] [data-mail-draft]');await draft.fill('Edited human draft');
+ await page.locator('[data-gmail-center] [data-mail-search] input').fill('different search');assert.equal(await draft.inputValue(),'Edited human draft');
  await page.locator('[data-os-nav=orders]').click();await page.getByText('请先完成当前保存，再切换页面。',{exact:true}).waitFor();
  await page.locator('[data-gmail-center] [data-save-draft]').click();await page.locator('[data-gmail-center] [data-mail-status]').getByText('已保存。',{exact:true}).waitFor();
  for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'overflow '+width);await page.screenshot({path:`qa-screens/gmail-${width}.png`,fullPage:true});}

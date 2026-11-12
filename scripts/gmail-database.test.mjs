@@ -32,6 +32,10 @@ test('Gmail SQL: exact-email enquiry dedupe, ambiguous order isolation, message 
  await assert.rejects(()=>server(db,'ai_store',{actor:id(1),message:mid,kind:'summary',content:{}}));
  await as(db,1);assert.equal((await read(db,mid)).messages[0].orders.length,0);await action(db,'settings',{aiEnabled:true});
  await as(db,null,'service_role');assert((await server(db,'ai_context',{message:mid,actor:id(1)})).message.body);await server(db,'ai_store',{actor:id(1),message:mid,kind:'reply',content:{text:'Draft'}});
+ await db.exec('reset role');await db.query("insert into clients(id,display_name) values($1,'Unresolved duplicate')",[id(99)]);await db.query('insert into client_private(client_id,email) values($1,$2)',[id(99),'avery@example.test']);
+ await as(db,null,'service_role');assert.equal((await server(db,'ingest',{...base,messages:[{...msg,id:'ambiguous'}]})).count,0);
+ await as(db,1);await assert.rejects(()=>action(db,'contact_email',{client:id(99),email:'avery@example.test'}));await action(db,'contact_email',{client:id(99),email:'verified@example.test'});
+ await as(db,null,'service_role');
  await server(db,'finish',{...base,cursor:'100',scan:null,count:1});await server(db,'disconnect',{actor:id(1)});
  await as(db,1);r=await read(db,mid);assert.equal(r.messages[0].body,'');assert.equal(r.ai.length,0);assert.equal(r.messages[0].subject,'');
  }finally{await db.close();}

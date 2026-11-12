@@ -143,7 +143,9 @@ begin
   if jsonb_array_length(p->'messages')>20 then raise exception 'batch_limit';end if;
   for v_msg in select value from jsonb_array_elements(p->'messages') loop
    select array_agg(distinct cp.client_id) into ids from public.client_private cp join public.clients c on c.id=cp.client_id
-    where c.deleted_at is null and lower(trim(cp.email)) in (select jsonb_array_elements_text((v_msg->'from')||(v_msg->'to')));
+    where c.deleted_at is null and lower(trim(cp.email)) in (select jsonb_array_elements_text((v_msg->'from')||(v_msg->'to')))
+     and (select count(*) from public.client_private other_cp join public.clients other_c on other_c.id=other_cp.client_id
+      where other_c.deleted_at is null and lower(trim(other_cp.email))=lower(trim(cp.email)))=1;
    if ids is null and not (acct.business_label is not null and coalesce((v_msg->>'businessLabel')::boolean,false)) then continue;end if;
    insert into sculpy_private.gmail_messages(account_id,gmail_id,thread_id,from_addresses,to_addresses,subject,body,snippet,attachments,direction,sent_at)
    values(acct.id,v_msg->>'id',v_msg->>'threadId',v_msg->'from',v_msg->'to',left(v_msg->>'subject',1000),left(v_msg->>'body',120000),left(v_msg->>'snippet',2000),v_msg->'attachments',v_msg->>'direction',(v_msg->>'sentAt')::timestamptz)
@@ -232,10 +234,15 @@ language plpgsql stable security definer set search_path='' as $$declare result 
  'total',(select count(*) from matching),'messages',coalesce((select jsonb_agg(to_jsonb(page)-'body'||case when p_message is not null then jsonb_build_object('body',body) else '{}'::jsonb end) from page),'[]'),
  'ai',coalesce((select jsonb_agg(jsonb_build_object('kind',kind,'content',content,'updatedAt',updated_at)) from sculpy_private.gmail_ai_results where message_id=p_message),'[]'),
  'candidates',coalesce((select jsonb_agg(jsonb_build_object('id',b.id,'order_number',b.order_number,'client',c.display_name)) from public.bookings b join public.clients c on c.id=b.client_id where b.deleted_at is null and exists(select 1 from sculpy_private.gmail_client_links l where l.message_id=p_message and l.client_id=b.client_id)),'[]'),
- 'clientProfiles',coalesce((select jsonb_agg(jsonb_build_object('id',c.id,'name',c.display_name)) from public.clients c join sculpy_private.gmail_client_links l on l.client_id=c.id where l.message_id=p_message),'[]'),
+ 'clientProfiles',coalesce((select jsonb_agg(jsonb_build_object('id',c.id,'name',c.display_name,'state',coalesce((select state from sculpy_private.gmail_client_states s where s.client_id=c.id),'active'))) from public.clients c join sculpy_private.gmail_client_links l on l.client_id=c.id where l.message_id=p_message),'[]'),
  'clientEmail',(select email from public.client_private where client_id=p_client),
  'lastContact',(select max(sent_at) from matching),
- 'stats',jsonb_build_object('pending',(select count(*) from matching where direction='incoming' and not replied and not redacted),
+ 'stats',jsonb_build_object('newCustomer',(select count(*) from matching m where direction='incoming' and not redacted and clients<>'[]'::jsonb
+  and (sent_at at time zone 'America/Toronto')::date=(now() at time zone 'America/Toronto')::date
+  and exists(select 1 from sculpy_private.gmail_client_links l where l.message_id=m.id and not exists(
+   select 1 from sculpy_private.gmail_client_links old_l join sculpy_private.gmail_messages old_m on old_m.id=old_l.message_id
+   where old_l.client_id=l.client_id and old_m.direction='incoming' and not old_m.redacted and (old_m.sent_at,old_m.id)<(m.sent_at,m.id)))),
+ 'pending',(select count(*) from matching where direction='incoming' and not replied and not redacted),
  'today',(select count(*) from matching where direction='incoming' and not redacted and (sent_at at time zone 'America/Toronto')::date=(now() at time zone 'America/Toronto')::date),
  'unlinked',(select count(*) from matching where clients='[]'::jsonb and not redacted))) into result;
  return result;
