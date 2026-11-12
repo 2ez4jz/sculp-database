@@ -11,8 +11,9 @@ export function gmailHandler({admin,callerFor,env,fetcher=fetch,model}){
  };
  const transport=token=>gmailTransport({...config(),token,fetcher});
  const safeCode=e=>e instanceof MailError?e.code:'operation_failed';
- async function analyze(message,actor,kind){
+ async function analyze(message,actor,kind,replyType){
   const context=await server('ai_context',{message,actor});if(!context)throw new MailError('ai_not_enabled',409);
+  if(kind==='reply')context.requestedDraft=replyType||'general';
   const content=validateAnalysis(await model({instructions:emailAiInstructions(kind),context,kind}),kind);
   await server('ai_store',{message,actor,kind,content});return {content};
  }
@@ -72,7 +73,7 @@ export function gmailHandler({admin,callerFor,env,fetcher=fetch,model}){
    const caller=callerFor(auth),user=await caller.auth.getUser();
    if(user.error||!user.data?.user)return reply({error:'sign_in_required'},401);
    const role=await caller.rpc('is_business_admin',{});if(role.error||role.data!==true)return reply({error:'permission_denied'},403);
-   const actor=user.data.user.id,{action,message}=await readBody(request);
+   const actor=user.data.user.id,{action,message,replyType}=await readBody(request);
    if(action==='state'){let configured=true;try{config();}catch{configured=false;}const r=await caller.rpc('sculpy_gmail_read',{});if(r.error)throw new MailError('migration_required',409);return reply({configured,...r.data});}
    if(action==='connect'){
     config();const state=random(),verifier=random();
@@ -89,7 +90,8 @@ export function gmailHandler({admin,callerFor,env,fetcher=fetch,model}){
    if(action==='sync'||action==='import')return reply(await sync(true,action==='import'));
    if(action==='summary'||action==='reply'){
     if(!/^[0-9a-f-]{36}$/i.test(message||''))return reply({error:'invalid_message'},400);
-    return reply(await analyze(message,actor,action));
+    if(action==='reply'&&replyType&&!['general','initial_enquiry','pricing','request_details','quote_followup','unavailable','deposit','pre_service','thank_you'].includes(replyType))return reply({error:'invalid_draft_type'},400);
+    return reply(await analyze(message,actor,action,replyType));
    }
    return reply({error:'unknown_action'},400);
   }catch(e){return reply({error:safeCode(e)},e instanceof MailError&&e.status>=400&&e.status<600?e.status:503);}

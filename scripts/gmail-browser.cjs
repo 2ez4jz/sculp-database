@@ -5,7 +5,9 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  await page.goto('http://localhost:4173/');await page.locator('[data-gmail-center] [data-mail]').waitFor();
  await page.locator('[data-os-nav=communications]').click();await page.locator('[data-gmail-center] [data-mail]').click();
  await page.locator('[data-gmail-center] [data-mail-draft]').waitFor();assert.equal(await page.locator('[data-gmail-center] script').count(),0);assert.equal(await page.evaluate(()=>window.bad),undefined);
+ await page.locator('[data-gmail-center] [data-reply-type]').selectOption('request_details');
  await page.locator('[data-gmail-center] [data-ai=reply]').click();await page.waitForFunction(()=>document.querySelector('[data-gmail-center] [data-mail-draft]').value.startsWith('Thank you'));
+ assert.equal(await page.evaluate(()=>window.gmailCalls.find(x=>x.action==='reply').replyType),'request_details');
  const draft=page.locator('[data-gmail-center] [data-mail-draft]');await draft.fill('Edited human draft');
  await page.locator('[data-gmail-center] [data-mail-search] input').fill('different search');assert.equal(await draft.inputValue(),'Edited human draft');
  await page.locator('[data-os-nav=orders]').click();await page.getByText('请先完成当前保存，再切换页面。',{exact:true}).waitFor();

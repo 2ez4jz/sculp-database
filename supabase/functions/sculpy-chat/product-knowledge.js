@@ -34,7 +34,7 @@ export const productKnowledge=Object.freeze({
   '首页新建订单入口；化妆师个人作品图库，多图选择、预览、下载和移除',
   '添加到桌面及手机安装指引；Demo 与正式入口分开；不提供离线订单编辑',
  ],scope:'Demo新增订单、备注和个人图库保存在当前浏览器，不代表正式数据跨设备同步'},
- notReleased:[{name:'SCULP OS 3.0 Phase 2.5 Gmail',status:'development_only',evidence:'docs/V3.0_GMAIL_CHANGELOG.md',scope:'尚未生产发布；Google OAuth、真实邮件和模型验收未完成',changes:['管理员通过设置授权只读Gmail；服务端加密令牌、按业务地址或指定标签导入、分页增量与重试','邮件中心与客户/订单邮件区域；不按姓名合并，不确定订单人工关联','AI分析需显式开启，仅生成未确认信息及英文回复草稿；草稿由人复制到Gmail发送','内部跟进任务不会自动外发邮件或新增设备推送；聊天没有邮件发送或直接读取邮箱的新工具']},{name:'SCULP OS 3.0 Phase 1',status:'development_only',evidence:'docs/V3.0_PHASE1_CHANGELOG.md',
+ notReleased:[{name:'SCULP OS 3.0 Phase 2.5 Gmail',status:'development_only',evidence:'docs/V3.0_GMAIL_CHANGELOG.md',scope:'尚未生产发布；Google OAuth、真实邮件和模型验收未完成',changes:['管理员通过设置授权只读Gmail；服务端加密令牌、按业务地址或指定标签导入、分页增量与重试','邮件中心与客户/订单邮件区域；不按姓名合并，不确定订单人工关联','AI分析需显式开启，仅生成未确认信息及英文回复草稿，支持八类人工选择的回复用途；草稿由人复制到Gmail发送','内部跟进任务不会自动外发邮件或新增设备推送；聊天没有邮件发送或直接读取邮箱的新工具']},{name:'SCULP OS 3.0 Phase 1',status:'development_only',evidence:'docs/V3.0_PHASE1_CHANGELOG.md',
   scope:'待审核分支；前端、数据库及聊天后端均未发布此版本',
   changes:['管理员日常工作台，真实询盘、订单、任务及已知CAD合同应收；需要新增基础查询接口',
    '客户搜索和人工确认新增；任务由当前管理员确认创建，可关联既有客户或订单，重试保留同一请求编号；完成以服务器回执和重新读取为准',

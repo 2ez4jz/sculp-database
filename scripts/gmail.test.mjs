@@ -52,6 +52,7 @@ test('OAuth start returns readonly consent and S256 state binding, never verifie
 });
 test('Edge denies unauthorized origins, staff, worker and callback forgery without external calls',async()=>{
  const x=handlerFixture();let r=await x.h(new Request('https://project.test/functions/v1/sculpy-gmail',{method:'POST',headers:{origin:'https://evil.test'},body:'{}'}));assert.equal(r.status,403);
+ r=await x.h(new Request('https://project.test/functions/v1/sculpy-gmail',{method:'POST',headers:{origin:'https://2ez4jz.github.io',authorization:'Bearer fixture'},body:JSON.stringify({action:'reply',message:'50000000-0000-4000-8000-000000000010',replyType:'send_now'})}));assert.equal(r.status,400);
  x.deny();r=await x.h(new Request('https://project.test/functions/v1/sculpy-gmail',{method:'POST',headers:{origin:'https://2ez4jz.github.io',authorization:'Bearer fixture'},body:'{}'}));assert.equal(r.status,403);
  r=await x.h(new Request('https://project.test/functions/v1/sculpy-gmail?action=worker',{method:'POST'}));assert.equal(r.status,401);
  r=await x.h(new Request('https://project.test/functions/v1/sculpy-gmail?action=callback&state=forged&code=secret'));assert.equal(r.status,400);assert(!JSON.stringify(await r.json()).includes('secret'));

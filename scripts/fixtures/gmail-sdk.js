@@ -3,7 +3,7 @@ const message={id:'50000000-0000-4000-8000-000000000010',gmail_id:'abc',thread_i
 export function createClient(){const c=base(),rpc=c.rpc,invoke=c.functions?.invoke;
  c.rpc=async(name,args={})=>{(window.gmailCalls??=[]).push({name,args});if(name==='sculpy_gmail_read')return {data:{accounts:[{id:'account',email:'studio@example.test',active:true,aiEnabled:true,status:'connected',lastSync:'2026-11-12T14:00:00Z',rules:{newHours:2,quoteHours:48,secondDays:5}}],messages:[message],ai:[],total:1,stats:{pending:1,today:1,unlinked:0},candidates:[]}};if(name==='sculpy_gmail_action')return {data:{ok:true}};return rpc(name,args);};
  c.functions={invoke:async(name,{body})=>{
-  if(name==='sculpy-gmail'){(window.gmailCalls??=[]).push({action:body.action});if(body.action==='state')return {data:{configured:false,accounts:[{email:'studio@example.test',active:true,aiEnabled:true,status:'connected',rules:{newHours:2,quoteHours:48,secondDays:5}}]}};return {data:{content:body.action==='reply'?{text:'Thank you for reaching out. Could you confirm your service date and location?'}:{fields:{date:{status:'proposed',value:'2027-07-24'}},summary:['The client asks about styling.']}}};}
+  if(name==='sculpy-gmail'){(window.gmailCalls??=[]).push({action:body.action,replyType:body.replyType});if(body.action==='state')return {data:{configured:false,accounts:[{email:'studio@example.test',active:true,aiEnabled:true,status:'connected',rules:{newHours:2,quoteHours:48,secondDays:5}}]}};return {data:{content:body.action==='reply'?{text:'Thank you for reaching out. Could you confirm your service date and location?'}:{fields:{date:{status:'proposed',value:'2027-07-24'}},summary:['The client asks about styling.']}}};}
   return invoke?.(name,{body})||{data:{ok:true}};
  }};return c;
 }
