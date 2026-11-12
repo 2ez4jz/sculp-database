@@ -15,6 +15,21 @@ const assert=require('node:assert/strict');
    await page.setViewportSize({width,height:900});
    await page.locator('[data-os-nav=dashboard]').click();
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow at ${width}`);
+   if(width<=760){
+    await page.evaluate(()=>{window.scrollTo(0,700);return new Promise(requestAnimationFrame);});
+    const nav=await page.locator('.studio-sidebar nav').boundingBox();
+    assert(Math.abs(nav.y)<1,`mobile menu must remain at viewport top at ${width}`);
+    assert(nav.height<90,'only the compact menu should stay pinned');
+    assert(await page.locator('.studio-sidebar .auth-brand').evaluate(el=>el.getBoundingClientRect().bottom<0),'brand must scroll away');
+    await page.locator('[data-os-nav=calendar]').click();
+    const target=await page.locator('[data-os-calendar]').boundingBox();
+    assert(target.y>=nav.height-1,'module target must not sit behind the menu');
+    await page.locator('[data-os-nav=settings]').click();
+    const heading=await page.locator('.studio-page-header').boundingBox();
+    assert(heading.y>=nav.height-1,'settings heading must remain below the menu');
+    await page.screenshot({path:`qa-screens/os-sticky-menu-${width}.png`});
+    await page.locator('[data-os-nav=dashboard]').click();
+   }
    await page.screenshot({path:`qa-screens/os-phase1-${width}.png`,fullPage:true});
   }
   await page.locator('[data-os-new-task]').click();

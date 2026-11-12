@@ -16,5 +16,5 @@ if (demo && config.environment === "demo") {
   await import("./app.js?v=orders-album-20261016");
 } else {
   document.querySelector("#demo-template").remove();
-  await import("./pages/login/index.js?v=gmail-setup-20261112");
+  await import("./pages/login/index.js?v=mobile-sticky-20261112");
 }

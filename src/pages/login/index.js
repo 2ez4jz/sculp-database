@@ -120,6 +120,7 @@ async function showWorkspace() {
     if(!setSettings(button.dataset.osNav==='settings'))return;
     root.querySelectorAll('[data-studio-nav]').forEach(b=>b.removeAttribute('aria-current'));button.setAttribute('aria-current','page');
     const target=root.querySelector(button.dataset.studioNav);
+    if(button.dataset.osNav==='settings'&&matchMedia('(max-width:760px)').matches)root.querySelector('.studio-page-header')?.scrollIntoView({behavior:'auto',block:'start'});
     if(button.dataset.osNav==='ai')target?.click();
     else if(button.dataset.osNav!=='settings'){if(button.dataset.osNav==='marketing'&&target)target.hidden=false;target?.scrollIntoView({behavior:'auto',block:'start'});}
   });
