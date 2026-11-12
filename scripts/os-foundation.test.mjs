@@ -74,3 +74,11 @@ test('OS DOM: stale responses cannot overwrite refreshed data or a changed clien
   assert.equal(x.root.querySelector('[data-os-client-list]').children.length,0);
  }finally{x.close();}
 });
+test('OS DOM: undeployed API is a rejected operation, not an unknown write that blocks navigation',async()=>{
+ const x=setup(name=>name==='sculpy_os_create_client'?{error:{code:'PGRST202'}}:undefined);
+ try{
+  const form=x.root.querySelector('[data-os-client-form]');form.elements.clientName.value='QA';form.elements.confirmed.checked=true;
+  submit(x.dom,form);await waitFor(()=>form.textContent.includes('基础接口尚未部署'));
+  assert.equal(x.app.canLeave(),true);assert.equal(form.elements.clientName.disabled,false);assert.equal(form.elements.clientName.value,'QA');
+ }finally{x.close();}
+});

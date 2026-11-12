@@ -123,9 +123,9 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
         const {data,error}=await supabase.rpc(method,pending);
         if(!alive)return;
         if(error){
-          if(['22023','23505','42501'].includes(error.code)){
+          if(['22023','23505','42501','PGRST202','42883'].includes(error.code)){
             pending=null;pendingWrites.delete(form);[...form.elements].forEach(el=>el.disabled=false);
-            result.textContent=error.code==='23505'?'存在同名客户或请求冲突，请核对已有资料。':error.code==='42501'?'权限已变化，请重新登录后核对。':'输入或关联记录无效，请核对。';
+            result.textContent=error.code==='23505'?'存在同名客户或请求冲突，请核对已有资料。':error.code==='42501'?'权限已变化，请重新登录后核对。':['PGRST202','42883'].includes(error.code)?'基础接口尚未部署，请联系系统管理员。':'输入或关联记录无效，请核对。';
             return;
           }
           throw Error('unacknowledged');
