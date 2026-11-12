@@ -17,7 +17,7 @@ const source=readFileSync(new URL('../supabase/functions/sculpy-chat/agent.ts',i
 function harness(script){
  const traces=[];
  const sdk={
-  Agent:class{constructor(options){assert.match(options.instructions,/可信产品能力与更新说明/);assert.match(options.instructions,/功能与更新自知/);for(const t of options.tools)assert(toolCapabilities[t.name],`Missing capability contract: ${t.name}`);this.options=options;}},
+  Agent:class{constructor(options){assert.match(options.instructions,/可信产品能力与更新说明/);assert.match(options.instructions,/工作台与Gmail基础接口及更新说明/);for(const t of options.tools)assert(toolCapabilities[t.name],`Missing capability contract: ${t.name}`);this.options=options;}},
   tool:options=>options,
   MemorySession:class{constructor(options){this.items=options.initialItems;}},
   OpenAIProvider:class{constructor(options){assert.equal(options.apiKey,'fake-key');}},

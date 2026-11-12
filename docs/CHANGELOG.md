@@ -4,13 +4,17 @@
 
 | 版本 | 日期 | 状态 | 主要更新 | 详细记录 |
 | --- | --- | --- | --- | --- |
-| SCULP OS 3.0 Phase 2.5 Gmail | 2026-11-12 | 开发候选；真实 OAuth/邮件未验，未发布生产 | Gmail 只读连接、范围同步、客户/订单邮件、AI 分级摘要与八类人工回复草稿、内部跟进 | [日志](V3.0_GMAIL_CHANGELOG.md) · [数据库](V3.0_GMAIL_DATABASE.md) · [测试](V3.0_GMAIL_TEST_REPORT.md) · [配置](V3.0_GMAIL_SETUP_GUIDE.md) |
-| SCULP OS 3.0 Phase 1 | 2026-11-12 | 开发候选，未发布生产 | 日常 Dashboard、九区导航、客户搜索/最小新增、关联任务、基础查询接口；复用既有订单、沟通和财务 | [开发日志](V3.0_PHASE1_CHANGELOG.md) · [审计](V2.5_AUDIT.md) · [测试](V3.0_TEST_REPORT.md) · [数据库方案](V3.0_DATABASE_PLAN.md) · [后续任务](V3.0_PHASE2_TASKS.md) |
+| SCULP OS 3.0 Phase 2.5 Gmail | 2026-11-12 | 前端/数据库/Gmail 后端已部署；OAuth 配置未就绪，真实邮箱未验 | Gmail 只读连接、范围同步、客户/订单邮件、AI 分级摘要与八类人工回复草稿、内部跟进 | [日志](V3.0_GMAIL_CHANGELOG.md) · [数据库](V3.0_GMAIL_DATABASE.md) · [测试](V3.0_GMAIL_TEST_REPORT.md) · [配置](V3.0_GMAIL_SETUP_GUIDE.md) |
+| SCULP OS 3.0 Phase 1 | 2026-11-12 | 前端/数据库已部署；真实账户/设备验收待完成 | 日常 Dashboard、九区导航、客户搜索/最小新增、关联任务、基础查询接口；复用既有订单、沟通和财务 | [开发日志](V3.0_PHASE1_CHANGELOG.md) · [审计](V2.5_AUDIT.md) · [测试](V3.0_TEST_REPORT.md) · [数据库方案](V3.0_DATABASE_PLAN.md) · [后续任务](V3.0_PHASE2_TASKS.md) |
 | V2.5 P0 | 2026-11-02 | 已记录部署；真实 iPhone 验收待完成 | 用户主动订阅的网页推送、官网新询盘和逾期提醒、设备与通知记录 | [发布记录](V25_RELEASE.md) |
 | V2.4.1 | 2026-11-02 | 见发布文档；不等于所有设备验收 | 明确负责人/系统管理员权限；移除应用内安装引导，保留浏览器手动安装 | [发布记录](V241_RELEASE.md) |
 | V2.4 | 2026-11-02 | 已记录前端/后端部署；真实业务验收有边界 | 询盘与订单沟通、附件与摘要确认、询盘转订单保留原始沟通 | [发布记录](V24_RELEASE.md) · [回退](V24_ROLLBACK.md) |
 | V2.3.1 | 2026-10-22 | 已记录部署 | 云端写入重试和回执处理、助手产品能力说明、原流程稳定性 | [发布记录](V231_RELEASE.md) |
 | V2.3 | 2026-10-18 | 已记录部署 | 询盘、合同/收退款、经营数据口径及来源转化 | [发布记录](V23_RELEASE.md) · [回退](V23_ROLLBACK.md) |
+
+## 2026-11-12 正式部署补记
+
+JZ 本轮明确授权部署，PR #45/#46 已合并，Pages、两条数据库迁移和 Gmail v1 后端及保留现网能力的聊天 v53 已发布。Google OAuth 实测 `setup_required`，尚未连接真实邮箱。当前证据、回退和验收边界见 [正式部署记录](V3.0_DEPLOYMENT_20261112.md)。以下保留原始候选阶段记录。
 
 ## SCULP OS 3.0 Phase 2.5 Gmail — 2026-11-12
 

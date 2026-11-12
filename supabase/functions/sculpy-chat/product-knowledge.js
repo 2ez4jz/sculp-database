@@ -1,3 +1,4 @@
+import {v30ReleaseFacts,v30FeatureDescription,v30PageActions} from '../_shared/v30-release.js';
 import {v24ReleaseFacts,v24FeatureDescription,v24PageAction,v241AccountPageAction,welcomeEditorPageAction,v25FeatureDescription,v25NotificationPageAction} from '../_shared/v24-release.js';
 // Maintained with releases, shipped with the backend, never supplied by a browser
 // catalog or business memory. A source commit is not evidence of a deployment.
@@ -34,17 +35,14 @@ export const productKnowledge=Object.freeze({
   '首页新建订单入口；化妆师个人作品图库，多图选择、预览、下载和移除',
   '添加到桌面及手机安装指引；Demo 与正式入口分开；不提供离线订单编辑',
  ],scope:'Demo新增订单、备注和个人图库保存在当前浏览器，不代表正式数据跨设备同步'},
- notReleased:[{name:'SCULP OS 3.0 Phase 2.5 Gmail',status:'development_only',evidence:'docs/V3.0_GMAIL_CHANGELOG.md',scope:'尚未生产发布；Google OAuth、真实邮件和模型验收未完成',changes:['管理员通过设置授权只读Gmail；服务端加密令牌、按业务地址或指定标签导入、分页增量与重试','邮件中心与客户/订单邮件区域；不按姓名合并，不确定订单人工关联','AI分析需显式开启，仅生成未确认信息及英文回复草稿，支持八类人工选择的回复用途；草稿由人复制到Gmail发送','内部跟进任务不会自动外发邮件或新增设备推送；聊天没有邮件发送或直接读取邮箱的新工具']},{name:'SCULP OS 3.0 Phase 1',status:'development_only',evidence:'docs/V3.0_PHASE1_CHANGELOG.md',
-  scope:'待审核分支；前端、数据库及聊天后端均未发布此版本',
-  changes:['管理员日常工作台，真实询盘、订单、任务及已知CAD合同应收；需要新增基础查询接口',
-   '客户搜索和人工确认新增；任务由当前管理员确认创建，可关联既有客户或订单，重试保留同一请求编号；完成以服务器回执和重新读取为准',
-   '日程仅近期订单服务日期；九区导航复用既有页面；邮件、外部日历、营销接口未接通；不新增聊天工具或自动推送']}],
+ notReleased:[],
  limits:['聊天不能直接改正式日期、价格、签约或付款状态；先生成建议，用户到现有页面核对确认',
   '没有实时外网搜索、天气或路线工具，不能声称查过实时信息',
   '不自动发客户消息、不操作银行扣款或退款；P0业务推送仅本人授权设备按已部署规则触发，聊天没有任意提醒或内部通知发送工具',
   '没有真实成本和工时等数据时不编造利润、ROI或人员利用率',
   '真实账号跨设备、实体手机录音和真实跨天使用仍需人工验收'],
  ...v24ReleaseFacts,
+ ...v30ReleaseFacts,
 });
 
 export const toolCapabilities=Object.freeze({
@@ -78,7 +76,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    '现有管理员页面管理询盘、签约、合同改价/取消、人工收退款；聊天只查数据或给待确认建议',
    '经营记忆面板：提出、管理员确认、更正、撤销、审计；仅已确认且当前有效的记录供后续回答使用，不是讨论自动永久记住',
    '个人回复偏好、按权限保存的对话、手机自适应布局；添加到桌面由使用者通过浏览器菜单手工操作',
-   v24FeatureDescription,v25FeatureDescription,
+   v24FeatureDescription,v25FeatureDescription,v30FeatureDescription,
   ]:[
    '按当前账号分配范围查看订单和工作记录，保留个人回复偏好与对话；设置页可管理本人设备通知，P1内部提醒尚未实施',
    '全局财务、公司经营记忆和管理员业务操作不对当前角色开放',
@@ -90,6 +88,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
     completion:'生成卡片只算待确认；用户确认且服务器返回保存成功后才算已保存。日期、金额及付款变更卡仅是建议，不等于正式字段已修改'},
    personalPageActions:!demo&&context.actor?.role?[v25NotificationPageAction]:[],
    existingPageActions:admin?[
+    ...v30PageActions,
     ...(context.actor?.role==='operations'?[v241AccountPageAction,welcomeEditorPageAction]:[]),
     v24PageAction,
     {task:'新建订单或录入时分配人员',where:'现有录入新订单表单',needs:['客户原文','明确年份的服务日期和开始时间','客户匹配与服务类型','人工核对确认'],completion:'保存成功后重新读取同一云端订单'},
