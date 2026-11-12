@@ -7,7 +7,16 @@ export const random=()=>b64(crypto.getRandomValues(new Uint8Array(32)));
 export async function seal(value,key){const k=await crypto.subtle.importKey('raw',un64(key),'AES-GCM',false,['encrypt']),iv=crypto.getRandomValues(new Uint8Array(12));return b64(iv)+'.'+b64(new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:enc.encode('sculp-gmail-v1')},k,enc.encode(JSON.stringify(value)))));}
 export async function unseal(value,key){const [iv,data]=value.split('.'),k=await crypto.subtle.importKey('raw',un64(key),'AES-GCM',false,['decrypt']);return JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:un64(iv),additionalData:enc.encode('sculp-gmail-v1')},k,un64(data))));}
 export class MailError extends Error{constructor(code,status=503){super(code);this.code=code;this.status=status;}}
-export function addresses(value=''){return [...new Set((value.match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)||[]).map(x=>x.toLowerCase()))];}
+export function addresses(value=''){
+ // Display names/comments can contain someone else's email. Match mailbox
+ // addresses, never those strings, and prefer <addr-spec> within each entry.
+ const safe=String(value).replace(/"(?:[^"\\]|\\.)*"/g,'').replace(/\([^()]*\)/g,'');
+ const found=safe.split(/[,;]/).flatMap(entry=>{
+  const angled=[...entry.matchAll(/<([^<>]*)>/g)];
+  return (angled.length?angled.map(x=>x[1]).join(','):entry).match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)||[];
+ });
+ return [...new Set(found.map(x=>x.toLowerCase()))];
+}
 export function parseMail(m,own,label){
  if(!/^[a-zA-Z0-9_-]{1,150}$/.test(m.id||'')||!m.threadId||!Number.isFinite(Number(m.internalDate)))throw new MailError('invalid_message');
  const headers=Object.fromEntries((m.payload?.headers||[]).map(h=>[h.name.toLowerCase(),h.value]));

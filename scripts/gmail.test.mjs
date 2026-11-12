@@ -9,6 +9,8 @@ test('Gmail MIME handles UTF-8, filenames and trustworthy sent direction; draft/
  assert(inScope(mail,new Set(['avery@example.test'])));assert(!inScope({...mail,labelIds:['DRAFT']},new Set(['avery@example.test'])));assert(!inScope({...mail,payload:{headers:header('private@other.test')}},new Set(['avery@example.test'])));
  assert.equal(parseMail({...mail,labelIds:['SENT'],payload:{...mail.payload,headers:header('studio@example.test')}},['studio@example.test']).direction,'outgoing');
  assert.equal(parseMail({...mail,labelIds:['SENT']},['studio@example.test']).direction,'unknown');
+ assert(!inScope({...mail,payload:{headers:header('"avery@example.test" <private@other.test>')}},new Set(['avery@example.test'])));
+ assert(!inScope({...mail,payload:{headers:header('avery@example.test <private@other.test>')}},new Set(['avery@example.test'])));
 });
 test('incremental cursor never advances past unprocessed records; retries retain stable Gmail IDs',async()=>{
  const saved=[],contacts=[{email:'avery@example.test'}],account={email:'studio@example.test',cursor:'90'};
