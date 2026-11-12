@@ -15,7 +15,7 @@ export function mountGmailSettings({root,supabase}){
   const a=s.accounts?.find(x=>x.active)||s.accounts?.[0];$('[data-account]').textContent=a?`${a.email} · ${a.status} · 最近同步：${a.lastSync?date(a.lastSync):'尚未同步'}${a.error?' · '+(errors[a.error]||a.error):''}`:'尚未连接邮箱';
   $('[data-connect]').disabled=!s.configured;for(const key of ['sync','import','disconnect'])$('[data-'+key+']').disabled=!a?.active;
   $('[data-ai-settings]').hidden=!a?.active;if(a){const f=$('[data-ai-settings]');f.elements.ai.checked=a.aiEnabled;for(const key of ['newHours','quoteHours','secondDays'])f.elements[key].value=a.rules?.[key]??({newHours:2,quoteHours:48,secondDays:5}[key]);}
-  status(s.configured?'连接配置已就绪；实际授权及同步状态以上述记录为准。':'Google OAuth 尚未配置，请联系系统管理员完成设置。');
+  status(s.configured?'连接配置已就绪；实际授权及同步状态以上述记录为准。':'Google OAuth 尚未配置。请先在 Google Cloud 创建授权应用，并按上方指南将配置保存到服务端；完成后刷新本页即可连接。');
  }catch(e){if(alive&&mine===version){status(e.message);root.querySelectorAll('button').forEach(b=>b.disabled=true);$('[data-ai-settings]').hidden=true;}}}
  async function run(action){if(busy)return;busy=true;root.querySelectorAll('button').forEach(b=>b.disabled=true);status('正在处理…');try{
   const r=await gmailApi(supabase,action);if(!alive)return;

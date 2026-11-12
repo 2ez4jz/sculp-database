@@ -1,4 +1,4 @@
-import {mountEmailCenter} from './gmail.js?v=gmail-20261112';
+import {mountEmailCenter} from './gmail.js?v=gmail-setup-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
@@ -8,7 +8,7 @@ import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
-import {mountOsFoundation} from './os-foundation.js?v=gmail-20261112';
+import {mountOsFoundation} from './os-foundation.js?v=gmail-setup-20261112';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
