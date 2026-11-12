@@ -4,12 +4,21 @@
 
 | 版本 | 日期 | 状态 | 主要更新 | 详细记录 |
 | --- | --- | --- | --- | --- |
+| SCULP OS 3.0 Phase 2.5 Gmail | 2026-11-12 | 开发候选；真实 OAuth/邮件未验，未发布生产 | Gmail 只读连接、范围同步、客户/订单邮件、AI 分级摘要与八类人工回复草稿、内部跟进 | [日志](V3.0_GMAIL_CHANGELOG.md) · [数据库](V3.0_GMAIL_DATABASE.md) · [测试](V3.0_GMAIL_TEST_REPORT.md) · [配置](V3.0_GMAIL_SETUP_GUIDE.md) |
 | SCULP OS 3.0 Phase 1 | 2026-11-12 | 开发候选，未发布生产 | 日常 Dashboard、九区导航、客户搜索/最小新增、关联任务、基础查询接口；复用既有订单、沟通和财务 | [开发日志](V3.0_PHASE1_CHANGELOG.md) · [审计](V2.5_AUDIT.md) · [测试](V3.0_TEST_REPORT.md) · [数据库方案](V3.0_DATABASE_PLAN.md) · [后续任务](V3.0_PHASE2_TASKS.md) |
 | V2.5 P0 | 2026-11-02 | 已记录部署；真实 iPhone 验收待完成 | 用户主动订阅的网页推送、官网新询盘和逾期提醒、设备与通知记录 | [发布记录](V25_RELEASE.md) |
 | V2.4.1 | 2026-11-02 | 见发布文档；不等于所有设备验收 | 明确负责人/系统管理员权限；移除应用内安装引导，保留浏览器手动安装 | [发布记录](V241_RELEASE.md) |
 | V2.4 | 2026-11-02 | 已记录前端/后端部署；真实业务验收有边界 | 询盘与订单沟通、附件与摘要确认、询盘转订单保留原始沟通 | [发布记录](V24_RELEASE.md) · [回退](V24_ROLLBACK.md) |
 | V2.3.1 | 2026-10-22 | 已记录部署 | 云端写入重试和回执处理、助手产品能力说明、原流程稳定性 | [发布记录](V231_RELEASE.md) |
 | V2.3 | 2026-10-18 | 已记录部署 | 询盘、合同/收退款、经营数据口径及来源转化 | [发布记录](V23_RELEASE.md) · [回退](V23_ROLLBACK.md) |
+
+## SCULP OS 3.0 Phase 2.5 Gmail — 2026-11-12
+
+**部署状态：未部署。** 已提交草稿 [PR #46](https://github.com/2ez4jz/sculp-database/pull/46)，基于尚未发布的 Phase 1 分支。
+
+- 最终代码 `c5bc9b1` 的 [CI 43294319784](https://github.com/2ez4jz/sculp-database/actions/runs/43294319784) 已通过：126 单元/DOM、31 真实 PostgreSQL、虚构备份恢复及完整浏览器回归。更多证据见 [Gmail 测试报告](V3.0_GMAIL_TEST_REPORT.md)。
+- 数据库为新增私有表及受限 RPC 候选，尚未应用生产；不申请发送权限。
+- 真实 OAuth、邮件同步、AI 质量、用户设备及托管恢复验收未完成。按 [配置指南](V3.0_GMAIL_SETUP_GUIDE.md) 完成测试后，再由 JZ 确认生产发布。
 
 ## SCULP OS 3.0 Phase 1 — 2026-11-12
 

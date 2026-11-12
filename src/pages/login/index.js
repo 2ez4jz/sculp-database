@@ -1,5 +1,6 @@
-import { mountCloudWorkspace } from "./workspace.js?v=phase1-20261112";
-import {osNavigation} from './os-foundation.js?v=phase1-20261112';
+import {mountGmailSettings} from './gmail.js?v=gmail-20261112';
+import { mountCloudWorkspace } from "./workspace.js?v=gmail-20261112";
+import {osNavigation} from './os-foundation.js?v=gmail-20261112';
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import {mountNotificationSettings} from "./notification-settings.js?v=25";
@@ -20,7 +21,7 @@ const esc = (value) =>
       ],
   );
 const roles = accountRoles;
-let supabase, subscription, workspace, welcomeEditor, notificationSettings, openNotification;
+let supabase, subscription, workspace, welcomeEditor, notificationSettings, gmailSettings, openNotification;
 const noticePattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 navigator.serviceWorker?.addEventListener("message",event=>{
   const source=event.source?.scriptURL;
@@ -39,6 +40,7 @@ function message(text) {
 export async function showLogin() {
   workspace?.destroy();
   welcomeEditor?.destroy();
+  gmailSettings?.destroy();gmailSettings=null;
   notificationSettings?.destroy();
   notificationSettings = null;
   openNotification = null;
@@ -98,10 +100,11 @@ async function showWorkspace() {
   const heading = profile.welcome_message?.trim() || "业务工作台";
   const headerActions = `<div class="studio-header-actions">${profile.role==='operations'?'<button class="auth-secondary" id="manage-accounts" type="button" aria-expanded="false" aria-controls="account-list">账户管理 <span>↗</span></button><button type="button" class="auth-secondary" id="edit-welcome" aria-expanded="false" aria-controls="welcome-editor">编辑欢迎语</button>':''}<button type="button" class="auth-secondary" id="workspace-settings" aria-expanded="false" aria-controls="notification-settings">设置</button></div>`;
   frame(
-    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${headerActions}</header><section id="notification-settings" aria-label="通知设置" hidden></section>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户" hidden></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${headerActions}</header><section id="notification-settings" aria-label="通知设置" hidden></section><section id="gmail-settings" aria-label="Gmail 设置" hidden></section>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户" hidden></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
   workspace?.destroy();
   welcomeEditor?.destroy();
+  gmailSettings?.destroy();gmailSettings=null;
   notificationSettings?.destroy();
   notificationSettings = null;
   openNotification = null;
@@ -128,9 +131,10 @@ async function showWorkspace() {
   let settingsMode=false;
   function setSettings(open) {
     if(open===settingsMode)return true;
-    if(!workspace.canLeave()||(welcomeEditor&&!welcomeEditor.canLeave())||(notificationSettings&&!notificationSettings.canLeave())){message("请先完成当前保存，再切换页面。");return false;}
+    if(!workspace.canLeave()||(welcomeEditor&&!welcomeEditor.canLeave())||(notificationSettings&&!notificationSettings.canLeave())||(gmailSettings&&!gmailSettings.canLeave())){message("请先完成当前保存，再切换页面。");return false;}
     settingsMode=open;
     root.querySelector("#notification-settings").hidden=!open;
+    root.querySelector("#gmail-settings").hidden=!open||!["owner","operations"].includes(profile.role);
     root.querySelector("#cloud-workspace").hidden=open;
     root.querySelector("#workspace-settings").setAttribute("aria-expanded",String(open));
     const title=root.querySelector(".studio-page-header h2");
@@ -139,12 +143,13 @@ async function showWorkspace() {
     if(open){
       for(const [id,button] of [["account-list","manage-accounts"],["welcome-editor","edit-welcome"]]){const el=root.querySelector("#"+id);if(el)el.hidden=true;root.querySelector("#"+button)?.setAttribute("aria-expanded","false");}
       if(!notificationSettings)notificationSettings=mountNotificationSettings({root:root.querySelector("#notification-settings"),supabase,profile,onBack:()=>setSettings(false),onOpen:async target=>{if(target.type==='settings')return;if(!setSettings(false))return;await workspace.openNotificationTarget(target);}});
+      if(!gmailSettings&&['operations','owner'].includes(profile.role)){gmailSettings=mountGmailSettings({root:root.querySelector('#gmail-settings'),supabase});}
     }
     return true;
   }
   root.querySelector("#workspace-settings").onclick=()=>setSettings(!settingsMode);
   openNotification=async id=>{
-    if(!workspace.canLeave()||(welcomeEditor&&!welcomeEditor.canLeave())||(notificationSettings&&!notificationSettings.canLeave())){message("请先完成当前保存，再到通知记录查看这条提醒。");return;}
+    if(!workspace.canLeave()||(welcomeEditor&&!welcomeEditor.canLeave())||(notificationSettings&&!notificationSettings.canLeave())||(gmailSettings&&!gmailSettings.canLeave())){message("请先完成当前保存，再到通知记录查看这条提醒。");return;}
     try{
       const target=await notificationApi(supabase,"open",{id});
       if(target.type==='settings')setSettings(true);else{setSettings(false);await workspace.openNotificationTarget(target);}
@@ -169,7 +174,7 @@ async function showWorkspace() {
     });
   });
   root.querySelector("#logout").onclick = async () => {
-    if(notificationSettings&&!notificationSettings.canLeave()){message("通知设置正在保存，请稍后退出。");return;}
+    if((notificationSettings&&!notificationSettings.canLeave())||(gmailSettings&&!gmailSettings.canLeave())){message("通知设置正在保存，请稍后退出。");return;}
     if (welcomeEditor && !welcomeEditor.canLeave()) {
       message("欢迎语尚未保存或正在保存，请先保存或取消修改。");
       return;
