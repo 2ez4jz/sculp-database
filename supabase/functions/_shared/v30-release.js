@@ -1,6 +1,7 @@
 // Deployment facts verified against Pages assets, installed RPCs and Edge status.
 // OAuth setup and real mailbox acceptance remain separate from code deployment.
 export const v30ReleaseFacts={
+ mobileWorkspaceNavigation:{status:'development_only',scope:'正式工作区760px及以下手机布局；待浏览器核验和发布',behavior:'仅横向菜单固定顶部，品牌标题随页面滚走；模块跳转为菜单留出空间',permissions:'沿用当前账号的导航与业务权限，不增加聊天工具或自动操作'},
  knowledgeRevision:'2026-11-12-sculp-os-3',
  latestBusinessRelease:{version:'SCULP OS 3.0',date:'2026-11-12',status:'deployed',acceptance:'pending_real_gmail_and_devices',evidence:'docs/V3.0_DEPLOYMENT_20261112.md',
   scope:'Phase 1工作台及Phase 2.5邮件基础前端、数据库接口和Gmail后端已部署。Google OAuth配置未就绪，尚未绑定或同步真实邮箱；实体设备和真实模型质量待验收',
