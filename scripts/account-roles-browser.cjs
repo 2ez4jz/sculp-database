@@ -21,7 +21,8 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   assert.equal(await page.evaluate(()=>window.qaCalls.filter(x=>x.name==='list_managed_accounts').length),1,'reopening must not reload and erase drafts');
   assert.equal(await page.locator('.enquiry-pending').count(),0,'follow-up enquiries do not get a pending marker');
   assert.equal(await page.locator('.studio-page-header h2').innerText(),'业务工作台');
-  assert.equal(await page.locator('.studio-sidebar nav button').first().getAttribute('data-studio-nav'),'#website-enquiries');
+  assert.equal(await page.locator('.studio-sidebar nav button').first().getAttribute('data-studio-nav'),'[data-os-home]');
+  assert.equal(await page.locator('.studio-sidebar [data-os-nav]').count(),9);
   assert(await page.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   const selects=page.locator('#account-list select[name=role]');
   for(const s of await selects.all()){assert.deepEqual(await s.locator('option').evaluateAll(xs=>xs.map(x=>x.value)),['operations','owner','artist','read_only']);assert.equal(await s.locator('option[value=admin]').count(),0);}
