@@ -1,0 +1,622 @@
+{
+  "date": "2026-10-10",
+  "mode": "fictional_300_live",
+  "gold": {
+    "today": {
+      "records": 1,
+      "completed": 1,
+      "completedCents": 42500,
+      "receivedCents": 42500,
+      "unknownPrices": 0,
+      "ids": [
+        "b157"
+      ]
+    },
+    "mtd": {
+      "records": 7,
+      "completed": 6,
+      "completedCents": 507000,
+      "receivedCents": 442500,
+      "unknownPrices": 0,
+      "ids": [
+        "b91",
+        "b95",
+        "b157",
+        "b169",
+        "b181",
+        "b249",
+        "b291"
+      ]
+    },
+    "september": {
+      "records": 28,
+      "completed": 21,
+      "completedCents": 1968500,
+      "receivedCents": 1372500,
+      "unknownPrices": 0,
+      "ids": [
+        "b79",
+        "b80",
+        "b81",
+        "b82",
+        "b83",
+        "b84",
+        "b85",
+        "b86",
+        "b87",
+        "b88",
+        "b89",
+        "b90",
+        "b108",
+        "b120",
+        "b132",
+        "b144",
+        "b156",
+        "b168",
+        "b180",
+        "b192",
+        "b204",
+        "b244",
+        "b245",
+        "b246",
+        "b247",
+        "b248",
+        "b278",
+        "b290"
+      ]
+    },
+    "instagramWedding": {
+      "records": 3,
+      "completed": 1,
+      "completedCents": 173000,
+      "receivedCents": 173000,
+      "unknownPrices": 0,
+      "ids": [
+        "b82",
+        "b87",
+        "b90"
+      ]
+    },
+    "googleWedding": {
+      "records": 2,
+      "completed": 2,
+      "completedCents": 326000,
+      "receivedCents": 161000,
+      "unknownPrices": 0,
+      "ids": [
+        "b81",
+        "b84"
+      ]
+    },
+    "michelleWedding": {
+      "records": 2,
+      "completed": 2,
+      "completedCents": 342000,
+      "receivedCents": 0,
+      "unknownPrices": 0,
+      "ids": [
+        "b79",
+        "b89"
+      ]
+    },
+    "busyDay": {
+      "records": 5,
+      "completed": 3,
+      "completedCents": 273500,
+      "receivedCents": 66000,
+      "unknownPrices": 0,
+      "ids": [
+        "b79",
+        "b83",
+        "b87",
+        "b144",
+        "b278"
+      ]
+    },
+    "futureCompleted": 35,
+    "pastCompleted": 187
+  },
+  "results": [
+    {
+      "id": "cross-instagram-wedding",
+      "message": "组合筛选：2026年9月+婚礼Wedding+Instagram渠道。请精确列记录数、已完成数、已完成金额和到账原额，金额为CAD，取消单不计完成金额。若查询不支持交叉筛选，要说明，不要从独立汇总猜数字。",
+      "ms": 7345,
+      "passed": true,
+      "turn": {
+        "id": "1f9f69ad-dfe1-4138-ac9e-28de83a84a1c",
+        "user": "组合筛选：2026年9月+婚礼Wedding+Instagram渠道。请精确列记录数、已完成数、已完成金额和到账原额，金额为CAD，取消单不计完成金额。若查询不支持交叉筛选，要说明，不要从独立汇总猜数字。",
+        "answer": "已按交叉筛选精确查询：共有3条记录，其中1条已完成。已完成金额为 CAD 1,730.00；到账原额为 CAD 1,730.00。取消单为0条，因此没有取消单计入完成金额。样本量较小，请谨慎解读。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-10",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 26,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 3,
+            "completed": 1,
+            "completedAmountCents": 173000,
+            "grossReceivedCents": 173000,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b87",
+          "b82",
+          "b90"
+        ],
+        "usage": {
+          "input_tokens": 17887,
+          "output_tokens": 152,
+          "calls": 2
+        },
+        "createdAt": "2026-10-10T23:36:50.881Z"
+      }
+    },
+    {
+      "id": "daily-today",
+      "message": "按多伦多2026年10月10日出经营日报。先列当天记录数、已完成数、已完成订单金额、按实际收款日统计的到账原额，然后解释服务类型+渠道+化妆师组合，并给最多3条有证据的行动。明确数据是虚构模拟。不要把全月数当今日数。",
+      "ms": 10227,
+      "passed": true,
+      "turn": {
+        "id": "e8b379ff-bb08-45fa-917f-f8935b59fa93",
+        "user": "按多伦多2026年10月10日出经营日报。先列当天记录数、已完成数、已完成订单金额、按实际收款日统计的到账原额，然后解释服务类型+渠道+化妆师组合，并给最多3条有证据的行动。明确数据是虚构模拟。不要把全月数当今日数。",
+        "answer": "这是虚构模拟经营日报，日期按多伦多当地时间 **2026年10月10日**；以下为当天数据，不是全月数：\n\n- 当天记录：**1条**；已完成：**1单**。\n- 已完成订单金额（按服务日期）：**CAD 425.00**。\n- 到账原额（按实际收款日期）：**CAD 425.00**，与服务日期同为当天。到账是未扣退款的原额，不代表净收款或利润。\n\n当天唯一记录是 **Event × Instagram × Michelle**：在 Four Seasons 服务，订单已完成，当天到账 CAD 425.00。这只是单条记录，样本量很小，不能据此判断该服务、渠道或化妆师的常态表现；也不能据此推断获客转化或渠道回报。\n\n可验证的行动（最多3条）：\n1. 将这单作为组合跟踪的单个样本，后续积累更多 Event × Instagram 订单后再评估趋势，不据此调整渠道或定价。\n2. 对照订单与收款记录核实当天 CAD 425.00 是否已正确入账；本日报只显示模拟数据中的到账原额。\n3. 继续记录后续订单的服务类型、渠道、主负责化妆师及到账日期，便于样本增加后再比较组合表现。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-10",
+            "filters": {
+              "from": "2026-10-10",
+              "to": "2026-10-10",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": "service"
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 1,
+            "completed": 1,
+            "completedAmountCents": 42500,
+            "grossReceivedCents": 42500,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b157"
+        ],
+        "usage": {
+          "input_tokens": 18015,
+          "output_tokens": 399,
+          "calls": 2
+        },
+        "createdAt": "2026-10-10T23:36:53.751Z"
+      }
+    },
+    {
+      "id": "cross-google-followup",
+      "message": "保持9月婚礼条件，只把渠道改成Google。列同样四项指标，再和刚才Instagram比较。样本少于10单要提示，不要叫ROI或获客转化率。",
+      "ms": 8288,
+      "passed": true,
+      "turn": {
+        "id": "a82886e9-2784-4ad8-99b1-d4314337b156",
+        "user": "保持9月婚礼条件，只把渠道改成Google。列同样四项指标，再和刚才Instagram比较。样本少于10单要提示，不要叫ROI或获客转化率。",
+        "answer": "按虚构演示数据的精确交叉筛选，2026年9月 Wedding + Google：2条记录、2条已完成；已完成金额 CAD 3,260.00，到账原额 CAD 1,610.00。\n\n和刚才的 Instagram（3条记录、1条已完成；已完成金额 CAD 1,730.00，到账原额 CAD 1,730.00）相比，Google 少1条记录、多1条已完成；已完成金额多 CAD 1,530.00，到账原额少 CAD 120.00。两组记录数都少于10，样本较小，不能据此推断长期表现；这些指标不是 ROI 或获客转化率。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-10",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "google",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 14,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 2,
+            "completed": 2,
+            "completedAmountCents": 326000,
+            "grossReceivedCents": 161000,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          },
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-10",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 26,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 3,
+            "completed": 1,
+            "completedAmountCents": 173000,
+            "grossReceivedCents": 173000,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b87",
+          "b82",
+          "b90",
+          "b84",
+          "b81"
+        ],
+        "usage": {
+          "input_tokens": 28643,
+          "output_tokens": 305,
+          "calls": 3
+        },
+        "createdAt": "2026-10-10T23:36:59.176Z"
+      }
+    },
+    {
+      "id": "daily-mtd-followup",
+      "message": "继续：补本月截至10月10日的累计数据，不能包含10月11日以后的已完成状态。给记录数、完成数、完成金额、实际到账，分别与刚才今日数区分。",
+      "ms": 8041,
+      "passed": true,
+      "turn": {
+        "id": "2bef3e64-4ff6-4a8a-8e1f-8a0b32ec5042",
+        "user": "继续：补本月截至10月10日的累计数据，不能包含10月11日以后的已完成状态。给记录数、完成数、完成金额、实际到账，分别与刚才今日数区分。",
+        "answer": "补充本月截至多伦多当地 2026年10月10日（含当日）的累计虚构模拟数据：记录数 **7条**，其中已完成 **6单**；已完成订单金额（按服务日期）**CAD 5,070.00**；实际到账原额（按收款日期）**CAD 4,425.00**。这不是10月全月数据，也不包含10月11日及之后日期的服务记录或已完成状态。累计金额与刚才的今日数口径相同，但范围不同：今日为1条、完成1单、完成金额CAD 425.00、到账原额CAD 425.00。累计到账是收款日期落在10月1日至10日的原额，未扣退款；不代表净收款或利润。样本较小，谨慎解读。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-10",
+            "filters": {
+              "from": "2026-10-01",
+              "to": "2026-10-10",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 7,
+            "completed": 6,
+            "completedAmountCents": 507000,
+            "grossReceivedCents": 442500,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b157",
+          "b181",
+          "b91",
+          "b95",
+          "b169",
+          "b249",
+          "b291"
+        ],
+        "usage": {
+          "input_tokens": 18793,
+          "output_tokens": 272,
+          "calls": 2
+        },
+        "createdAt": "2026-10-10T23:37:01.796Z"
+      }
+    },
+    {
+      "id": "cross-september-rank",
+      "message": "用9月全量订单按渠道分组，分别指出已完成金额最高的渠道和到账原额最高的渠道及金额，两种排名要独立比较。记录数包含取消，不要当咨询线索数。",
+      "ms": 7566,
+      "passed": true,
+      "turn": {
+        "id": "65b9ea29-1b0b-439b-ad20-6acb546a651f",
+        "user": "用9月全量订单按渠道分组，分别指出已完成金额最高的渠道和到账原额最高的渠道及金额，两种排名要独立比较。记录数包含取消，不要当咨询线索数。",
+        "answer": "按虚构演示数据的2026年9月全量订单分渠道精确比较（记录数包含取消）：已完成金额最高的是 Website，CAD 5,475.00；到账原额最高的也是 Website，CAD 3,745.00。两项排名独立核对，均无并列。各渠道记录数为5至6条，均少于10，样本较小，不宜据此推断长期表现。记录数是订单记录数，不是咨询线索数。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-10",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": "channel"
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 28,
+            "completed": 21,
+            "completedAmountCents": 1968500,
+            "grossReceivedCents": 1372500,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b87",
+          "b82",
+          "b90",
+          "b84",
+          "b81",
+          "b156",
+          "b244",
+          "b144",
+          "b278",
+          "b79",
+          "b83",
+          "b132",
+          "b245",
+          "b80",
+          "b88",
+          "b120",
+          "b204",
+          "b246",
+          "b108",
+          "b192",
+          "b85",
+          "b89",
+          "b180",
+          "b247",
+          "b168",
+          "b290",
+          "b86",
+          "b248"
+        ],
+        "usage": {
+          "input_tokens": 25728,
+          "output_tokens": 194,
+          "calls": 2
+        },
+        "createdAt": "2026-10-10T23:37:06.743Z"
+      }
+    }
+  ],
+  "reviewNote": "Automatic numeric/text heuristics plus manual review; these are fictional deployed-model tests, not real-account acceptance.",
+  "manualReview": {
+    "passed": true,
+    "cases": 5,
+    "note": "Read all five responses and checked daily/MTD figures, comparison direction, both independent maxima and small-sample statements."
+  }
+}

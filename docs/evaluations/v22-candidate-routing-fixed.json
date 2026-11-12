@@ -1,0 +1,1509 @@
+{
+  "version": "candidate",
+  "fictionalOnly": true,
+  "at": "2026-10-15T00:12:18.467Z",
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "寒暄",
+      "messages": [
+        "你好，今天有点累。",
+        "别分析工作，随便聊两句。"
+      ],
+      "turns": [
+        {
+          "message": "你好，今天有点累。",
+          "status": 200,
+          "ms": 7498,
+          "turn": {
+            "id": "824c3901-4751-4714-9225-cecd863e46c6",
+            "user": "你好，今天有点累。",
+            "answer": "辛苦了。先喝点水、歇一会儿吧。想聊聊今天怎么了，我在。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:35.076Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "别分析工作，随便聊两句。",
+          "status": 200,
+          "ms": 4102,
+          "turn": {
+            "id": "c774c2c3-d350-4317-b3c6-ed539a9bfa42",
+            "user": "别分析工作，随便聊两句。",
+            "answer": "好，不聊工作。今天想听个轻松的小问题吗：如果现在能立刻吃到一样东西，你会选什么？",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:39.183Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "能力说明",
+      "messages": [
+        "你能帮我做什么？两句话就好。",
+        "你会自动帮我改订单吗？"
+      ],
+      "turns": [
+        {
+          "message": "你能帮我做什么？两句话就好。",
+          "status": 200,
+          "ms": 2931,
+          "turn": {
+            "id": "bb0309a0-9f00-44cb-ae01-622aee479428",
+            "user": "你能帮我做什么？两句话就好。",
+            "answer": "我可以帮你查订单、看 SCULP Studio 的模拟经营报表，也能一起梳理分析和下一步建议。需要记录或修改订单时，我可以准备待确认的建议卡片，但不会直接改动资料。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:42.105Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "你会自动帮我改订单吗？",
+          "status": 200,
+          "ms": 3112,
+          "turn": {
+            "id": "2635ee6d-230f-459c-8318-c791c29ecf75",
+            "user": "你会自动帮我改订单吗？",
+            "answer": "不会。我只能在你明确要求记录或修改时准备建议卡片；你点击确认前，我不会改动订单。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:45.226Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "简短偏好",
+      "messages": [
+        "后面请尽量简短。",
+        "解释一下到账和收入有什么区别，一句话。"
+      ],
+      "turns": [
+        {
+          "message": "后面请尽量简短。",
+          "status": 200,
+          "ms": 2127,
+          "turn": {
+            "id": "c85dc648-3697-45bb-95b7-485f6ee9a73d",
+            "user": "后面请尽量简短。",
+            "answer": "好的，之后我会尽量简短。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:47.352Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "解释一下到账和收入有什么区别，一句话。",
+          "status": 200,
+          "ms": 2736,
+          "turn": {
+            "id": "12699b62-d55f-47ec-8e86-83071d104664",
+            "user": "解释一下到账和收入有什么区别，一句话。",
+            "answer": "到账是钱实际收到的时间和金额；收入是按业务完成或会计规则确认的金额，两者可能不在同一个月。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:50.091Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "改口",
+      "messages": [
+        "我说的负责人是 Miranda。",
+        "不是 Miranda，是 Mira，她们是一个人吗？"
+      ],
+      "turns": [
+        {
+          "message": "我说的负责人是 Miranda。",
+          "status": 200,
+          "ms": 2837,
+          "turn": {
+            "id": "d8add679-622d-4728-9bdc-ddad40a8865a",
+            "user": "我说的负责人是 Miranda。",
+            "answer": "明白，你说的负责人是 **Miranda**，不是 Mira。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:52.916Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "不是 Miranda，是 Mira，她们是一个人吗？",
+          "status": 200,
+          "ms": 2581,
+          "turn": {
+            "id": "fa2dca5d-a36a-4133-b524-03f5521a4806",
+            "user": "不是 Miranda，是 Mira，她们是一个人吗？",
+            "answer": "抱歉，我刚才听错了：你说的是 **Mira**。Mira 和 Miranda 是不同的人，我不会把她们当作同一位负责人。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:55.505Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "英语",
+      "messages": [
+        "Please explain what you can do in two sentences.",
+        "Keep speaking English. What does gross receipt mean?"
+      ],
+      "turns": [
+        {
+          "message": "Please explain what you can do in two sentences.",
+          "status": 200,
+          "ms": 3072,
+          "turn": {
+            "id": "2fec0c65-acb6-4560-a2cf-c2389bfbe3ea",
+            "user": "Please explain what you can do in two sentences.",
+            "answer": "I can look up booking details and analyze the fictional demo data, including service, channel, and artist breakdowns. I can also suggest next steps or draft a booking change for your confirmation, but I can’t make changes directly.",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:10:58.587Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "Keep speaking English. What does gross receipt mean?",
+          "status": 200,
+          "ms": 2689,
+          "turn": {
+            "id": "2e085082-62f6-44aa-b891-897ab524426c",
+            "user": "Keep speaking English. What does gross receipt mean?",
+            "answer": "A **gross receipt** is money received before subtracting refunds, fees, or costs. In these demo reports, gross receipts are counted by **payment date**, which may differ from the date the service was completed; they aren’t net receipts or profit.",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:01.272Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "语音残句",
+      "messages": [
+        "那个她的订单就是上次那个……",
+        "我没说清楚，你需要我补充什么？"
+      ],
+      "turns": [
+        {
+          "message": "那个她的订单就是上次那个……",
+          "status": 200,
+          "ms": 3210,
+          "turn": {
+            "id": "8f96e6bf-816b-4b7a-a8f3-01927f722946",
+            "user": "那个她的订单就是上次那个……",
+            "answer": "你说的是谁的订单？给我她的名字或订单号，我就能接着查。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:04.480Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "我没说清楚，你需要我补充什么？",
+          "status": 200,
+          "ms": 2675,
+          "turn": {
+            "id": "debb99f4-5a84-407d-a5c0-42d9aac24f36",
+            "user": "我没说清楚，你需要我补充什么？",
+            "answer": "补充她的名字或订单号就行，这样我能确定你说的是哪一单。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:07.156Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "双月经营",
+      "messages": [
+        "比较2026年8月和9月完成金额和到账原额。",
+        "这能证明9月经营变差了吗？请说人话。"
+      ],
+      "turns": [
+        {
+          "message": "比较2026年8月和9月完成金额和到账原额。",
+          "status": 200,
+          "ms": 6594,
+          "turn": {
+            "id": "61173b0e-4ff1-450f-bb38-4c470f071006",
+            "user": "比较2026年8月和9月完成金额和到账原额。",
+            "answer": "以下是**虚构模拟数据**中 2026 年 8 月与 9 月的比较，金额均为加元：\n\n| 指标 | 8 月 | 9 月 | 9 月较 8 月 |\n|---|---:|---:|---:|\n| 已完成服务金额（按服务日期） | CAD 26,025.00 | CAD 19,685.00 | 减少 CAD 6,340.00 |\n| 到账原额（按收款日期） | CAD 21,235.00 | CAD 13,725.00 | 减少 CAD 7,510.00 |\n\n两项指标在 9 月都下降了。它们按**不同日期口径**统计，不能用同月两项金额之差直接判断未收款；建议核对收款日期与对应订单，确认是否存在跨月到账。\n\n完成金额按服务日期、到账原额按收款日期统计，未扣退款；两者都不是利润，差额也不能直接认定为欠款。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 34,
+                "completed": 26,
+                "completedAmountCents": 2602500,
+                "grossReceivedCents": 2123500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:13.729Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "这能证明9月经营变差了吗？请说人话。",
+          "status": 200,
+          "ms": 7394,
+          "turn": {
+            "id": "7935b62e-04f7-4bd5-89ef-750d5bf15331",
+            "user": "这能证明9月经营变差了吗？请说人话。",
+            "answer": "不能证明。**这份虚构模拟数据只能说明：9 月完成金额和到账原额都比 8 月低**，不能直接说“生意变差了”。8 月可能本来就是旺月；到账也可能跨月，和当月做了多少服务不是一回事。\n\n更实在的判断办法是：先拿 **2025 年 9 月对比 2026 年 9 月**，再核对 9 月完成的订单后来有没有到账。现在可以说“9 月这两项数字下滑了”，还不能说“经营出了问题”。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 34,
+                "completed": 26,
+                "completedAmountCents": 2602500,
+                "grossReceivedCents": 2123500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 34,
+                "completed": 26,
+                "completedAmountCents": 2602500,
+                "grossReceivedCents": 2123500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:21.137Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "旺季判断",
+      "messages": [
+        "2026年6月到8月，按月比较婚礼完成金额。",
+        "这些数据足够支持明年多招一个人吗？"
+      ],
+      "turns": [
+        {
+          "message": "2026年6月到8月，按月比较婚礼完成金额。",
+          "status": 200,
+          "ms": 6719,
+          "turn": {
+            "id": "b9b1d6af-8d8c-4b77-a561-2c5e1035b66a",
+            "user": "2026年6月到8月，按月比较婚礼完成金额。",
+            "answer": "按**婚礼服务完成日期**统计，2026 年 6—8 月的完成金额如下（虚构模拟数据，单位：加元）：\n\n| 月份 | 已完成婚礼 | 完成金额 |\n|---|---:|---:|\n| 6 月 | 11 单 | CAD 17,870.00 |\n| 7 月 | 14 单 | CAD 23,100.00 |\n| 8 月 | 13 单 | CAD 21,330.00 |\n\n7 月比 6 月增加 **CAD 5,230.00**；8 月比 7 月减少 **CAD 1,770.00**，但仍高于 6 月。这是已完成服务的订单金额，**不是当月到账金额**。若要核查波动，可进一步对比各月完成订单的价格分布；目前不能仅凭这三个月判断原因。\n\n完成金额按服务日期、到账原额按收款日期统计，未扣退款；两者都不是利润，差额也不能直接认定为欠款。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-06-01",
+                  "to": "2026-06-30",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 16,
+                "completed": 11,
+                "completedAmountCents": 1787000,
+                "grossReceivedCents": 1461000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-07-01",
+                  "to": "2026-07-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 19,
+                "completed": 14,
+                "completedAmountCents": 2310000,
+                "grossReceivedCents": 1815000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 18,
+                "completed": 13,
+                "completedAmountCents": 2133000,
+                "grossReceivedCents": 1811000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:27.865Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "这些数据足够支持明年多招一个人吗？",
+          "status": 200,
+          "ms": 9526,
+          "turn": {
+            "id": "eb07bd26-16d5-497d-8a01-099e3ae5294f",
+            "user": "这些数据足够支持明年多招一个人吗？",
+            "answer": "**还不够支持现在就决定明年多招一名全职员工。**这份虚构模拟数据只显示：2026 年 6—8 月，婚礼每月完成 11–14 单，完成金额为 CAD 17,870.00–CAD 23,100.00。它能说明这三个月有业务量，但不能说明现有人手是否已满负荷，也不能证明明年全年都有足够工作，更不能判断新增人力成本能否覆盖。\n\n我的建议是先做一次低成本核查：整理这三个月**因排期冲突而拒绝或流失的询单**，并对照团队实际可工作时段、其他服务的工作量和新增岗位的全年成本。如果缺口主要集中在少数婚礼旺季日期，可先评估弹性支援，再决定是否需要全年增员；这只是分析建议，不是招聘决定。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-06-01",
+                  "to": "2026-06-30",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 16,
+                "completed": 11,
+                "completedAmountCents": 1787000,
+                "grossReceivedCents": 1461000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-07-01",
+                  "to": "2026-07-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 19,
+                "completed": 14,
+                "completedAmountCents": 2310000,
+                "grossReceivedCents": 1815000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 18,
+                "completed": 13,
+                "completedAmountCents": 2133000,
+                "grossReceivedCents": 1811000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-06-01",
+                  "to": "2026-06-30",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 16,
+                "completed": 11,
+                "completedAmountCents": 1787000,
+                "grossReceivedCents": 1461000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-07-01",
+                  "to": "2026-07-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 19,
+                "completed": 14,
+                "completedAmountCents": 2310000,
+                "grossReceivedCents": 1815000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 18,
+                "completed": 13,
+                "completedAmountCents": 2133000,
+                "grossReceivedCents": 1811000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:37.387Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "渠道经营",
+      "messages": [
+        "比较2026年9月Google和Instagram的记录数与完成金额。",
+        "那么该把Google预算翻倍吗？"
+      ],
+      "turns": [
+        {
+          "message": "比较2026年9月Google和Instagram的记录数与完成金额。",
+          "status": 200,
+          "ms": 9420,
+          "turn": {
+            "id": "c0f0c08b-9aea-47ae-8507-171e5b94f16b",
+            "user": "比较2026年9月Google和Instagram的记录数与完成金额。",
+            "answer": "按**2026年9月服务日期**统计（虚构模拟数据），记录数包含所有状态，包括取消；完成金额只计已完成服务，单位为加元：\n\n| 渠道 | 记录数 | 已完成数 | 完成金额 |\n|---|---:|---:|---:|\n| Google | 5 | 5 | CAD 4,730.00 |\n| Instagram | 6 | 2 | CAD 2,115.00 |\n\nInstagram 比 Google **多1条记录**，但完成金额**少 CAD 2,615.00**。两组样本都较小，不能据此判断渠道的长期表现。建议先核查 Instagram 那2条已确认记录的后续状态，再做渠道投入判断。\n\n完成金额按服务日期、到账原额按收款日期统计，未扣退款；两者都不是利润，差额也不能直接认定为欠款。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance",
+              "growth"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": "channel"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": "google",
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 53,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 5,
+                "completed": 5,
+                "completedAmountCents": 473000,
+                "grossReceivedCents": 308000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": "instagram",
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 67,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 6,
+                "completed": 2,
+                "completedAmountCents": 211500,
+                "grossReceivedCents": 173000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:46.843Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "那么该把Google预算翻倍吗？",
+          "status": 200,
+          "ms": 8351,
+          "turn": {
+            "id": "6e5f0947-ad63-4480-9078-49880b283276",
+            "user": "那么该把Google预算翻倍吗？",
+            "answer": "**先别把 Google 预算翻倍。**按刚核对的 2026 年 9 月虚构模拟数据，Google 有 5 条记录、5 单完成，完成金额 CAD 4,730.00；Instagram 有 6 条记录、2 单完成，完成金额 CAD 2,115.00。但两组样本都很小，而且缺少广告花费和真实线索数，不能据此判断 Google 多花预算后仍会有同样表现，也算不出投放回报。\n\n更稳妥的是先设一个**有上限的小额测试**：面向有明确预约意向的客户投放 Google 广告，用清晰的服务与预约信息，给链接加渠道追踪标签；记录花费、有效询问和最终确认订单，再与相近时段比较。测试结果出来前，不建议直接翻倍。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance",
+              "growth"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": "channel"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": "google",
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 53,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 5,
+                "completed": 5,
+                "completedAmountCents": 473000,
+                "grossReceivedCents": 308000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": "instagram",
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 67,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 6,
+                "completed": 2,
+                "completedAmountCents": 211500,
+                "grossReceivedCents": 173000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": "google",
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 53,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 5,
+                "completed": 5,
+                "completedAmountCents": 473000,
+                "grossReceivedCents": 308000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": "instagram",
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 67,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 6,
+                "completed": 2,
+                "completedAmountCents": 211500,
+                "grossReceivedCents": 173000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:11:55.147Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "课程经营",
+      "messages": [
+        "2026年1月到9月课程的完成记录和金额是多少？",
+        "能据此判断课程的利润率吗？"
+      ],
+      "turns": [
+        {
+          "message": "2026年1月到9月课程的完成记录和金额是多少？",
+          "status": 200,
+          "ms": 5954,
+          "turn": {
+            "id": "26ab0219-68f1-4261-8143-0ea6f02244ec",
+            "user": "2026年1月到9月课程的完成记录和金额是多少？",
+            "answer": "按**课程服务日期**统计，2026 年 1 月 1 日至 9 月 30 日共有 **36 条已完成记录**，对应的已完成订单金额为 **CAD 5,880.00**。这是虚构模拟数据；该金额不等于同期到账金额。\n\n建议抽查几条课程记录的完成状态和价格，确认统计口径与实际要看的“课程完成”一致。\n\n完成金额按服务日期、到账原额按收款日期统计，未扣退款；两者都不是利润，差额也不能直接认定为欠款。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-09-30",
+                  "service": "Education",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": "Completed",
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 46,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 36,
+                "completed": 36,
+                "completedAmountCents": 588000,
+                "grossReceivedCents": 450000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:12:01.125Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "能据此判断课程的利润率吗？",
+          "status": 200,
+          "ms": 3220,
+          "turn": {
+            "id": "3060197f-1aea-4f0e-936a-9c3ddf8ba8d7",
+            "user": "能据此判断课程的利润率吗？",
+            "answer": "不能。前面查到的 **CAD 5,880.00** 是虚构模拟数据中、按服务日期统计的课程已完成订单金额，不是利润。要算利润率，至少还需要明确成本口径，并取得课程相关的讲师报酬、材料、场地等成本；已完成金额和到账额也不能直接相减当作利润。\n\n可先核对这些课程的成本记录，再按约定口径计算利润率。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-09-30",
+                  "service": "Education",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": "Completed",
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 46,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 36,
+                "completed": 36,
+                "completedAmountCents": 588000,
+                "grossReceivedCents": 450000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:12:04.345Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "获客缺分母",
+      "messages": [
+        "2026年9月各渠道订单表现，按渠道查。",
+        "直接告诉我哪个渠道ROI最高。"
+      ],
+      "turns": [
+        {
+          "message": "2026年9月各渠道订单表现，按渠道查。",
+          "status": 200,
+          "ms": 8201,
+          "turn": {
+            "id": "154c0dc3-fa0b-4e35-9b4a-4fc4c815d383",
+            "user": "2026年9月各渠道订单表现，按渠道查。",
+            "answer": "以下是**虚构模拟数据**中，2026 年 9 月按渠道统计的订单表现。记录数包含已完成、已确认、咨询和已取消订单；“已完成金额”按服务日期统计，“到账”按收款日期统计，两者不一定对应同一批订单。\n\n| 渠道 | 记录数 | 已完成 | 已完成金额 | 9 月到账 |\n|---|---:|---:|---:|---:|\n| Google | 5 | 5 | CAD 4,730.00 | CAD 3,080.00 |\n| Instagram | 6 | 2 | CAD 2,115.00 | CAD 1,730.00 |\n| 婚礼策划师（planner） | 5 | 3 | CAD 3,560.00 | CAD 1,870.00 |\n| 转介绍（referral） | 6 | 6 | CAD 3,805.00 | CAD 3,300.00 |\n| 官网（website） | 6 | 5 | CAD 5,475.00 | CAD 3,745.00 |\n| **合计** | **28** | **21** | **CAD 19,685.00** | **CAD 13,725.00** |\n\n官网的已完成金额和到账金额最高；转介绍的已完成单数最多。**各渠道样本都较小，不能据此推断长期表现**，也不能把这些记录数当作线索分母计算转化率。建议先核对 Instagram 的 2 条已确认及 1 条咨询记录的后续状态，再看是否需要调整跟进方式。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "growth"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": "channel"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:12:12.531Z"
+          },
+          "reportValidationErrors": []
+        },
+        {
+          "message": "直接告诉我哪个渠道ROI最高。",
+          "status": 200,
+          "ms": 5858,
+          "turn": {
+            "id": "7369c716-4871-4033-86c4-c6d580f244e5",
+            "user": "直接告诉我哪个渠道ROI最高。",
+            "answer": "目前**无法判断哪个渠道 ROI 最高**：这份虚构模拟报表没有各渠道投入成本，也没有足够数据把收入准确归因到渠道。上月官网的已完成金额最高，但这不等于 ROI 最高。若要比较 ROI，需先补齐各渠道花费和可归因收入。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "growth"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-14",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": null,
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "status": null,
+                  "groupBy": "channel"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 300,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 28,
+                "completed": 21,
+                "completedAmountCents": 1968500,
+                "grossReceivedCents": 1372500,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T00:12:18.401Z"
+          },
+          "reportValidationErrors": []
+        }
+      ]
+    }
+  ]
+}

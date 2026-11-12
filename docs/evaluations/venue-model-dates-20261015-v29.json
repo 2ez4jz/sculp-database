@@ -1,0 +1,847 @@
+{
+  "at": "2026-10-15T17:17:28.788Z",
+  "fictionalOnly": true,
+  "edgeVersion": 29,
+  "scenarios": [
+    {
+      "id": "venue-average",
+      "turns": [
+        {
+          "message": "哪个场地婚礼客单价最高",
+          "status": 200,
+          "ms": 11502,
+          "errors": [],
+          "turn": {
+            "id": "19e388c3-dace-4d79-8d00-7376af1e9def",
+            "user": "哪个场地婚礼客单价最高",
+            "answer": "按虚构模拟数据，2026年1月1日至10月15日，**SCULP Studio** 的婚礼客单价最高：已完成且价格有效的12单，平均 **CAD 1,680.00**。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 70,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:16:42.835Z"
+          }
+        },
+        {
+          "message": "前三名列个表，附订单数和平均客单价",
+          "status": 200,
+          "ms": 8690,
+          "errors": [],
+          "turn": {
+            "id": "d062fe19-f494-444b-a8d1-70f68adb4db3",
+            "user": "前三名列个表，附订单数和平均客单价",
+            "answer": "沿用上次的期间（2026年1月1日至10月15日），虚构模拟数据中，婚礼客单价前三名如下；仅统计**已完成、价格有效的加元订单**。\n\n| 排名 | 场地 | 订单数 | 平均客单价 |\n|---|---|---:|---:|\n| 1 | SCULP Studio | 12 | CAD 1,680.00 |\n| 并列第2 | Casa Loma | 12 | CAD 1,646.67 |\n| 并列第2 | Four Seasons Toronto | 12 | CAD 1,646.67 |\n\n两处场地并列第二。若要判断价差从何而来，可以先核对各场地订单的服务内容是否相近。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 70,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:16:51.540Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "venue-chart",
+      "turns": [
+        {
+          "message": "今年截至今天，各场地已完成婚礼的平均客单价是多少",
+          "status": 200,
+          "ms": 13868,
+          "errors": [],
+          "turn": {
+            "id": "108f52c0-cd62-4b8c-9cc7-e5b51c72718d",
+            "user": "今年截至今天，各场地已完成婚礼的平均客单价是多少",
+            "answer": "按**2026 年 1 月 1 日至 10 月 15 日**已完成、价格有效的加元婚礼订单计算，虚构模拟数据中各场地的平均客单价为：\n\n| 场地 | 平均客单价 | 订单数 |\n|---|---:|---:|\n| SCULP Studio | CAD 1,680.00 | 12 |\n| Casa Loma | CAD 1,646.67 | 12 |\n| Four Seasons Toronto | CAD 1,646.67 | 12 |\n| Graydon Hall Manor | CAD 1,646.36 | 11 |\n| The Distillery District | CAD 1,638.00 | 10 |\n| Liberty Grand | CAD 1,634.62 | 13 |\n\nSCULP Studio 在这段期间最高；若要据此比较定价，建议先核对各场地订单的服务套餐是否相同。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 70,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:16:45.227Z"
+          }
+        },
+        {
+          "message": "用柱状图看看",
+          "status": 200,
+          "ms": 8067,
+          "errors": [],
+          "turn": {
+            "id": "ac64e043-fc9c-4b0b-a923-5e79894ca4af",
+            "user": "用柱状图看看",
+            "answer": "已按上一轮口径展示柱状图：**2026 年 1 月 1 日至 10 月 15 日，各场地已完成婚礼的平均客单价**（虚构模拟数据，仅计价格有效的加元订单）。SCULP Studio 最高，为 **CAD 1,680.00**，样本为 12 单；其余场地的均价较接近。若要用这些差异评估定价，建议先核对各场地的套餐内容是否一致。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 70,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:16:53.293Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "channel-average",
+      "turns": [
+        {
+          "message": "今年截至今天，哪个渠道的婚礼平均客单价最高",
+          "status": 200,
+          "ms": 5885,
+          "errors": [],
+          "turn": {
+            "id": "9629d1a6-d844-4419-9e1b-6d6033542790",
+            "user": "今年截至今天，哪个渠道的婚礼平均客单价最高",
+            "answer": "在虚构模拟数据中，2026年1月1日至10月15日，**Instagram** 的婚礼平均客单价最高，为 **CAD 1,661.76**（按17笔已完成、价格有效的订单计算）。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "growth"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": null,
+                  "groupBy": "channel"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 94,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:16:59.189Z"
+          }
+        },
+        {
+          "message": "订单最多的渠道和客单价最高的是同一个吗",
+          "status": 200,
+          "ms": 5715,
+          "errors": [],
+          "turn": {
+            "id": "b9fff4d1-c31c-43cf-8513-47f44e579373",
+            "user": "订单最多的渠道和客单价最高的是同一个吗",
+            "answer": "是同一个：今年1月1日至今天（10月15日），Instagram 的婚礼记录最多，共 **25笔**（含未完成和取消）；它的已完成、价格有效婚礼平均客单价也最高，为 **CAD 1,661.76**（17笔）。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "growth"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": null,
+                  "groupBy": "channel"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 94,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:17:04.905Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "venue-filter",
+      "turns": [
+        {
+          "message": "2026年8月Graydon Hall的婚礼完成金额和平均客单价是多少",
+          "status": 200,
+          "ms": 6344,
+          "errors": [],
+          "turn": {
+            "id": "fe0c02cd-ed5b-491f-aad1-c89359334144",
+            "user": "2026年8月Graydon Hall的婚礼完成金额和平均客单价是多少",
+            "answer": "在虚构模拟数据中，2026年8月 Graydon Hall Manor 的婚礼**完成金额为 CAD 4,990.00**；按3笔已完成且有有效加元价格的订单计算，**平均客单价为 CAD 1,663.33**。样本仅3笔，不宜据此推断长期表现；如要用于定价判断，建议再核对更长期间的订单。\n\n完成金额按服务日期、到账原额按收款日期统计，未扣退款；两者都不是利润，差额也不能直接认定为欠款。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": null,
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 18,
+                "completed": 13,
+                "pricedCompleted": 13,
+                "averageCompletedAmountCents": 164077,
+                "completedAmountCents": 2133000,
+                "grossReceivedCents": 1811000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:16:59.685Z"
+          }
+        },
+        {
+          "message": "换成9月，同口径比较变化",
+          "status": 200,
+          "ms": 11873,
+          "errors": [],
+          "turn": {
+            "id": "7814277a-9dac-414b-af97-328fffeb2906",
+            "user": "换成9月，同口径比较变化",
+            "answer": "同口径看虚构模拟数据，Graydon Hall Manor **2026年9月的婚礼完成金额为 CAD 1,650.00**，比8月的 CAD 4,990.00 减少 **CAD 3,340.00（−66.9%）**；**平均客单价为 CAD 1,650.00**，比8月的 CAD 1,663.33 低 **CAD 13.33（−0.8%）**。\n\n金额下降主要体现在已完成笔数从3笔变为1笔；9月均价只基于这一笔，样本较小，不能据此判断长期价格变化。若要用于经营判断，建议再核对相邻几个月的完成笔数。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [
+              "business",
+              "finance"
+            ],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": null,
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 18,
+                "completed": 13,
+                "pricedCompleted": 13,
+                "averageCompletedAmountCents": 164077,
+                "completedAmountCents": 2133000,
+                "grossReceivedCents": 1811000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": null,
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 100,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 12,
+                "completed": 9,
+                "pricedCompleted": 9,
+                "averageCompletedAmountCents": 167222,
+                "completedAmountCents": 1505000,
+                "grossReceivedCents": 998000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-08-01",
+                  "to": "2026-08-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": "graydon",
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 17,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 3,
+                "completed": 3,
+                "pricedCompleted": 3,
+                "averageCompletedAmountCents": 166333,
+                "completedAmountCents": 499000,
+                "grossReceivedCents": 499000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              },
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-09-01",
+                  "to": "2026-09-30",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": "graydon",
+                  "status": null,
+                  "groupBy": null
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 17,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 2,
+                "completed": 1,
+                "pricedCompleted": 1,
+                "averageCompletedAmountCents": 165000,
+                "completedAmountCents": 165000,
+                "grossReceivedCents": 0,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:17:11.502Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "artist-average",
+      "turns": [
+        {
+          "message": "今年截至今天，各主负责人已完成婚礼的平均客单价排名",
+          "status": 200,
+          "ms": 7175,
+          "errors": [],
+          "turn": {
+            "id": "10048d8f-aabf-463f-84ce-255f16c279b2",
+            "user": "今年截至今天，各主负责人已完成婚礼的平均客单价排名",
+            "answer": "按**2026 年 1 月 1 日至今天（10 月 15 日）**的虚构模拟数据，各主负责人已完成婚礼的平均客单价排名如下（仅统计价格有效的加元订单）：\n\n| 排名 | 主负责人 | 平均客单价 | 订单数 |\n|---|---|---:|---:|\n| 1 | Miranda | CAD 1,680.00 | 8 |\n| 2 | Emily | CAD 1,667.14 | 14 |\n| 3 | Michelle | CAD 1,650.00 | 14 |\n| 4 | Angelina | CAD 1,644.67 | 15 |\n| 5 | Giselle | CAD 1,630.00 | 10 |\n| 6 | Elaine | CAD 1,618.89 | 9 |\n\nMiranda 目前最高；但她和 Elaine 的样本较小，不能据此推断长期表现。若要比较定价表现，建议先核对各负责人承接的婚礼套餐是否相近。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "artist"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 70,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:17:18.685Z"
+          }
+        },
+        {
+          "message": "均价最高就说明她最赚钱吗",
+          "status": 200,
+          "ms": 5610,
+          "errors": [],
+          "turn": {
+            "id": "700c6c15-4ba3-400b-8e3e-f4b2b4a69f4b",
+            "user": "均价最高就说明她最赚钱吗",
+            "answer": "不能。Miranda 的已知婚礼订单均价最高，只说明她的**单笔成交金额平均更高**，不代表总收入或利润最高；还要看订单量、成本和工时。目前缺少成本与工时数据，无法判断谁最赚钱。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "artist"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 70,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:17:24.294Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "empty-and-context",
+      "turns": [
+        {
+          "message": "2020年各场地婚礼平均客单价最高的是哪个",
+          "status": 200,
+          "ms": 11464,
+          "errors": [],
+          "turn": {
+            "id": "d28794bd-8363-4f5f-a3cc-dc65f58b8f66",
+            "user": "2020年各场地婚礼平均客单价最高的是哪个",
+            "answer": "2020年没有已完成且价格有效的婚礼订单，因此无法判断哪个场地的平均客单价最高。这是虚构模拟数据；如需核查，建议确认2020年的婚礼订单是否已录入。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2020-01-01",
+                  "to": "2020-12-31",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 0,
+                "completed": 0,
+                "pricedCompleted": 0,
+                "averageCompletedAmountCents": null,
+                "completedAmountCents": 0,
+                "grossReceivedCents": 0,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:17:22.966Z"
+          }
+        },
+        {
+          "message": "改看今年截至今天，并列的也列出来",
+          "status": 200,
+          "ms": 5611,
+          "errors": [],
+          "turn": {
+            "id": "cc2b1ea1-817c-4936-ae7b-fcf7e15e344e",
+            "user": "改看今年截至今天，并列的也列出来",
+            "answer": "按 **2026年1月1日至10月15日**已完成、价格有效的加元婚礼订单计算，平均客单价最高的是 **SCULP Studio：CAD 1,680.00**（12单），**没有并列第一**。这是虚构模拟数据；如要核查口径，可确认这些订单的场地归属是否录入正确。",
+            "references": [],
+            "proposals": [],
+            "sourceIds": [],
+            "skillsUsed": [],
+            "modelProfile": {
+              "model": "gpt-6-sol",
+              "effort": "medium"
+            },
+            "demoReportSources": [
+              {
+                "source": "current_fictional_demo_full_catalog",
+                "fictional": true,
+                "asOfDate": "2026-10-15",
+                "filters": {
+                  "from": "2026-01-01",
+                  "to": "2026-10-15",
+                  "service": "Wedding",
+                  "channelId": null,
+                  "artistId": null,
+                  "bookingId": null,
+                  "venueId": null,
+                  "status": "Completed",
+                  "groupBy": "venue"
+                },
+                "coverage": {
+                  "catalogRecords": 300,
+                  "scopedRecords": 73,
+                  "allMatchingRowsAggregated": true
+                },
+                "records": 70,
+                "completed": 70,
+                "pricedCompleted": 70,
+                "averageCompletedAmountCents": 164886,
+                "completedAmountCents": 11542000,
+                "grossReceivedCents": 9063000,
+                "unpricedCompleted": 0,
+                "nonCadCompleted": 0,
+                "catalogQuality": {
+                  "futureDatedReceipts": 26,
+                  "futureCompleted": 32,
+                  "completedOnOrBeforeAsOf": 190,
+                  "invalidServiceDates": 0
+                }
+              }
+            ],
+            "engine": "sdk",
+            "createdAt": "2026-10-15T17:17:28.586Z"
+          }
+        }
+      ]
+    }
+  ]
+}

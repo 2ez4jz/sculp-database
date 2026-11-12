@@ -1,0 +1,307 @@
+{
+  "edgeVersion": 33,
+  "fictionalOnly": true,
+  "inlineSyntheticRows": 3,
+  "results": [
+    {
+      "id": "casual",
+      "message": "今天开发了一天，有点累，随便陪我聊两句。",
+      "status": 200,
+      "errors": [],
+      "turn": {
+        "id": "546c9aa4-ba0c-4d48-b107-5af14f36c6cf",
+        "user": "今天开发了一天，有点累，随便陪我聊两句。",
+        "answer": "辛苦了，开发一整天，脑子可能还在后台跑任务。先喝口水、伸伸肩，咱们就随便聊，不解决问题：今天有没有一个小瞬间，让你觉得“嗯，这段总算搞定了”？",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "skillsUsed": [],
+        "modelProfile": {
+          "model": "gpt-6-sol",
+          "effort": "medium"
+        },
+        "demoReportSources": [],
+        "engine": "sdk",
+        "createdAt": "2026-10-15T18:27:12.957Z"
+      }
+    },
+    {
+      "id": "concept",
+      "message": "客单价是啥？说得像平时聊天，别讲术语。",
+      "status": 200,
+      "errors": [
+        "unexpected fallback"
+      ],
+      "turn": {
+        "id": "84c49e74-ee35-4f82-90f2-19c487076d89",
+        "user": "客单价是啥？说得像平时聊天，别讲术语。",
+        "modelProfile": {
+          "model": "gpt-6-sol"
+        },
+        "answer": "客单价就是平均每笔订单花了多少钱。比如完成了两笔订单，分别是 500 加元和 1,000 加元，平均下来每笔就是 750 加元。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "fake-a",
+          "fake-b",
+          "fake-old"
+        ],
+        "usage": {
+          "input_tokens": 3709,
+          "output_tokens": 47,
+          "calls": 1
+        },
+        "skillsUsed": [
+          "business"
+        ],
+        "engine": "legacy",
+        "agentFallback": true,
+        "createdAt": "2026-10-15T18:27:14.742Z"
+      }
+    },
+    {
+      "id": "plain-language",
+      "message": "“对获客来说，核对订单来源与服务结构，再判断是否发展该场地的合作。”这句话帮我改成老板一眼能听懂的话，不用专业词。",
+      "status": 200,
+      "errors": [],
+      "turn": {
+        "id": "b5695c9d-a7d5-459a-8b6e-f6f020003be3",
+        "user": "“对获客来说，核对订单来源与服务结构，再判断是否发展该场地的合作。”这句话帮我改成老板一眼能听懂的话，不用专业词。",
+        "modelProfile": {
+          "model": "gpt-6-sol"
+        },
+        "answer": "先看看来这儿的客人是怎么找到我们的、主要做了哪些服务，再决定要不要和这个场地多合作。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [
+          "fake-a",
+          "fake-b",
+          "fake-old"
+        ],
+        "usage": {
+          "input_tokens": 3959,
+          "output_tokens": 51,
+          "calls": 1
+        },
+        "skillsUsed": [
+          "business",
+          "growth"
+        ],
+        "engine": "legacy",
+        "createdAt": "2026-10-15T18:27:18.199Z"
+      }
+    },
+    {
+      "id": "creative",
+      "message": "帮Sculpy想三句有趣的欢迎语，不要像客服。",
+      "status": 200,
+      "errors": [],
+      "turn": {
+        "id": "35b5df81-23ea-49de-8ea1-b063e49a89eb",
+        "user": "帮Sculpy想三句有趣的欢迎语，不要像客服。",
+        "answer": "1. 你来啦！今天想聊点正经的，还是先让脑洞热个身？\n2. 欢迎进入 Sculpy 的小宇宙，灵感可以随手乱放。\n3. 有什么念头尽管抛过来，半成品也很欢迎。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "skillsUsed": [],
+        "modelProfile": {
+          "model": "gpt-6-sol",
+          "effort": "medium"
+        },
+        "demoReportSources": [],
+        "engine": "sdk",
+        "createdAt": "2026-10-15T18:27:19.413Z"
+      }
+    },
+    {
+      "id": "brief",
+      "message": "哪个场地婚礼客单价最高？一句话。",
+      "status": 200,
+      "errors": [],
+      "turn": {
+        "id": "a7259e73-e8a2-4c16-948f-c52960fb8ac6",
+        "user": "哪个场地婚礼客单价最高？一句话。",
+        "answer": "虚构模拟数据中，按已完成且有价格的婚礼订单计算，今年至今（2026-01-01至10-15）客单价最高的是测试场地A：CAD 1,000.00（1单）；全部已记录历史（2025-02-01至2026-10-15）则是测试场地B：CAD 5,250.00（2单），样本都很少，先核对B场地两单的服务内容再判断它是否值得重点关注。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "skillsUsed": [
+          "business"
+        ],
+        "modelProfile": {
+          "model": "gpt-6-sol",
+          "effort": "medium"
+        },
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-15",
+            "filters": {
+              "from": "2026-01-01",
+              "to": "2026-10-15",
+              "service": "Wedding",
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "venueId": null,
+              "status": null,
+              "groupBy": "venue"
+            },
+            "coverage": {
+              "catalogRecords": 3,
+              "scopedRecords": 3,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 2,
+            "completed": 2,
+            "pricedCompleted": 2,
+            "averageCompletedAmountCents": 75000,
+            "completedAmountCents": 150000,
+            "grossReceivedCents": 0,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 0,
+              "futureCompleted": 0,
+              "completedOnOrBeforeAsOf": 3,
+              "invalidServiceDates": 0
+            }
+          },
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-15",
+            "filters": {
+              "from": "2025-02-01",
+              "to": "2026-10-15",
+              "service": "Wedding",
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "venueId": null,
+              "status": null,
+              "groupBy": "venue"
+            },
+            "coverage": {
+              "catalogRecords": 3,
+              "scopedRecords": 3,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 3,
+            "completed": 3,
+            "pricedCompleted": 3,
+            "averageCompletedAmountCents": 383333,
+            "completedAmountCents": 1150000,
+            "grossReceivedCents": 0,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 0,
+              "futureCompleted": 0,
+              "completedOnOrBeforeAsOf": 3,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "engine": "sdk",
+        "createdAt": "2026-10-15T18:27:26.619Z"
+      }
+    },
+    {
+      "id": "business",
+      "message": "哪个场地婚礼客单价最高",
+      "status": 200,
+      "errors": [],
+      "turn": {
+        "id": "02972117-ce33-42f5-9533-f500ce0560be",
+        "user": "哪个场地婚礼客单价最高",
+        "answer": "按**已完成、价格有效的婚礼订单**计算，两个时间范围的最高场地不同。客单价就是每笔这类订单的平均成交金额；以下是虚构模拟数据。\n\n| 范围 | 婚礼客单价最高的场地 | 客单价 | 有效订单 |\n|---|---|---:|---:|\n| 今年至今（2026-01-01 至 2026-10-15） | 测试场地A | CAD 1,000.00 | 1单 |\n| 全部已记录历史（2025-02-01 至 2026-10-15） | 测试场地B | CAD 5,250.00 | 2单 |\n\n**怎么看：**历史排名主要被场地B在2025年的一笔高价订单拉高；今年场地B的婚礼订单是 CAD 500.00。每个场地只有一两单，不能据此认定哪个场地的客人通常预算更高。先对照这几单的套餐、服务人数和时长，再判断差价是否与场地有关，还是服务内容不同。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "skillsUsed": [
+          "business"
+        ],
+        "modelProfile": {
+          "model": "gpt-6-sol",
+          "effort": "medium"
+        },
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-15",
+            "filters": {
+              "from": "2026-01-01",
+              "to": "2026-10-15",
+              "service": "Wedding",
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "venueId": null,
+              "status": null,
+              "groupBy": "venue"
+            },
+            "coverage": {
+              "catalogRecords": 3,
+              "scopedRecords": 3,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 2,
+            "completed": 2,
+            "pricedCompleted": 2,
+            "averageCompletedAmountCents": 75000,
+            "completedAmountCents": 150000,
+            "grossReceivedCents": 0,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 0,
+              "futureCompleted": 0,
+              "completedOnOrBeforeAsOf": 3,
+              "invalidServiceDates": 0
+            }
+          },
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-15",
+            "filters": {
+              "from": "2025-02-01",
+              "to": "2026-10-15",
+              "service": "Wedding",
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "venueId": null,
+              "status": null,
+              "groupBy": "venue"
+            },
+            "coverage": {
+              "catalogRecords": 3,
+              "scopedRecords": 3,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 3,
+            "completed": 3,
+            "pricedCompleted": 3,
+            "averageCompletedAmountCents": 383333,
+            "completedAmountCents": 1150000,
+            "grossReceivedCents": 0,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 0,
+              "futureCompleted": 0,
+              "completedOnOrBeforeAsOf": 3,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "engine": "sdk",
+        "createdAt": "2026-10-15T18:27:27.581Z"
+      }
+    }
+  ]
+}

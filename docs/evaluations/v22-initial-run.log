@@ -1,0 +1,22 @@
+candidate 1 1 200 sdk 辛苦啦。要不要先歇一会儿、喝点水？如果有件事让你特别累，也可以跟我说说。
+candidate 1 2 200 legacy 好，不聊工作。今天就放空一下吧——如果现在能瞬间去一个地方待半小时，你想去海边、山里，还是窝在家里？
+candidate 2 1 200 sdk 我可以帮你查订单、看虚构模拟报表，梳理经营数据并给出可核查的建议。需要记录或修改订单时，我可以准备待确认的建议卡片，但不能直接改动正式数据。
+candidate 2 2 200 legacy 不会。我不能直接改订单；只有你明确提出修改要求，我才会准备建议卡片，仍需你点击确认。
+candidate 3 1 200 sdk 好，后面我会尽量简短。
+candidate 3 2 200 legacy 在这份虚构数据里，“收入”指按服务日期统计的已完成订单金额，“到账”指按收款日期统计的收款原额，二者不一定发生在同一个月。
+candidate 4 1 200 sdk 明白，你说的负责人是 Miranda，不是 Mira。
+candidate 4 2 200 legacy 抱歉，我刚才理解错了。Mira 和 Miranda 是不同的人；你说的负责人是 Mira。
+candidate 5 1 200 sdk I can look up booking details and analyze SCULP Studio’s fictional dem
+candidate 5 2 200 legacy A **gross receipt** is the full amount received before deducting refun
+candidate 6 1 200 sdk 你说的是谁的订单？给我她的名字或订单号，我就能帮你查。
+candidate 6 2 200 legacy 给我她的名字或订单号就行；如果记得日期或场地，也可以告诉我，我来帮你找。
+candidate 7 1 200 sdk 按**虚构模拟数据**比较，2026 年 9 月两项金额都低于 8 月：
+
+| 口径 | 8 月 | 9 月 | 9 月较 8 月 |
+|-
+candidate 7 2 200 legacy 不能证明。**这份虚构模拟数据只能说明：9 月比 8 月做完的单更少（21 单对 26 单），完成金额和到账原额也都下降了。**
+
+但两个月
+candidate 8 1 200 sdk 按**婚礼服务完成日期**统计，2026 年 6–8 月的完成金额如下（加元；虚构模拟数据）：
+
+| 月份 | 已完成婚礼 | 完成金额 |

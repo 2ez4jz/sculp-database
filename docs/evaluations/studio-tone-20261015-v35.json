@@ -1,0 +1,127 @@
+{
+  "edgeVersion": 35,
+  "fictionalOnly": true,
+  "inlineSyntheticRows": 32,
+  "results": [
+    {
+      "id": "accurate-plain-concept",
+      "message": "客单价是啥？说人话，顺便说一下和收款有什么区别。",
+      "status": 200,
+      "errors": [],
+      "turn": {
+        "id": "b025b916-bea8-4ad8-b360-031eefea7448",
+        "user": "客单价是啥？说人话，顺便说一下和收款有什么区别。",
+        "answer": "客单价，说人话就是：**平均一单卖了多少钱**。比如（假设）做完 3 单，总共约定成交价 900 加元，客单价就是 300 加元。\n\n**收款**是已经进账的钱。客人可能先付定金、之后再付尾款，所以一单卖了 300 加元，不等于现在已经收到了 300 加元。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "skillsUsed": [
+          "business",
+          "finance"
+        ],
+        "modelProfile": {
+          "model": "gpt-6-sol",
+          "effort": "medium"
+        },
+        "demoReportSources": [],
+        "engine": "sdk",
+        "createdAt": "2026-10-15T18:32:57.980Z"
+      }
+    },
+    {
+      "id": "direct-opportunity",
+      "message": "哪个场地婚礼客单价最高？直接告诉我这钱有没有机会赚，先做什么。",
+      "status": 200,
+      "errors": [],
+      "turn": {
+        "id": "0e2822f0-b942-4ba8-9c52-e6deebb8cd35",
+        "user": "哪个场地婚礼客单价最高？直接告诉我这钱有没有机会赚，先做什么。",
+        "answer": "**婚礼客单价最高的是测试场地A。**这里的客单价，是每笔已完成、价格有效的婚礼订单平均成交多少钱。以下均为虚构模拟数据：\n\n| 范围 | 最高场地 | 一单平均成交价 | 有效订单 |\n|---|---|---:|---:|\n| 今年至今（2026-01-01～10-15） | 测试场地A | CAD 2,000.00 | 8单 |\n| 全部已记录历史（2025-08-01～2026-10-15） | 测试场地A | CAD 2,000.00 | 16单 |\n\n**有机会多做这种单，先别当成已经赚到利润。**同期测试场地B平均是 CAD 1,000.00；订单描述显示两边都是一位新娘、四小时标准套餐，没有加人或加时。这让A的成交价差很值得盯住，但今年A只有8单，不能据此认定场地本身带来了高价；也没有成本数据能算利润。\n\n你先对照看今年A、B各前三单的报价和实际服务内容，确认是不是同样的服务在卖不同价格。若确认一致，再小范围试着争取A场地的类似订单，观察新订单能否维持这个成交价，以及扣除实际投入后是否划算。",
+        "references": [],
+        "proposals": [],
+        "sourceIds": [],
+        "skillsUsed": [
+          "business"
+        ],
+        "modelProfile": {
+          "model": "gpt-6-sol",
+          "effort": "medium"
+        },
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-15",
+            "filters": {
+              "from": "2026-01-01",
+              "to": "2026-10-15",
+              "service": "Wedding",
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "venueId": null,
+              "status": null,
+              "groupBy": "venue"
+            },
+            "coverage": {
+              "catalogRecords": 32,
+              "scopedRecords": 32,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 16,
+            "completed": 16,
+            "pricedCompleted": 16,
+            "averageCompletedAmountCents": 150000,
+            "completedAmountCents": 2400000,
+            "grossReceivedCents": 0,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 0,
+              "futureCompleted": 0,
+              "completedOnOrBeforeAsOf": 32,
+              "invalidServiceDates": 0
+            }
+          },
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-15",
+            "filters": {
+              "from": "2025-08-01",
+              "to": "2026-10-15",
+              "service": "Wedding",
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "venueId": null,
+              "status": null,
+              "groupBy": "venue"
+            },
+            "coverage": {
+              "catalogRecords": 32,
+              "scopedRecords": 32,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 32,
+            "completed": 32,
+            "pricedCompleted": 32,
+            "averageCompletedAmountCents": 150000,
+            "completedAmountCents": 4800000,
+            "grossReceivedCents": 0,
+            "unpricedCompleted": 0,
+            "nonCadCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 0,
+              "futureCompleted": 0,
+              "completedOnOrBeforeAsOf": 32,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "engine": "sdk",
+        "createdAt": "2026-10-15T18:33:10.891Z"
+      }
+    }
+  ]
+}

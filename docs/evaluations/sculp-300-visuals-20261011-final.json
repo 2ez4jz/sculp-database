@@ -1,0 +1,1405 @@
+{
+  "date": "2026-10-11",
+  "mode": "fictional_300_live_visuals",
+  "results": [
+    {
+      "id": "auto-cross",
+      "ms": 8144,
+      "passed": true,
+      "turn": {
+        "id": "744642f6-c712-4401-bf0f-a0983a669be7",
+        "user": "分析2026年9月Instagram渠道的婚礼订单数量和状态。",
+        "answer": "这是虚构演示数据：2026年9月 Instagram 渠道共有 **3条婚礼订单记录**，状态分别为：已完成 1 条、已确认 1 条、咨询中 1 条、已取消 0 条。已完成金额为 **CAD 1,730.00**。样本量较小，不能据此推断长期表现。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-11",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 26,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 3,
+            "completed": 1,
+            "completedAmountCents": 173000,
+            "grossReceivedCents": 173000,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b87",
+          "b82",
+          "b90"
+        ],
+        "usage": {
+          "input_tokens": 18174,
+          "output_tokens": 165,
+          "calls": 2
+        },
+        "createdAt": "2026-10-11T18:25:39.024Z",
+        "analysisCharts": [
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": true,
+            "kind": "donut",
+            "title": "status",
+            "metric": "records",
+            "rows": [
+              {
+                "label": "Completed",
+                "value": 1
+              },
+              {
+                "label": "Confirmed",
+                "value": 1
+              },
+              {
+                "label": "Inquiry",
+                "value": 1
+              },
+              {
+                "label": "Cancelled",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": true,
+            "kind": "bars",
+            "title": "status",
+            "metric": "records",
+            "rows": [
+              {
+                "label": "Completed",
+                "value": 1
+              },
+              {
+                "label": "Confirmed",
+                "value": 1
+              },
+              {
+                "label": "Inquiry",
+                "value": 1
+              },
+              {
+                "label": "Cancelled",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": true,
+            "kind": "bars",
+            "title": "finance",
+            "metric": "cents",
+            "rows": [
+              {
+                "label": "completed",
+                "value": 173000
+              },
+              {
+                "label": "receipts",
+                "value": 173000
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-receipts",
+      "ms": 8787,
+      "passed": true,
+      "turn": {
+        "id": "d9387160-0e2f-4eff-8f17-7ffb30438735",
+        "user": "给2026年9月各渠道的到账原额占比饼图，收款按实际收款日。",
+        "answer": "虚构测试数据：2026-09-01 → 2026-09-30\n合计：CAD 13,725.00。\nGoogle CAD 3,080.00（22.4%）；Instagram CAD 1,730.00（12.6%）；Planner CAD 1,870.00（13.6%）；转介绍 CAD 3,300.00（24.0%）；官网 CAD 3,745.00（27.3%）。\n收款按实际收款日期统计，为未扣退款的到账原额。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-11",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": "channel"
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 28,
+            "completed": 21,
+            "completedAmountCents": 1968500,
+            "grossReceivedCents": 1372500,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b156",
+          "b244",
+          "b144",
+          "b278",
+          "b79",
+          "b83",
+          "b87",
+          "b132",
+          "b245",
+          "b80",
+          "b84",
+          "b88",
+          "b120",
+          "b204",
+          "b246",
+          "b108",
+          "b192",
+          "b81",
+          "b85",
+          "b89",
+          "b180",
+          "b247",
+          "b168",
+          "b290",
+          "b82",
+          "b86",
+          "b90",
+          "b248"
+        ],
+        "usage": {
+          "input_tokens": 25478,
+          "output_tokens": 289,
+          "calls": 2
+        },
+        "createdAt": "2026-10-11T18:25:39.675Z",
+        "analysisCharts": [
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "donut",
+            "title": "channel",
+            "metric": "grossReceivedCents",
+            "rows": [
+              {
+                "label": "google",
+                "value": 308000
+              },
+              {
+                "label": "instagram",
+                "value": 173000
+              },
+              {
+                "label": "planner",
+                "value": 187000
+              },
+              {
+                "label": "referral",
+                "value": 330000
+              },
+              {
+                "label": "website",
+                "value": 374500
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "finance",
+            "metric": "cents",
+            "rows": [
+              {
+                "label": "completed",
+                "value": 1968500
+              },
+              {
+                "label": "receipts",
+                "value": 1372500
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "channel",
+            "metric": "cents",
+            "paired": true,
+            "rows": [
+              {
+                "label": "google",
+                "value": 473000,
+                "secondary": 308000,
+                "count": 5
+              },
+              {
+                "label": "instagram",
+                "value": 211500,
+                "secondary": 173000,
+                "count": 6
+              },
+              {
+                "label": "planner",
+                "value": 356000,
+                "secondary": 187000,
+                "count": 5
+              },
+              {
+                "label": "referral",
+                "value": 380500,
+                "secondary": 330000,
+                "count": 6
+              },
+              {
+                "label": "website",
+                "value": 547500,
+                "secondary": 374500,
+                "count": 6
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-daily",
+      "ms": 10093,
+      "passed": true,
+      "turn": {
+        "id": "57194de9-4b2f-4aa0-af07-8f4ad8c6250e",
+        "user": "出2026年9月的简短日报汇总，解释订单状态、服务构成、完成金额与实际收款。用普通人能听懂的语言。",
+        "answer": "2026年9月（虚构演示数据）：共28条记录——21条已完成、3条已确认、2条咨询中、2条已取消。服务构成是婚礼12条、活动9条、课程5条、商业服务2条；商业服务只有2条，样本较少，不宜据此判断趋势。\n\n已完成服务的订单金额合计 CAD 19,685.00；9月实际到账原额 CAD 13,725.00。两者口径不同：前者按服务日期统计已完成订单金额，后者按收款日期统计到账金额；不能把差额直接当作欠款，也不是扣除退款后的净收款。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-11",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": "service"
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 28,
+            "completed": 21,
+            "completedAmountCents": 1968500,
+            "grossReceivedCents": 1372500,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b156",
+          "b244",
+          "b144",
+          "b278",
+          "b79",
+          "b83",
+          "b87",
+          "b132",
+          "b245",
+          "b80",
+          "b84",
+          "b88",
+          "b120",
+          "b204",
+          "b246",
+          "b108",
+          "b192",
+          "b81",
+          "b85",
+          "b89",
+          "b180",
+          "b247",
+          "b168",
+          "b290",
+          "b82",
+          "b86",
+          "b90",
+          "b248"
+        ],
+        "usage": {
+          "input_tokens": 25305,
+          "output_tokens": 237,
+          "calls": 2
+        },
+        "createdAt": "2026-10-11T18:25:40.969Z",
+        "analysisCharts": [
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "donut",
+            "title": "service",
+            "metric": "completedAmountCents",
+            "rows": [
+              {
+                "label": "Commercial",
+                "value": 128000
+              },
+              {
+                "label": "Education",
+                "value": 38000
+              },
+              {
+                "label": "Event",
+                "value": 297500
+              },
+              {
+                "label": "Wedding",
+                "value": 1505000
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "status",
+            "metric": "records",
+            "rows": [
+              {
+                "label": "Completed",
+                "value": 21
+              },
+              {
+                "label": "Confirmed",
+                "value": 3
+              },
+              {
+                "label": "Inquiry",
+                "value": 2
+              },
+              {
+                "label": "Cancelled",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "finance",
+            "metric": "cents",
+            "rows": [
+              {
+                "label": "completed",
+                "value": 1968500
+              },
+              {
+                "label": "receipts",
+                "value": 1372500
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "service",
+            "metric": "cents",
+            "paired": true,
+            "rows": [
+              {
+                "label": "Commercial",
+                "value": 128000,
+                "secondary": 128000,
+                "count": 2
+              },
+              {
+                "label": "Education",
+                "value": 38000,
+                "secondary": 38000,
+                "count": 5
+              },
+              {
+                "label": "Event",
+                "value": 297500,
+                "secondary": 208500,
+                "count": 9
+              },
+              {
+                "label": "Wedding",
+                "value": 1505000,
+                "secondary": 998000,
+                "count": 12
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-followup",
+      "ms": 9100,
+      "passed": true,
+      "turn": {
+        "id": "ce8aa635-4a73-40bd-a2f3-5158a8a7d7da",
+        "user": "沿用刚才的日期与条件，用图看看。",
+        "answer": "虚构测试数据：2026-09-01 → 2026-09-30 · 婚礼 · Instagram\n合计：3 条。\n已完成 1 条（33.3%）；已确认 1 条（33.3%）；咨询中 1 条（33.3%）；已取消 0 条（0.0%）。\n样本少，只说明这部分记录的情况。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-11",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 26,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 3,
+            "completed": 1,
+            "completedAmountCents": 173000,
+            "grossReceivedCents": 173000,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b87",
+          "b82",
+          "b90"
+        ],
+        "usage": {
+          "input_tokens": 18382,
+          "output_tokens": 169,
+          "calls": 2
+        },
+        "createdAt": "2026-10-11T18:25:48.146Z",
+        "analysisCharts": [
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": "Wedding",
+              "channelId": "instagram",
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": true,
+            "kind": "donut",
+            "title": "status",
+            "metric": "records",
+            "rows": [
+              {
+                "label": "Completed",
+                "value": 1
+              },
+              {
+                "label": "Confirmed",
+                "value": 1
+              },
+              {
+                "label": "Inquiry",
+                "value": 1
+              },
+              {
+                "label": "Cancelled",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-trend",
+      "ms": 7601,
+      "passed": true,
+      "turn": {
+        "id": "8b904677-9208-417d-b706-c2e2eb7ac57d",
+        "user": "分别对比2026年8月与9月的完成金额和到账原额，日期范围分开，简单说明哪里变了。",
+        "answer": "按服务日期统计的完成金额：2026年8月 CAD 26,025.00，9月 CAD 19,685.00，减少 CAD 6,340.00。按收款日期统计的到账原额：8月 CAD 21,235.00，9月 CAD 13,725.00，减少 CAD 7,510.00。简单说，9月这两项都比8月低；到账原额未扣退款，且和完成金额按不同日期归属，不能把两者差额直接看作欠款。",
+        "references": [],
+        "proposals": [],
+        "demoReportSources": [
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-11",
+            "filters": {
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 34,
+            "completed": 26,
+            "completedAmountCents": 2602500,
+            "grossReceivedCents": 2123500,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          },
+          {
+            "source": "current_fictional_demo_full_catalog",
+            "fictional": true,
+            "asOfDate": "2026-10-11",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "coverage": {
+              "catalogRecords": 300,
+              "scopedRecords": 300,
+              "allMatchingRowsAggregated": true
+            },
+            "records": 28,
+            "completed": 21,
+            "completedAmountCents": 1968500,
+            "grossReceivedCents": 1372500,
+            "unpricedCompleted": 0,
+            "catalogQuality": {
+              "futureDatedReceipts": 29,
+              "futureCompleted": 35,
+              "completedOnOrBeforeAsOf": 187,
+              "invalidServiceDates": 0
+            }
+          }
+        ],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b156",
+          "b244",
+          "b144",
+          "b278",
+          "b79",
+          "b83",
+          "b87",
+          "b132",
+          "b245",
+          "b80",
+          "b84",
+          "b88",
+          "b120",
+          "b204",
+          "b246",
+          "b108",
+          "b192",
+          "b81",
+          "b85",
+          "b89",
+          "b180",
+          "b247",
+          "b168",
+          "b290",
+          "b82",
+          "b86",
+          "b90",
+          "b248",
+          "b119",
+          "b203",
+          "b240",
+          "b61",
+          "b65",
+          "b69",
+          "b73",
+          "b77",
+          "b107",
+          "b191",
+          "b269",
+          "b179",
+          "b241",
+          "b62",
+          "b66",
+          "b70",
+          "b74",
+          "b78",
+          "b289",
+          "b167",
+          "b242",
+          "b63",
+          "b67",
+          "b71",
+          "b75",
+          "b155",
+          "b277",
+          "b143",
+          "b243",
+          "b64"
+        ],
+        "usage": {
+          "input_tokens": 25667,
+          "output_tokens": 279,
+          "calls": 2
+        },
+        "createdAt": "2026-10-11T18:25:48.542Z",
+        "analysisCharts": [
+          {
+            "kind": "trend",
+            "title": "trend",
+            "metric": "cents",
+            "paired": true,
+            "from": "2026-08-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "rows": [
+              {
+                "label": "2026-08-01 → 2026-08-31",
+                "value": 2602500,
+                "secondary": 2123500
+              },
+              {
+                "label": "2026-09-01 → 2026-09-30",
+                "value": 1968500,
+                "secondary": 1372500
+              }
+            ],
+            "fictional": true
+          },
+          {
+            "from": "2026-08-01",
+            "to": "2026-08-31",
+            "filters": {
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "donut",
+            "title": "service",
+            "metric": "completedAmountCents",
+            "rows": [
+              {
+                "label": "Commercial",
+                "value": 132000
+              },
+              {
+                "label": "Education",
+                "value": 60000
+              },
+              {
+                "label": "Event",
+                "value": 277500
+              },
+              {
+                "label": "Wedding",
+                "value": 2133000
+              }
+            ]
+          },
+          {
+            "from": "2026-08-01",
+            "to": "2026-08-31",
+            "filters": {
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "finance",
+            "metric": "cents",
+            "rows": [
+              {
+                "label": "completed",
+                "value": 2602500
+              },
+              {
+                "label": "receipts",
+                "value": 2123500
+              }
+            ]
+          },
+          {
+            "from": "2026-08-01",
+            "to": "2026-08-31",
+            "filters": {
+              "from": "2026-08-01",
+              "to": "2026-08-31",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "channel",
+            "metric": "cents",
+            "paired": true,
+            "rows": [
+              {
+                "label": "google",
+                "value": 48500,
+                "secondary": 48500,
+                "count": 3
+              },
+              {
+                "label": "instagram",
+                "value": 563000,
+                "secondary": 563000,
+                "count": 9
+              },
+              {
+                "label": "planner",
+                "value": 726000,
+                "secondary": 495000,
+                "count": 6
+              },
+              {
+                "label": "referral",
+                "value": 970500,
+                "secondary": 775000,
+                "count": 9
+              },
+              {
+                "label": "website",
+                "value": 294500,
+                "secondary": 242000,
+                "count": 7
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "donut",
+            "title": "service",
+            "metric": "completedAmountCents",
+            "rows": [
+              {
+                "label": "Commercial",
+                "value": 128000
+              },
+              {
+                "label": "Education",
+                "value": 38000
+              },
+              {
+                "label": "Event",
+                "value": 297500
+              },
+              {
+                "label": "Wedding",
+                "value": 1505000
+              }
+            ]
+          },
+          {
+            "from": "2026-09-01",
+            "to": "2026-09-30",
+            "filters": {
+              "from": "2026-09-01",
+              "to": "2026-09-30",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": false,
+            "kind": "bars",
+            "title": "finance",
+            "metric": "cents",
+            "rows": [
+              {
+                "label": "completed",
+                "value": 1968500
+              },
+              {
+                "label": "receipts",
+                "value": 1372500
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-schedule",
+      "ms": 9504,
+      "passed": true,
+      "turn": {
+        "id": "728161af-2e41-4559-96bd-6f11eb456091",
+        "user": "看看2026-09-05的排期，按已有日期、化妆师与时间说明安排，咨询中的订单不要当已确认。",
+        "answer": "2026-09-05 查到 5 场排期：\n\n- 08:00–18:00，Sophie Wang 07，婚礼，Michelle，Completed（已完成）。\n- 08:00–18:00，Rachel Kim 07，婚礼，Elaine，Confirmed（已确认）。\n- 08:00–18:00，Lisa Park 08，婚礼，Elaine，Inquiry（咨询中，尚未确认），不计作已确认安排。\n- 10:00–12:00，Jessica Li 24，商业，Miranda，Completed。\n- 14:00–16:00，Sarah Chen 13，活动，Giselle，Completed。\n\n以上时间与化妆师按订单记录列出；Elaine 同时出现在一场已确认婚礼和一场咨询中婚礼，后者不应视为已确认。",
+        "references": [
+          {
+            "id": "b79",
+            "label": "Sophie Wang 07 · 婚礼 · 2026-09-05"
+          },
+          {
+            "id": "b83",
+            "label": "Rachel Kim 07 · 婚礼 · 2026-09-05"
+          },
+          {
+            "id": "b87",
+            "label": "Lisa Park 08 · 婚礼 · 2026-09-05"
+          },
+          {
+            "id": "b144",
+            "label": "Sarah Chen 13 · 活动 · 2026-09-05"
+          },
+          {
+            "id": "b278",
+            "label": "Jessica Li 24 · 商业 · 2026-09-05"
+          }
+        ],
+        "proposals": [],
+        "sourceIds": [
+          "b0",
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6",
+          "b7",
+          "b8",
+          "b9",
+          "b10",
+          "b11",
+          "b12",
+          "b13",
+          "b14",
+          "b15",
+          "b16",
+          "b17",
+          "b18",
+          "b19",
+          "b20",
+          "b21",
+          "b22",
+          "b23",
+          "b24",
+          "b25",
+          "b26",
+          "b27",
+          "b28",
+          "b29",
+          "b156",
+          "b244",
+          "b144",
+          "b278",
+          "b79",
+          "b83",
+          "b87",
+          "b132",
+          "b245",
+          "b80",
+          "b84",
+          "b88",
+          "b120",
+          "b204",
+          "b246",
+          "b108",
+          "b192",
+          "b81",
+          "b85",
+          "b89",
+          "b180",
+          "b247",
+          "b168",
+          "b290",
+          "b82",
+          "b86",
+          "b90",
+          "b248"
+        ],
+        "usage": {
+          "input_tokens": 18054,
+          "output_tokens": 272,
+          "calls": 2
+        },
+        "createdAt": "2026-10-11T18:25:49.174Z",
+        "analysisCharts": [
+          {
+            "from": "2026-09-05",
+            "to": "2026-09-05",
+            "filters": {
+              "from": "2026-09-05",
+              "to": "2026-09-05",
+              "service": null,
+              "channelId": null,
+              "artistId": null,
+              "bookingId": null,
+              "status": null,
+              "groupBy": null
+            },
+            "fictional": true,
+            "unpriced": 0,
+            "future": 0,
+            "lowSample": true,
+            "kind": "schedule",
+            "title": "schedule",
+            "metric": "schedule",
+            "truncated": false,
+            "rows": [
+              {
+                "label": "2026-09-05 · b144 · giselle",
+                "status": "Completed",
+                "start": 840,
+                "end": 960,
+                "value": 0,
+                "time": "14:00–16:00"
+              },
+              {
+                "label": "2026-09-05 · b278 · miranda",
+                "status": "Completed",
+                "start": 600,
+                "end": 720,
+                "value": 0,
+                "time": "10:00–12:00"
+              },
+              {
+                "label": "2026-09-05 · b79 · michelle",
+                "status": "Completed",
+                "start": 480,
+                "end": 1080,
+                "value": 0,
+                "time": "08:00–18:00"
+              },
+              {
+                "label": "2026-09-05 · b83 · elaine",
+                "status": "Confirmed",
+                "start": 480,
+                "end": 1080,
+                "value": 0,
+                "time": "08:00–18:00"
+              },
+              {
+                "label": "2026-09-05 · b87 · elaine",
+                "status": "Inquiry",
+                "start": 480,
+                "end": 1080,
+                "value": 0,
+                "time": "08:00–18:00"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

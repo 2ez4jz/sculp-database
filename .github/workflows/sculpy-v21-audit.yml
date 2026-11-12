@@ -1,0 +1,25 @@
+name: Sculpy V2.1 focused audit
+on:
+  push:
+    branches: [sculpy-v2-1-data-audit]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  demo-data-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Repeated exact-data regressions
+        run: |
+          node --test scripts/v2-1-financial-reconciliation.test.mjs scripts/demo-report.test.mjs scripts/analysis-charts.test.mjs
+          node --test scripts/v2-1-financial-reconciliation.test.mjs scripts/demo-report.test.mjs scripts/analysis-charts.test.mjs
+          node --test scripts/v2-1-financial-reconciliation.test.mjs scripts/demo-report.test.mjs scripts/analysis-charts.test.mjs
+      - name: Full repository tests
+        run: npm test

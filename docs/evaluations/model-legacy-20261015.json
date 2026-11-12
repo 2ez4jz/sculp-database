@@ -1,0 +1,120 @@
+{
+  "status": 200,
+  "turn": {
+    "id": "5cf9bc09-2139-49f7-b9c1-a43430402010",
+    "user": "2026年9月已完成订单金额多少？一句话就行",
+    "modelProfile": {
+      "model": "gpt-6-sol"
+    },
+    "answer": "虚构演示数据中，2026年9月按服务日期统计的已完成订单金额为 CAD 19,685.00。",
+    "references": [],
+    "proposals": [],
+    "demoReportSources": [
+      {
+        "source": "current_fictional_demo_full_catalog",
+        "fictional": true,
+        "asOfDate": "2026-10-15",
+        "filters": {
+          "from": "2026-09-01",
+          "to": "2026-09-30",
+          "service": null,
+          "channelId": null,
+          "artistId": null,
+          "bookingId": null,
+          "venueId": null,
+          "status": null,
+          "groupBy": null
+        },
+        "coverage": {
+          "catalogRecords": 300,
+          "scopedRecords": 300,
+          "allMatchingRowsAggregated": true
+        },
+        "records": 28,
+        "completed": 21,
+        "pricedCompleted": 21,
+        "averageCompletedAmountCents": 93738,
+        "completedAmountCents": 1968500,
+        "grossReceivedCents": 1372500,
+        "unpricedCompleted": 0,
+        "nonCadCompleted": 0,
+        "catalogQuality": {
+          "futureDatedReceipts": 26,
+          "futureCompleted": 32,
+          "completedOnOrBeforeAsOf": 190,
+          "invalidServiceDates": 0
+        }
+      }
+    ],
+    "sourceIds": [
+      "b0",
+      "b1",
+      "b2",
+      "b3",
+      "b4",
+      "b5",
+      "b6",
+      "b7",
+      "b8",
+      "b9",
+      "b10",
+      "b11",
+      "b12",
+      "b13",
+      "b14",
+      "b15",
+      "b16",
+      "b17",
+      "b18",
+      "b19",
+      "b20",
+      "b21",
+      "b22",
+      "b23",
+      "b24",
+      "b25",
+      "b26",
+      "b27",
+      "b28",
+      "b29",
+      "b156",
+      "b244",
+      "b144",
+      "b278",
+      "b79",
+      "b83",
+      "b87",
+      "b132",
+      "b245",
+      "b80",
+      "b84",
+      "b88",
+      "b120",
+      "b204",
+      "b246",
+      "b108",
+      "b192",
+      "b81",
+      "b85",
+      "b89",
+      "b180",
+      "b247",
+      "b168",
+      "b290",
+      "b82",
+      "b86",
+      "b90",
+      "b248"
+    ],
+    "usage": {
+      "input_tokens": 21424,
+      "output_tokens": 100,
+      "calls": 2
+    },
+    "skillsUsed": [
+      "finance"
+    ],
+    "engine": "legacy",
+    "createdAt": "2026-10-15T17:14:49.949Z"
+  }
+}

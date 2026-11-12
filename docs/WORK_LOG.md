@@ -1,0 +1,243 @@
+# SCULP Database / Sculpy 工作日志
+
+## 2026-10-22：聊天阅读空间
+
+桌面独立聊天页收紧顶部及输入区，1280×720正文区从约202px增加至411px。手机375/390/430px、长回复、表格、语音转写及模拟键盘回归通过，手机正文占76%–83%。PR #36已合并，Pages发布及聊天v41更新说明已验证。详见 [聊天阅读空间记录](CHAT_SPACE_2026-10-22.md)。
+
+## 2026-10-22：功能与更新自知
+
+为正式聊天与Demo SDK接入同一份服务端功能清单和最近更新说明，区分当前工具、角色、页面能力、已发布与未发布功能；避免把“sculpy功能”误解为缺少日志的版本对比。实现及验证见 [功能与更新说明记录](PRODUCT_KNOWLEDGE_2026-10-22.md)。已通过PR #35发布；前端及聊天v40状态见 [V2.3.1发布记录](V231_RELEASE.md)。
+
+## 2026-10-22：正式业务写入可靠性
+
+保持现有操作流程，修复成功收款后读取失败误重试、询盘刷新丢失重试编号、版本/权限冲突卡住及退出时丢失未确认写入的问题。说明、验证及未完成边界见 [云端写入可靠性记录](CLOUD_WRITE_RELIABILITY_2026-10-22.md)。本轮未修改生产数据库或 GitHub Actions。已通过PR #35发布，部署及线上验证见 [V2.3.1发布记录](V231_RELEASE.md)。
+
+
+## 2026-10-16：首页新建订单与化妆师个人图库
+
+- 首页管理视角增加明显的「新建订单」按钮，直接打开现有新建确认表单；成功后跳转订单详情。正式登录工作区也增加同名按钮，展开现有云端录入面板并聚焦原文。不新增数据库、AI或权限接口。
+- 化妆师个人页面新增「个人作品图库」，支持多张拖拽、手机选图、原图预览、下载与逐张移除。作品按当前页面的化妆师归档；管理员可管理各人图库，员工演示视角仅展示自己的图库。
+- Demo 原图使用 IndexedDB，元数据沿用现有浏览器状态；刷新后保留。页面明确标注「仅当前浏览器保存」，未接入云端跨设备图库。官网精选作品及原有场次作品保持独立。
+- 文件限制：JPG/PNG/WebP、每张10 MB、每批20张且总计100 MB；验证真实图片解码。图片归档失败、元数据配额失败不会报告成功；元数据保存失败回滚原图。单张删除仅删除该原图，保留同批其他图片；切换页面释放临时预览地址。
+- 本地162项回归：161通过、1项因外部PostgreSQL环境跳过、0失败。真实浏览器通过：新建/取消/刷新订单、选图、实际DataTransfer拖放、原图预览/下载链接、同批单张删除、坏图拒绝、存储失败回滚、员工视角隔离、手机无溢出。
+- 既有 cloud-intake、intake、mobile-workspace 浏览器检查通过；覆盖16个页面、375/390/430px、桌面列表保留及正式录入入口展开。此处云端录入为现有模拟适配器测试，没有创建真实客户订单，也不代表实体iPhone验收。
+- 发布状态：准备提交；最终CI、合并及Pages结果见对应PR与Actions。
+
+## 2026-10-14：最近几天改动完整 review 与修复
+
+- 检查2026-10-09至10-14的数据、图表、财务口径、Demo/云端隔离、SDK、历史、权限和发布。发现实际问题并修复，详见 [完整 review](SCULPY_REVIEW_2026-10-14.md)。
+- 本地128项：127通过、1跳过、0失败；新增范围、未知金额、SDK路由/回退、长历史、真实日期锚点回归。
+- sculpy-chat v21已部署。6轮真实虚构数据对话及未登录401检查通过，来源报表与程序金额一致；SDK实际执行无fallback。
+- 正式库0订单、33张public表全部RLS；未新增真实订单、用户、密钥或改变正式权限。
+- 前一提交48e8860的桌面/手机浏览器与真实PostgreSQL/恢复检查已成功；最终前端本次提交CI结果以Actions为准。
+
+## 2026-10-14：独立 Dashboard / SCULPY 页面回归修复
+
+- 核对 main：Dashboard 与 SCULPY 已分为独立路由；本轮修正仍引用旧 Dashboard 容器的月度图表、分析图表与聊天生命周期浏览器检查。问答图表在对应聊天回复内验证。
+- 新增桌面/手机浏览器验收：固定三图、独立导航、聊天历史跨页面/刷新保留、发送按钮在视口内、员工不显示经营图表。加入 Verify 工作流。
+- 修正 Dashboard 提示文案，指向独立助手页面。空图表给出无正值数据说明。
+- 更新旧测试环境：补齐浏览器 location、SDK schema nullable 模拟；断言与现有 Demo opt-in 发布门控及简短建议要求一致。未修改模型、密钥、正式数据库或 SDK 发布门控。
+- 本地 npm test：118 项，117 通过、1 跳过（未配置外部 PostgreSQL）、0 失败。当前环境浏览器下载失败，浏览器与 PostgreSQL 验收结果以 GitHub Actions 为准。
+
+## 2026-10-10：300单日报与交叉分析实测
+
+- 44轮实际线上AI对话。发现并修正交叉汇总不可用、截至日期/未来状态误计、渠道比较方向和金额最大值排名问题。
+- 新增只读Demo精确报表，程序计算日期与维度组合、分组排名和渠道差值；AI解释业务现象，提示小样本与缺失数据。
+- 保存[日报样例](SCULPY_DAILY_REPORT_2026-10-10.md)及[全部实测结果](SCULPY_DAILY_EVAL_2026-10-10.md)。没有导入真实订单或自动改动测试基线状态。
+
+## 2026-10-10：正式经营月报接入聊天与日期范围修正
+
+- **已实现**：正式聊天新增只读 `query_monthly_report` 工具，调用已部署的 `sculpy_monthly_report`，沿用当前用户认证与数据库权限。仅 owner/operations 可用；Demo 不调用正式月报。
+- **已实现**：区分服务月已完成订单金额与收款月到账原额；模型须说明缺价格、非 CAD、退款待核对和缺付款日期。未提供成本及退款流水，仍不能计算利润或净收款。
+- **已实现**：按多伦多当地日期解释相对月份；每轮最多12个不同月份，同一月份重复查询复用结果。每轮保留月报月份、读取时间与正式来源标记。
+- **已实现**：财务对话及其连续追问保留管理权限标记；账号降为员工后不返回这些旧对话。浏览器提交的虚构汇总和月报均不能覆盖正式数据库结果。
+- **已修正**：Demo 月度图表按提问范围显示本月、上月、最近N个月、明确月份/范围、年度或季度；不再对三个月问题显示全年。现已统一为同一份300单虚构数据；订单、档案、渠道、报表和AI查询读取当前修改后的记录，删除旧24单数据及缓存。
+- **验证**：完整本地测试通过（最终数量见本轮发布结果）；新增工具、认证转发、参数拒绝、失败响应、权限降级、财务追问和日历范围测试。浏览器与 PostgreSQL 检查由 GitHub CI 执行。
+- **验收边界**：真实管理员账号、两设备端到端查询和真实业务财务核对仍待团队验收；本轮不导入真实订单、不新增账号、不接自动长期记忆。
+
+
+## 2026-10-08：订单来源渠道页面（Demo 第一版）
+
+- **已提交**：新增「来源渠道」导航页面，包括 Instagram、小红书、Google 搜索、官网咨询、客户转介绍、Planner/合作方和其他。支持管理员添加、停用自定义渠道，统计明确关联的演示订单数量。
+- **已提交**：订单详情增加「订单来源渠道」选择框。默认未填写；变更写入当前浏览器 localStorage，刷新后仍可查看，不会自动猜测来源。
+- **已提交**：渠道规则单元测试，并加入 GitHub Verify 工作流。
+- **未完成**：正式 Supabase 来源渠道表、订单外键、权限策略及安全迁移尚未部署；新订单云端写入流程尚未添加来源字段。暂时不可视为跨账号同步。
+- **后续分析**：渠道订单量、确认率、成交金额、获客成本和转化率需要分别定义口径。现有 `bookings.source` 是数据录入来源，不应直接当成营销渠道。
+- **验证状态**：本次提交触发自动化测试与部署，结果以 GitHub Actions 为准。
+
+
+更新时间：2026-10-08，Toronto 时间。范围：数据库中的 AI 工作助手模块。
+
+状态说明：**已做**表示已有实现；**已验证**只代表下述测试范围通过，不代表真实业务全面验收；**未做**表示尚未实现或接入；**待验证**表示有实现但还缺对应实际测试。
+
+
+## 2026-10-08：正式云端录入与AI识别（已上线）
+
+- **已做**：登录后的管理员工作区新增“录入新订单”；原文、客户匹配、完整日期/开始时间、服务需求、预算和化妆师分配均可核对后保存。可以一次事务创建客户与订单；同名客户须明确选择，不自动合并。
+- **已做**：原文逐字保留（含空格）、录入时间、服务端保存时间、作者与确认内容一并归档。预算独立于成交价；新单为待确认需求，未知价格/结束时间不填假值，化妆师可待定。
+- **已做**：数据库端校验与同请求重试保护；网络返回丢失后重试同一请求，不重复建单。事务中途失败全部回滚。日期按多伦多时区转换，夏令时不存在/重复时刻拒绝猜测。
+- **已做**：保存后重新读取详情；订单列表、搜索及现有Sculpy上下文可查询该记录。客户原文/预算仅管理员可见；员工依原有分配范围查询订单。初始化公开团队名称与服务目录，不导入真实客户。
+- **已验证**：27项既有/新增逻辑与数据库测试通过；新增页面自动测试覆盖未确认不写入、丢失回包重试、原文精确保留、修改原文失效、同名客户明确选择和390px宽度。原有7套浏览器回归全部通过。
+- **已验证（实际云端）**：使用明确标注的虚构Amy，通过正式RPC保存；另一数据库连接重新读取相同ID、原文、时区、预算和需求；重复请求返回同一订单。测试客户与订单已清理，审计事件保留。该检查是数据库/API层验证，不等于两部真实设备、真实员工账号登录验收。
+- **安全检查**：移除匿名角色对现有权限辅助函数的执行权；禁用不需要暴露的触发器函数调用。新表RLS及原文访问隔离通过。剩余检查提示为已有的、需要认证且有角色检查的权限函数，以及尚未开启的泄露密码保护；参见 Supabase [权限函数检查说明](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable) 与 [密码保护说明](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)。
+- **AI识别已启用**：用户于2026-10-08明确授权后，`sculpy-intake` 已部署，`cloudIntakeAiEnabled=true`。只有登录后的管理员主动点击“识别订单”才会把本次客户原文发送给OpenAI；返回内容仍须人工核对并确认保存。原始录入全文、新增服务说明与预算仅人类详情接口读取，不自动加入既有聊天模型上下文。
+- **待验证**：需用真实管理员账号完成Amy自然语言的完整人工验收；真实账号跨设备登录、真实语音、图片云端归档与团队试用仍未验收。当前本地截图缺少中文字库，布局检查通过，文字视觉需CI截图或实际设备复核。
+- **发布状态**：数据库迁移已应用；前端发布结果见本次PR及Actions。
+
+## 2026-10-07：录入下一阶段 — 新客户／订单确认卡片（已授权发布）
+
+- **已做**：管理员演示录入面板可从原文识别新客户／新订单，最多返回6张建议卡片；点击“核对并补齐”进入可修改表单，确认前不写入。
+- **已做**：未知或同名歧义对象不自动匹配；缺少日期、客户、负责人、场地、服务类型时阻止建单；校验实际日历日期，阻止同名客户和同客户／日期／服务的疑似重复订单。
+- **已做**：新档案与原始输入、录入时间、保存时间一并存储；原文空格也保留。图片来源沿用本地归档，写入失败尝试清理归档。原文修改、切换对象和关闭面板会使旧识别结果失效。
+- **已验证**：22项逻辑和后端契约检查通过（模型接口为模拟响应）；新增浏览器测试通过未确认不写入、字段修改、缺字段拦截、刷新恢复、原文保留、员工入口隔离和手机宽度。原有 context-memory 浏览器回归也通过，涵盖模拟语音、关联记录、权限和手动建单。
+- **限制**：目前仅演示模式浏览器本地数据；新客户和其订单需分步确认，创建客户后重新识别订单。订单时间10:00–12:00和金额0仍为明确提示的演示占位值。真实模型大样本识别质量尚未验收，截图环境缺中文字体，不能据此宣称字体视觉验收通过。
+- **线上接口抽测**：虚构新客户与订单、明确取消不建单、原有记录整理均返回成功；补充ISO日期格式要求。小样本不代表生产准确率。
+- **发布状态**：用户已明确授权上线；sculpy-ai v4已部署，前端经PR检查后发布。原Git命令缺少凭据，改用已连接的GitHub插件提交。发布最终结果以PR、Actions与线上验证为准。
+
+## 2026-10-07：其他页面移除重复悬浮入口
+
+- **已做**：订单、客户、化妆师、场地、合作方等页面右下角只保留一个连续聊天入口；移除旧“记一下”悬浮按钮，桌面和手机端均贴近底部显示。主聊天页仍直接对话，不显示悬浮入口。
+- **已验证**：上述五类列表页在桌面和手机宽度均只有一个入口；上下文记录、语音模拟、草稿、员工权限，以及连续聊天、保存和刷新恢复测试通过。
+- **保留**：档案详情记录区内的补充记录操作仍可使用；此轮只统一右下角入口，未扩大聊天的记录类型支持范围。
+- **未做／待验证**：真实人声识别质量和自动长期记忆的限制与上一轮相同。
+
+## 2026-10-07：主聊天页面统一（本次更新）
+
+- **已做**：Sculpy 页面直接显示连续对话，移除旧搜索框、独立记录表单、启动聊天卡片与本页浮动聊天按钮。其他订单页保留上下文聊天入口。
+- **已做**：一个输入框支持 Enter 发送、Shift+Enter 换行；中文输入法确认候选词不会误发。语音转写进入同一输入框，核对后发送。
+- **已做**：回复偏好折叠展示；确认保存卡片保留；演示收入饼图在同一对话内展示。
+- **已做**：补充岗位、实际能力与未接入能力说明；不能通过数据目录猜自己的功能，自我介绍不附无关客户卡片。sculpy-chat v4 已部署。
+- **已验证**：本地浏览器验证连续追问、刷新恢复、保存、身份隔离、键盘与输入法、手机宽度、迟到回复隔离；模拟麦克风验证录音停止、转写回填与切换页面后丢弃迟到转写。原有页面 smoke 和权限检查通过。
+- **已验证**：上线后真实模型自我介绍与能力限制2个场景通过，无无关客户卡片；测试记录见 `scripts/fixtures/conversation-v4-identity.json`。
+- **未做／待验证**：真实人声、噪声和口音下的识别质量仍未验收；自动长期记忆仍未实现；公司业务角色资料仍需初始化。接口相同不等于所有未来能力已经实现。
+
+## 2026-10-07：连续聊天与自然表达升级
+
+### 已做 / 已上线
+
+| 内容 | 当前状态与边界 |
+|---|---|
+| 全局与订单聊天入口 | 已做；可连续追问、补充、改口 |
+| 每轮业务上下文 | 已做；读取当前资料，其他有权限订单按需查询；当前正式记录优先于旧聊天 |
+| 登录和账号权限 | 已接入 Supabase；员工按订单分配范围读取，个人聊天与偏好按账号隔离 |
+| 公司角色与工作规则 | 已提供管理员维护入口；尚不能视为实际公司规则全部整理完毕 |
+| 个人回复偏好 | 已做；可明确设置简洁／适中／详细及工作说明；不是自动长期记忆 |
+| 确认保存卡片 | 已做；显示目标订单，确认后保存备注／事项／待审核建议；保存成功才显示成功 |
+| 正式字段保护 | 聊天不会直接改正式时间、金额、付款状态；相关变更仍为待审核建议 |
+| 自然表达 | 已上线新规则；减少固定标题和机械结束语，简单问题简答、复杂判断解释依据 |
+| 转场判断 | 已修正：时段不重叠不等于赶得上；路程和准备时间未知时，不承诺可行 |
+| 代码与部署 | PR #5 已合并；sculpy-chat v3 已部署生效 |
+
+### 已验证
+
+- 已完成旧版与新版各一轮、每轮8个模拟对话场景的真实模型调用。只使用虚构客户和订单，未写入真实业务记录。
+- 新版8/8启发式检查通过，并逐条查看实际回复：时间地点、提前半小时但先不改、记录待确认事项、改口切换客户与待付定金、旧聊天时间冲突、同名客户、缺失密码、含糊语句。
+- 旧版算对20分钟间隔，但过早说“时间上可行”；新版明确指出路程和准备时间未知，不能确认赶得上。
+- 12项本地接口／业务逻辑测试通过；GitHub Verify SCULP Demo 第49次运行全部通过，包含接口、数据库事务与权限、浏览器交互和响应式检查。
+- 上线后未登录请求正式聊天历史返回 HTTP 401。
+- 新版本轮每次响应约3.9–7.9秒，含网络、模型与工具查询；不代表稳定延迟承诺。
+- 此轮没有重新做真实账号下完整订单读写人工验收；自动化和模拟数据测试不能替代团队实际使用。
+
+### 未做 / 待补齐
+
+| 内容 | 状态 | 需要补什么 |
+|---|---|---|
+| 自动个人长期记忆 | **未做** | 自动提取习惯、去重、纠正、失效、删除和按权限检索；Mem0 未接入正式系统 |
+| 公司规则初始化 | **待补齐** | 核对实际人员职责、业务术语、修改权限和到场／准备时间规则 |
+| 主要信息逐项程序校验 | **未做** | 回答中的时间地点等尚无完整逐项校验；不能靠提示词保证零错误 |
+| 正式字段修改闭环 | **未做** | 将待审核变更安全地应用到正式订单、审批及冲突处理 |
+| 真实订单导入与团队验收 | **待完成** | 此前云端无真实订单；本轮未重新盘点订单数量，也未导入真实订单 |
+| 真实语音端到端测试 | **待验证** | 录音和转写接口已有，但本轮未测试真实音频、噪声、口音、中英混说及识别错误 |
+| 长对话与完整历史检索 | **未做** | 当前只带最近12轮；单会话最多留100轮；详情读取最近20条日志、30条记录 |
+| 外部路线／天气查询 | **未做** | 当前没有相应工具，不能声称查过实时路况或天气 |
+| 日报、主动提醒、深入分析 | **未完成本轮目标** | 不是本次上线交付；现有演示统计不能视为正式业务分析已经接通 |
+| 大规模可靠性与性能验收 | **待验证** | 小样本通过不等于零错误；复杂多轮、并发、成本和持续运行仍需验证 |
+
+### 下一步建议
+
+1. 用户先试用新版，标记“太机械、太短、理解错、查错对象”的具体回复。
+2. 补充5–10段匿名真实工作对话，以及到场／转场准备规则，扩充测试案例。
+3. 优先补主要字段校验和正式订单读写验收，再做真实语音测试。
+4. 按实际需求加入少量自动长期记忆，不将订单时间、付款等正式事实交给记忆组件作为唯一依据。
+
+### 证据与入口
+
+- [线上模拟订单](https://2ez4jz.github.io/sculp-database/?demo=1#bookings/b0)
+- [已合并 PR #5](https://github.com/2ez4jz/sculp-database/pull/5)
+- [自动检查第49次运行](https://github.com/2ez4jz/sculp-database/actions/runs/37700596606)
+- [详细测试说明](CONVERSATION_QUALITY.md)
+- [旧版真实回复](../scripts/fixtures/conversation-baseline.json)、[新版真实回复](../scripts/fixtures/conversation-v3.json)
+
+补充说明：之前 Mem0 的试用结果来自前序工作记录；本轮没有重新测试或接入。自动长期记忆是**尚未实现**，不能写成仅仅“尚未测试”。
+
+
+## 2026-11-02 — V2.4 implementation
+
+Implemented unified authenticated Lead/Booking communication records, private attachment persistence, server-scoped multimodal summary draft and human confirmation, atomic Lead-to-Booking conversion, pending inbox and separated wide desktop/tablet/mobile workspace layout. Reused existing intake, audio, business confirmation and Pages deployment paths. Database/transport tests and fictional browser acceptance were added; existing regression checks remain required. Production is not claimed from local code or tests. See [V24_RELEASE.md](V24_RELEASE.md) for validation limits, deployment evidence and [V24_ROLLBACK.md](V24_ROLLBACK.md) for non-destructive rollback.
+
+V2.4 release verified: PR #37 merged as 3bd9f73 after CI 41438030432 passed browser and PostgreSQL checks. Pages deployment 41438356984 succeeded; production index/CSS/panel/auth entry bytes matched. Production migration and sculpy-intake v2 deployed; transactional smoke rolled back without retained test rows; unauthenticated summary/voice return 401. sculpy-chat v46 is deployed and re-read verified; only release knowledge and shared V2.4 facts changed, with all 15 prior non-knowledge runtime files unchanged, including long-term memory. Physical phone, authenticated two-device and live model quality acceptance remain open.
+
+
+## 2026-11-02 — V2.4.1 role and installation cleanup
+
+User requested removal of the ordinary legacy admin role and all in-app Add to Home Screen/Desktop entry points. Implemented shared assignable-role definitions, account Edge validation and database assignment constraint. Owner retains business viewing/editing, while operations alone manages accounts/passwords. Installation is now browser-menu-only with no app controls/dialogs/prompts. Existing system/owner accounts were inspected; no password or role is changed. Validation and publication are tracked in docs/V241_RELEASE.md.
+
+Added the requested UI refinement to this release: system-font hierarchy, compact professional workspace spacing, aligned dashboard/form controls, member rows with expandable account management, clearer original/summary layouts, restrained neutral surfaces and compact financial empty states. Phone uses larger input/touch targets and responsive stacking.
+
+Follow-up priority: operations and owner now see enquiry management as the first business section and first navigation item; the dashboard is placed below orders. Browser regression checks assert this order for both roles.
+
+- Follow-up: personalised the verified sculp_miranda account welcome with the user’s exact wording; retained the standard heading for other accounts and added phone overflow verification.
+
+### V2.4.1 verified publication — 2026-11-02
+
+PR #38 passed browser/PostgreSQL checks (41443912438) and merged as 3cc9f71. Existing Pages workflow 41444359487 completed successfully; seven live frontend files matched released source byte for byte. Production legacy-admin constraint is validated and account-admin v2 source was read back. JZ and Miranda accounts remain unchanged. The live sculpy-chat v47 deployment updates release descriptions only, preserving all 15 newer runtime implementation files from v46. Desktop and phone fictional screenshots confirm Miranda’s exact requested welcome, enquiry-first layout and no app installation controls. Full evidence and remaining real-device/live-AI acceptance are in docs/V241_RELEASE.md.
+
+### Editable account welcomes — 2026-11-02
+
+User requested a greeting editor beside JZ’s account management. Added an operations-only inline account selector/editor with preview, cloud persistence, default restoration, existing Miranda greeting migration, revision conflict protection, audit and uncertain-response retry. Existing business layout and account permissions remain unchanged. Implementation/local database verification completed; PR, browser checks and actual publication pending. Evidence: docs/WELCOME_EDITOR_2026-11-02.md.
+
+### Editable welcomes: verified publication — 2026-11-02
+
+PR #39 passed PostgreSQL/browser CI (41447255658), merged as 71d1292 and published through the existing Pages workflow (41447916554). Six live frontend files match released source. Production welcome migration/readback and the operations-gated RPC passed; existing roles/passwords remain unchanged and Miranda’s exact welcome is preserved. sculpy-chat v48 only updates release knowledge while preserving all 15 newer runtime implementation files. Local suite: 186 pass, 2 PostgreSQL-only checks subsequently passed in CI; PostgreSQL CI 22 pass; final chat/multi-step checks 16 pass. Desktop/phone fictional UI verified; actual-device account acceptance remains manual. Full evidence: docs/WELCOME_EDITOR_2026-11-02.md.
+
+### Account-panel disclosure and subtle pending markers — 2026-11-02
+
+User reported account management could not be closed and requested the same selected-color/toggle behavior as the welcome editor. Preserved account forms while collapsing/reopening and deduplicated initial reads. Added a small muted dot/tag only for pending enquiries, following the request to avoid strong highlighting. Existing permissions/status workflows are unchanged. Verification/publication pending; evidence: docs/ACCOUNT_TOGGLE_PENDING_2026-11-02.md.
+
+### Account disclosure and pending markers: verified publication — 2026-11-02
+
+PR #40 passed browser/PostgreSQL checks (41451708676), merged as f3db936, and published through the existing Pages workflow (41452202361). Six live frontend resources match the released source. Desktop/phone fictional QA confirms same-button collapse, selected-color feedback and a small muted pending-only tag; drafts survive reopening and account reads are not repeated. Release knowledge updated in sculpy-chat v49 with all 16 other runtime files preserved; 16 chat/multi-step checks passed. No schema, role, password or business-data changes. Evidence: docs/ACCOUNT_TOGGLE_PENDING_2026-11-02.md.
+
+### V2.5 P0 development — 2026-11-02
+
+Inspected current main e1125ed (V2.4.1), PWA/Service Worker, profiles, Auth sessions, website intake, private schema and deployment workflows. Reused existing login/roles, enquiry reader, manifest/icons, private server API pattern and Pages CI. Added private notification queue/preferences/devices, Vault-backed server identity, scheduler wiring, Edge transport with pinned web-push 3.6.7, Settings → Notifications, protected click routes and sign-out cleanup. The user explicitly removed quiet hours; neither UI nor backend contains a quiet-hour rule. Local focused handler/worker/SQL tests passed; broader/browser checks and real deployment remain pending. No real notification was enabled or sent, and P1 is deferred until actual iPhone acceptance. Evidence: docs/V25_RELEASE.md.
+
+
+### V2.5 P0: verified publication, physical iPhone acceptance pending — 2026-11-02
+
+PR #41 passed checked-head browser/PostgreSQL CI (41500721083), merged as 8b78133, and published by the existing Pages workflow (41501315725). All nine changed frontend resources match the released source. Both additive migrations applied; notification Edge v1 is ACTIVE, Vault identity and actual-runtime crypto self-test passed, cron runs every minute and the worker returns HTTP 200 with zero errors. No devices or real accounts have been opted in; no real push was sent. No quiet-hour UI or backend rule exists. Full suite 197 tests: 194 pass / 3 PostgreSQL-only skips; real PostgreSQL 25/25, backup/recovery and browser regression passed. Final capability/multistep checks 16/16. sculpy-chat v50 updates only product/release knowledge and preserves all 15 other v49 implementation files, including long-term memory. Real iPhone background receipt/click and business-device acceptance are still required; P1 internal messaging is not implemented. Evidence and manual acceptance steps: docs/V25_RELEASE.md.
+
+
+### Regression test correction — 2026-11-02
+
+The post-publication repeat exposed a pre-existing random-value test flake: a generated order reference could already be 610000, making the attempted update a valid no-op. PR #42 guarantees a different replacement while retaining the rejection and unchanged-value checks; two focused database tests pass locally. No production SQL or UI changes; see PR checks for the checked-head regression result. Original P0 release evidence remains recorded in docs/V25_RELEASE.md.
+
+
+### Communication screenshot drag/drop — 2026-11-02
+
+User requested dragging screenshots directly into communication records. Reused the shared Lead/Booking panel, attachment validator/staging/removal, private upload and immutable retry flow. Added a small drop hint and muted hover state; preserved mobile file selection and explicit 保存记录. Mixed invalid files, 20-file cap and frozen-save drops are handled. No schema, RLS or business-field changes. Local focused checks pass; browser/visual/publication verification pending. Evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
+
+
+### Communication screenshot drag/drop: verified publication — 2026-11-02
+
+PR #43 passed checked-head browser/PostgreSQL checks (41528784478), merged as 4495e0a and published through the existing Pages workflow (41529319802). All seven changed frontend resources match released source. Multi-image drops in both Lead/Booking, invalid file handling, shared picker, limits/removal, immutable retry, image readback, AI confirmation and conversion history passed browser regression across 320–1920px. Desktop and 390px phone UI inspected with fictional data; two PNG fixtures were selected through the real chooser. No schema, Storage/RLS, business-field or AI memory behavior changes. Release knowledge updated after publication; original P0 push real-iPhone acceptance remains pending. Evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
+
+
+### Prominent communication drop frame — 2026-11-02
+
+User requested a more obvious drop box at the top. Added an independent dashed upload frame above the textarea, with an icon, clear drag instruction and a direct file-picker shortcut. Existing file staging/save/permissions unchanged. Browser acceptance now checks the clickable frame and its position/size on desktop and phone. Verification/publication pending; evidence: docs/COMMUNICATION_DROP_2026-11-02.md.
+
+
+### Prominent drop frame: verified publication — 2026-11-02
+
+PR #44 passed browser/PostgreSQL CI 41532351613, merged as 94ace33 and published through Pages 41532838440. All seven changed frontend files byte-matched production. Desktop and 390px phone review confirms the independent dashed upload frame sits above the textarea, with clear instruction/icon and direct picker action. Existing drop, staging, limits, explicit save and retry behavior retained. No database or permission changes. Release knowledge updated after publication; evidence: docs/COMMUNICATION_DROP_2026-11-02.md.

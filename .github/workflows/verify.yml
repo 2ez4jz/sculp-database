@@ -1,0 +1,90 @@
+name: Verify SCULP Demo
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, codex/sculp-os-v3-phase1]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Chinese fonts for visual checks
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify calculations and AI handler contracts
+        run: |
+          npm ci
+          npm run test:unit
+      - name: Verify database transaction and permissions
+        run: npm run test:database
+      - name: Verify interactions and responsive layouts
+        run: |
+          mkdir -p qa-screens
+          exec > >(tee qa-screens/browser-check.log) 2>&1
+          python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
+          node scripts/gmail-browser.cjs
+          node scripts/os-foundation-browser.cjs
+          node scripts/account-roles-browser.cjs
+          node scripts/welcome-editor-browser.cjs
+          node scripts/notifications-browser.cjs
+          node scripts/communication-browser.cjs
+          node scripts/wedding-v23-browser.cjs
+          node scripts/order-numbers.cjs
+          node scripts/unified-demo.cjs
+          node scripts/monthly-browser.cjs
+          node scripts/dashboard-navigation.cjs
+          node scripts/chat.cjs
+          node scripts/readable-answers.cjs
+          node scripts/guided-chat.cjs
+          node scripts/mobile-chat.cjs
+          node scripts/mobile-workspace.cjs
+          node scripts/pwa.cjs
+          node scripts/auth.cjs
+          node scripts/smoke.cjs
+          node scripts/permissions.cjs
+          node scripts/sculpy-lifecycle.cjs
+          node scripts/analysis-charts.cjs
+          node scripts/context-memory.cjs
+          node scripts/intake.cjs
+          node scripts/booking-album.cjs
+          node scripts/cloud-intake.cjs
+          node scripts/cloud-operations.cjs
+      - name: Save visual checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sculp-visual-checks
+          path: qa-screens/
+  postgres-check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Verify complete migrations, permissions and concurrent edits on PostgreSQL
+        env:
+          SCULPY_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/postgres
+        run: npm run test:postgres
+      - name: Verify fictional fixture backup and recovery
+        env:
+          SCULPY_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/postgres
+          SCULPY_TEST_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: npm run test:recovery
