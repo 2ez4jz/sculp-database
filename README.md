@@ -1,6 +1,10 @@
 # Sculpy — SCULP Studio internal app
 
-Current release: **V2.3.1 (2026-10-22)**. Cloud write retries and acknowledgment handling are hardened; the assistant knows its current capabilities, task boundaries and recent release changes. Existing workflows remain intact. See [release evidence and acceptance boundaries](docs/V231_RELEASE.md).
+## 版本与更新
+
+- **最近有部署记录的业务版本：V2.5 P0（2026-11-02）**，推送与询盘提醒已记录部署；真实 iPhone 送达仍待验收。见 [V2.5 发布记录](docs/V25_RELEASE.md)。
+- **当前开发候选：SCULP OS V3.0 Phase 1（2026-11-12）**，包含日常工作台、九区导航和客户/任务基础整合；未发布生产。见 [开发日志](docs/V3.0_PHASE1_CHANGELOG.md)与[测试及待验收项](docs/V3.0_TEST_REPORT.md)。
+- **[完整版本历史与更新记录](docs/CHANGELOG.md)**：以后每次版本更新都在这里登记，并同步此入口。代码完成、测试通过和生产发布分别记录。
 
 Every SCULP booking becomes a record connecting the client, artist, venue, partners, notes and photos.
 

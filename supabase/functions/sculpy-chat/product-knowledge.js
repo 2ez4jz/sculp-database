@@ -3,7 +3,7 @@ import {v24ReleaseFacts,v24FeatureDescription,v24PageAction,v241AccountPageActio
 // catalog or business memory. A source commit is not evidence of a deployment.
 export const productKnowledge=Object.freeze({
  product:'SCULPY · SCULP Studio 工作助手',
- knowledgeRevision:'2026-11-02',
+ knowledgeRevision:'2026-11-12',
  includedBackendUpdate:{
   date:'2026-10-22',name:'功能与更新自知',
   changes:['回答时内置可信功能清单和最近更新说明','区分当前演示/正式环境、当前可调用工具、页面操作及权限边界','不再让用户提供本系统已有的功能或更新说明；新问题优先于旧对话中的误解'],
@@ -34,7 +34,11 @@ export const productKnowledge=Object.freeze({
   '首页新建订单入口；化妆师个人作品图库，多图选择、预览、下载和移除',
   '添加到桌面及手机安装指引；Demo 与正式入口分开；不提供离线订单编辑',
  ],scope:'Demo新增订单、备注和个人图库保存在当前浏览器，不代表正式数据跨设备同步'},
- notReleased:[],
+ notReleased:[{name:'SCULP OS 3.0 Phase 1',status:'development_only',evidence:'docs/V3.0_PHASE1_CHANGELOG.md',
+  scope:'待审核分支；前端、数据库及聊天后端均未发布此版本',
+  changes:['管理员日常工作台，真实询盘、订单、任务及已知CAD合同应收；需要新增基础查询接口',
+   '客户搜索和人工确认新增；任务由当前管理员确认创建，可关联既有客户或订单，重试保留同一请求编号；完成以服务器回执和重新读取为准',
+   '日程仅近期订单服务日期；九区导航复用既有页面；邮件、外部日历、营销接口未接通；不新增聊天工具或自动推送']}],
  limits:['聊天不能直接改正式日期、价格、签约或付款状态；先生成建议，用户到现有页面核对确认',
   '没有实时外网搜索、天气或路线工具，不能声称查过实时信息',
   '不自动发客户消息、不操作银行扣款或退款；P0业务推送仅本人授权设备按已部署规则触发，聊天没有任意提醒或内部通知发送工具',
