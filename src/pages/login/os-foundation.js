@@ -5,7 +5,7 @@ export const osNavigation = [
   ['crm', 'CRM｜客户与询盘', '[data-os-clients]'],
   ['orders', 'Orders｜订单管理', '[data-orders-section]'],
   ['calendar', 'Calendar｜日程与任务', '[data-os-calendar]'],
-  ['communications', 'Communications｜沟通中心', '.comm-inbox'],
+  ['communications', 'Communications｜沟通中心', '[data-gmail-center]'],
   ['finance', 'Finance｜财务中心', '.w23-dashboard'],
   ['marketing', 'Marketing｜营销中心', '[data-os-marketing]'],
   ['ai', 'AI Insights｜AI 分析', '[data-global]'],
@@ -19,7 +19,7 @@ const empty = text => `<p class="os-empty">${esc(text)}</p>`;
 const metric = (label, value, note='') => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd><small>${esc(note)}</small></div>`;
 
 // All data enters through authenticated, role-checked RPCs. No Demo imports/fallback.
-export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onNewOrder}) {
+export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onNewOrder, onClientEmails}) {
   let alive=true, overviewVersion=0, clientsVersion=0, offset=0, overview=null;
   const pendingWrites=new Set();
   const canLeave=()=>pendingWrites.size===0;
@@ -27,7 +27,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
     <div class="os-heading"><div><span class="auth-eyebrow">SCULP OS · V3.0 PHASE 1</span><h3>今日工作台</h3><p class="cloud-note">先处理需要你关注的事。所有数据按当前账户权限读取。</p></div><button type="button" data-os-refresh>刷新工作台</button></div>
     <p role="status" data-os-status>正在读取工作台…</p><dl class="os-metrics" data-os-metrics></dl>
     <div class="os-shortcuts" aria-label="快捷操作"><button type="button" data-os-new-order>新建订单</button><button type="button" data-os-new-client>新增客户</button><button type="button" data-os-leads>查看询盘</button><button type="button" data-os-new-task>添加任务</button><button type="button" data-os-schedule>查看日程</button></div>
-    <div class="os-grid"><section class="os-card"><h4>今日与逾期待办</h4><div data-os-today></div></section><section class="os-card"><h4>需要跟进的客户</h4><div data-os-followups></div></section><section class="os-card"><h4>近期订单与预约</h4><div data-os-upcoming></div></section><section class="os-card"><h4>系统与通知</h4><p>通知记录与本机授权请到 <button type="button" data-os-settings>系统设置</button> 查看。</p><p class="cloud-note">邮件、外部日历与营销平台尚未接入。任务不会自动发送推送。</p></section></div>
+    <div class="os-grid"><section class="os-card"><h4>今日与逾期待办</h4><div data-os-today></div></section><section class="os-card"><h4>需要跟进的客户</h4><div data-os-followups></div></section><section class="os-card"><h4>近期订单与预约</h4><div data-os-upcoming></div></section><section class="os-card"><h4>系统与通知</h4><p>通知记录与本机授权请到 <button type="button" data-os-settings>系统设置</button> 查看。</p><p class="cloud-note">Gmail 需在设置中完成授权；外部日历与营销平台尚未接入。任务不会自动发送推送。</p></section></div>
   </section>
   <section class="cloud-orders" data-os-clients><h3>客户档案</h3><p class="cloud-note">同一客户可以有多笔订单。新增前请先搜索；姓名相同不代表同一个人。</p>
     <form data-os-client-search><label>搜索客户<input name="query" maxlength="160" placeholder="客户姓名"></label><button>搜索客户</button></form>
@@ -62,6 +62,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
     const b=event.target.closest('button');if(!b)return;
     if(b.dataset.osOrder)onOrder(b.dataset.osOrder);
     if(b.dataset.osLead)onLead(b.dataset.osLead);
+    if(b.dataset.osClientEmails){onClientEmails?.(b.dataset.osClientEmails);return;}
     if(b.dataset.osClientTask)openTask({clientId:b.dataset.osClientTask,label:b.dataset.label});
   });
   function renderOverview(data) {
@@ -101,7 +102,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
       if(!alive||mine!==clientsVersion)return;
       if(error||!Array.isArray(data?.clients))throw Error('unavailable');
       $('[data-os-clients-status]').textContent=`共 ${data.total} 位客户 · 每页 30 位`;
-      $('[data-os-client-list]').innerHTML=data.clients.map(c=>`<article class="os-list-row"><strong>${esc(c.display_name)}</strong><span>${esc(c.referral_source||'来源待补充')} · ${esc(c.order_count)} 笔订单</span><button type="button" data-os-client-task="${esc(c.id)}" data-label="${esc(c.display_name)}">为客户添加任务</button></article>`).join('')||empty('暂无匹配客户。可先核对询盘，再新增客户档案。');
+      $('[data-os-client-list]').innerHTML=data.clients.map(c=>`<article class="os-list-row"><strong>${esc(c.display_name)}</strong><span>${esc(c.referral_source||'来源待补充')} · ${esc(c.order_count)} 笔订单</span><button type="button" data-os-client-emails="${esc(c.id)}">查看客户邮件</button><button type="button" data-os-client-task="${esc(c.id)}" data-label="${esc(c.display_name)}">为客户添加任务</button></article>`).join('')||empty('暂无匹配客户。可先核对询盘，再新增客户档案。');
       $('[data-os-client-prev]').disabled=offset===0;$('[data-os-client-next]').disabled=offset+30>=data.total;
     } catch {if(alive&&mine===clientsVersion)$('[data-os-clients-status]').textContent='客户列表暂不可用，请检查权限及基础接口。';}
   }

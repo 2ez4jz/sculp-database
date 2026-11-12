@@ -4,6 +4,7 @@
 
 | 版本 | 日期 | 状态 | 主要更新 | 详细记录 |
 | --- | --- | --- | --- | --- |
+| SCULP OS 3.0 Phase 2.5 Gmail | 2026-11-12 | 开发候选；真实 OAuth/邮件未验，未发布生产 | Gmail 只读连接、范围同步、客户/订单邮件、AI 分级摘要与人工回复草稿、内部跟进 | [日志](V3.0_GMAIL_CHANGELOG.md) · [数据库](V3.0_GMAIL_DATABASE.md) · [测试](V3.0_GMAIL_TEST_REPORT.md) · [配置](V3.0_GMAIL_SETUP_GUIDE.md) |
 | SCULP OS 3.0 Phase 1 | 2026-11-12 | 开发候选，未发布生产 | 日常 Dashboard、九区导航、客户搜索/最小新增、关联任务、基础查询接口；复用既有订单、沟通和财务 | [开发日志](V3.0_PHASE1_CHANGELOG.md) · [审计](V2.5_AUDIT.md) · [测试](V3.0_TEST_REPORT.md) · [数据库方案](V3.0_DATABASE_PLAN.md) · [后续任务](V3.0_PHASE2_TASKS.md) |
 | V2.5 P0 | 2026-11-02 | 已记录部署；真实 iPhone 验收待完成 | 用户主动订阅的网页推送、官网新询盘和逾期提醒、设备与通知记录 | [发布记录](V25_RELEASE.md) |
 | V2.4.1 | 2026-11-02 | 见发布文档；不等于所有设备验收 | 明确负责人/系统管理员权限；移除应用内安装引导，保留浏览器手动安装 | [发布记录](V241_RELEASE.md) |

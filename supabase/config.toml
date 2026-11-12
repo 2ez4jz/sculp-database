@@ -10,3 +10,8 @@ verify_jwt = false
 # Demo accepts only caller-supplied fictional data. Cloud mode verifies the user
 # with Auth /user and reads/writes through that user's JWT and database checks.
 verify_jwt = false
+
+[functions.sculpy-gmail]
+# GET callback consumes one-time hashed state; worker uses its own secret;
+# all browser POST actions verify Auth.getUser and the active database role.
+verify_jwt = false

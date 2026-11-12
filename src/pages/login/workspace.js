@@ -1,3 +1,4 @@
+import {mountEmailCenter} from './gmail.js?v=gmail-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
@@ -7,7 +8,7 @@ import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
-import {mountOsFoundation} from './os-foundation.js?v=phase1-20261112';
+import {mountOsFoundation} from './os-foundation.js?v=gmail-20261112';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -34,7 +35,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     panel.open();
   };
   const osRoot = document.createElement('div');
-  let foundation=null;
+  let foundation=null,emailCenter=null,orderEmails=null;
   if(businessAdmin)root.prepend(osRoot);
   const reportRoot = document.createElement('section');
   let report = null, editor = null, business = null, communication = null;
@@ -46,16 +47,17 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   let enquiries=null;
   if(businessAdmin){$('.cloud-workspace-actions').after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox,onSaved:()=>foundation?.refresh()});
     const quick=document.createElement('button');quick.type='button';quick.className='auth-primary';quick.dataset.quickLead='';quick.textContent='新建客户询盘';quick.onclick=()=>enquiries.openNew();$('.cloud-workspace-actions').prepend(quick);void refreshInbox();}
-  const canLeave=()=>[editor,business,intake,enquiries,communication,foundation].every(part=>!part?.canLeave||part.canLeave());
+  const canLeave=()=>[editor,business,intake,enquiries,communication,foundation,emailCenter,orderEmails].every(part=>!part?.canLeave||part.canLeave());
   const beforeUnload=event=>{if(!canLeave()){event.preventDefault();event.returnValue='';}};
   window.addEventListener('beforeunload',beforeUnload);
   let detailVersion = 0;
   async function openOrder(id) {
-    if ((editor && !editor.canLeave()) || (business && !business.canLeave()) || (communication && !communication.canLeave()) || (foundation && !foundation.canLeave())) {
+    if ((editor && !editor.canLeave()) || (business && !business.canLeave()) || (communication && !communication.canLeave()) || (foundation && !foundation.canLeave()) || (emailCenter && !emailCenter.canLeave()) || (orderEmails && !orderEmails.canLeave())) {
       const status = business && !business.canLeave()?root.querySelector('[data-business-status]'):root.querySelector('[data-edit-status]');
       if(status)status.textContent='修改仍在保存或尚未收到确认，请先重试同一笔修改。';
       return;
     }
+    orderEmails?.destroy();orderEmails=null;
     editor?.destroy(); editor=null; business?.destroy();business=null;communication?.destroy();communication=null;
     const mine = ++detailVersion;
     const detail = $("[data-order-detail]");
@@ -69,7 +71,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     detail.innerHTML=`<h3>${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)}</h3><p>${esc(new Date(b.starts_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 多伦多时间</p><p>${esc(b.venue||'地点待定')} · ${esc(b.artists.join(' / ')||'人员待定')}</p><p>服务需求：${esc(b.service_details||'待补充')}</p>${['operations','owner'].includes(profile.role)?`<p>预算：${b.budget_cad==null?'未填写':esc(b.budget_cad)+' CAD'} · 成交价：${b.price_cad==null?'未确定':esc(b.price_cad)+' CAD'}</p>`:''}<p>状态：${esc({inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'}[b.status]||b.status)}</p>${data.intake?`<details><summary>查看原始记录与时间</summary><p>录入：${esc(new Date(data.intake.recordedAt).toLocaleString('zh-CN'))} · 保存：${esc(new Date(data.intake.savedAt).toLocaleString('zh-CN'))}</p><pre>${esc(data.intake.rawText)}</pre></details>`:''}<button type="button" data-discuss>与 Sculpy 讨论这笔订单</button>`;
     detail.querySelector('[data-discuss]').onclick=()=>{current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};panel.open()};
     if(businessAdmin){const task=document.createElement('button');task.type='button';task.textContent='为此订单添加任务';task.onclick=()=>foundation?.openTask({bookingId:id,label:(b.order_number||'')+' · '+b.client});detail.append(task);}
-    if(businessAdmin){const commRoot=document.createElement('div');detail.append(commRoot);communication=mountCommunicationPanel({root:commRoot,supabase,type:'booking',id,onChange:refreshInbox});}
+    if(businessAdmin){const emailRoot=document.createElement('div');detail.append(emailRoot);orderEmails=mountEmailCenter({root:emailRoot,supabase,bookingId:id,onTask:x=>foundation?.openTask(x),onClient:openClientEmails});const commRoot=document.createElement('div');detail.append(commRoot);communication=mountCommunicationPanel({root:commRoot,supabase,type:'booking',id,onChange:refreshInbox});}
     detail.scrollIntoView({block:'start',behavior:'smooth'});
     if(businessAdmin && data.edit) {
       const businessRoot=document.createElement('div');detail.append(businessRoot);
@@ -84,9 +86,12 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   if(businessAdmin)foundation=mountOsFoundation({root:osRoot,supabase,profile,
     onOrder:id=>void openOrder(id).catch(()=>{}),
     onLead:id=>{if(canLeave())void enquiries.openLead(id);},
-    onNewOrder:()=>{if(canLeave())intake.open();},
+    onNewOrder:()=>{if(canLeave())intake.open();},onClientEmails:openClientEmails,
   });
   if(businessAdmin){const note=document.createElement('p');note.className='cloud-note';note.textContent='沟通中心：询盘和订单的沟通记录已接入。外部邮件尚未接入。';$('.comm-inbox h3').after(note);}
+  const emailRoot=document.createElement('div');emailRoot.dataset.gmailCenter='';
+  function openClientEmails(id){if(!canLeave())return;emailCenter?.destroy();emailCenter=mountEmailCenter({root:emailRoot,supabase,clientId:id,onTask:x=>foundation?.openTask(x),onClient:openClientEmails});emailRoot.scrollIntoView({block:'start'});}
+  if(businessAdmin){root.append(emailRoot);emailCenter=mountEmailCenter({root:emailRoot,supabase,onTask:x=>foundation?.openTask(x),onClient:openClientEmails});}
   async function refreshInbox(){
     if(!businessAdmin||destroyed)return;
     try{const {data,error}=await supabase.rpc('sculpy_communication_inbox',{});
@@ -193,7 +198,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       editor?.destroy();
       business?.destroy();
       communication?.destroy();
-      foundation?.destroy();
+      foundation?.destroy();emailCenter?.destroy();orderEmails?.destroy();
       report?.destroy();
       panel.destroy();
     },

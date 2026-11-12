@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, codex/sculp-os-v3-phase1]
   workflow_dispatch:
 permissions:
   contents: read
@@ -28,6 +28,7 @@ jobs:
           mkdir -p qa-screens
           exec > >(tee qa-screens/browser-check.log) 2>&1
           python3 -m http.server 4173 > /tmp/sculp-server.log 2>&1 &
+          node scripts/gmail-browser.cjs
           node scripts/os-foundation-browser.cjs
           node scripts/account-roles-browser.cjs
           node scripts/welcome-editor-browser.cjs
