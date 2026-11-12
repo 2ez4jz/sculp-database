@@ -1,12 +1,13 @@
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
-import { mountWebsiteEnquiries } from './enquiries.js?v=communication-drop-box-20261102';
+import { mountWebsiteEnquiries } from './enquiries.js?v=phase1-20261112';
 import { mountCloudIntake } from './intake.js?v=24';
 import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
+import {mountOsFoundation} from './os-foundation.js?v=phase1-20261112';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -32,6 +33,9 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     current = { id: "global", label: "全局工作助手" };
     panel.open();
   };
+  const osRoot = document.createElement('div');
+  let foundation=null;
+  if(businessAdmin)root.prepend(osRoot);
   const reportRoot = document.createElement('section');
   let report = null, editor = null, business = null, communication = null;
   if (businessAdmin) {
@@ -40,14 +44,14 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   }
   const enquiriesRoot=document.createElement('div');
   let enquiries=null;
-  if(businessAdmin){$('.cloud-workspace-actions').after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox});
+  if(businessAdmin){$('.cloud-workspace-actions').after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox,onSaved:()=>foundation?.refresh()});
     const quick=document.createElement('button');quick.type='button';quick.className='auth-primary';quick.dataset.quickLead='';quick.textContent='新建客户询盘';quick.onclick=()=>enquiries.openNew();$('.cloud-workspace-actions').prepend(quick);void refreshInbox();}
-  const canLeave=()=>[editor,business,intake,enquiries,communication].every(part=>!part?.canLeave||part.canLeave());
+  const canLeave=()=>[editor,business,intake,enquiries,communication,foundation].every(part=>!part?.canLeave||part.canLeave());
   const beforeUnload=event=>{if(!canLeave()){event.preventDefault();event.returnValue='';}};
   window.addEventListener('beforeunload',beforeUnload);
   let detailVersion = 0;
   async function openOrder(id) {
-    if ((editor && !editor.canLeave()) || (business && !business.canLeave()) || (communication && !communication.canLeave())) {
+    if ((editor && !editor.canLeave()) || (business && !business.canLeave()) || (communication && !communication.canLeave()) || (foundation && !foundation.canLeave())) {
       const status = business && !business.canLeave()?root.querySelector('[data-business-status]'):root.querySelector('[data-edit-status]');
       if(status)status.textContent='修改仍在保存或尚未收到确认，请先重试同一笔修改。';
       return;
@@ -64,18 +68,25 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
     current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};
     detail.innerHTML=`<h3>${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)}</h3><p>${esc(new Date(b.starts_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 多伦多时间</p><p>${esc(b.venue||'地点待定')} · ${esc(b.artists.join(' / ')||'人员待定')}</p><p>服务需求：${esc(b.service_details||'待补充')}</p>${['operations','owner'].includes(profile.role)?`<p>预算：${b.budget_cad==null?'未填写':esc(b.budget_cad)+' CAD'} · 成交价：${b.price_cad==null?'未确定':esc(b.price_cad)+' CAD'}</p>`:''}<p>状态：${esc({inquiry:'待确认需求',confirmed:'已确认',completed:'已完成',cancelled:'已取消'}[b.status]||b.status)}</p>${data.intake?`<details><summary>查看原始记录与时间</summary><p>录入：${esc(new Date(data.intake.recordedAt).toLocaleString('zh-CN'))} · 保存：${esc(new Date(data.intake.savedAt).toLocaleString('zh-CN'))}</p><pre>${esc(data.intake.rawText)}</pre></details>`:''}<button type="button" data-discuss>与 Sculpy 讨论这笔订单</button>`;
     detail.querySelector('[data-discuss]').onclick=()=>{current={id,label:(b.order_number?b.order_number+" · ":"")+b.client+" · "+b.service};panel.open()};
+    if(businessAdmin){const task=document.createElement('button');task.type='button';task.textContent='为此订单添加任务';task.onclick=()=>foundation?.openTask({bookingId:id,label:(b.order_number||'')+' · '+b.client});detail.append(task);}
     if(businessAdmin){const commRoot=document.createElement('div');detail.append(commRoot);communication=mountCommunicationPanel({root:commRoot,supabase,type:'booking',id,onChange:refreshInbox});}
     detail.scrollIntoView({block:'start',behavior:'smooth'});
     if(businessAdmin && data.edit) {
       const businessRoot=document.createElement('div');detail.append(businessRoot);
-      business=mountBookingBusiness({root:businessRoot,supabase,bookingId:id,onSaved:async savedId=>{business?.destroy();business=null;await load();await openOrder(savedId);void report?.refresh();}});
+      business=mountBookingBusiness({root:businessRoot,supabase,bookingId:id,onSaved:async savedId=>{business?.destroy();business=null;await load();await openOrder(savedId);void report?.refresh();void foundation?.refresh();}});
       const editRoot=document.createElement('div');detail.append(editRoot);
       editor=mountOrderEditor({root:editRoot,supabase,bookingId:id,edit:data.edit,
-        onSaved:async savedId=>{await load();await openOrder(savedId);}});
+        onSaved:async savedId=>{await load();await openOrder(savedId);void foundation?.refresh();}});
     }
   }
-  const intake = ["operations","owner"].includes(profile.role) ? mountCloudIntake({root:$("[data-intake-root]"),supabase,onSaved:async id=>{await load();await openOrder(id);void enquiries?.refresh();void refreshInbox();}}) : null;
+  const intake = ["operations","owner"].includes(profile.role) ? mountCloudIntake({root:$("[data-intake-root]"),supabase,onSaved:async id=>{await load();await openOrder(id);void enquiries?.refresh();void refreshInbox();void foundation?.refresh();void foundation?.refreshClients();}}) : null;
   if (businessAdmin) $("[data-new-booking]").onclick = () => intake.open();
+  if(businessAdmin)foundation=mountOsFoundation({root:osRoot,supabase,profile,
+    onOrder:id=>void openOrder(id).catch(()=>{}),
+    onLead:id=>{if(canLeave())void enquiries.openLead(id);},
+    onNewOrder:()=>{if(canLeave())intake.open();},
+  });
+  if(businessAdmin){const note=document.createElement('p');note.className='cloud-note';note.textContent='沟通中心：询盘和订单的沟通记录已接入。外部邮件尚未接入。';$('.comm-inbox h3').after(note);}
   async function refreshInbox(){
     if(!businessAdmin||destroyed)return;
     try{const {data,error}=await supabase.rpc('sculpy_communication_inbox',{});
@@ -182,6 +193,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       editor?.destroy();
       business?.destroy();
       communication?.destroy();
+      foundation?.destroy();
       report?.destroy();
       panel.destroy();
     },

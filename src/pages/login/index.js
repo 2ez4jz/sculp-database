@@ -1,4 +1,5 @@
-import { mountCloudWorkspace } from "./workspace.js?v=communication-drop-box-20261102";
+import { mountCloudWorkspace } from "./workspace.js?v=phase1-20261112";
+import {osNavigation} from './os-foundation.js?v=phase1-20261112';
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import {mountNotificationSettings} from "./notification-settings.js?v=25";
@@ -109,9 +110,16 @@ async function showWorkspace() {
   layout.className='studio-layout';
   const story=layout.querySelector('.auth-story');
   story.className='studio-sidebar';
-  story.innerHTML=`<a class="auth-brand" href="./">Sculpy<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?'<button type="button" data-studio-nav="#website-enquiries" aria-current="page">客户询盘</button><button type="button" data-studio-nav="[data-orders-section]">订单管理</button><button type="button" data-studio-nav=".comm-inbox">待整理记录</button><button type="button" data-studio-nav=".w23-dashboard">经营概览</button>':'<button type="button" data-studio-nav="[data-orders-section]" aria-current="page">我的订单</button>'}</nav><small>SCULP Studio 团队工作区<br>SCULPY V2.5</small>`;
+  story.innerHTML=`<a class="auth-brand" href="./">SCULP OS<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?osNavigation.map(([key,label,target],i)=>`<button type="button" data-os-nav="${key}" data-studio-nav="${esc(target)}"${i===0?' aria-current="page"':''}>${esc(label)}</button>`).join(''):'<button type="button" data-studio-nav="[data-orders-section]" aria-current="page">我的订单</button>'}</nav><small>SCULP Studio 团队工作区<br>V3.0 Phase 1 · 开发版本</small>`;
   layout.querySelector('.auth-content').classList.add('studio-content');
-  root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>{if(!setSettings(false))return;root.querySelectorAll('[data-studio-nav]').forEach(b=>b.removeAttribute('aria-current'));button.setAttribute('aria-current','page');root.querySelector(button.dataset.studioNav)?.scrollIntoView({behavior:'smooth',block:'start'});});
+  root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>{
+    if(!workspace.canLeave()){message('请先完成当前保存，再切换页面。');return;}
+    if(!setSettings(button.dataset.osNav==='settings'))return;
+    root.querySelectorAll('[data-studio-nav]').forEach(b=>b.removeAttribute('aria-current'));button.setAttribute('aria-current','page');
+    const target=root.querySelector(button.dataset.studioNav);
+    if(button.dataset.osNav==='ai')target?.click();
+    else if(button.dataset.osNav!=='settings'){if(button.dataset.osNav==='marketing'&&target)target.hidden=false;target?.scrollIntoView({behavior:'auto',block:'start'});}
+  });
   workspace = mountCloudWorkspace({
     root: root.querySelector("#cloud-workspace"),
     supabase,

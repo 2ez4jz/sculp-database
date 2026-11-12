@@ -4,7 +4,7 @@ import {esc,today} from './wedding-dashboard.js';
 const sources={unknown:'尚未确认',instagram:'Instagram',google:'Google 搜索',xiaohongshu:'小红书',wechat:'微信',referral:'熟人/客户推荐',planner:'婚礼策划师推荐',direct:'直接访问',other:'其他'};
 const states={pending:'待处理',contacted:'已联系',qualified:'跟进中',quoted:'已报价',won:'已成交',lost:'明确未成交',spam:'无效询盘'};
 const services={wedding:'婚礼',trial:'试妆',event:'活动',personal:'个人造型',commercial:'商业',photoshoot:'拍摄',education:'课程'};
-export function mountWebsiteEnquiries({root,supabase,onConvert,onOpenBooking,onCommunicationChange}){
+export function mountWebsiteEnquiries({root,supabase,onConvert,onOpenBooking,onCommunicationChange,onSaved}){
  let alive=true,version=0,owners=[],activeFilter='open';
  const writes=new Set(),panels=new Map();
  let revealId=null;
@@ -43,6 +43,7 @@ export function mountWebsiteEnquiries({root,supabase,onConvert,onOpenBooking,onC
     pending=null;saved=true;saving=false;writes.delete(writeToken);
     if(!alive)return;
     msg.textContent='询盘已保存。';
+    void Promise.resolve().then(()=>onSaved?.()).catch(()=>{});
     if(isNew)$('[data-new]').replaceChildren();await load();
    }
    catch(error){if(!alive)return;if(cloudWriteFailure(error)==='refresh'){pending=null;needsRefresh=true;msg.textContent=error.message+' 请刷新询盘，按最新权限和内容核对；本次未保存。';}else if(cloudWriteFailure(error)==='rejected'){pending=null;form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=false);form.elements.confirmed.checked=false;msg.textContent=error.message;}else{form.querySelector('[data-save-lead]').disabled=false;msg.textContent='未收到成功确认，请重试同一笔询盘。';}}

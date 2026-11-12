@@ -2,6 +2,10 @@
 
 Preserve the existing business workflow and confirmation steps unless the user explicitly requests a change. Keep Demo and authenticated business data separate. Use Node.js 24 and the pinned lockfile.
 
+## Version records
+
+For every version update, add or update an entry in `docs/CHANGELOG.md` and keep the README version entry current in the same change. Record version, date, concrete changes, validation, deployment status, remaining acceptance and links to detailed reports. Clearly separate development candidates, merged code, tested changes and verified production releases. Never mark a release deployed based only on a commit or passing CI. Do not publish private production audit details; keep public version records limited to product changes and verification boundaries.
+
 ## Runtime product knowledge
 
 `supabase/functions/sculpy-chat/product-knowledge.js` is the shared product knowledge source for the authenticated conversation and Demo SDK paths.
