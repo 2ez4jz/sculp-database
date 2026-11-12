@@ -16,7 +16,7 @@
 
 **部署状态：未部署。** 已提交草稿 [PR #46](https://github.com/2ez4jz/sculp-database/pull/46)，基于尚未发布的 Phase 1 分支。
 
-- 首轮 CI 已通过；最后边界补强在复核，最终证据见 [Gmail 测试报告](V3.0_GMAIL_TEST_REPORT.md)。
+- 最终代码 `c5bc9b1` 的 [CI 43294319784](https://github.com/2ez4jz/sculp-database/actions/runs/43294319784) 已通过：126 单元/DOM、31 真实 PostgreSQL、虚构备份恢复及完整浏览器回归。更多证据见 [Gmail 测试报告](V3.0_GMAIL_TEST_REPORT.md)。
 - 数据库为新增私有表及受限 RPC 候选，尚未应用生产；不申请发送权限。
 - 真实 OAuth、邮件同步、AI 质量、用户设备及托管恢复验收未完成。按 [配置指南](V3.0_GMAIL_SETUP_GUIDE.md) 完成测试后，再由 JZ 确认生产发布。
 
