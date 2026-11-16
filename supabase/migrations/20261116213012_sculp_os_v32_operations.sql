@@ -262,13 +262,19 @@ exception when others then return jsonb_build_object('line',coalesce(line_number
 end $$;
 
 create function sculpy_private.os32_import_preview(p_kind text,p_rows jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
-declare row_data jsonb;review jsonb;reviews jsonb:='[]';seen jsonb:='{}';seen_hashes jsonb:='{}';creates int:=0;links int:=0;skips int:=0;errors int:=0;plan_hash text;
+declare row_data jsonb;review jsonb;reviews jsonb:='[]';seen jsonb:='{}';seen_hashes jsonb:='{}';seen_targets jsonb:='{}';target text;creates int:=0;links int:=0;skips int:=0;errors int:=0;plan_hash text;
 begin
  perform sculpy_private.os32_actor();
  if p_kind is null or p_kind not in ('clients','orders') or p_rows is null or jsonb_typeof(p_rows)<>'array' or jsonb_array_length(p_rows) not between 1 and 100 or octet_length(p_rows::text)>1048576 then raise exception '每批须为 1 至 100 行，内容不超过 1 MiB' using errcode='22023';end if;
  for row_data in select value from jsonb_array_elements(p_rows) loop
   review:=sculpy_private.os32_import_row(p_kind,row_data);
-  if review->>'sourceKey' is not null then
+  if p_kind='clients' and review->>'hash' is not null then
+   target:=coalesce(review->'normalized'->>'client',case when review->>'action'='skip' then review->>'id' end,'new');
+   if seen_targets?(review->>'hash') and seen_targets->>(review->>'hash')<>target then
+    review:=review||jsonb_build_object('action','error','reason','本批相同客户资料选择了不同关联方式，请核对并排除重复行');
+   else seen_targets:=seen_targets||jsonb_build_object(review->>'hash',target);end if;
+  end if;
+  if review->>'sourceKey' is not null and review->>'action'<>'error' then
    if seen?(review->>'sourceKey') then
     if seen->>(review->>'sourceKey')<>review->>'hash' then review:=review||jsonb_build_object('action','error','reason','同一来源编号在本批包含不同内容');
     else review:=review||jsonb_build_object('action','skip','reason','本批重复行');end if;

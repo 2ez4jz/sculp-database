@@ -13,7 +13,7 @@ export function mountClientEditor({root,supabase,detail,onSaved}){
  const fill=()=>{for(const [key] of fields)form.elements[key].value=key==='tags'?(original.tags||[]).join(';'):original[key]||'';form.elements.confirmed.checked=false;};
  function lock(value){for(const el of form.elements)if(el!==submit)el.disabled=value;$('[data-client-edit]').disabled=value;}
  function resetReview(){prepared=null;$('[data-client-review-panel]').hidden=true;form.elements.confirmed.checked=false;}
- $('[data-client-edit]').onclick=()=>{if(pending||saving)return;fill();dirty=false;resetReview();status.textContent='';$('[data-client-edit-panel]').hidden=false;};
+ $('[data-client-edit]').onclick=()=>{if(pending||saving||!$('[data-client-edit-panel]').hidden)return;fill();dirty=false;resetReview();status.textContent='';$('[data-client-edit-panel]').hidden=false;};
  $('[data-client-discard]').onclick=()=>{if(pending||saving)return;version++;dirty=false;resetReview();fill();$('[data-client-edit-panel]').hidden=true;};
  form.oninput=event=>{if(event.target.name==='confirmed'||pending||saving)return;dirty=true;version++;resetReview();status.textContent='修改尚未保存，请先核对。';};
  $('[data-client-back]').onclick=()=>{if(!pending&&!saving){lock(false);resetReview();}};

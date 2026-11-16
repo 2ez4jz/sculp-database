@@ -63,6 +63,7 @@ test('V3.2 SQL: customer import is atomic, replayable and deduplicates files and
  const db=await createDatabase();try{
   await fixture(db);await as(db,1);
   const a=customer(2),rows=[a,{...a,line:3,external_id:'AliasC2'}];let p=await preview(db,'clients',rows);
+  assert.equal((await preview(db,'clients',[a,{...a,line:3,external_id:'DifferentTarget',client_choice:id(10)}])).ready,false);
   assert.equal(p.ready,true,JSON.stringify(p.rows));assert.equal(p.creates,1);assert.equal(p.skips,1);
   await assert.rejects(()=>commit(db,40,'clients',rows,p,false));const saved=await commit(db,40,'clients',rows,p);assert.equal(saved.rows[0].id,saved.rows[1].id);
   assert.equal((await commit(db,40,'clients',rows,p)).replayed,true);

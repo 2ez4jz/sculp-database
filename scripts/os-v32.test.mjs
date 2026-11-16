@@ -34,6 +34,7 @@ function editor(override){
 test('V3.2 customer editor: dirty drafts block navigation, review is required and duplicate text is escaped',async()=>{
  const x=editor();try{
   x.$('[data-client-edit]').click();x.input('phone','+44 20 1234');assert.equal(x.app.canLeave(),false);x.submit();await tick();assert.equal(x.calls.length,0);
+  x.$('[data-client-edit]').click();assert.equal(x.form.elements.phone.value,'+44 20 1234');assert.equal(x.app.canLeave(),false);
   x.$('[data-client-review]').click();await until(()=>!x.$('[data-client-review-panel]').hidden);assert.equal(x.root.querySelector('img'),null);
   x.form.elements.confirmed.checked=true;x.form.elements.confirmed.dispatchEvent(new x.dom.window.Event('input',{bubbles:true}));x.submit();await until(()=>x.saved===1);
   assert.equal(x.app.canLeave(),true);assert.equal(x.calls.at(-1).args.p_fields.phone,'+44 20 1234');
