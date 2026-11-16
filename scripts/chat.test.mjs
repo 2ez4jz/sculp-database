@@ -288,10 +288,12 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     for(const tool of body.tools||[])assert(toolCapabilities[tool.name],`Missing capability contract: ${tool.name}`);
     const marker='可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n';
     const knowledge=JSON.parse(body.instructions.split(marker)[1].split('\n')[0]);
-    assert.equal(knowledge.latestBusinessRelease.version,'SCULP OS 3.0');
-    assert.equal(knowledge.latestBusinessRelease.acceptance,'pending_real_gmail_and_devices');assert.equal(knowledge.pushNotifications.quietHours,false);
-    assert.equal(knowledge.latestBusinessRelease.date,'2026-11-12');
-    assert.equal(knowledge.includedBackendUpdate.name,'工作台与Gmail基础接口及更新说明');
+    assert.equal(knowledge.latestBusinessRelease.version,'SCULP OS 3.1');
+    assert.equal(knowledge.latestBusinessRelease.acceptance,'pending_real_devices');assert.equal(knowledge.pushNotifications.quietHours,false);
+    assert.equal(knowledge.latestBusinessRelease.date,'2026-11-16');
+    assert.equal(knowledge.includedBackendUpdate.name,'客户档案与任务接口及更新说明');
+    assert.equal(knowledge.gmailIntegration.status,'deployed_setup_required');
+    assert.equal(knowledge.taskCapabilities.existingPageActions.some(x=>x.task.includes('重新打开跟进任务')),context.actor?.role==='owner');
     assert(knowledge.availableTools.includes(expected));assert(!knowledge.availableTools.includes(missing));
     assert.equal(knowledge.latestBusinessRelease.status,'deployed');assert(Array.isArray(knowledge.notReleased));assert(!knowledge.latestBusinessRelease.changes.some(x=>x.includes('尚未核实上线')));
     assert.match(body.instructions,/不让用户上传已有更新日志/);
