@@ -2,9 +2,9 @@
 
 ## 版本与更新
 
-- **SCULP OS 3.2 开发候选（2026-11-16，未部署）**：客户资料编辑、任务负责人分配/改派与我的/团队筛选、CSV 历史客户/订单导入。基线 V3.1 已由 JZ 确认验收。见 [V3.2 发布与验证记录](docs/V3.2_RELEASE.md)。
+- **当前线上版本：SCULP OS 3.2（2026-11-16，已部署，待本版用户验收）**：客户资料编辑、任务负责人分配/改派与我的/团队筛选、UTF-8 CSV 历史客户/订单预览、匹配与分批导入。前端、数据库及聊天说明均已验证发布；基线 V3.1 已由 JZ 验收。见 [V3.2 发布与验证记录](docs/V3.2_RELEASE.md)。
 
-- **当前线上版本：SCULP OS 3.1（2026-11-16，已上线）**：客户档案及联系方式、分页订单历史、姓名/邮箱/电话搜索；跟进任务完成/取消/改期/重新打开与状态筛选。Gmail 配置暂停。见 [V3.1 更新与验证记录](docs/V3.1_RELEASE.md)。
+- **此前业务版本：SCULP OS 3.1（2026-11-16，JZ 已验收）**：客户档案及联系方式、分页订单历史、姓名/邮箱/电话搜索；跟进任务完成/取消/改期/重新打开与状态筛选。Gmail 配置暂停。见 [V3.1 更新与验证记录](docs/V3.1_RELEASE.md)。
 
 - **手机顶部固定菜单修正（2026-11-12，已上线）**：横向菜单固定、品牌标题随页面滚走，模块跳转保留顶部空间。见 [验证与发布记录](docs/V3.0_MOBILE_NAV_20261112.md)。
 
@@ -21,8 +21,8 @@ No build or dependencies required. Run `python -m http.server 4173` in this fold
 For development checks, use Node.js 24 and run `npm ci`, then `npm test`.
 Dependencies are for tests only. Cloud order editing, permission checks, monthly
 reporting and PostgreSQL acceptance instructions are in [Cloud operations V1](docs/CLOUD_OPERATIONS_V1.md).
-The new operations migration is locally verified; deployment and real-account
-cross-device acceptance remain pending.
+Current production deployment evidence is recorded in the version links above;
+V3.2 real-account cross-device acceptance remains pending.
 
 ## Included
 
