@@ -289,7 +289,7 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     const marker='可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n';
     const knowledge=JSON.parse(body.instructions.split(marker)[1].split('\n')[0]);
     assert.equal(knowledge.latestBusinessRelease.version,'SCULP OS 3.1');
-    assert.equal(knowledge.latestBusinessRelease.acceptance,'pending_real_devices');assert.equal(knowledge.pushNotifications.quietHours,false);
+    assert.equal(knowledge.latestBusinessRelease.acceptance,'user_accepted');assert.equal(knowledge.pushNotifications.quietHours,false);
     assert.equal(knowledge.latestBusinessRelease.date,'2026-11-16');
     assert.equal(knowledge.includedBackendUpdate.name,'客户档案与任务接口及更新说明');
     assert.equal(knowledge.gmailIntegration.status,'deployed_setup_required');

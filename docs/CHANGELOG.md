@@ -4,6 +4,7 @@
 
 | 版本 | 日期 | 状态 | 主要更新 | 详细记录 |
 | --- | --- | --- | --- | --- |
+| SCULP OS 3.2 | 2026-11-16 | 开发候选，未部署；V3.1 已由 JZ 验收 | 客户编辑与并发保护、任务分配改派、CSV 预览/核对/去重及事务批次导入 | [发布与验证](V3.2_RELEASE.md) |
 | SCULP OS 3.1 | 2026-11-16 | 前端/数据库/聊天说明已部署；真实账号与设备验收待完成 | 客户档案/联系方式/订单历史、姓名邮箱电话搜索、任务完成取消改期与重新打开、分页和并发保护 | [发布与验证](V3.1_RELEASE.md) |
 | SCULP OS 3.0 Phase 2.5 Gmail | 2026-11-12 | 前端/数据库/Gmail 后端已部署；OAuth 配置未就绪，真实邮箱未验 | Gmail 只读连接、范围同步、客户/订单邮件、AI 分级摘要与八类人工回复草稿、内部跟进 | [日志](V3.0_GMAIL_CHANGELOG.md) · [数据库](V3.0_GMAIL_DATABASE.md) · [测试](V3.0_GMAIL_TEST_REPORT.md) · [配置](V3.0_GMAIL_SETUP_GUIDE.md) |
 | SCULP OS 3.0 Phase 1 | 2026-11-12 | 前端/数据库已部署；真实账户/设备验收待完成 | 日常 Dashboard、九区导航、客户搜索/最小新增、关联任务、基础查询接口；复用既有订单、沟通和财务 | [开发日志](V3.0_PHASE1_CHANGELOG.md) · [审计](V2.5_AUDIT.md) · [测试](V3.0_TEST_REPORT.md) · [数据库方案](V3.0_DATABASE_PLAN.md) · [后续任务](V3.0_PHASE2_TASKS.md) |

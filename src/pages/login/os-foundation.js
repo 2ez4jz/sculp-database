@@ -1,4 +1,5 @@
-import {mountOsOperations} from './os-operations.js?v=os31-20261116';
+import {mountHistoryImport} from './os-import.js?v=os32-20261116';
+import {mountOsOperations} from './os-operations.js?v=os32-20261116';
 import {esc, money} from './wedding-dashboard.js';
 
 export const osNavigation = [
@@ -23,10 +24,10 @@ const metric = (label, value, note='') => `<div><dt>${esc(label)}</dt><dd>${esc(
 export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onNewOrder, onClientEmails}) {
   let alive=true, overviewVersion=0, clientsVersion=0, offset=0, overview=null;
   const pendingWrites=new Set();
-  let operations=null;
-  const canLeave=()=>pendingWrites.size===0&&(operations?.canLeave()??true);
+  let operations=null,historyImport=null;
+  const canLeave=()=>pendingWrites.size===0&&(operations?.canLeave()??true)&&(historyImport?.canLeave()??true);
   root.innerHTML=`<section class="os-home" data-os-home aria-label="日常运营工作台">
-    <div class="os-heading"><div><span class="auth-eyebrow">SCULP OS · V3.1</span><h3>今日工作台</h3><p class="cloud-note">先处理需要你关注的事。所有数据按当前账户权限读取。</p></div><button type="button" data-os-refresh>刷新工作台</button></div>
+    <div class="os-heading"><div><span class="auth-eyebrow">SCULP OS · V3.2</span><h3>今日工作台</h3><p class="cloud-note">先处理需要你关注的事。所有数据按当前账户权限读取。</p></div><button type="button" data-os-refresh>刷新工作台</button></div>
     <p role="status" data-os-status>正在读取工作台…</p><dl class="os-metrics" data-os-metrics></dl>
     <div class="os-shortcuts" aria-label="快捷操作"><button type="button" data-os-new-order>新建订单</button><button type="button" data-os-new-client>新增客户</button><button type="button" data-os-leads>查看询盘</button><button type="button" data-os-new-task>添加任务</button><button type="button" data-os-schedule>查看日程</button></div>
     <div class="os-grid"><section class="os-card"><h4>今日与逾期待办</h4><div data-os-today></div></section><section class="os-card"><h4>需要跟进的客户</h4><div data-os-followups></div></section><section class="os-card"><h4>近期订单与预约</h4><div data-os-upcoming></div></section><section class="os-card"><h4>系统与通知</h4><p>通知记录与本机授权请到 <button type="button" data-os-settings>系统设置</button> 查看。</p><p class="cloud-note">Gmail 需在设置中完成授权；外部日历与营销平台尚未接入。任务不会自动发送推送。</p></section></div>
@@ -35,9 +36,9 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
     <form data-os-client-search><label>搜索客户<input name="query" maxlength="160" placeholder="客户姓名、邮箱或电话"></label><button>搜索客户</button></form>
     <details data-os-client-create><summary>新增客户</summary><form data-os-client-form><label>客户姓名<input name="clientName" required maxlength="160"></label><label>客户来源<input name="source" maxlength="100"></label><label><input name="confirmed" type="checkbox" required>已搜索并核对客户资料</label><button>确认新增客户</button><p role="status" data-os-write-result></p></form></details>
     <p role="status" data-os-clients-status></p><div data-os-client-list></div><section class="os-card" data-os-client-detail hidden></section><div class="os-shortcuts"><button type="button" data-os-client-prev>上一页客户</button><button type="button" data-os-client-next>下一页客户</button></div>
-  </section>
-  <section class="cloud-orders" data-os-calendar><h3>日程与任务</h3><p class="cloud-note">近期预约读取订单服务日期；尚未同步 Google / Outlook 日历。这里只展示最近 10 笔预约与最早 20 项未完成任务。</p><div data-os-calendar-list></div>
-    <details data-os-task-create><summary>添加任务</summary><form data-os-task-form><label>任务内容<input name="title" required maxlength="300"></label><label>截止日期（多伦多）<input name="dueOn" type="date" required></label><input name="bookingId" type="hidden"><input name="clientId" type="hidden"><p data-os-task-link class="cloud-note">未关联客户或订单 · 分配给当前账户</p><label><input name="confirmed" type="checkbox" required>已核对内容及截止日期</label><button>确认添加任务</button><p role="status" data-os-write-result></p></form></details>
+  <section data-os-import-root></section></section>
+  <section class="cloud-orders" data-os-calendar><h3>日程与任务</h3><p class="cloud-note">近期预约读取订单服务日期；尚未同步 Google / Outlook 日历。近期预约最多展示 10 笔；任务每页 20 项，可按负责人和状态查看。</p><div data-os-calendar-list></div>
+    <details data-os-task-create><summary>添加任务</summary><form data-os-task-form><label>任务内容<input name="title" required maxlength="300"></label><label>截止日期（多伦多）<input name="dueOn" type="date" required></label><label>负责人<select name="assignedTo" disabled><option value="">正在读取负责人…</option></select></label><p data-os-assignee-status class="cloud-note"></p><input name="bookingId" type="hidden"><input name="clientId" type="hidden"><p data-os-task-link class="cloud-note">未关联客户或订单</p><label><input name="confirmed" type="checkbox" required>已核对内容及截止日期</label><button>确认添加任务</button><p role="status" data-os-write-result></p></form></details>
     <div data-os-tasks></div><p class="cloud-note">任务修改需人工确认；完成及取消记录可在任务状态筛选中查看。</p>
   </section>
   <section class="cloud-orders" data-os-marketing hidden><h3>营销中心</h3><p>尚未接入 Instagram / 小红书的素材、审核、排期及发布流程。</p><p class="cloud-note">当前入口仅说明开发范围，不会自动发布或发送消息。</p></section>`;
@@ -48,7 +49,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
     const form=$('[data-os-task-form]');
     form.elements.bookingId.value=bookingId;form.elements.clientId.value=clientId;
     form.elements.confirmed.checked=false;
-    $('[data-os-task-link]').textContent=label+' · 分配给当前账户';
+    $('[data-os-task-link]').textContent=label+'';
     $('[data-os-task-create]').open=true;scroll('[data-os-task-create]');form.elements.title.focus();
   }
   $('[data-os-refresh]').onclick=()=>void refresh();
@@ -118,6 +119,9 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
     let pending=null,saving=false;
     form.onsubmit=async e=>{
       e.preventDefault();if(saving||!alive)return;
+      if(!pending&&!canLeave()){result.textContent='请先完成当前修改或放弃未保存草稿。';return;}
+      if(!pending&&!form.reportValidity())return;
+      if(method==='sculpy_os_create_task_v32'&&!form.elements.assignedTo.value){result.textContent='请等待负责人读取完成，或刷新后重试。';return;}
       if(!pending)pending=makePayload(form);
       saving=true;pendingWrites.add(form);button.disabled=true;
       [...form.elements].forEach(el=>{if(el!==button)el.disabled=true;});
@@ -136,7 +140,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
         }
         if(!data?.id||data.id!==pending.p_id)throw Error('unacknowledged');
         acknowledged=true;pending=null;pendingWrites.delete(form);form.reset();
-        [...form.elements].forEach(el=>el.disabled=false);button.textContent=method==='sculpy_os_create_task'?'确认添加任务':'确认新增客户';
+        [...form.elements].forEach(el=>el.disabled=false);button.textContent=method==='sculpy_os_create_task_v32'?'确认添加任务':'确认新增客户';
         result.textContent='已保存。';
       } catch {if(alive){result.textContent='未收到保存确认，请重试同一笔操作。';button.textContent='重试同一笔操作';}}
       finally {saving=false;if(alive)button.disabled=false;}
@@ -144,11 +148,12 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
       if(acknowledged)await onSaved();
     };
   }
-  bindCreate('[data-os-task-form]','sculpy_os_create_task',form=>({p_id:crypto.randomUUID(),p_title:form.elements.title.value.trim(),p_due_at:form.elements.dueOn.value+'T12:00:00Z',p_booking_id:form.elements.bookingId.value||null,p_client_id:form.elements.clientId.value||null,p_confirmed:true}),async()=>{ $('[data-os-task-link]').textContent='未关联客户或订单 · 分配给当前账户';await refresh();});
+  bindCreate('[data-os-task-form]','sculpy_os_create_task_v32',form=>({p_id:crypto.randomUUID(),p_title:form.elements.title.value.trim(),p_due_at:form.elements.dueOn.value+'T12:00:00Z',p_assigned_to:form.elements.assignedTo.value,p_booking_id:form.elements.bookingId.value||null,p_client_id:form.elements.clientId.value||null,p_confirmed:true}),async()=>{ $('[data-os-task-link]').textContent='未关联客户或订单';await refresh();});
   bindCreate('[data-os-client-form]','sculpy_os_create_client',form=>({p_id:crypto.randomUUID(),p_name:form.elements.clientName.value.trim(),p_source:form.elements.source.value.trim(),p_confirmed:true}),loadClients);
   if(!['owner','operations'].includes(profile.role)){root.replaceChildren();return {canLeave:()=>true,refresh:async()=>{},openTask:()=>{},destroy(){alive=false;}};}
-  operations=mountOsOperations({taskRoot:$('[data-os-tasks]'),clientRoot:$('[data-os-client-detail]'),supabase,onOrder,onNewTask:openTask,onSaved:refreshOverview});
+  operations=mountOsOperations({taskRoot:$('[data-os-tasks]'),clientRoot:$('[data-os-client-detail]'),supabase,onOrder,onNewTask:openTask,onSaved:refreshOverview,onClientSaved:async()=>{await loadClients();await refreshOverview();},onAssignees:data=>{const select=$('[name=assignedTo]');if(!data){$('[data-os-assignee-status]').textContent='暂时无法读取负责人，请刷新页面。';return;}select.innerHTML=data.assignees.map(a=>`<option value="${esc(a.id)}" ${a.id===data.actor?'selected':''}>${esc(a.name)}</option>`).join('');select.disabled=false;}});
+  historyImport=mountHistoryImport({root:$('[data-os-import-root]'),supabase,onSaved:async()=>{await loadClients();await refresh();},onClient:id=>operations.openClient(id),onOrder});
   async function refresh(){await Promise.all([refreshOverview(),operations?.refreshTasks()]);}
   void refresh();void loadClients();
-  return {canLeave,refresh,refreshClients:loadClients,openTask,destroy(){alive=false;overviewVersion++;clientsVersion++;operations?.destroy();}};
+  return {canLeave,refresh,refreshClients:loadClients,openTask,destroy(){alive=false;overviewVersion++;clientsVersion++;operations?.destroy();historyImport?.destroy();}};
 }
