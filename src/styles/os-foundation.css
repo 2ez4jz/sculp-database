@@ -10,3 +10,6 @@
  .studio-sidebar nav::-webkit-scrollbar{display:none}
  .studio-sidebar nav button{flex:0 0 auto;white-space:nowrap;min-height:44px;padding:9px 12px;font-size:12px}
 }
+
+.os-client-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.os-client-fields>div{min-width:0}.os-client-fields dt{font-size:12px;color:#647663}.os-client-fields dd{margin:5px 0;overflow-wrap:anywhere}.os-preserve-lines{white-space:pre-wrap;overflow-wrap:anywhere}[data-os-client-detail],[data-task-editor]{scroll-margin-top:90px}[data-os-calendar] select{font:inherit;max-width:100%;min-height:44px;padding:8px;border:1px solid #dbe2d6;border-radius:8px;background:#fff;color:#344e3e}[data-task-update] label{display:block;margin:12px 0}[data-task-update] [hidden]{display:none}[data-task-update] input:not([type=checkbox]){font-size:16px}[data-task-list] .os-shortcuts{margin:6px 0}[data-os-client-detail] h4{margin-top:18px}[data-task-filter]{display:block}
+@media(max-width:480px){.os-client-fields{grid-template-columns:1fr}.os-client-fields>div{padding-bottom:8px;border-bottom:1px solid #e2e5dc}}

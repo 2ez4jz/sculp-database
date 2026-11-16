@@ -8,7 +8,7 @@ import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
-import {mountOsFoundation} from './os-foundation.js?v=gmail-setup-20261112';
+import {mountOsFoundation} from './os-foundation.js?v=os31-20261116';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
