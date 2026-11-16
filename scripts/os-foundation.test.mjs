@@ -15,6 +15,7 @@ function setup(rpc,role='owner'){
  const defaultRpc=async(name,args)=>{
   calls.push({name,args});
   if(rpc){const r=await rpc(name,args);if(r!==undefined)return r;}
+  if(name==='sculpy_os_task_context')return {data:{actor:'self',assignees:[{id:'self',name:'QA'}]}};
   if(name==='sculpy_os_overview')return {data:snapshot()};
   if(name==='sculpy_os_clients')return {data:{total:1,clients:[{id:'c',display_name:'QA',order_count:2}]}};
   return {data:{id:args.p_id}};
@@ -44,7 +45,7 @@ test('OS DOM: permission/missing-migration failure clears old metrics and no Dem
 });
 test('OS DOM: lost response retries identical request, guards navigation, acknowledgment survives refresh failure',async()=>{
  let tries=0,failRefresh=false;const x=setup((name,args)=>{
-  if(name==='sculpy_os_create_task'){tries++;if(tries===1)throw Error('lost acknowledgment');return {data:{id:args.p_id}};}
+  if(name==='sculpy_os_create_task_v32'){tries++;if(tries===1)throw Error('lost acknowledgment');return {data:{id:args.p_id}};}
   if(failRefresh&&name==='sculpy_os_overview')return {error:{code:'offline'}};
  });
  try{
@@ -56,7 +57,7 @@ test('OS DOM: lost response retries identical request, guards navigation, acknow
   x.app.openTask({clientId:'another'});assert.equal(form.elements.bookingId.value,'b');
   failRefresh=true;submit(x.dom,form);await waitFor(()=>x.app.canLeave());
   await waitFor(()=>x.root.querySelector('[data-os-status]').textContent.includes('暂不可用'));
-  const writes=x.calls.filter(c=>c.name==='sculpy_os_create_task');assert.equal(writes.length,2);assert.deepEqual(writes[0].args,writes[1].args);
+  const writes=x.calls.filter(c=>c.name==='sculpy_os_create_task_v32');assert.equal(writes.length,2);assert.deepEqual(writes[0].args,writes[1].args);
   assert.equal(form.querySelector('[data-os-write-result]').textContent,'已保存。');
   assert.equal(form.elements.title.disabled,false);assert.equal(form.elements.title.value,'');
  }finally{x.close();}

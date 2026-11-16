@@ -14,9 +14,9 @@ function setup(override){
   const app=mountOsOperations({taskRoot,clientRoot,onOrder:id=>orders.push(id),onNewTask:x=>newTasks.push(x),onSaved:async()=>{saved++;},supabase:{rpc:async(name,args)=>{
     calls.push({name,args:structuredClone(args)});
     const custom=await override?.(name,args);if(custom!==undefined)return custom;
-    if(name==='sculpy_os_tasks')return {data:{total:1,tasks:[{...task,status:args.p_status}]}};
+    if(name==='sculpy_os_tasks_v32')return {data:{total:1,tasks:[{...task,status:args.p_status}]}};
     if(name==='sculpy_os_update_task')return {data:{id:args.p_task_id,requestId:args.p_request_id}};
-    if(name==='sculpy_os_client_detail')return {data:{client:{id:args.p_client_id,display_name:'<script>QA</script>',referral_source:'Instagram',city:'Toronto',lifecycle_status:'active'},contact:{email:'qa@example.test',internal_notes:'<img src=x>\nNotes'},total:21,bookings:[{id:'booking',order_number:'612358',service:'Wedding',starts_at:'2026-11-17T02:00:00Z',status:'confirmed'}]}};
+    if(name==='sculpy_os_client_detail_v32')return {data:{client:{id:args.p_client_id,display_name:'<script>QA</script>',referral_source:'Instagram',city:'Toronto',lifecycle_status:'active'},contact:{email:'qa@example.test',internal_notes:'<img src=x>\nNotes'},total:21,bookings:[{id:'booking',order_number:'612358',service:'Wedding',starts_at:'2026-11-17T02:00:00Z',status:'confirmed'}]}};
   }}});
   const $=s=>taskRoot.querySelector(s),c$=s=>clientRoot.querySelector(s);
   const form=$('[data-task-update]');
@@ -83,7 +83,7 @@ test('OS operations: concurrent conflict requires rereading rather than overwrit
 test('OS operations: successful write remains acknowledged when subsequent list refresh fails',async()=>{
   let updated=false;const x=setup(name=>{
     if(name==='sculpy_os_update_task')updated=true;
-    if(name==='sculpy_os_tasks'&&updated)return {error:{code:'offline'}};
+    if(name==='sculpy_os_tasks_v32'&&updated)return {error:{code:'offline'}};
   });
   try{
     await x.app.refreshTasks();x.$('[data-task-edit]').click();x.form.elements.confirmed.checked=true;x.submit();
@@ -94,8 +94,8 @@ test('OS operations: successful write remains acknowledged when subsequent list 
 });
 test('OS operations: stale customer responses and denied reads never reveal the previous customer',async()=>{
   let resolve;const x=setup((name,args)=>{
-    if(name==='sculpy_os_client_detail'&&args.p_client_id==='slow')return new Promise(r=>resolve=r);
-    if(name==='sculpy_os_client_detail'&&args.p_client_id==='denied')return {error:{code:'42501'}};
+    if(name==='sculpy_os_client_detail_v32'&&args.p_client_id==='slow')return new Promise(r=>resolve=r);
+    if(name==='sculpy_os_client_detail_v32'&&args.p_client_id==='denied')return {error:{code:'42501'}};
   });
   try{
     const slow=x.app.openClient('slow');await tick();await x.app.openClient('current');

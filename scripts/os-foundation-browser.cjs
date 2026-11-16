@@ -42,7 +42,7 @@ const assert=require('node:assert/strict');
   await page.locator('[data-os-nav=crm]').click();await page.getByText('请先完成当前保存，再切换页面。',{exact:true}).waitFor();
   await form.getByRole('button',{name:'重试同一笔操作'}).click();
   await form.getByText('已保存。',{exact:true}).waitFor();
-  const writes=await page.evaluate(()=>window.osCalls.filter(x=>x.name==='sculpy_os_create_task'));
+  const writes=await page.evaluate(()=>window.osCalls.filter(x=>x.name==='sculpy_os_create_task_v32'));
   assert.equal(writes.length,2);assert.deepEqual(writes[0].args,writes[1].args);
   await page.locator('[data-os-nav=calendar]').click();
   await page.locator('[data-task-edit]').click();

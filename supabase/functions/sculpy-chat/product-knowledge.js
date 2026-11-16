@@ -1,3 +1,4 @@
+import {v32ReleaseFacts,v32FeatureDescription,v32PageActions} from '../_shared/v32-release.js';
 import {v31ReleaseFacts,v31FeatureDescription,v31PageActions} from '../_shared/v31-release.js';
 import {v30ReleaseFacts,v30FeatureDescription,v30PageActions} from '../_shared/v30-release.js';
 import {v24ReleaseFacts,v24FeatureDescription,v24PageAction,v241AccountPageAction,welcomeEditorPageAction,v25FeatureDescription,v25NotificationPageAction} from '../_shared/v24-release.js';
@@ -45,6 +46,7 @@ export const productKnowledge=Object.freeze({
  ...v24ReleaseFacts,
  ...v30ReleaseFacts,
  ...v31ReleaseFacts,
+ ...v32ReleaseFacts,
 });
 
 export const toolCapabilities=Object.freeze({
@@ -78,7 +80,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    '现有管理员页面管理询盘、签约、合同改价/取消、人工收退款；聊天只查数据或给待确认建议',
    '经营记忆面板：提出、管理员确认、更正、撤销、审计；仅已确认且当前有效的记录供后续回答使用，不是讨论自动永久记住',
    '个人回复偏好、按权限保存的对话、手机自适应布局；添加到桌面由使用者通过浏览器菜单手工操作',
-   v24FeatureDescription,v25FeatureDescription,v30FeatureDescription,v31FeatureDescription,
+   v24FeatureDescription,v25FeatureDescription,v30FeatureDescription,v31FeatureDescription,v32FeatureDescription,
   ]:[
    '按当前账号分配范围查看订单和工作记录，保留个人回复偏好与对话；设置页可管理本人设备通知，P1内部提醒尚未实施',
    '全局财务、公司经营记忆和管理员业务操作不对当前角色开放',
@@ -92,6 +94,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    existingPageActions:admin?[
     ...v30PageActions,
     ...v31PageActions,
+    ...v32PageActions,
     ...(context.actor?.role==='operations'?[v241AccountPageAction,welcomeEditorPageAction]:[]),
     v24PageAction,
     {task:'新建订单或录入时分配人员',where:'现有录入新订单表单',needs:['客户原文','明确年份的服务日期和开始时间','客户匹配与服务类型','人工核对确认'],completion:'保存成功后重新读取同一云端订单'},
