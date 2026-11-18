@@ -35,7 +35,7 @@ export function notificationHandler({admin,callerFor,allowedOrigins,generateKeys
     else{
      const n=prepared.notification;
      // Rebuild the payload from an allowlist. No customer, date, venue or money fields.
-     const title=n.kind==='test'?'Sculpy 推送测试':n.kind==='overdue'?'有询盘等待跟进':n.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘';
+     const title=n.kind==='test'?'Sculpy 推送测试':n.kind==='marketing_mention'?'有新的社媒任务留言':n.kind==='overdue'?'有询盘等待跟进':n.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘';
      const payload={id:n.id,kind:n.kind,title,body:'请打开 Sculpy 查看。'};
      const response=await sendPush({subscription:prepared.subscription,payload,keys,topic:n.id.replace(/-/g,'')});
      outcome=deliveryOutcome(response.status,response.retryAfter);
@@ -69,6 +69,11 @@ export function notificationHandler({admin,callerFor,allowedOrigins,generateKeys
    if(body.action==='subscribe'){try{await validateSubscription(data.subscription);}catch{return reply({error:'设备订阅无效，请重新开启推送。'},400);}}
    if(['open','test','unsubscribe'].includes(body.action)&&!UUID.test(data[body.action==='open'?'id':'deviceId']||''))return reply({error:'通知或设备编号无效。'},400);
    if(body.action==='logout'){data.deviceId=UUID.test(data.deviceId||'')?data.deviceId:null;data.endpoint=validEndpoint(data.endpoint)?data.endpoint:null;}
+   if(body.action==='open'){
+     const marketing=await admin.rpc('sculpy_marketing_open_notification',{p_id:data.id,p_actor:user.id});
+     if(marketing.error)return reply({error:'通知操作失败，请稍后重试。'},503);
+     if(marketing.data)return reply(marketing.data);
+   }
    const result=await admin.rpc('sculpy_push_api',{p_action:body.action,p_actor:user.id,p_session:session,p_data:data});
    if(result.error){const code=result.error.code;return reply({error:code==='42501'?'当前账号或会话无权执行此操作。':code==='P0429'?'请稍等一分钟再测试。':code==='55000'?'通知服务暂未就绪。':'通知操作失败，请检查内容或稍后重试。'},code==='42501'?403:code==='P0429'?429:code==='55000'?503:400);}
    if(body.action==='state')result.data.publicKey=(await identity()).publicKey;

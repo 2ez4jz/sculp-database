@@ -182,9 +182,12 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   return {
     canLeave,
     async openNotificationTarget(target){
-      if(!target||!['lead','booking'].includes(target.type))throw Error('无效通知目标');
+      if(!target||!['lead','booking','marketing'].includes(target.type))throw Error('无效通知目标');
       if(!canLeave())throw Error('请先完成当前保存');
-      if(target.type==='lead'){
+      if(target.type==='marketing'){
+        if(!businessAdmin||!Number.isInteger(target.postId)||target.postId<1||target.postId>24)throw Error('社媒任务不可查看');
+        foundation?.openMarketingPost(target.postId);
+      }else if(target.type==='lead'){
         if(!enquiries||await enquiries.openLead(target.id)===false)throw Error('询盘当前不可查看');
       }else await openOrder(target.id);
     },
