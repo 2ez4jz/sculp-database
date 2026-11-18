@@ -7,8 +7,16 @@ const subscription=()=>({endpoint:'https://fcm.googleapis.com/fcm/send/FICTIONAL
 const req=(body,headers={},url='https://example.test/sculpy-notifications')=>new Request(url,{method:'POST',headers:{origin:'https://2ez4jz.github.io',authorization:'Bearer '+token,'Content-Type':'application/json',...headers},body:JSON.stringify(body)});
 function handler(extra={}){
  const calls=[];const h=notificationHandler({allowedOrigins:new Set(['https://2ez4jz.github.io']),callerFor:()=>({auth:{getUser:async()=>({data:{user:{id:uid}}})}}),
-  admin:{rpc:async(name,args)=>{calls.push({name,args});if(name==='sculpy_push_api')return {data:{preferences:{enabled:false},publicKey:null}};return {data:{publicKey:'public-only',privateKey:'NEVER-EXPOSE'}};}},generateKeys:()=>({}),sendPush:async()=>({status:201}),...extra});return {h,calls};
+  admin:{rpc:async(name,args)=>{calls.push({name,args});if(name==='sculpy_marketing_open_notification')return {data:null};if(name==='sculpy_push_api')return {data:{preferences:{enabled:false},publicKey:null}};return {data:{publicKey:'public-only',privateKey:'NEVER-EXPOSE'}};}},generateKeys:()=>({}),sendPush:async()=>({status:201}),...extra});return {h,calls};
 }
+test('marketing mention notification opens only the verified recipient task',async()=>{
+ const calls=[];const {h}=handler({admin:{rpc:async(name,args)=>{calls.push({name,args});return name==='sculpy_marketing_open_notification'?{data:{type:'marketing',postId:12}}:{data:{}};}}});
+ const response=await h(req({action:'open',data:{id:nid}}));
+ assert.equal(response.status,200);
+ assert.deepEqual(await response.json(),{type:'marketing',postId:12});
+ assert.equal(calls[0].args.p_actor,uid);
+ assert.equal(calls.some(x=>x.name==='sculpy_push_api'),false);
+});
 test('push API: validated actor/session, strict actions and origins, no implicit opt-in or secret response',async()=>{
  const {h,calls}=handler();let r=await h(req({action:'state'}));assert.equal(r.status,200);assert(!await r.text().then(x=>x.includes('NEVER-EXPOSE')));
  assert.equal(calls[0].args.p_actor,uid);assert.equal(calls[0].args.p_session,sid);assert.equal(calls[0].args.p_action,'state');
