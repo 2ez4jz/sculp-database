@@ -1,6 +1,7 @@
 import {mountHistoryImport} from './os-import.js?v=os32-20261116';
 import {mountOsOperations} from './os-operations.js?v=os32-20261116';
 import {esc, money} from './wedding-dashboard.js';
+import {mountMarketingPlan} from './marketing-plan.js?v=holiday-20261118';
 
 export const osNavigation = [
   ['dashboard', 'Dashboard｜工作台', '[data-os-home]'],
@@ -41,8 +42,9 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
     <details data-os-task-create><summary>添加任务</summary><form data-os-task-form><label>任务内容<input name="title" required maxlength="300"></label><label>截止日期（多伦多）<input name="dueOn" type="date" required></label><label>负责人<select name="assignedTo" disabled><option value="">正在读取负责人…</option></select></label><p data-os-assignee-status class="cloud-note"></p><input name="bookingId" type="hidden"><input name="clientId" type="hidden"><p data-os-task-link class="cloud-note">未关联客户或订单</p><label><input name="confirmed" type="checkbox" required>已核对内容及截止日期</label><button>确认添加任务</button><p role="status" data-os-write-result></p></form></details>
     <div data-os-tasks></div><p class="cloud-note">任务修改需人工确认；完成及取消记录可在任务状态筛选中查看。</p>
   </section>
-  <section class="cloud-orders" data-os-marketing hidden><h3>营销中心</h3><p>尚未接入 Instagram / 小红书的素材、审核、排期及发布流程。</p><p class="cloud-note">当前入口仅说明开发范围，不会自动发布或发送消息。</p></section>`;
+  <section class="cloud-orders" data-os-marketing hidden aria-label="营销中心社媒计划"></section>`;
   const $=s=>root.querySelector(s);
+  mountMarketingPlan($('[data-os-marketing]'));
   const scroll=s=>$(s)?.scrollIntoView({block:'start'});
   function openTask({bookingId='',clientId='',label='未关联客户或订单'}={}) {
     if(!canLeave())return;
