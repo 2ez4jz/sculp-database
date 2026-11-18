@@ -17,7 +17,7 @@ const esc = (value) =>
         c
       ],
   );
-export function mountCloudWorkspace({ root, supabase, profile }) {
+export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   const businessAdmin = ["operations", "owner"].includes(profile.role);
   let destroyed = false,
     version = 0,
@@ -57,6 +57,7 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       if(status)status.textContent='修改仍在保存或尚未收到确认，请先重试同一笔修改。';
       return;
     }
+    showPage('orders');
     orderEmails?.destroy();orderEmails=null;
     editor?.destroy(); editor=null; business?.destroy();business=null;communication?.destroy();communication=null;
     const mine = ++detailVersion;
@@ -85,13 +86,40 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
   if (businessAdmin) $("[data-new-booking]").onclick = () => intake.open();
   if(businessAdmin)foundation=mountOsFoundation({root:osRoot,supabase,profile,
     onOrder:id=>void openOrder(id).catch(()=>{}),
-    onLead:id=>{if(canLeave())void enquiries.openLead(id);},
+    onLead:id=>{if(canLeave()){showPage('crm');void enquiries.openLead(id);}},
     onNewOrder:()=>{if(canLeave())intake.open();},onClientEmails:openClientEmails,
+    onNavigate:showPage,
   });
   if(businessAdmin){const note=document.createElement('p');note.className='cloud-note';note.textContent='沟通中心：询盘和订单的沟通记录已接入。外部邮件尚未接入。';$('.comm-inbox h3').after(note);}
   const emailRoot=document.createElement('div');emailRoot.dataset.gmailCenter='';
-  function openClientEmails(id){if(!canLeave())return;emailCenter?.destroy();emailCenter=mountEmailCenter({root:emailRoot,supabase,clientId:id,onTask:x=>foundation?.openTask(x),onClient:openClientEmails});emailRoot.scrollIntoView({block:'start'});}
+  function openClientEmails(id){if(!canLeave())return;showPage('communications');emailCenter?.destroy();emailCenter=mountEmailCenter({root:emailRoot,supabase,clientId:id,onTask:x=>foundation?.openTask(x),onClient:openClientEmails});emailRoot.scrollIntoView({block:'start'});}
   if(businessAdmin){root.append(emailRoot);emailCenter=mountEmailCenter({root:emailRoot,supabase,onTask:x=>foundation?.openTask(x),onClient:openClientEmails});}
+  // Page isolation: hidden categories remain mounted (and retain their state), but
+  // are never reachable by scrolling down from the currently selected section.
+  let activePage='dashboard';
+  const pageGroups={
+    dashboard:[osRoot.querySelector('[data-os-home]'),$('.cloud-workspace-actions')],
+    crm:[osRoot.querySelector('[data-os-clients]'),enquiriesRoot],
+    orders:[$('[data-orders-section]'),$('[data-order-detail]'),$('[data-intake-root]')],
+    calendar:[osRoot.querySelector('[data-os-calendar]')],
+    communications:[$('.comm-inbox'),emailRoot],
+    finance:[reportRoot],marketing:[osRoot.querySelector('[data-os-marketing]')],
+    ai:[],settings:[],
+  };
+  const aiPage=document.createElement('section');aiPage.className='cloud-orders';aiPage.innerHTML='<h3>AI 分析与助手</h3><p class="cloud-note">与 Sculpy 讨论工作室运营、订单和获客。</p>';
+  const aiButton=$('[data-global]');if(aiButton)aiPage.append(aiButton);
+  root.append(aiPage);pageGroups.ai.push(aiPage);
+  const companyRules=$('.company-rules');if(companyRules)pageGroups.settings.push(companyRules);
+  const allPages=[...new Set(Object.values(pageGroups).flat().filter(Boolean))];
+  function showPage(page){
+    if(!pageGroups[page])return false;
+    activePage=page;
+    if(page==='marketing'&&pageGroups.marketing[0])pageGroups.marketing[0].hidden=false;
+    for(const element of allPages)element.classList.toggle('workspace-page-inactive',!pageGroups[page].includes(element));
+    onPageChange?.(page);
+    return true;
+  }
+  showPage('dashboard');
   async function refreshInbox(){
     if(!businessAdmin||destroyed)return;
     try{const {data,error}=await supabase.rpc('sculpy_communication_inbox',{});
@@ -186,11 +214,14 @@ export function mountCloudWorkspace({ root, supabase, profile }) {
       if(!canLeave())throw Error('请先完成当前保存');
       if(target.type==='marketing'){
         if(!businessAdmin||!Number.isInteger(target.postId)||target.postId<1||target.postId>24)throw Error('社媒任务不可查看');
+        showPage('marketing');
         foundation?.openMarketingPost(target.postId);
       }else if(target.type==='lead'){
+        showPage('crm');
         if(!enquiries||await enquiries.openLead(target.id)===false)throw Error('询盘当前不可查看');
-      }else await openOrder(target.id);
+      }else{showPage('orders');await openOrder(target.id);}
     },
+    showPage,
     destroy() {
       destroyed = true;
       window.removeEventListener('beforeunload',beforeUnload);

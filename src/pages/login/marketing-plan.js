@@ -61,8 +61,11 @@ export const marketingProductionTasks = holidayContentPlan.map((p,i)=>({id:p.id,
 
 export function mountMarketingPlan(root, profile = {}, supabase) {
   if (!root) return;
+  // Reserved index 50 is the post-level completion flag; legacy production-task
+  // checks at indices 0..N must not be mistaken for published/completed posts.
+  const COMPLETE_INDEX=50;
   let checks={},comments=[],assignees=[],ready=false,alive=true,loading=false,selectedPost=null;
-  root.innerHTML = `<div class="marketing-head"><div><span class="auth-eyebrow">HOLIDAY 2026 · CONTENT CALENDAR</span><h3>社媒日历与制作清单</h3><p>11月23日–12月20日 · Instagram 12篇 / 小红书12篇 · 8篇Holiday内容</p></div><span class="marketing-pill">团队云端共享</span></div><p class="cloud-note">Checklist 与每项任务下的留言由 JZ / Miranda 共享，支持 @相关人员并在对方开启通知的设备上推送。仅在确认保存成功后显示完成；不会自动发布。</p><div class="marketing-filters"><label>周次<select data-marketing-week><option value="1">第1周 · 11/23–11/29</option><option value="2">第2周 · 11/30–12/06</option><option value="3">第3周 · 12/07–12/13</option><option value="4">第4周 · 12/14–12/20</option></select></label><label>平台<select data-marketing-platform><option value="all">全部平台</option><option>Instagram</option><option>小红书</option></select></label><button type="button" data-marketing-refresh>刷新共享进度</button></div><p role="status" data-marketing-status>正在读取团队进度…</p><div data-marketing-list class="marketing-calendar" aria-label="四周发布日历"></div><article data-marketing-detail class="marketing-detail" hidden></article>`;
+  root.innerHTML = `<div class="marketing-head"><div><span class="auth-eyebrow">HOLIDAY 2026 · CONTENT CALENDAR</span><h3>社媒发布日历</h3><p>11月23日–12月20日 · Instagram 12篇 / 小红书12篇 · 8篇Holiday内容</p></div><span class="marketing-pill">团队云端共享</span></div><p class="cloud-note">点击日历查看图片安排和完整文案；每篇内容只需勾选一次「已完成」。留言与 @提醒由 JZ / Miranda 共享。</p><div class="marketing-filters"><label>周次<select data-marketing-week><option value="1">第1周 · 11/23–11/29</option><option value="2">第2周 · 11/30–12/06</option><option value="3">第3周 · 12/07–12/13</option><option value="4">第4周 · 12/14–12/20</option></select></label><label>平台<select data-marketing-platform><option value="all">全部平台</option><option>Instagram</option><option>小红书</option></select></label><button type="button" data-marketing-refresh>刷新共享进度</button></div><p role="status" data-marketing-status>正在读取团队进度…</p><div data-marketing-list class="marketing-calendar" aria-label="四周发布日历"></div><article data-marketing-detail class="marketing-detail" hidden></article>`;
   const list=root.querySelector('[data-marketing-list]'),detail=root.querySelector('[data-marketing-detail]');
   const week=root.querySelector('[data-marketing-week]'),platform=root.querySelector('[data-marketing-platform]');
   const status=root.querySelector('[data-marketing-status]');
@@ -94,7 +97,7 @@ export function mountMarketingPlan(root, profile = {}, supabase) {
     list.innerHTML=dayNames.map((day,i)=>{
       const date=new Date(start.getTime()+i*86400000).toISOString().slice(0,10);
       const posts=visible.filter(p=>p.date===date);
-      return `<div class="marketing-day"><div class="marketing-day-heading"><span>${day}</span><strong>${date.slice(5)}</strong></div>${posts.length?posts.map(p=>{const task=marketingProductionTasks[p.id-1];const count=task.tasks.filter((_,n)=>checks[`${p.id}:${n}`]).length;return `<button type="button" class="marketing-event ${p.category==='Holiday'?'holiday':''}" data-post="${p.id}"><span>${escapeHTML(p.platform)} · ${escapeHTML(p.category)}</span><strong>${escapeHTML(p.title)}</strong><small>${count}/${task.tasks.length} 已勾选</small></button>`;}).join(''):'<small class="marketing-no-post">无排期</small>'}</div>`;
+      return `<div class="marketing-day"><div class="marketing-day-heading"><span>${day}</span><strong>${date.slice(5)}</strong></div>${posts.length?posts.map(p=>`<div class="marketing-event-wrap"><button type="button" class="marketing-event ${p.category==='Holiday'?'holiday':''}" data-post="${p.id}"><span>${escapeHTML(p.platform)} · ${escapeHTML(p.category)}</span><strong>${escapeHTML(p.title)}</strong></button><label class="marketing-done"><input type="checkbox" data-done="${p.id}" ${checks[key(p.id,COMPLETE_INDEX)]?'checked':''} ${ready?'':'disabled'}><span>已完成</span></label></div>`).join(''):'<small class="marketing-no-post">无排期</small>'}</div>`;
     }).join('');
   }
   function openPost(id){
@@ -102,22 +105,13 @@ export function mountMarketingPlan(root, profile = {}, supabase) {
     selectedPost=id;
     const production=marketingProductionTasks[id-1];
     const displayName=userId=>assignees.find(a=>a.id===userId)?.name||'团队成员';
-    const commentRows=taskIndex=>comments.filter(c=>c.post_id===id&&c.task_index===taskIndex);
-    const taskMarkup=production.tasks.map((task,i)=>`<div class="marketing-task"><label><input type="checkbox" data-check="${i}" ${checks[key(id,i)]?'checked':''} ${ready?'':'disabled'}><span>${escapeHTML(task)}</span></label><div class="marketing-task-comments">${commentRows(i).map(c=>`<p><strong>${escapeHTML(displayName(c.author_id))}</strong> <time>${escapeHTML(new Date(c.created_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))}</time>${c.mentioned_user_id?` <em>@${escapeHTML(displayName(c.mentioned_user_id))}</em>`:''}<span>${escapeHTML(c.body)}</span></p>`).join('')||'<small>暂无留言</small>'}</div><form data-comment-form="${i}"><textarea name="body" rows="2" maxlength="1000" placeholder="在这项任务下留言…" ${ready?'':'disabled'} required></textarea><div><select name="mention" aria-label="选择要@的人员" ${ready?'':'disabled'}><option value="">不@任何人</option>${assignees.filter(a=>a.id!==profile.id).map(a=>`<option value="${escapeHTML(a.id)}">@${escapeHTML(a.name)}</option>`).join('')}</select><button type="submit" ${ready?'':'disabled'}>发送留言</button></div><small role="status" data-comment-status></small></form></div>`).join('');
+    const commentRows=()=>comments.filter(c=>c.post_id===id);
+    const taskMarkup=`<div class="marketing-task"><div class="marketing-task-comments">${commentRows().map(c=>`<p><strong>${escapeHTML(displayName(c.author_id))}</strong> <time>${escapeHTML(new Date(c.created_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))}</time>${c.mentioned_user_id?` <em>@${escapeHTML(displayName(c.mentioned_user_id))}</em>`:''}<span>${escapeHTML(c.body)}</span></p>`).join('')||'<small>暂无留言</small>'}</div><form data-comment-form="${COMPLETE_INDEX}"><textarea name="body" rows="2" maxlength="1000" placeholder="就这篇内容留言…" ${ready?'':'disabled'} required></textarea><div><select name="mention" aria-label="选择要@的人员" ${ready?'':'disabled'}><option value="">不@任何人</option>${assignees.filter(a=>a.id!==profile.id).map(a=>`<option value="${escapeHTML(a.id)}">@${escapeHTML(a.name)}</option>`).join('')}</select><button type="submit" ${ready?'':'disabled'}>发送留言</button></div><small role="status" data-comment-status></small></form></div>`;
     detail.hidden=false;
-    detail.innerHTML=`<div class="marketing-detail-top"><span class="auth-eyebrow">CONTENT #${String(id).padStart(2,'0')} · ${escapeHTML(p.date)} · ${escapeHTML(p.platform)}</span><button type="button" data-marketing-close>收起 ×</button></div><h4>${escapeHTML(p.title)}</h4><p><b>制作形式：</b>${escapeHTML(p.format)} · 共 ${production.assets.length} ${p.format.includes('Reel')?'段镜头':'张图片/卡片'}</p><div class="marketing-cover"><small>封面文案</small><strong>${escapeHTML(p.cover)}</strong></div><h5>逐张图片 / 逐段镜头安排</h5><ol class="marketing-assets">${production.assets.map((asset,i)=>`<li><strong>${p.format.includes('Reel')?'镜头':'第'} ${i+1}${p.format.includes('Reel')?'':'张'}</strong><span>${escapeHTML(asset)}</span></li>`).join('')}</ol><h5>团队 Checklist <small data-marketing-progress></small></h5><div class="marketing-checklist">${taskMarkup}</div><h5>完整发布文案</h5><div class="marketing-caption">${escapeHTML(p.caption)}</div><div class="marketing-detail-actions"><button type="button" data-marketing-copy>复制文案</button><button type="button" data-marketing-copy-brief>复制整篇制作任务</button><small role="status" data-marketing-copy-result></small></div>`;
+    detail.innerHTML=`<div class="marketing-detail-top"><span class="auth-eyebrow">CONTENT #${String(id).padStart(2,'0')} · ${escapeHTML(p.date)} · ${escapeHTML(p.platform)}</span><button type="button" data-marketing-close>收起 ×</button></div><h4>${escapeHTML(p.title)}</h4><p><b>制作形式：</b>${escapeHTML(p.format)} · 共 ${production.assets.length} ${p.format.includes('Reel')?'段镜头':'张图片/卡片'}</p><div class="marketing-cover"><small>封面文案</small><strong>${escapeHTML(p.cover)}</strong></div><h5>逐张图片 / 逐段镜头安排</h5><ol class="marketing-assets">${production.assets.map((asset,i)=>`<li><strong>${p.format.includes('Reel')?'镜头':'第'} ${i+1}${p.format.includes('Reel')?'':'张'}</strong><span>${escapeHTML(asset)}</span></li>`).join('')}</ol><h5>完整发布文案</h5><div class="marketing-caption">${escapeHTML(p.caption)}</div><div class="marketing-detail-actions"><button type="button" data-marketing-copy>复制文案</button><button type="button" data-marketing-copy-brief>复制整篇制作安排</button><small role="status" data-marketing-copy-result></small></div><h5>团队留言 / @提醒</h5><div class="marketing-checklist">${taskMarkup}</div>`;
     detail.querySelector('[data-marketing-close]').onclick=()=>{detail.hidden=true;};
     detail.querySelector('[data-marketing-copy]').onclick=async()=>{try{await navigator.clipboard.writeText(p.caption);detail.querySelector('[data-marketing-copy-result]').textContent='文案已复制';}catch{detail.querySelector('[data-marketing-copy-result]').textContent='复制失败，可手动选择文字';}};
-    detail.querySelector('[data-marketing-copy-brief]').onclick=async()=>{try{await navigator.clipboard.writeText(`${p.date} ${p.platform}｜${p.title}\n${p.format}\n封面：${p.cover}\n\n素材：\n${production.assets.map((x,i)=>`${i+1}. ${x}`).join('\n')}\n\nChecklist：\n${production.tasks.map((x,i)=>`${checks[`${id}:${i}`]?'[x]':'[ ]'} ${x}`).join('\n')}\n\n文案：\n${p.caption}`);detail.querySelector('[data-marketing-copy-result]').textContent='整篇制作任务已复制';}catch{detail.querySelector('[data-marketing-copy-result]').textContent='复制失败';}};
-    const progress=detail.querySelector('[data-marketing-progress]');
-    const updateProgress=()=>{progress.textContent=`${production.tasks.filter((_,i)=>checks[key(id,i)]).length}/${production.tasks.length} 已完成（云端共享）`;};
-    detail.querySelectorAll('[data-check]').forEach(input=>input.addEventListener('change',async()=>{
-      const index=Number(input.dataset.check),desired=input.checked;
-      input.disabled=true;
-      try{const result=await supabase.rpc('sculpy_marketing_set_check',{p_post_id:id,p_task_index:index,p_checked:desired});if(result.error)throw result.error;checks[key(id,index)]=result.data.checked;status.textContent='勾选已保存，可由另一账号刷新查看';}
-      catch{input.checked=!desired;status.textContent='勾选保存失败，未修改共享状态。请重试。';}
-      finally{input.disabled=!ready;updateProgress();renderCalendarOnly();}
-    }));
+    detail.querySelector('[data-marketing-copy-brief]').onclick=async()=>{try{await navigator.clipboard.writeText(`${p.date} ${p.platform}｜${p.title}\n${p.format}\n封面：${p.cover}\n\n素材：\n${production.assets.map((x,i)=>`${i+1}. ${x}`).join('\n')}\n\n文案：\n${p.caption}`);detail.querySelector('[data-marketing-copy-result]').textContent='整篇制作安排已复制';}catch{detail.querySelector('[data-marketing-copy-result]').textContent='复制失败';}};
     detail.querySelectorAll('[data-comment-form]').forEach(form=>form.addEventListener('submit',async event=>{
       event.preventDefault();const taskIndex=Number(form.dataset.commentForm),button=form.querySelector('button'),output=form.querySelector('[data-comment-status]');
       button.disabled=true;output.textContent='正在发送…';
@@ -126,15 +120,20 @@ export function mountMarketingPlan(root, profile = {}, supabase) {
         if(result.error)throw result.error;
         output.textContent=result.data.notificationQueued?'留言已保存，已加入推送队列':'留言已保存（对方未订阅或推送未入队）';
         const snapshot={...result.data};comments.push({id:snapshot.id,post_id:id,task_index:taskIndex,body:snapshot.body,author_id:snapshot.authorId,mentioned_user_id:snapshot.mentionedUserId,created_at:snapshot.createdAt});
-        const note=form.closest('.marketing-task').querySelector('.marketing-task-comments');note.innerHTML=comments.filter(c=>c.post_id===id&&c.task_index===taskIndex).map(c=>`<p><strong>${escapeHTML(displayName(c.author_id))}</strong> <time>${escapeHTML(new Date(c.created_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))}</time>${c.mentioned_user_id?` <em>@${escapeHTML(displayName(c.mentioned_user_id))}</em>`:''}<span>${escapeHTML(c.body)}</span></p>`).join('');
+        const note=form.closest('.marketing-task').querySelector('.marketing-task-comments');note.innerHTML=commentRows().map(c=>`<p><strong>${escapeHTML(displayName(c.author_id))}</strong> <time>${escapeHTML(new Date(c.created_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))}</time>${c.mentioned_user_id?` <em>@${escapeHTML(displayName(c.mentioned_user_id))}</em>`:''}<span>${escapeHTML(c.body)}</span></p>`).join('');
         form.reset();
       }catch{output.textContent='留言发送失败，内容尚未保存，请重试。';}finally{button.disabled=false;}
     }));
-    function renderCalendarOnly(){const wasHidden=detail.hidden;renderList();detail.hidden=wasHidden;}
-    updateProgress();
     detail.scrollIntoView?.({block:'nearest'});
   }
   list.addEventListener('click',e=>{const button=e.target.closest('[data-post]');if(button)openPost(Number(button.dataset.post));});
+  list.addEventListener('change',async e=>{
+    const input=e.target.closest('[data-done]');if(!input)return;
+    const id=Number(input.dataset.done),desired=input.checked;input.disabled=true;
+    try{const result=await supabase.rpc('sculpy_marketing_set_check',{p_post_id:id,p_task_index:COMPLETE_INDEX,p_checked:desired});if(result.error)throw result.error;checks[key(id,COMPLETE_INDEX)]=result.data.checked;status.textContent='完成状态已保存，另一账号刷新后可见';}
+    catch{input.checked=!desired;status.textContent='完成状态保存失败，请重试。';}
+    finally{input.disabled=!ready;}
+  });
   week.onchange=renderList;platform.onchange=renderList;
   root.querySelector('[data-marketing-refresh]').onclick=()=>void refreshCloud();
   renderList();

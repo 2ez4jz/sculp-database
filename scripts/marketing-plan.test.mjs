@@ -38,12 +38,14 @@ test('Marketing module filters posts, opens details and writes shared checks', a
   assert.equal(root.querySelector('[data-marketing-detail]').hidden,false);
   assert.match(root.querySelector('.marketing-caption').textContent,/150 CAD/);
   assert.equal(root.querySelectorAll('.marketing-assets li').length,4);
-  const check=root.querySelector('[data-check="0"]');
+  assert.equal(root.querySelectorAll('[data-check]').length,0);
+  const check=root.querySelector('[data-done="2"]');
   check.checked=true;
-  check.dispatchEvent(new dom.window.Event('change'));
+  check.dispatchEvent(new dom.window.Event('change',{bubbles:true}));
   await new Promise(resolve=>setTimeout(resolve,0));
-  assert.match(root.querySelector('[data-marketing-progress]').textContent,/1\/12 已完成/);
-  const form=root.querySelector('[data-comment-form="0"]');
+  assert.equal(root.querySelector('[data-done="2"]').checked,true);
+  assert.match(root.querySelector('[data-marketing-status]').textContent,/完成状态已保存/);
+  const form=root.querySelector('[data-comment-form="50"]');
   form.elements.body.value='请 Miranda 看一下';form.elements.mention.value='u2';
   form.dispatchEvent(new dom.window.Event('submit',{cancelable:true}));
   await new Promise(resolve=>setTimeout(resolve,0));

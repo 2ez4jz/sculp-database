@@ -1,7 +1,7 @@
 import {mountHistoryImport} from './os-import.js?v=os32-20261116';
 import {mountOsOperations} from './os-operations.js?v=os32-20261116';
 import {esc, money} from './wedding-dashboard.js';
-import {mountMarketingPlan} from './marketing-plan.js?v=marketing-sync-20261118';
+import {mountMarketingPlan} from './marketing-plan.js?v=marketing-pages-20261118';
 
 export const osNavigation = [
   ['dashboard', 'Dashboard｜工作台', '[data-os-home]'],
@@ -22,7 +22,7 @@ const empty = text => `<p class="os-empty">${esc(text)}</p>`;
 const metric = (label, value, note='') => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd><small>${esc(note)}</small></div>`;
 
 // All data enters through authenticated, role-checked RPCs. No Demo imports/fallback.
-export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onNewOrder, onClientEmails}) {
+export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onNewOrder, onClientEmails, onNavigate}) {
   let alive=true, overviewVersion=0, clientsVersion=0, offset=0, overview=null;
   const pendingWrites=new Set();
   let operations=null,historyImport=null;
@@ -48,6 +48,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
   const scroll=s=>$(s)?.scrollIntoView({block:'start'});
   function openTask({bookingId='',clientId='',label='未关联客户或订单'}={}) {
     if(!canLeave())return;
+    onNavigate?.('calendar');
     const form=$('[data-os-task-form]');
     form.elements.bookingId.value=bookingId;form.elements.clientId.value=clientId;
     form.elements.confirmed.checked=false;
@@ -56,10 +57,10 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
   }
   $('[data-os-refresh]').onclick=()=>void refresh();
   $('[data-os-new-order]').onclick=onNewOrder;
-  $('[data-os-new-client]').onclick=()=>{$('[data-os-client-create]').open=true;scroll('[data-os-clients]');$('[name=clientName]').focus();};
+  $('[data-os-new-client]').onclick=()=>{onNavigate?.('crm');$('[data-os-client-create]').open=true;scroll('[data-os-clients]');$('[name=clientName]').focus();};
   $('[data-os-new-task]').onclick=()=>openTask();
-  $('[data-os-schedule]').onclick=()=>scroll('[data-os-calendar]');
-  $('[data-os-leads]').onclick=()=>document.querySelector('#website-enquiries')?.scrollIntoView({block:'start'});
+  $('[data-os-schedule]').onclick=()=>{onNavigate?.('calendar');scroll('[data-os-calendar]');};
+  $('[data-os-leads]').onclick=()=>{onNavigate?.('crm');document.querySelector('#website-enquiries')?.scrollIntoView({block:'start'});};
   const leadsShortcut=document.createElement('button');leadsShortcut.type='button';leadsShortcut.textContent='查看客户询盘';leadsShortcut.onclick=$('[data-os-leads]').onclick;
   $('[data-os-clients] h3').after(leadsShortcut);
   $('[data-os-settings]').onclick=()=>document.querySelector('#workspace-settings')?.click();
@@ -68,7 +69,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
     if(b.dataset.osOrder)onOrder(b.dataset.osOrder);
     if(b.dataset.osLead)onLead(b.dataset.osLead);
     if(b.dataset.osClientOpen){void operations?.openClient(b.dataset.osClientOpen);return;}
-    if(b.hasAttribute('data-os-manage-tasks'))scroll('[data-os-tasks]');
+    if(b.hasAttribute('data-os-manage-tasks')){onNavigate?.('calendar');scroll('[data-os-tasks]');}
     if(b.dataset.osClientEmails){onClientEmails?.(b.dataset.osClientEmails);return;}
     if(b.dataset.osClientTask)openTask({clientId:b.dataset.osClientTask,label:b.dataset.label});
   });

@@ -1,6 +1,6 @@
 import {mountGmailSettings} from './gmail.js?v=gmail-setup-20261112';
-import { mountCloudWorkspace } from "./workspace.js?v=marketing-sync-20261118";
-import {osNavigation} from './os-foundation.js?v=marketing-sync-20261118';
+import { mountCloudWorkspace } from "./workspace.js?v=marketing-pages-20261118";
+import {osNavigation} from './os-foundation.js?v=marketing-pages-20261118';
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import {mountNotificationSettings} from "./notification-settings.js?v=25";
@@ -119,15 +119,14 @@ async function showWorkspace() {
     if(!workspace.canLeave()){message('请先完成当前保存，再切换页面。');return;}
     if(!setSettings(button.dataset.osNav==='settings'))return;
     root.querySelectorAll('[data-studio-nav]').forEach(b=>b.removeAttribute('aria-current'));button.setAttribute('aria-current','page');
-    const target=root.querySelector(button.dataset.studioNav);
-    if(button.dataset.osNav==='settings'&&matchMedia('(max-width:760px)').matches)root.querySelector('.studio-page-header')?.scrollIntoView({behavior:'auto',block:'start'});
-    if(button.dataset.osNav==='ai')target?.click();
-    else if(button.dataset.osNav!=='settings'){if(button.dataset.osNav==='marketing'&&target)target.hidden=false;target?.scrollIntoView({behavior:'auto',block:'start'});}
+    if(button.dataset.osNav!=='settings')workspace.showPage(button.dataset.osNav||'orders');
+    root.querySelector('.studio-page-header')?.scrollIntoView({behavior:'auto',block:'start'});
   });
   workspace = mountCloudWorkspace({
     root: root.querySelector("#cloud-workspace"),
     supabase,
     profile,
+    onPageChange(page){root.querySelectorAll('[data-studio-nav]').forEach(b=>{if(b.dataset.osNav===page||(!b.dataset.osNav&&page==='orders'))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});},
   });
   let settingsMode=false;
   function setSettings(open) {
