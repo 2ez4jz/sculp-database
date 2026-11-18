@@ -1,7 +1,7 @@
 import {mountHistoryImport} from './os-import.js?v=os32-20261116';
 import {mountOsOperations} from './os-operations.js?v=os32-20261116';
 import {esc, money} from './wedding-dashboard.js';
-import {mountMarketingPlan} from './marketing-plan.js?v=holiday-20261118';
+import {mountMarketingPlan} from './marketing-plan.js?v=calendar-20261118';
 
 export const osNavigation = [
   ['dashboard', 'Dashboard｜工作台', '[data-os-home]'],
@@ -44,7 +44,7 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
   </section>
   <section class="cloud-orders" data-os-marketing hidden aria-label="营销中心社媒计划"></section>`;
   const $=s=>root.querySelector(s);
-  mountMarketingPlan($('[data-os-marketing]'));
+  mountMarketingPlan($('[data-os-marketing]'),profile);
   const scroll=s=>$(s)?.scrollIntoView({block:'start'});
   function openTask({bookingId='',clientId='',label='未关联客户或订单'}={}) {
     if(!canLeave())return;

@@ -30,22 +30,67 @@ const entries = [
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const holidayContentPlan = entries.map(([date,platform,category,title,format,cover,visual,caption],index)=>({id:index+1,date,platform,category,title,format,cover,visual,caption}));
 
-export function mountMarketingPlan(root) {
+// Exact asset order. Each segment represents one photo/card or a timed video shot.
+const assetBriefs = [
+  ['完整新娘半身照，面部清晰、留出封面留白','正面近景：底妆、眼妆完整呈现','眼妆和皮肤局部特写','自然光侧脸或回眸照'],
+  ['原 Holiday 海报：$150、仅化妆、Studio','真实节日妆容脸部近景','Studio化妆台/环境照片','信息卡：Markham、活动时间、预约方式'],
+  ['封面：3种真实妆容三宫格','Soft & Romantic：自然光妆容','Elegant Glam：晚宴妆容','Festive Glow：节日细闪妆容','信息卡：Holiday Makeup $150 / Markham'],
+  ['真实新娘正面半身照','眼妆近景，清晰可见晕染','底妆局部，保留真实肤质','侧脸和轮廓','整体婚礼造型'],
+  ['眼妆超近景','自然皮肤光泽和底妆','唇妆色彩与质地','完整妆容照'],
+  ['封面：同一套拍照妆容完整效果','底妆：自然光细节及文字建议','眼妆：展示层次','轮廓与腮红近景','总结：拍摄光线与服装协调'],
+  ['完整新娘造型封面','脸部正面近景','婚礼现场或自然光照片','侧脸/妆容轮廓'],
+  ['新娘完整造型','眼妆细节','底妆及唇色','自然光侧面','真实婚礼场景'],
+  ['0–2秒：妆前正面，征得本人同意','2–8秒：底妆及眼妆过程','8–13秒：眼妆、睫毛、唇妆特写','13–17秒：完成效果与转头','17–20秒：活动信息及Logo'],
+  ['封面：三种Party妆容拼图','Soft Glam完整妆容','Elegant Glam晚宴妆容','Festive Glow细闪妆容','信息卡：$150仅化妆、Markham'],
+  ['0–3秒：化妆刷和工作台','3–6秒：产品准备、配色','6–10秒：化妆师上妆动作','10–15秒：完成作品和Logo'],
+  ['三宫格封面：不同妆容局部','作品A：眼妆层次','作品B：底妆质感','作品C：唇妆与腮红','完整妆容对照'],
+  ['经典新娘妆完整造型','正面妆容近景','侧脸或婚纱搭配','眼妆与皮肤细节'],
+  ['工作室入口和环境','工具消毒整理/工作台准备','化妆师与客户沟通画面','上妆过程','完成效果','工作台收尾和Logo'],
+  ['0–3秒：正面妆容','3–6秒：柔和侧脸','6–10秒：眼妆特写','10–15秒：唇妆细节及整体'],
+  ['圣诞写真风格的真实妆容封面','皮肤光泽和底妆特写','眼妆细节','不同角度的整体照片','活动信息卡：$150仅化妆'],
+  ['0–3秒：Studio环境','3–6秒：化妆台准备','6–10秒：沟通造型风格','10–16秒：上妆细节','16–21秒：完成效果','21–25秒：SCULP Logo与活动信息'],
+  ['案例A完整妆容','案例A腮红与轮廓细节','案例B完整妆容','案例B眼妆和轮廓细节','总结：因人而异，不套固定模板'],
+  ['现代简约新娘完整造型','正面细节','侧脸/发型搭配','婚礼现场或全身造型'],
+  ['最近一组真实妆容正面封面','眼妆近景','侧脸及自然光','完整造型'],
+  ['主图：Holiday Glam完成照','说明卡：$150 CAD、仅Studio化妆','确认后的空余日期、地点、DM预约；同步Story'],
+  ['节日/晚宴妆容完整效果','眼妆特写','底妆及唇妆细节','小型信息卡：$150、Markham、至12月底'],
+  ['另一组作品的眼妆近景','皮肤与底妆细节','唇妆近景','整体完成照'],
+  ['合集封面：4组新娘妆容拼图','新娘作品A：清透风格','新娘作品B：优雅风格','新娘作品C：Glam风格','新娘作品D：个性风格','品牌收尾页：SCULP Studio']
+];
+export const marketingProductionTasks = holidayContentPlan.map((p,i)=>({id:p.id,assets:assetBriefs[i],tasks:[...assetBriefs[i].map((_,n)=>`素材 ${n+1} 已准备并确认可使用`),'封面文字和排版已检查','完整文案与标签已核对','客户/模特及素材公开授权已核实','预约价格、服务范围和档期已核对（如涉及）','发布前由负责人最终确认']}));
+
+export function mountMarketingPlan(root, profile = {}) {
   if (!root) return;
-  root.innerHTML = `<div class="marketing-head"><div><span class="auth-eyebrow">HOLIDAY 2026 · EDITORIAL PLAN</span><h3>社媒内容计划</h3><p>11月23日–12月20日 · Instagram 12篇 / 小红书12篇 · 8篇Holiday内容</p></div><span class="marketing-pill">团队共享 · 只读</span></div><p class="cloud-note">点击内容查看完整文案、封面及拍摄/配图方案。此计划不会自动发布，素材需使用获授权的真实作品。</p><div class="marketing-filters"><label>周次<select data-marketing-week><option value="1">第1周 · 11/23–11/29</option><option value="2">第2周 · 11/30–12/06</option><option value="3">第3周 · 12/07–12/13</option><option value="4">第4周 · 12/14–12/20</option></select></label><label>平台<select data-marketing-platform><option value="all">全部平台</option><option>Instagram</option><option>小红书</option></select></label></div><div data-marketing-list class="marketing-list"></div><article data-marketing-detail class="marketing-detail" hidden></article>`;
+  const storeKey=`sculp-holiday-checks-v1-${profile.id||'local'}`;
+  let checks={};
+  try{checks=JSON.parse(localStorage.getItem(storeKey)||'{}')||{};}catch{checks={};}
+  root.innerHTML = `<div class="marketing-head"><div><span class="auth-eyebrow">HOLIDAY 2026 · CONTENT CALENDAR</span><h3>社媒日历与制作清单</h3><p>11月23日–12月20日 · Instagram 12篇 / 小红书12篇 · 8篇Holiday内容</p></div><span class="marketing-pill">内容团队共享</span></div><p class="cloud-note">点击日历中的内容查看逐张配图/分镜、完整文案及制作Checklist。勾选暂存在当前账号使用的浏览器，不会同步给另一台设备或Miranda；不会自动发布。</p><div class="marketing-filters"><label>周次<select data-marketing-week><option value="1">第1周 · 11/23–11/29</option><option value="2">第2周 · 11/30–12/06</option><option value="3">第3周 · 12/07–12/13</option><option value="4">第4周 · 12/14–12/20</option></select></label><label>平台<select data-marketing-platform><option value="all">全部平台</option><option>Instagram</option><option>小红书</option></select></label></div><div data-marketing-list class="marketing-calendar" aria-label="四周发布日历"></div><article data-marketing-detail class="marketing-detail" hidden></article>`;
   const list=root.querySelector('[data-marketing-list]'),detail=root.querySelector('[data-marketing-detail]');
   const week=root.querySelector('[data-marketing-week]'),platform=root.querySelector('[data-marketing-platform]');
   function renderList(){
     detail.hidden=true;
     const visible=holidayContentPlan.filter(p=>Math.floor((p.id-1)/6)+1===Number(week.value)&&(platform.value==='all'||p.platform===platform.value));
-    list.innerHTML=visible.map(p=>`<button type="button" class="marketing-item" data-post="${p.id}"><span class="marketing-item-meta">${escapeHTML(p.date)} · ${escapeHTML(p.platform)} <em class="${p.category==='Holiday'?'holiday':''}">${escapeHTML(p.category)}</em></span><strong>${escapeHTML(p.title)}</strong><small>${escapeHTML(p.format)} · 点击查看完整制作稿 →</small></button>`).join('');
+    const start=new Date(Date.UTC(2026,10,23+(Number(week.value)-1)*7));
+    const dayNames=['周一','周二','周三','周四','周五','周六','周日'];
+    list.innerHTML=dayNames.map((day,i)=>{
+      const date=new Date(start.getTime()+i*86400000).toISOString().slice(0,10);
+      const posts=visible.filter(p=>p.date===date);
+      return `<div class="marketing-day"><div class="marketing-day-heading"><span>${day}</span><strong>${date.slice(5)}</strong></div>${posts.length?posts.map(p=>{const task=marketingProductionTasks[p.id-1];const count=task.tasks.filter((_,n)=>checks[`${p.id}:${n}`]).length;return `<button type="button" class="marketing-event ${p.category==='Holiday'?'holiday':''}" data-post="${p.id}"><span>${escapeHTML(p.platform)} · ${escapeHTML(p.category)}</span><strong>${escapeHTML(p.title)}</strong><small>${count}/${task.tasks.length} 已勾选</small></button>`;}).join(''):'<small class="marketing-no-post">无排期</small>'}</div>`;
+    }).join('');
   }
   function openPost(id){
     const p=holidayContentPlan.find(x=>x.id===id);if(!p)return;
+    const production=marketingProductionTasks[id-1];
     detail.hidden=false;
-    detail.innerHTML=`<div class="marketing-detail-top"><span class="auth-eyebrow">CONTENT #${String(id).padStart(2,'0')} · ${escapeHTML(p.date)} · ${escapeHTML(p.platform)}</span><button type="button" data-marketing-close>收起 ×</button></div><h4>${escapeHTML(p.title)}</h4><p><b>形式：</b>${escapeHTML(p.format)}</p><div class="marketing-cover"><small>封面文案</small><strong>${escapeHTML(p.cover)}</strong></div><h5>图片 / 视频布置</h5><p>${escapeHTML(p.visual)}</p><h5>完整发布文案</h5><div class="marketing-caption">${escapeHTML(p.caption)}</div><div class="marketing-detail-actions"><button type="button" data-marketing-copy>复制文案</button><small role="status" data-marketing-copy-result></small></div>`;
+    detail.innerHTML=`<div class="marketing-detail-top"><span class="auth-eyebrow">CONTENT #${String(id).padStart(2,'0')} · ${escapeHTML(p.date)} · ${escapeHTML(p.platform)}</span><button type="button" data-marketing-close>收起 ×</button></div><h4>${escapeHTML(p.title)}</h4><p><b>制作形式：</b>${escapeHTML(p.format)} · 共 ${production.assets.length} ${p.format.includes('Reel')?'段镜头':'张图片/卡片'}</p><div class="marketing-cover"><small>封面文案</small><strong>${escapeHTML(p.cover)}</strong></div><h5>逐张图片 / 逐段镜头安排</h5><ol class="marketing-assets">${production.assets.map((asset,i)=>`<li><strong>${p.format.includes('Reel')?'镜头':'第'} ${i+1}${p.format.includes('Reel')?'':'张'}</strong><span>${escapeHTML(asset)}</span></li>`).join('')}</ol><h5>制作 Checklist <small data-marketing-progress></small></h5><div class="marketing-checklist">${production.tasks.map((task,i)=>`<label><input type="checkbox" data-check="${i}" ${checks[`${id}:${i}`]?'checked':''}><span>${escapeHTML(task)}</span></label>`).join('')}</div><h5>完整发布文案</h5><div class="marketing-caption">${escapeHTML(p.caption)}</div><div class="marketing-detail-actions"><button type="button" data-marketing-copy>复制文案</button><button type="button" data-marketing-copy-brief>复制整篇制作任务</button><small role="status" data-marketing-copy-result></small></div>`;
     detail.querySelector('[data-marketing-close]').onclick=()=>{detail.hidden=true;};
     detail.querySelector('[data-marketing-copy]').onclick=async()=>{try{await navigator.clipboard.writeText(p.caption);detail.querySelector('[data-marketing-copy-result]').textContent='文案已复制';}catch{detail.querySelector('[data-marketing-copy-result]').textContent='复制失败，可手动选择文字';}};
+    detail.querySelector('[data-marketing-copy-brief]').onclick=async()=>{try{await navigator.clipboard.writeText(`${p.date} ${p.platform}｜${p.title}\n${p.format}\n封面：${p.cover}\n\n素材：\n${production.assets.map((x,i)=>`${i+1}. ${x}`).join('\n')}\n\nChecklist：\n${production.tasks.map((x,i)=>`${checks[`${id}:${i}`]?'[x]':'[ ]'} ${x}`).join('\n')}\n\n文案：\n${p.caption}`);detail.querySelector('[data-marketing-copy-result]').textContent='整篇制作任务已复制';}catch{detail.querySelector('[data-marketing-copy-result]').textContent='复制失败';}};
+    const progress=detail.querySelector('[data-marketing-progress]');
+    const updateProgress=()=>{progress.textContent=`${production.tasks.filter((_,i)=>checks[`${id}:${i}`]).length}/${production.tasks.length} 已完成（仅本浏览器）`;};
+    detail.querySelectorAll('[data-check]').forEach(input=>input.addEventListener('change',()=>{checks[`${id}:${input.dataset.check}`]=input.checked;try{localStorage.setItem(storeKey,JSON.stringify(checks));}catch{}updateProgress();renderCalendarOnly();}));
+    function renderCalendarOnly(){const wasHidden=detail.hidden;renderList();detail.hidden=wasHidden;}
+    updateProgress();
     detail.scrollIntoView?.({block:'nearest'});
   }
   list.addEventListener('click',e=>{const button=e.target.closest('[data-post]');if(button)openPost(Number(button.dataset.post));});
