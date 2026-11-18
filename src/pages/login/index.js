@@ -1,6 +1,6 @@
 import {mountGmailSettings} from './gmail.js?v=gmail-setup-20261112';
 import { mountCloudWorkspace } from "./workspace.js?v=os32-20261116";
-import {osNavigation} from './os-foundation.js?v=os32-20261116';
+import {osNavigation} from './os-foundation.js?v=holiday-20261118';
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import {mountNotificationSettings} from "./notification-settings.js?v=25";
