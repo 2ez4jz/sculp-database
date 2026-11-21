@@ -11,7 +11,7 @@ import {
   authConfigured,
   getAuthClient,
   verifiedProfile,
-} from "../../services/auth.js?v=welcome-20261102";
+} from "../../services/auth.js?v=keep-sign-in-20261121";
 const root = document.querySelector("#auth-root");
 const esc = (value) =>
   String(value ?? "").replace(
@@ -39,6 +39,8 @@ function message(text) {
   root.querySelector(".auth-status").textContent = text;
 }
 export async function showLogin() {
+  subscription?.unsubscribe?.();
+  subscription = null;
   workspace?.destroy();
   welcomeEditor?.destroy();
   gmailSettings?.destroy();gmailSettings=null;
@@ -49,7 +51,7 @@ export async function showLogin() {
   workspace = null;
   document.title = "登录 · Sculpy";
   frame(
-    `<div class="auth-card"><span class="auth-eyebrow">WELCOME BACK</span><h2>欢迎回到工作室</h2><p class="auth-muted">使用你的团队账户登录 Sculpy。</p><form id="login-form"><label for="username">账号</label><input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="例如 sculp_jz" required minlength="7" maxlength="32" pattern="[sS][cC][uU][lL][pP]_[a-zA-Z0-9][a-zA-Z0-9_]{0,25}"><label for="password">密码</label><div class="auth-password"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button type="button" id="toggle-password" aria-label="显示密码" aria-pressed="false">显示</button></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-primary" id="login-submit" type="submit">登录工作空间 <span>↗</span></button></form><p class="auth-help">需要开通账号或重置密码？请联系系统管理员 Jz。</p>${config.environment === "demo" ? '<div class="auth-divider"></div><a class="auth-demo" href="?demo=1#bookings">先浏览演示空间 →</a><p class="auth-muted auth-small">演示使用虚构数据，记录仅保存在当前浏览器。</p>' : ""}</div><small class="auth-footer">SCULP STUDIO · 仅供团队成员使用</small>`,
+    `<div class="auth-card"><span class="auth-eyebrow">WELCOME BACK</span><h2>欢迎回到工作室</h2><p class="auth-muted">使用你的团队账户登录 Sculpy。</p><form id="login-form"><label for="username">账号</label><input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="例如 sculp_jz" required minlength="7" maxlength="32" pattern="[sS][cC][uU][lL][pP]_[a-zA-Z0-9][a-zA-Z0-9_]{0,25}"><label for="password">密码</label><div class="auth-password"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button type="button" id="toggle-password" aria-label="显示密码" aria-pressed="false">显示</button></div><label class="auth-keep-signed-in"><input type="checkbox" name="keepSignedIn">在此设备保持登录</label><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-primary" id="login-submit" type="submit">登录工作空间 <span>↗</span></button></form><p class="auth-help">需要开通账号或重置密码？请联系系统管理员 Jz。</p>${config.environment === "demo" ? '<div class="auth-divider"></div><a class="auth-demo" href="?demo=1#bookings">先浏览演示空间 →</a><p class="auth-muted auth-small">演示使用虚构数据，记录仅保存在当前浏览器。</p>' : ""}</div><small class="auth-footer">SCULP STUDIO · 仅供团队成员使用</small>`,
   );
   const form = root.querySelector("form");
   const button = root.querySelector("#login-submit");
@@ -67,10 +69,11 @@ export async function showLogin() {
   };
   form.onsubmit = async (event) => {
     event.preventDefault();
+    if (button.disabled) return;
     button.disabled = true;
     message("正在验证账户…");
     try {
-      supabase = await getAuthClient();
+      supabase = await getAuthClient({ keepSignedIn: form.elements.keepSignedIn.checked });
       const { error } = await supabase.auth.signInWithPassword({
         email: accountIdentifier(form.username.value),
         password: form.password.value,
@@ -90,6 +93,10 @@ async function showWorkspace() {
   try {
     profile = await verifiedProfile(supabase);
   } catch (error) {
+    if (error.temporary) {
+      message(error.message);
+      return;
+    }
     await supabase.auth.signOut({ scope: "local" });
     void localPushCleanup();
     await showLogin();
@@ -209,10 +216,18 @@ async function showWorkspace() {
       accountsLoading = false;
     }
   });
-  if (!subscription)
-    subscription = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {void localPushCleanup();void showLogin();}
+  if (!subscription) {
+    const client = supabase;
+    subscription = client.auth.onAuthStateChange((event, session) => {
+      if (client !== supabase) return;
+      const switched = session?.user?.id && session.user.id !== profile.id;
+      if (event === "SIGNED_OUT" || switched) {
+        void localPushCleanup();
+        void showLogin();
+        if (switched) setTimeout(() => void restoreStoredSession(), 0);
+      }
     }).data.subscription;
+  }
 }
 async function loadAccounts(profile) {
   const container = root.querySelector("#account-list");
@@ -352,15 +367,23 @@ async function manageCredentials(body) {
   if (!data?.ok) throw new Error(data?.error || "操作未完成，请重试。");
   return data;
 }
-await showLogin();
-if (authConfigured()) {
+async function restoreStoredSession() {
+  const button = root.querySelector("#login-submit");
+  if (!authConfigured() || !button || button.disabled) return;
+  button.disabled = true;
   try {
     supabase = await getAuthClient();
     const {
       data: { session },
+      error,
     } = await supabase.auth.getSession();
+    if (error) throw error;
     if (session) await showWorkspace();
   } catch {
     message("登录服务暂时不可用，请稍后重试。");
+  } finally {
+    button.disabled = false;
   }
 }
+await showLogin();
+await restoreStoredSession();
