@@ -14,7 +14,7 @@ const assert=require('node:assert/strict');const fs=require('node:fs');
    await page.screenshot({path:`qa-screens/v24-workspace-${width}.png`,fullPage:true});
   }
   await page.setViewportSize({width:1440,height:1000});
-  await page.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await page.locator('.communication-panel [data-text]').waitFor();
+  await page.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await page.locator('.enquiry-communication > summary').click();await page.locator('.communication-panel [data-text]').waitFor();
   const panel=page.locator('.communication-panel').first();
   await panel.locator('[data-text]').fill('虚构记录：客户从半天改为全天，价格待确认。');
   const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jltkAAAAASUVORK5CYII=','base64');

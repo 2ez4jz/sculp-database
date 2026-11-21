@@ -25,6 +25,7 @@ test('simple enquiry actions preserve customer details and require an explicit f
  const x=setup();try{
   await tick();
   assert(x.root.querySelector('.comm-lead-profile'),x.root.textContent);
+  assert.equal(x.root.querySelector('.enquiry-communication').open,false);
   x.root.querySelector('[data-lead-conversion] > button').click();assert.equal(x.converted[0].id,x.lead.id);
   x.root.querySelector('[data-quick-notes]').value='Followed up by email';
   x.root.querySelector('[data-save-notes]').click();await tick();

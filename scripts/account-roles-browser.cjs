@@ -40,7 +40,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   assert(await owner.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   assert.equal(await owner.locator('#manage-accounts').count(),0);assert.equal(await owner.locator('#account-list').count(),0);
   assert(await owner.locator('[data-new-booking]').isVisible());assert(await owner.locator('[data-quick-lead]').isVisible());
-  await owner.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await owner.locator('.communication-panel [data-text]').waitFor();
+  await owner.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await owner.locator('.enquiry-communication > summary').click();await owner.locator('.communication-panel [data-text]').waitFor();
   assert(await owner.locator('.communication-panel [data-text]').isEnabled());assert(await owner.locator('.communication-panel [data-save]').isEnabled());
   assert.equal(await owner.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
   assert(await owner.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
