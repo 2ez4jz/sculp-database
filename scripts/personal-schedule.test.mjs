@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {mountPersonalSchedule,canManagePersonalSchedule,scheduleOnDay} from '../src/pages/login/personal-schedule.js';
 const tick=()=>new Promise(r=>setTimeout(r,10));
-function setup({schedule=[],tasks=[],marketing=[],onWorkTask,onWorkWrite,failTasks=false,now=()=>new Date('2026-11-21T15:00:00Z')}={}){
+function setup({schedule=[],tasks=[],marketing=[],comments=[],username="sculp_jz",loseComment,onWorkTask,onWorkWrite,failTasks=false,now=()=>new Date('2026-11-21T15:00:00Z')}={}){
  const dom=new JSDOM('<main id="root"></main>',{url:'https://fixture.test'}),root=dom.window.document.querySelector('#root');dom.window.confirm=()=>true;
  const rows=[...schedule],calls=[];let lose=false;
  const sdk={rpc:async(name,args)=>{
@@ -18,7 +18,28 @@ function setup({schedule=[],tasks=[],marketing=[],onWorkTask,onWorkWrite,failTas
   assert.equal(name,'sculpy_shared_daily_work_tasks');
   if(failTasks)return {error:{code:'42501'}};
   return {data:tasks.filter(task=>task.status==='open'?task.due_on<=args.p_day:task.due_on===args.p_day||task.completed_on===args.p_day).slice(args.p_offset,args.p_offset+100)};
- },from(table){let mode='select',data,filters=[];const q={select(){return q;},lte(){return q;},gte(){return q;},order(){return q;},range(){return q;},eq(k,v){filters.push([k,v]);return q;},insert(d){mode='insert';data=d;return q;},update(d){mode='update';data=d;return q;},delete(){mode='delete';return q;},maybeSingle(){return q;},then(resolve,reject){return Promise.resolve().then(()=>{
+ },from(table){
+  if(table==='miranda_day_comments'){
+   let filters=[],write=null,patch=null,single=false,limit=Infinity;
+   const match=(key,test)=>{filters.push(row=>test(row[key]));return query;};
+   const query={select(){return query;},eq:(key,value)=>match(key,x=>x===value),neq:(key,value)=>match(key,x=>x!==value),
+    is:(key,value)=>match(key,x=>x===value),order(){return query;},range(){return query;},limit(n){limit=n;return query;},
+    single(){single=true;return query;},insert(data){write=data;return query;},update(data){patch=data;return query;},
+    then(resolve,reject){return Promise.resolve().then(()=>{
+     if(write){
+      if(comments.some(row=>row.id===write.id))return {error:{code:'23505'}};
+      const other=username==='sculp_jz'?'miranda':'jz';
+      const row={...write,author_id:username.slice(6),mentioned_user_id:write.body.toLowerCase().includes('@'+other)?other:null,read_at:null,created_at:now().toISOString()};
+      comments.push(row);if(loseComment?.())throw Error('receipt lost');
+      return {data:structuredClone(row)};
+     }
+     const result=comments.filter(row=>filters.every(test=>test(row))).slice(0,limit);
+     if(patch)for(const row of result)Object.assign(row,patch);
+     return {data:structuredClone(single?result[0]:result)};
+    }).then(resolve,reject);}
+   };return query;
+  }
+  let mode='select',data,filters=[];const q={select(){return q;},lte(){return q;},gte(){return q;},order(){return q;},range(){return q;},eq(k,v){filters.push([k,v]);return q;},insert(d){mode='insert';data=d;return q;},update(d){mode='update';data=d;return q;},delete(){mode='delete';return q;},maybeSingle(){return q;},then(resolve,reject){return Promise.resolve().then(()=>{
   if(table==='marketing_checklist_state')return {data:structuredClone(marketing)};
   calls.push({mode,data:structuredClone(data),filters});let found=rows.filter(row=>filters.every(([k,v])=>row[k]===v));
   if(mode==='insert'){if(rows.some(r=>r.id===data.id))return {error:{code:'23505'}};const item={...data,version:1,updated_by:'jz',updated_at:'2026-11-21T15:00:00Z'};rows.push(item);if(lose){lose=false;throw Error('lost response');}return {data:structuredClone(item)};}
@@ -26,7 +47,7 @@ function setup({schedule=[],tasks=[],marketing=[],onWorkTask,onWorkWrite,failTas
   if(mode==='delete'){found.forEach(row=>rows.splice(rows.indexOf(row),1));return {data:found.map(x=>({id:x.id}))};}
   return {data:filters.length?structuredClone(found[0]||null):structuredClone(rows)};
  }).then(resolve,reject);}};return q;}};
- const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:'jz',username:'sculp_jz',role:'operations',active:true},onWorkTask,now});
+ const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:username.slice(6),username,role:username==='sculp_jz'?'operations':'owner',active:true},onWorkTask,now});
  return {dom,root,rows,calls,app,lose:()=>{lose=true;},close(){app.destroy();dom.window.close();}};
 }
 const change=(x,el)=>el.dispatchEvent(new x.dom.window.Event('change',{bubbles:true}));
@@ -201,4 +222,28 @@ test('personal agenda: lost insert acknowledgment retries same UUID; conflict re
   x.root.querySelector('[data-ps-edit]').click();x.rows[0].version++;x.rows[0].title='Miranda changed it';f.title.value='My draft';submit(x);await tick();
   assert.equal(f.title.value,'My draft');assert.match(x.root.querySelector('[data-ps-form-status]').textContent,/另一位刚修改/);assert.equal(x.rows[0].title,'Miranda changed it');
  }finally{x.close();}
+});
+
+test('daily comments stay with their date; either account can mention, acknowledge and safely retry',async()=>{
+ const comments=[];let drop=true;
+ const jz=setup({comments,loseComment:()=>{const previous=drop;drop=false;return previous;}});
+ const miranda=setup({comments,username:'sculp_miranda'});
+ const nodes=x=>{const form=x.root.querySelector('[data-compose]');return {form,input:form.querySelector('textarea'),mention:form.querySelector('[data-mention]'),send:form.querySelector('[type=submit]'),thread:x.root.querySelector('[data-thread]')};};
+ try{
+  const j=nodes(jz),m=nodes(miranda);
+  await Promise.all([jz.app.refresh(),miranda.app.refresh()]);
+  j.mention.click();j.input.value+='<img> 确认时间';assert.equal(jz.app.canLeave(),false);
+  jz.dom.window.confirm=()=>false;jz.root.querySelector('[data-ps-day-next]').click();
+  assert.match(j.input.value,/@Miranda/);
+  j.send.click();await tick();assert.equal(j.send.textContent,'重试发送');assert.equal(comments.length,1);
+  j.send.click();await tick();assert.equal(comments.length,1);assert.equal(jz.app.canLeave(),true);
+  assert.equal(comments[0].agenda_day,'2026-11-21');assert.equal(j.thread.querySelector('img'),null);
+  miranda.root.querySelector('[data-ps-day-next]').click();await tick();
+  assert.doesNotMatch(m.thread.textContent,/确认时间/);
+  miranda.root.querySelector('[data-mentions] button').click();await tick();
+  assert.match(m.thread.textContent,/JZ.*确认时间/s);m.thread.querySelector('button').click();await tick();
+  assert(comments[0].read_at);assert(!m.thread.querySelector('button'));
+  m.mention.click();m.input.value+='收到';m.send.click();await tick();await jz.app.refresh();
+  assert.match(j.thread.textContent,/Miranda.*@JZ 收到/s);
+ }finally{jz.close();miranda.close();}
 });
