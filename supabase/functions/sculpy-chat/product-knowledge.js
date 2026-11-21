@@ -57,7 +57,7 @@ export const productKnowledge=Object.freeze({
  ...personalScheduleReleaseFacts,
  knowledgeRevision:'2026-11-21-device-zone',
  latestReleasedUpdate:{date:'2026-11-21',name:'行程自动时区',revision:'device-zone-20261121',status:'deployed',scope:'两位行程账户的设备时间显示与通知定位',evidence:'docs/CHANGELOG.md#行程自动时区',changes:['每天清单跟随当前设备时区，默认多伦多','机票保留机场当地时间，酒店预订日期固定，前夜提醒按行程时区','已适配温哥华 2026 年时区规则']},
- includedBackendUpdate:{date:'2026-11-21',name:'行程设备时区说明',scope:'日程的显示、录入与提醒时区',changes:['说明按本机时区查看日期与定时安排，多伦多为默认时区','机场当地时间、日期型预订及行程推送时刻分别保留']},
+ includedBackendUpdate:{date:'2026-11-21',name:'通知设备总览说明',scope:'JZ 账户管理中的只读设备清单',changes:['在账户管理展开通知设备可读取最新订阅和已开启的通知类型','服务端按当前有效的 sculp_jz 系统管理员身份授权，实体设备送达需单独验证']},
 });
 
 export const toolCapabilities=Object.freeze({
@@ -92,6 +92,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    '经营记忆面板：提出、管理员确认、更正、撤销、审计；仅已确认且当前有效的记录供后续回答使用，不是讨论自动永久记住',
    '个人回复偏好、按权限保存的对话、手机自适应布局；添加到桌面由使用者通过浏览器菜单手工操作',
    'SCULP OS 各类导航各自为独立页面，不会滚动进入其他分类；Marketing｜营销中心：Holiday 2026 四周24篇共享发布日历，逐张素材安排、完整文案及每篇一项已完成勾和团队留言；owner和operations的完成状态云端同步，@具体团队账户会向其已订阅设备排队发送通用提醒，未订阅不保证推送；不自动发布，不是聊天可执行工具',
+   'JZ 可在账户管理展开「通知设备」读取最新的团队有效订阅，查看账号、平台、浏览器及通知类别。仅具名的 sculp_jz 有效系统管理员可以查看，聊天可说明入口。',
    personalScheduleFeature,
    '询盘管理的主操作为转订单、备注保存和失败。失败原因可选未回复、拒绝、其他原因，其他原因须填备注。客户资料与询盘进展、沟通记录可按需展开。转订单进入已有核对与保存流程。',
    v24FeatureDescription,v25FeatureDescription,v30FeatureDescription,v31FeatureDescription,v32FeatureDescription,

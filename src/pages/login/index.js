@@ -1,3 +1,4 @@
+import {mountNotificationDevices} from './notification-devices.js?v=jz-devices-20261121';
 import {canManagePersonalSchedule} from './personal-schedule.js?v=device-zone-20261121';
 import {mountGmailSettings} from './gmail.js?v=gmail-setup-20261112';
 import { mountCloudWorkspace } from "./workspace.js?v=device-zone-20261121";
@@ -205,6 +206,7 @@ async function showWorkspace() {
     const container = root.querySelector("#account-list");
     container.hidden = !container.hidden;
     event.currentTarget.setAttribute("aria-expanded", String(!container.hidden));
+    if(!container.hidden)container.querySelector('[data-notification-devices][open] [data-refresh-devices]')?.click();
     // Keep the mounted forms and their drafts when collapsed; load only once.
     if (container.hidden || container.childElementCount || accountsLoading) return;
     accountsLoading = true;
@@ -233,6 +235,7 @@ async function loadAccounts(profile) {
   const container = root.querySelector("#account-list");
   message("正在读取账户…");
   const { data, error } = await supabase.rpc("list_managed_accounts");
+  if(!container?.isConnected)return;
   if (error) {
     message("无法读取账户。请确认管理员权限及账户服务已部署。");
     return;
@@ -294,6 +297,7 @@ async function loadAccounts(profile) {
       )}</select></label><p class="auth-muted">负责人可查看经营看板并编辑业务；系统管理员另可管理账号、权限和密码。</p><button class="auth-primary" type="submit">创建账户</button><p role="status" class="create-result"></p></form></details>`,
   );
   container.querySelector('.account-section-heading').after(container.querySelector('.account-create'));
+  mountNotificationDevices({anchor:container.querySelector('.account-section-heading'),supabase,profile});
   const create = container.querySelector("#create-account");
   create.onsubmit = async (event) => {
     event.preventDefault();

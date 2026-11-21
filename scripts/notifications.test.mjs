@@ -84,3 +84,26 @@ test('itinerary push shows one local time and a short location with an event-bou
  assert.deepEqual(byId[sid],{id:sid,kind:'itinerary',title:'行程提醒 · QA27 虚构城市 → 虚构目的地',body:'11-26 13:40 温哥华时间起飞 · YVR T2'});
  assert.equal(byId[nid].body,'11-27 12:30 北京时间开始');
 });
+
+test('only JZ can open and refresh the read-only device panel',async()=>{
+ const {JSDOM}=await import('jsdom');
+ const {mountNotificationDevices}=await import('../src/pages/login/notification-devices.js');
+ const dom=new JSDOM('<section><h3>团队账户</h3></section>'),doc=dom.window.document;
+ const anchor=doc.querySelector('h3'),profile={active:true,username:'sculp_jz',role:'operations'};
+ let result={data:{systemEnabled:true,devices:[{name:'Fixture <em>',platform:'iPhone',browser:'Safari',ref:'1234abcd',enabled:true,marketing:true,itinerary:false}]}},reads=0;
+ const supabase={rpc:async(name)=>{assert.equal(name,'sculpy_jz_notification_devices');reads++;return result;}};
+ try{
+  for(const other of [{...profile,active:false},{...profile,username:'sculp_other'},{...profile,role:'owner'}])
+   mountNotificationDevices({anchor,supabase,profile:other});
+  assert.equal(doc.querySelector('details'),null);
+  mountNotificationDevices({anchor,supabase,profile});
+  const panel=doc.querySelector('details');assert(panel);assert.equal(reads,0);
+  panel.open=true;await new Promise(resolve=>setTimeout(resolve,15));
+  assert.match(panel.textContent,/Fixture <em> · iPhone · Safari/);assert.equal(panel.querySelector('em'),null);
+  assert.match(panel.textContent,/行程提醒已关闭/);
+  result={error:{code:'42501'}};await panel.querySelector('button').onclick();
+  assert.match(panel.textContent,/无法读取设备/);assert.equal(panel.querySelector('article'),null);
+  result={data:{systemEnabled:true,devices:[]}};await panel.querySelector('button').onclick();
+  assert.match(panel.textContent,/没有有效设备/);
+ }finally{dom.window.close();}
+});
