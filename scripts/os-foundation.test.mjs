@@ -24,13 +24,13 @@ function setup(rpc,role='owner'){
  return {dom,root,calls,app,close(){app.destroy();Object.assign(globalThis,prior);dom.window.close();}};
 }
 const submit=(dom,form)=>form.dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));
-test('OS DOM: real-data rendering, XSS escaping, 9 navigation targets and employee isolation',async()=>{
+test('OS DOM: real-data rendering, XSS escaping, 10 navigation targets and employee isolation',async()=>{
  const x=setup();try{
   await waitFor(()=>x.root.querySelector('[data-os-metrics]').children.length===5);
   assert.match(x.root.querySelector('[data-os-metrics]').textContent,/CA\$123.45/);
   assert.equal(x.root.querySelector('[data-os-today] img'),null);
   assert.equal(x.root.querySelector('[data-os-followups] script'),null);
-  assert.equal(osNavigation.length,9);assert.equal(new Set(osNavigation.map(x=>x[0])).size,9);
+  assert.equal(osNavigation.length,10);assert.equal(new Set(osNavigation.map(x=>x[0])).size,10);
   assert.equal(x.root.querySelector('[data-os-marketing]').hidden,true);
  }finally{x.close();}
  const staff=setup(null,'artist');try{assert.equal(staff.root.childElementCount,0);assert.equal(staff.calls.length,0);}finally{staff.close();}
