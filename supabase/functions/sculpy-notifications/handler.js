@@ -25,21 +25,29 @@ function pushText(value, length) {
  return Array.from(value.replace(/[\u0000-\u001f\u007f]/g,' ').trim()).slice(0,length).join('');
 }
 const zoneLabels={'Asia/Shanghai':'北京时间','America/Toronto':'多伦多时间','America/Vancouver':'温哥华时间'};
+function itineraryPlace(detail) {
+ if (typeof detail.place!=='string') return '';
+ const [first]=detail.place.split(/[\r\n·；;]/,1);
+ const airport=detail.category==='flight' && first.match(/\b([A-Z]{3})\b(?:[\s,，]+(T\d{1,2}[A-Z]?)\b)?/);
+ if (airport) return [airport[1],airport[2]].filter(Boolean).join(' ');
+ const [name]=first.trim().split(/[,，]/,1);
+ if (/^\d+\s|(?:路|街|巷|道|弄)\s*\d/.test(name)) return '';
+ return pushText(name,32);
+}
 function itineraryPayload(notice) {
  const detail=notice.itinerary;
  if (!detail || !UUID.test(notice.id) || !Number.isInteger(detail.ttl) || detail.ttl<1 || detail.ttl>300) return null;
- const title=pushText(detail.title,125), time=pushText(detail.time,20), zone=pushText(detail.zone,65);
+ const title=pushText(detail.title,64), time=pushText(detail.time,20), zone=pushText(detail.zone,65);
  if (!title || !time || !zone) return null;
  const label=detail.category==='flight'?(detail.moment==='end'?'到达':'起飞'):
   detail.category==='hotel'?(detail.moment==='end'?'退房':'入住'):(detail.moment==='end'?'结束':'开始');
- const when=`${label} ${time} ${zoneLabels[zone]||zone}`;
- const clock=pushText(detail.clockZone,65), clockTime=pushText(detail.clockTime,20);
- const equivalent=clock&&clock!==zone&&clockTime?`（${zoneLabels[clock]||clock} ${clockTime}）`:'';
- const place=pushText(detail.place,420), flight=pushText(detail.flight,36);
+ const flight=detail.category==='flight' ? pushText(detail.flight,12) : '';
+ const subject=flight&&!title.toUpperCase().includes(flight.toUpperCase()) ? `${flight} ${title}` : title;
+ const place=itineraryPlace(detail);
+ const body=[`${time} ${zoneLabels[zone]||zone}${label}`,place&&!subject.includes(place)?place:''].filter(Boolean).join(' · ');
  return {
   ttl:detail.ttl,
-  payload:{id:notice.id,kind:'itinerary',title:`${detail.alert==='evening'?'前夜提醒':'行程提醒'} · ${title}`,
-   body:`${when}${equivalent}${flight?' · '+flight:''}\n${place?'地点：'+place:'地点待补充'}`},
+  payload:{id:notice.id,kind:'itinerary',title:`${detail.alert==='evening'?'前夜提醒':'行程提醒'} · ${subject}`,body},
  };
 }
 
