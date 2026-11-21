@@ -16,7 +16,7 @@ export function scheduleOnDay(item,day) {
   return day >= first && day <= last;
 }
 const afterTimedItems = '24:00';
-const milestoneLabels = {flight:{start:'航班起飞',end:'航班抵达'},hotel:{start:'酒店入住'}};
+const milestoneLabels = {flight:{start:'航班起飞',end:'航班抵达'},hotel:{start:'酒店入住',end:'酒店退房'}};
 const zones = [['America/Toronto','多伦多'],['America/Vancouver','温哥华'],['Asia/Shanghai','北京时间'],['America/New_York','纽约 / 奥兰多'],['America/Los_Angeles','洛杉矶'],['Asia/Tokyo','东京'],['Asia/Hong_Kong','香港'],['Europe/London','伦敦'],['Europe/Paris','巴黎'],['UTC','UTC']];
 const zoneNames = Object.fromEntries(zones);
 const dayFormatter = new Intl.DateTimeFormat('zh-CN', {timeZone:'UTC', month:'long', day:'numeric', weekday:'short'});
@@ -61,8 +61,10 @@ function personalRow(item, day, milestone) {
 function scheduleEntry(item,day) {
   const [start,end] = agendaTimes(item);
   const startsToday = start.slice(0,10) === day;
-  const stamp = startsToday ? start : end?.slice(0,10) === day ? end : null;
-  const milestone = stamp && milestoneLabels[item.category]?.[startsToday ? 'start' : 'end'];
+  const endsToday = end?.slice(0,10) === day;
+  const stamp = startsToday ? start : endsToday ? end : null;
+  const milestone = item.category==='hotel' && startsToday && endsToday
+    ? '酒店入住 / 退房' : stamp && milestoneLabels[item.category]?.[startsToday ? 'start' : 'end'];
   return {
     time: !item.all_day && stamp ? stamp.slice(11) : afterTimedItems,
     done: Boolean(item.completed),

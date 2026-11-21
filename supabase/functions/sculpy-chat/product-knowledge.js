@@ -57,7 +57,7 @@ export const productKnowledge=Object.freeze({
  ...personalScheduleReleaseFacts,
  knowledgeRevision:'2026-11-21-day-comments',
  latestReleasedUpdate:{date:'2026-11-21',name:'每日行程留言',revision:'day-comments-20261121',status:'deployed',scope:'JZ 和 Miranda 的每日行程页面',evidence:'docs/CHANGELOG.md#每日行程留言',changes:['在所选日期下方留言，可输入或点选对方的 @ 名称','在行程页可跳至其他日期的未读提及并标记已读']},
- includedBackendUpdate:{date:'2026-11-21',name:'每日行程留言功能说明',scope:'行程留言权限、归属日期及站内提及',changes:['记录两位账号的留言操作，消息按日期保存','说明站内未读提及的查看和确认方式']},
+ includedBackendUpdate:{date:'2026-11-21',name:'酒店退房标注说明',scope:'两位行程账户的每日酒店展示',changes:['按已录入的入住及退房日期显示对应标注，续住日保留普通标签']},
 });
 
 export const toolCapabilities=Object.freeze({
