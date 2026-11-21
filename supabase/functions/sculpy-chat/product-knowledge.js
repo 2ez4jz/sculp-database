@@ -55,6 +55,7 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
+ notReleased:[...personalScheduleReleaseFacts.notReleased,{name:'Miranda 行程按天切换',status:'pending_deployment',changes:['日期左右的按钮可单击切换前一天或后一天']}],
  knowledgeRevision:'2026-11-21-keep-sign-in',
  latestReleasedUpdate:{date:'2026-11-21',name:'在此设备保持登录',revision:'keep-sign-in-20261121',status:'deployed',scope:'SCULP OS 正式账户登录页',evidence:'docs/CHANGELOG.md#保持登录',changes:['登录时可主动勾选保存有效会话','同一浏览器或已安装的应用重开后重新验证登录','主动退出清除保存的会话']},
  includedBackendUpdate:{date:'2026-11-21',name:'保持登录功能说明',scope:'正式登录页的选择、会话恢复及退出流程',changes:['说明保持登录的入口、适用设备和验证条件']},

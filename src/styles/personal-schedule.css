@@ -21,6 +21,20 @@
 .ps-clock { color: #57685a; font-size: .8rem; white-space: nowrap; }
 .personal-schedule button { font-size: .875rem; cursor: pointer; }
 .personal-schedule button:disabled { opacity: .55; cursor: default; }
+.ps-day-navigation { display: inline-flex; align-items: center; gap: .25rem; }
+.personal-schedule .ps-day-step {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  border: 1px solid #dce4db;
+  border-radius: 8px;
+  background: #f5f7f3;
+  color: #2c4235;
+  font-size: 1.5rem;
+  line-height: 1;
+}
 .personal-schedule .ps-date-toggle {
   display: inline-flex;
   align-items: center;
