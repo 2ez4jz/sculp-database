@@ -134,7 +134,17 @@ test('personal agenda still shows plans when the work task request fails', async
  }finally{x.close();}
 });
 
-test('the daily list orders timed milestones before date-only items and marks flights and check-in',async()=>{
+test('a same-day hotel booking shows both milestones while an open-ended booking only shows check-in',async()=>{
+ const day='2026-11-24',hotel={category:'hotel',starts_local:day+'T09:00:00'};
+ const x=setup({schedule:[{...hotel,id:'day-use',title:'Day use',ends_local:day+'T18:00:00'},{...hotel,id:'open',title:'Open stay'}],now:()=>new Date(day+'T04:00:00Z')});
+ try{
+  await x.app.refresh();
+  assert.equal(x.root.querySelector('[data-ps-item="day-use"] .ps-tag-milestone').textContent,'酒店入住 / 退房');
+  assert.equal(x.root.querySelector('[data-ps-item="open"] .ps-tag-milestone').textContent,'酒店入住');
+ }finally{x.close();}
+});
+
+test('the daily list orders timed milestones before date-only items and marks flights, hotel check-in and checkout',async()=>{
  const schedule=[
   {id:'stay',title:'Hotel stay',category:'hotel',starts_local:'2026-11-23T00:00:00',ends_local:'2026-11-25T00:00:00',all_day:true},
   {id:'checkout',title:'Hotel checkout',category:'hotel',starts_local:'2026-11-23T15:00:00',ends_local:'2026-11-24T10:00:00'},
@@ -148,9 +158,12 @@ test('the daily list orders timed milestones before date-only items and marks fl
   await x.app.refresh();
   assert.deepEqual([...x.root.querySelectorAll('.ps-agenda strong')].map(el=>el.textContent),
    ['Overnight flight','Flight leaving today','Hotel checkout','Hotel stay','Hotel check-in','Date-only work task','Bridal Soft Glam','圣诞限定妆容体验']);
-  assert.deepEqual([...x.root.querySelectorAll('.ps-tag-milestone')].map(el=>el.textContent),['航班抵达','航班起飞','酒店入住']);
-  assert.equal(x.root.querySelector('[data-ps-item="checkout"] .ps-tag').textContent,'酒店');
+  assert.deepEqual([...x.root.querySelectorAll('.ps-tag-milestone')].map(el=>el.textContent),['航班抵达','航班起飞','酒店退房','酒店入住']);
+  assert.equal(x.root.querySelector('[data-ps-item="checkout"] .ps-tag-milestone').textContent,'酒店退房');
   assert.equal(x.root.querySelector('[data-ps-item="stay"] .ps-tag').textContent,'酒店');
+  x.root.querySelector('[data-ps-day-next]').click();await x.app.refresh();
+  assert.equal(x.root.querySelector('[data-ps-item="stay"] .ps-tag-milestone').textContent,'酒店退房');
+  assert.equal(x.root.querySelector('[data-ps-item="checkin"] .ps-tag-milestone'),null);
  }finally{x.close();}
 });
 
