@@ -1,5 +1,5 @@
 import {mountHistoryImport} from './os-import.js?v=os32-20261116';
-import {mountOsOperations} from './os-operations.js?v=os32-20261116';
+import {mountOsOperations} from './os-operations.js?v=daily-agenda-20261121';
 import {esc, money} from './wedding-dashboard.js';
 import {mountMarketingPlan} from './marketing-plan.js?v=marketing-pages-20261118';
 
@@ -159,5 +159,5 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
   historyImport=mountHistoryImport({root:$('[data-os-import-root]'),supabase,onSaved:async()=>{await loadClients();await refresh();},onClient:id=>operations.openClient(id),onOrder});
   async function refresh(){await Promise.all([refreshOverview(),operations?.refreshTasks()]);}
   void refresh();void loadClients();
-  return {canLeave,refresh,refreshClients:loadClients,openTask,openMarketingPost(id){const section=$('[data-os-marketing]');section.hidden=false;marketingPlan?.openPost(id);},destroy(){alive=false;overviewVersion++;clientsVersion++;operations?.destroy();historyImport?.destroy();marketingPlan?.destroy();}};
+  return {canLeave,refresh,refreshClients:loadClients,openTask,openTaskEditor:operations.openTaskEditor,openMarketingPost(id){const section=$('[data-os-marketing]');section.hidden=false;marketingPlan?.openPost(id);},destroy(){alive=false;overviewVersion++;clientsVersion++;operations?.destroy();historyImport?.destroy();marketingPlan?.destroy();}};
 }

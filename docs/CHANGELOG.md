@@ -4,6 +4,7 @@
 
 | 版本 | 日期 | 状态 | 主要更新 | 详细记录 |
 | --- | --- | --- | --- | --- |
+| Miranda 行程首屏精简 | 2026-11-21 | 待部署与真实账户验收 | 今日清单优先，点击日期选日，分配给 Miranda 的当日工作待办同列 | [发布记录](MIRANDA_PERSONAL_SCHEDULE.md#首屏调整) |
 | SCULP OS 独立分类页面 + 精简营销日历 | 2026-11-18 | 已测试，前端待部署与真实账户验收 | 九类导航各自独立页面；Marketing 每篇只显示一个完成勾、保留单篇留言/@提醒、素材分镜与完整文案 | README、页面及测试 |
 | SCULP OS Marketing Collaboration | 2026-11-18 | 前端/数据库/通知函数已验证部署；双账号/设备推送待验收 | 管理账户共享完成状态、留言、@JZ/@Miranda 通知队列与点击定位；权限按现有角色校验 | [PR #52](https://github.com/2ez4jz/sculp-database/pull/52) |
 | SCULP OS Marketing Calendar（候选） | 2026-11-18 | 未部署、待测试及真实账户验收 | 四周日历、24篇逐张素材分镜、可勾选制作Checklist（仅本机保存），保留完整文案与复制 | README 与本记录 |

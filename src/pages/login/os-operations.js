@@ -37,9 +37,9 @@ export function mountOsOperations({taskRoot,clientRoot,supabase,onOrder,onNewTas
     $('[data-task-prev]').disabled=locked||offset===0;
     $('[data-task-next]').disabled=locked||offset+20>=Number(taskRoot.dataset.total||0);
   }
-  function openEditor(id){
-    if(!canLeave())return;
-    selected=tasks.find(t=>t.id===id);if(!selected)return;
+  function openTaskEditor(task){
+    if(!canLeave()||!task)return;
+    selected=task;
     form.reset();$('[data-task-result]').textContent='';submit.textContent='确认修改任务';
     $('[data-task-title]').textContent=selected.reason;
     $('[data-task-context]').textContent=`${date(selected.due_at)} · ${statusNames[selected.status]} · ${selected.assignee||'未分配'}`;
@@ -73,7 +73,7 @@ export function mountOsOperations({taskRoot,clientRoot,supabase,onOrder,onNewTas
   $('[data-task-close]').onclick=()=>{if(canLeave())$('[data-task-editor]').hidden=true;};
   taskRoot.addEventListener('click',event=>{
     const button=event.target.closest('button');if(!button||!canLeave())return;
-    if(button.dataset.taskEdit)openEditor(button.dataset.taskEdit);
+    if(button.dataset.taskEdit)openTaskEditor(tasks.find(task=>task.id===button.dataset.taskEdit));
     if(button.dataset.taskOrder)onOrder(button.dataset.taskOrder);
   });
   form.onsubmit=async event=>{
@@ -140,5 +140,5 @@ export function mountOsOperations({taskRoot,clientRoot,supabase,onOrder,onNewTas
   clientRoot.addEventListener('click',event=>{const button=event.target.closest('[data-client-order]');if(button&&canLeave())onOrder(button.dataset.clientOrder);});
   async function loadContext(){try{const {data,error}=await supabase.rpc('sculpy_os_task_context',{});if(!alive)return;if(error||!Array.isArray(data?.assignees))throw Error('unavailable');assignees=data.assignees;onAssignees?.(data);}catch{if(alive)onAssignees?.(null);}}
   void loadContext();
-  return {canLeave,refreshTasks,openClient,destroy(){alive=false;taskVersion++;clientVersion++;clientEditor?.destroy();}};
+  return {canLeave,refreshTasks,openClient,openTaskEditor,destroy(){alive=false;taskVersion++;clientVersion++;clientEditor?.destroy();}};
 }
