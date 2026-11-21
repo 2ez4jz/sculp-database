@@ -55,10 +55,9 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- notReleased:[...personalScheduleReleaseFacts.notReleased,{name:'询盘精简与共享任务',status:'pending_deployment',changes:['精简询盘备注、转订单和失败操作','行程内共享工作与 Marketing 任务，未完成顺延']}],
- knowledgeRevision:'2026-11-21-agenda-day-step',
- latestReleasedUpdate:{date:'2026-11-21',name:'Miranda 行程按天切换',revision:'agenda-day-step-20261121',status:'deployed',scope:'JZ 和 Miranda 的个人行程页',evidence:'docs/MIRANDA_PERSONAL_SCHEDULE.md#按天切换',changes:['日期左右的前一天、后一天按钮可单击切换一天']},
- includedBackendUpdate:{date:'2026-11-21',name:'保持登录功能说明',scope:'正式登录页的选择、会话恢复及退出流程',changes:['说明保持登录的入口、适用设备和验证条件']},
+ knowledgeRevision:'2026-11-21-shared-work',
+ latestReleasedUpdate:{date:'2026-11-21',name:'询盘精简与共享任务',revision:'shared-work-20261121',status:'deployed',scope:'正式询盘管理及 JZ/Miranda 的共享行程任务',evidence:'docs/CHANGELOG.md#询盘精简与共享任务',changes:['询盘转订单、备注及失败快捷操作，资料与沟通记录可展开','行程包含两位账户的工作与 Marketing 任务，可直接勾选并共享完成状态','未完成任务顺延到后续日期，保留原定日期']},
+ includedBackendUpdate:{date:'2026-11-21',name:'共享任务与询盘功能说明',scope:'页面操作及已验证发布范围',changes:['说明询盘失败原因、备注及转订单入口','说明行程内任务勾选、共享状态和未完成顺延']},
 });
 
 export const toolCapabilities=Object.freeze({
@@ -94,6 +93,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    '个人回复偏好、按权限保存的对话、手机自适应布局；添加到桌面由使用者通过浏览器菜单手工操作',
    'SCULP OS 各类导航各自为独立页面，不会滚动进入其他分类；Marketing｜营销中心：Holiday 2026 四周24篇共享发布日历，逐张素材安排、完整文案及每篇一项已完成勾和团队留言；owner和operations的完成状态云端同步，@具体团队账户会向其已订阅设备排队发送通用提醒，未订阅不保证推送；不自动发布，不是聊天可执行工具',
    personalScheduleFeature,
+   '询盘管理的主操作为转订单、备注保存和失败。失败原因可选未回复、拒绝、其他原因，其他原因须填备注。客户资料与询盘进展、沟通记录可按需展开。转订单进入已有核对与保存流程。',
    v24FeatureDescription,v25FeatureDescription,v30FeatureDescription,v31FeatureDescription,v32FeatureDescription,
   ]:[
    '按当前账号分配范围查看订单和工作记录，保留个人回复偏好与对话；设置页可管理本人设备通知，P1内部提醒尚未实施',
