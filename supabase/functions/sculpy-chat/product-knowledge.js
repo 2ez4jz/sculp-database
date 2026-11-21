@@ -55,8 +55,8 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- knowledgeRevision:'2026-11-21-device-row',
- latestReleasedUpdate:{date:'2026-11-21',name:'通知设备总览',revision:'device-row-20261121',status:'deployed',scope:'JZ 账户管理中的通知设备清单',evidence:'docs/CHANGELOG.md#通知设备总览',changes:['在团队账户标题下方展开独立的「通知设备」行，可查看订阅、平台、浏览器及通知类别','刷新可读取最新清单，跨账号查询仅向具名 JZ 系统管理员开放']},
+ knowledgeRevision:'2026-11-21-production',
+ latestReleasedUpdate:{date:'2026-11-21',name:'正式工作区启用',revision:'team-20261121',status:'deployed',scope:'团队成员的登录、聊天语音和工作台快捷操作',evidence:'docs/CHANGELOG.md#正式模式与安全检查',changes:['旧演示书签进入团队登录页面，语音转写要求有效团队账号','工作台新建询盘或订单、沟通中心打开询盘、询盘转订单均可直接进入对应页面']},
  includedBackendUpdate:{date:'2026-11-21',name:'正式工作区说明',scope:'成员登录、语音和正式工作区发布范围',changes:['旧演示书签进入团队登录流程','只有已登录且有效的团队账号可使用语音转写，聊天根据当前账号权限读取资料']},
 });
 

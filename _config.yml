@@ -1,0 +1,27 @@
+# Keep development and server files out of branch-based GitHub Pages builds too.
+exclude:
+  - scripts
+  - docs
+  - skills
+  - node_modules
+  - qa-screens
+  - site-build
+  - README.md
+  - TASKS.md
+  - AGENTS.md
+  - package.json
+  - package-lock.json
+  - supabase/config.toml
+  - supabase/seed_team.sql
+  - supabase/migrations
+  - supabase/functions/_shared
+  - supabase/functions/account-admin
+  - supabase/functions/sculp-enquiry
+  - supabase/functions/sculpy-chat
+  - supabase/functions/sculpy-gmail
+  - supabase/functions/sculpy-intake
+  - supabase/functions/sculpy-notifications
+  - "supabase/functions/sculpy-ai/*.ts"
+  - src/pages/insights
+  - src/components/analysis
+  - src/domain/demo-workspace.js
