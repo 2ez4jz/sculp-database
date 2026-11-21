@@ -7,7 +7,6 @@ const assert = require("node:assert/strict");
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
-  await page.addInitScript(() => localStorage.setItem("memora-demo-language", "zh"));
   await page.addInitScript(() => { globalThis.SCULPY_CONFIG = {supabasePublishableKey: ""}; });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
@@ -30,10 +29,10 @@ const assert = require("node:assert/strict");
     ),
   );
   await page.screenshot({ path: "qa-screens/login-mobile.png" });
-  await page.getByRole("link", { name: "先浏览演示空间" }).click();
-  await page.locator("#main h1").waitFor();
-  await page.getByRole("link", { name: "返回登录" }).click();
+  assert.equal(await page.locator(".auth-demo").count(),0);
+  await page.goto("http://localhost:4173/?demo=1#bookings");
   await page.locator("#login-form").waitFor();
+  assert(!new URL(page.url()).searchParams.has("demo"));
   // Mock the SDK boundary. SQL tests independently verify the real authorization boundary.
   await page.addInitScript(() => {
     globalThis.SCULPY_CONFIG = { supabasePublishableKey: "test-key" };
@@ -87,7 +86,7 @@ const assert = require("node:assert/strict");
   await page.locator("#login-form").waitFor();
   assert.deepEqual(errors, []);
   await browser.close();
-  console.log("login, account management, demo separation and mobile passed");
+  console.log("login, account management, retired link and mobile passed");
 })().catch((error) => {
   console.error(error);
   process.exit(1);

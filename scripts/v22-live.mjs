@@ -1,5 +1,5 @@
 import {scenarios} from './v22-cases.mjs';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 import {advisorRowsFromBookings,advisorSnapshot} from '../src/domain/demo-workspace.js';
 import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
 import {config} from '../src/config.js';

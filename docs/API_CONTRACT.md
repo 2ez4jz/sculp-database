@@ -1,63 +1,7 @@
-# Sculpy API contract
+# Sculpy 语音与聊天接口
 
-The static preview switches from `aiMode: "mock"` to `aiMode: "openai"` after the `sculpy-ai` Supabase Edge Function is deployed. The function uses an action query parameter (`transcribe`, `extract`, or `search`). The OpenAI API key exists only in Supabase Secrets and must never be included in browser code.
+正式客户端携带当前 Supabase 会话。语音服务核实用户身份并检查有效团队档案，聊天通过当前用户令牌读取获准的数据。
 
-## `POST /functions/v1/sculpy-ai?action=transcribe`
-
-Multipart field: `audio` (`webm`, `m4a`, `wav`, or `mp3`).
-
-Response:
-
-```json
-{"text":"...","provider":"openai","requestId":"..."}
-```
-
-## `POST /functions/v1/sculpy-ai?action=extract`
-
-Request:
-
-```json
-{"bookingId":"uuid","rawText":"...","pageContext":{"artistId":"uuid","clientId":"uuid"}}
-```
-
-Response must conform to a server-validated schema:
-
-```json
-{
-  "summary":"...",
-  "preferences":["..."],
-  "opportunities":["..."],
-  "partners":[{"name":"...","type":"Photography","confidence":0.8}],
-  "confidence":0.91,
-  "provider":"openai"
-}
-```
-
-Current Demo: the endpoint returns a draft JSON response only; it does not create an `ai_drafts` row or update clients/work logs. Confirmation currently saves a browser-local note.
-
-Production requirement (not yet implemented): persist the proposal in `ai_drafts`, then validate and confirm it through a separate authenticated transaction with an audit event.
-
-## `POST /functions/v1/sculpy-ai?action=search`
-
-Demo request: `{"query":"...","catalog":{...}}`. Only the fictional catalog already visible in the public preview is sent. Production derives user identity and role from the session, queries Supabase under row-level security and returns only rows the user can access. The browser never sends an unrestricted catalog in production.
-
-Response:
-
-```json
-{
-  "answer":"...",
-  "results":[{"type":"booking","id":"uuid","title":"...","meta":"...","href":"#bookings/uuid"}],
-  "evidenceIds":["uuid"],
-  "provider":"openai"
-}
-```
-
-Production requirement (not yet implemented): for numeric answers and charts, the server must call approved reporting views such as `booking_financials` and `service_revenue_monthly`. OpenAI explains the returned data but does not calculate authoritative totals. Each production request must create an `ai_runs` record containing its purpose, source/output record IDs, model usage and estimated cost; the service role writes this log and clients cannot forge it.
-
-The current Demo chart uses deterministic browser calculations over fictional bookings; it does not call the production reporting views.
-
-## Environment separation
-
-- Development/Demo: dedicated Supabase project, fictional clients and bookings, real public team profiles.
-- Production: separate Supabase project, invite-only accounts, no demo rows.
-- Preview deployments never receive production service-role credentials.
+- `POST /functions/v1/sculpy-ai?action=transcribe` 接收 `multipart/form-data`，字段名为 `audio`，单段最多 5 MB。成功返回 `text`。缺少有效登录返回 401，账号停用返回 403。
+- 历史演示专用的识别和搜索入口返回 410。正式询盘及沟通识别使用独立的 `sculpy-intake`。
+- `POST /functions/v1/sculpy-chat` 使用当前账号读取或发送对话，旧演示请求返回 410。

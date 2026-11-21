@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.ts';
 import {converse} from '../supabase/functions/sculpy-chat/core.ts';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 const args={from:'2026-10-10',to:'2026-10-10',service:null,channelId:null,artistId:null,bookingId:null,status:null,groupBy:null};
 const report=(patch={},rows=bookings)=>demoReport(rows,{...args,...patch},'2026-10-10');
 test('daily report, month-to-date cutoff and future completion quality use full 300 records',()=>{

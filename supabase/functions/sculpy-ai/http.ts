@@ -20,14 +20,16 @@ export function json(origin: string, body: unknown, status = 200) {
   });
 }
 
-export function rateLimited(request: Request) {
-  const key =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+export function rateLimited(userId: string) {
   const now = Date.now();
-  const recent = (requestLog.get(key) || []).filter(
+  const recent = (requestLog.get(userId) || []).filter(
     (time) => now - time < 60_000,
   );
+  if (recent.length >= 20) return true;
+  if (requestLog.size > 1000) {
+    for (const [id, times] of requestLog) if (now - times[times.length - 1] >= 60000) requestLog.delete(id);
+  }
   recent.push(now);
-  requestLog.set(key, recent);
-  return recent.length > 20;
+  requestLog.set(userId, recent);
+  return false;
 }

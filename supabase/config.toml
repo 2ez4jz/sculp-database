@@ -7,8 +7,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.sculpy-chat]
-# Demo accepts only caller-supplied fictional data. Cloud mode verifies the user
-# with Auth /user and reads/writes through that user's JWT and database checks.
+# Verify the caller with Auth /user and use the caller token for cloud access.
 verify_jwt = false
 
 [functions.sculpy-gmail]

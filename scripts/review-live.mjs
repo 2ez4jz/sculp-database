@@ -1,6 +1,6 @@
 // Explicit, bounded live check. Uses only fictional demo records and the
 // deployed public endpoint; never reads a key or writes production records.
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 import {advisorRowsFromBookings,advisorSnapshot} from '../src/domain/demo-workspace.js';
 import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
 import {config} from '../src/config.js';

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {renderMonthlyAnalytics} from "../src/pages/insights/monthly.js";
-import {bookings} from "../src/data/demo.js";
+import {bookings} from "./fixtures/catalog/demo.js";
 const esc=v=>String(v);
 const money=v=>"$"+v.toLocaleString("en-CA",{minimumFractionDigits:0,maximumFractionDigits:2});
 test("monthly analysis shows expected demo September totals",()=>{

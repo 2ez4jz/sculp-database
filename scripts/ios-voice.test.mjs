@@ -21,10 +21,10 @@ test('client upload and server forwarding repair old Safari uploads without chan
  const previous=globalThis.fetch;
  try{
   globalThis.fetch=async(url,options)=>{
-   const file=options.body.get('audio');assert.match(file.name,/\.mp4$/);assert.equal(file.type,'audio/mp4');
+   assert.equal(options.headers.authorization,'Bearer fixture-token');const file=options.body.get('audio');assert.match(file.name,/\.mp4$/);assert.equal(file.type,'audio/mp4');
    return Response.json({text:'synthetic client test'});
   };
-  assert.equal((await transcribeAudio(new Blob([mp4],{type:'audio/mp4'}))).text,'synthetic client test');
+  assert.equal((await transcribeAudio(new Blob([mp4],{type:'audio/mp4'}),{auth:{getSession:async()=>({data:{session:{access_token:'fixture-token'}}})}})).text,'synthetic client test');
   globalThis.fetch=async(url,options)=>{
    const file=options.body.get('file');assert.equal(file.name,'sculpy.mp4');assert.equal(file.type,'audio/mp4');
    assert.deepEqual(new Uint8Array(await file.arrayBuffer()),mp4);

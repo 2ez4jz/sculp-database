@@ -7,8 +7,8 @@ import { mountWebsiteEnquiries } from './enquiries.js?v=shared-work-20261121';
 import { mountCloudIntake } from './intake.js?v=24';
 import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
-import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
-import { cloudChatAdapter } from "../../services/chat.js";
+import { createChatPanel } from "../../components/chat/panel.js?v=team-20261121";
+import { cloudChatAdapter } from "../../services/chat.js?v=team-20261121";
 import {mountOsFoundation} from './os-foundation.js?v=shared-work-20261121';
 const esc = (value) =>
   String(value ?? "").replace(

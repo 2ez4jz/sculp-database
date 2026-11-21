@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {demoChatAdapter,wantsChatVisual} from '../src/services/chat.js';import {bookings} from '../src/data/demo.js';import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
+import {demoChatAdapter,wantsChatVisual} from './fixtures/demo-chat.js';import {bookings} from './fixtures/catalog/demo.js';import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
 test('V2.2 simple answers avoid automatic charts; explicit chart follow-ups retain reports',async()=>{
  for(const q of ['8月完成金额是多少？一句话','解释收入和到账的区别','排期怎么样','各渠道占比多少','不要图表，只告诉我金额'])assert.equal(wantsChatVisual(q),false,q);
  for(const q of ['用图看看','再画渠道分布图，保持日期','9月收入饼图','Show a channel chart'])assert.equal(wantsChatVisual(q),true,q);

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {monthlyStats} from '../src/domain/monthly-stats.js';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 const admin={role:'admin'};
 test('300-order September has 26 active records and 21 completed bookings totaling CAD 19685',()=>{
  const r=monthlyStats(bookings,'2026-09',admin);

@@ -21,8 +21,8 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   assert.equal(await page.evaluate(()=>window.qaCalls.filter(x=>x.name==='list_managed_accounts').length),1,'reopening must not reload and erase drafts');
   assert.equal(await page.locator('.enquiry-pending').count(),0,'follow-up enquiries do not get a pending marker');
   assert.equal(await page.locator('.studio-page-header h2').innerText(),'业务工作台');
-  assert.equal(await page.locator('.studio-sidebar nav button').first().getAttribute('data-studio-nav'),'[data-os-home]');
-  assert.equal(await page.locator('.studio-sidebar [data-os-nav]').count(),9);
+  assert.equal(await page.locator('.studio-sidebar nav button').first().getAttribute('data-studio-nav'),'[data-os-personal]');
+  assert.equal(await page.locator('.studio-sidebar [data-os-nav]').count(),10);
   assert(await page.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   const selects=page.locator('#account-list select[name=role]');
   for(const s of await selects.all()){assert.deepEqual(await s.locator('option').evaluateAll(xs=>xs.map(x=>x.value)),['operations','owner','artist','read_only']);assert.equal(await s.locator('option[value=admin]').count(),0);}
@@ -31,15 +31,16 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   await page.setViewportSize({width:390,height:844});await toggle.click();assert(!await accounts.isVisible());await toggle.click();assert(await accounts.isVisible());assert.equal(await draft.inputValue(),'Fictional draft retained');
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   const pending=await context.newPage();pending.on('pageerror',e=>errors.push(e.message));await pending.setViewportSize({width:390,height:844});
-  await pending.goto('http://localhost:4173/?qa_pending=1');await pending.locator('.enquiry-pending').waitFor();
+  await pending.goto('http://localhost:4173/?qa_pending=1');await pending.locator('[data-os-nav=crm]').click();await pending.locator('.enquiry-pending').waitFor();
   assert.equal(await pending.locator('.enquiry-pending').innerText(),'待处理');assert.equal(await pending.locator('.enquiry-pending').count(),1);
   assert(await pending.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await pending.screenshot({path:'qa-screens/enquiry-pending-phone.png',fullPage:false});
   const owner=await context.newPage();owner.on('pageerror',e=>errors.push(e.message));await owner.setViewportSize({width:390,height:844});
-  await owner.goto('http://localhost:4173/?qa_role=owner');await owner.locator('.w23-headline').waitFor();
+  await owner.goto('http://localhost:4173/?qa_role=owner');await owner.locator('[data-os-nav=finance]').click();await owner.locator('.w23-headline').waitFor();
   assert.equal(await owner.locator('.studio-page-header h2').innerText(),'业务工作台');
   assert(await owner.evaluate(()=>document.querySelector('#website-enquiries').compareDocumentPosition(document.querySelector('.w23-dashboard'))&Node.DOCUMENT_POSITION_FOLLOWING));
   assert.equal(await owner.locator('#manage-accounts').count(),0);assert.equal(await owner.locator('#account-list').count(),0);
-  assert(await owner.locator('[data-new-booking]').isVisible());assert(await owner.locator('[data-quick-lead]').isVisible());
+  await owner.locator('[data-os-nav=dashboard]').click();assert(await owner.locator('[data-new-booking]').isVisible());assert(await owner.locator('[data-quick-lead]').isVisible());
+  await owner.locator('[data-os-nav=communications]').click();
   await owner.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await owner.locator('.enquiry-communication > summary').click();await owner.locator('.communication-panel [data-text]').waitFor();
   assert(await owner.locator('.communication-panel [data-text]').isEnabled());assert(await owner.locator('.communication-panel [data-save]').isEnabled());
   assert.equal(await owner.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);

@@ -1,4 +1,4 @@
-name: Verify SCULP Demo
+name: Verify SCULP OS
 on:
   push:
     branches: [main]
@@ -37,24 +37,8 @@ jobs:
           node scripts/notifications-browser.cjs
           node scripts/communication-browser.cjs
           node scripts/wedding-v23-browser.cjs
-          node scripts/order-numbers.cjs
-          node scripts/unified-demo.cjs
-          node scripts/monthly-browser.cjs
-          node scripts/dashboard-navigation.cjs
-          node scripts/chat.cjs
-          node scripts/readable-answers.cjs
-          node scripts/guided-chat.cjs
-          node scripts/mobile-chat.cjs
-          node scripts/mobile-workspace.cjs
           node scripts/pwa.cjs
           node scripts/auth.cjs
-          node scripts/smoke.cjs
-          node scripts/permissions.cjs
-          node scripts/sculpy-lifecycle.cjs
-          node scripts/analysis-charts.cjs
-          node scripts/context-memory.cjs
-          node scripts/intake.cjs
-          node scripts/booking-album.cjs
           node scripts/cloud-intake.cjs
           node scripts/cloud-operations.cjs
       - name: Save visual checks

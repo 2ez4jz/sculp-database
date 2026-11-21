@@ -3,7 +3,6 @@ import {modelStatus} from "./model-status.js";
 import {renderChatAnswer} from "./answer-view.js?v=guided-20261015";
 import {createOperatingMemory} from "./operating-memory.js";
 import { createVoiceCapture } from "../../pages/sculpy/voice.js?v=ios-audio-20261015";
-import { transcribeAudio } from "../../services/sculpy.js?v=ios-audio-20261015";
 import { config } from "../../config.js";
 const esc = (value) =>
   String(value ?? "").replace(
@@ -39,7 +38,7 @@ export function createChatPanel({
   let lastModelTurn=null;
   function showModel(state,turn=lastModelTurn){
     if(turn)lastModelTurn=turn;
-    const view=modelStatus(state,turn,adapter.mode==='demo'&&window.DemoI18n?.language!=='zh');
+    const view=modelStatus(state,turn,false);
     const indicator=$(".chat-model-status");indicator.dataset.aiState=view.state;indicator.title=view.detail;
     indicator.querySelector('span').textContent=view.text;
   }
@@ -54,7 +53,7 @@ export function createChatPanel({
   const desktopPlaceholder=$('#chat-input').placeholder;
   function resizeInput(){
     const input=$('#chat-input');
-    input.placeholder=mobile()?(window.DemoI18n?.language==='en'?'Message or record…':'发消息，或录音…'):desktopPlaceholder;
+    input.placeholder=mobile()?('发消息，或录音…'):desktopPlaceholder;
     input.style.height=mobile()?'0px':'';
     if(mobile())input.style.height=Math.min(128,Math.max(44,input.scrollHeight))+'px';
   }
@@ -81,7 +80,7 @@ export function createChatPanel({
           "#sculpy-text": "#chat-input",
         }[s] || s,
       ),
-    transcribeAudio,
+    transcribeAudio: adapter.transcribe,
     config,
   });
   const voiceStateObserver=new MutationObserver(()=>{
@@ -134,7 +133,7 @@ export function createChatPanel({
     status("正在读取订单、对话和个人偏好…");
     $(".chat-scope").textContent = next.label;
     $(".chat-storage").textContent =
-      adapter.mode === "cloud" ? "云端私人对话" : "虚构演示 · 仅本机保存";
+      "云端私人对话";
     $("#chat-input").value = drafts.get(`${identity}:${scope.id}`) || "";
     if (inline) dialog.setAttribute("open", "");
     else if (!dialog.open) dialog.showModal();
@@ -235,7 +234,7 @@ export function createChatPanel({
     }
     if (button.id === "chat-voice" && !busy) voice.toggle();
     if (button.dataset.example) {
-      $("#chat-input").value = window.DemoI18n?.text(button.dataset.example) || button.dataset.example;
+      $("#chat-input").value = button.dataset.example;
       resizeInput();
       $("#chat-input").focus();
     }
@@ -276,9 +275,7 @@ export function createChatPanel({
           status(
             proposal.kind === "change"
               ? "变更建议已保存，正式订单字段尚未修改。"
-              : adapter.mode === "cloud"
-                ? "已保存到对应订单。"
-                : "已保存到此浏览器的演示订单。",
+              : "已保存到对应订单。",
           );
         }
       } catch (error) {

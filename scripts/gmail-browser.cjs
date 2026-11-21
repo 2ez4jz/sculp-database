@@ -2,7 +2,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox']});try{
  const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/src/vendor/supabase.js',r=>r.fulfill({contentType:'text/javascript',body:"export {createClient} from '/scripts/fixtures/gmail-sdk.js';"}));
- await page.goto('http://localhost:4173/');await page.locator('[data-gmail-center] [data-mail]').waitFor();
+ await page.goto('http://localhost:4173/');
  await page.locator('[data-os-nav=communications]').click();await page.locator('[data-gmail-center] [data-mail]').click();
  await page.locator('[data-gmail-center] [data-mail-draft]').waitFor();assert.equal(await page.locator('[data-gmail-center] script').count(),0);assert.equal(await page.evaluate(()=>window.bad),undefined);
  await page.locator('[data-gmail-center] [data-reply-type]').selectOption('request_details');
