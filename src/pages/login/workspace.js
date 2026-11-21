@@ -1,15 +1,15 @@
-import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=agenda-day-step-20261121';
+import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=shared-work-20261121';
 import {mountEmailCenter} from './gmail.js?v=gmail-setup-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
 import {mountWeddingDashboard} from './wedding-dashboard.js?v=23';
-import { mountWebsiteEnquiries } from './enquiries.js?v=phase1-20261112';
+import { mountWebsiteEnquiries } from './enquiries.js?v=shared-work-20261121';
 import { mountCloudIntake } from './intake.js?v=24';
 import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
-import {mountOsFoundation} from './os-foundation.js?v=agenda-order-20261121';
+import {mountOsFoundation} from './os-foundation.js?v=shared-work-20261121';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -40,7 +40,7 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   const personalRoot=document.createElement('section');
   if(canManagePersonalSchedule(profile)){
     root.append(personalRoot);
-    personalSchedule=mountPersonalSchedule({root:personalRoot,supabase,profile,onWorkTask:openPlannerTask});
+    personalSchedule=mountPersonalSchedule({root:personalRoot,supabase,profile,onWorkTask:openPlannerTask,onMarketing:openPlannerMarketing,onWorkChange:()=>foundation?.refresh()});
   }
   if(businessAdmin)root.prepend(osRoot);
   const reportRoot = document.createElement('section');
@@ -123,10 +123,15 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
     foundation.openTaskEditor(task);
     return true;
   }
+  function openPlannerMarketing(id){
+    if(!showPage('marketing'))return false;
+    foundation.openMarketingPost(id);
+    return true;
+  }
   function showPage(page,{refreshPersonal=true}={}){
     if(!pageGroups[page]||(page==='personal'&&!personalSchedule)||!canLeave())return false;
     activePage=page;
-    if(page==='marketing'&&pageGroups.marketing[0])pageGroups.marketing[0].hidden=false;
+    if(page==='marketing'&&pageGroups.marketing[0]){pageGroups.marketing[0].hidden=false;void foundation?.refreshMarketing();}
     for(const element of allPages)element.classList.toggle('workspace-page-inactive',!pageGroups[page].includes(element));
     if(page==='personal'&&refreshPersonal)void personalSchedule?.refresh();
     else personalSchedule?.closeCalendar();

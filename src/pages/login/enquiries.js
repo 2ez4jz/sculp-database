@@ -2,14 +2,15 @@ import {mountCommunicationPanel} from '../../components/communication/panel.js?v
 import {intakeRpc,cloudWriteFailure} from '../../services/cloud-intake.js?v=cloud-write-20261022';
 import {esc,today} from './wedding-dashboard.js';
 const sources={unknown:'尚未确认',instagram:'Instagram',google:'Google 搜索',xiaohongshu:'小红书',wechat:'微信',referral:'熟人/客户推荐',planner:'婚礼策划师推荐',direct:'直接访问',other:'其他'};
-const states={pending:'待处理',contacted:'已联系',qualified:'跟进中',quoted:'已报价',won:'已成交',lost:'明确未成交',spam:'无效询盘'};
+const states={pending:'待处理',contacted:'已联系',qualified:'跟进中',quoted:'已报价',won:'已成交',lost:'失败',spam:'无效询盘'};
 const services={wedding:'婚礼',trial:'试妆',event:'活动',personal:'个人造型',commercial:'商业',photoshoot:'拍摄',education:'课程'};
 export function mountWebsiteEnquiries({root,supabase,onConvert,onOpenBooking,onCommunicationChange,onSaved}){
+ const document=root.ownerDocument;
  let alive=true,version=0,owners=[],activeFilter='open';
- const writes=new Set(),panels=new Map();
+ const writes=new Set(),panels=new Map(),noteDrafts=new Set();
  let revealId=null;
- const canLeave=()=>writes.size===0&&[...panels.values()].every(p=>p.canLeave());
- root.innerHTML=`<section class="cloud-orders" id="website-enquiries"><h3>询盘管理</h3><p class="cloud-note">统一跟进官网、微信和其他渠道的客户咨询。</p><div class="w23-actions"><button type="button" data-new-lead>手动新增询盘</button><select data-filter aria-label="询盘状态"><option value="open">待处理和跟进中</option><option value="all">全部</option><option value="won">已成交</option><option value="lost">明确未成交</option><option value="spam">无效</option></select><button type="button" data-refresh>刷新</button></div><div data-new></div><p data-status role="status"></p><div data-list></div></section>`;
+ const canLeave=()=>writes.size===0&&noteDrafts.size===0&&[...panels.values()].every(p=>p.canLeave());
+ root.innerHTML=`<section class="cloud-orders" id="website-enquiries"><h3>询盘管理</h3><p class="cloud-note">统一跟进官网、微信和其他渠道的客户咨询。</p><div class="w23-actions"><button type="button" data-new-lead>手动新增询盘</button><select data-filter aria-label="询盘状态"><option value="open">待处理和跟进中</option><option value="all">全部</option><option value="won">已成交</option><option value="lost">失败</option><option value="spam">无效</option></select><button type="button" data-refresh>刷新</button></div><div data-new></div><p data-status role="status"></p><div data-list></div></section>`;
  const $=s=>root.querySelector(s);
  async function load(){if(!alive)return;if(!canLeave()){$('[data-filter]').value=activeFilter;$('[data-status]').textContent='询盘仍在保存或尚未收到确认，请先重试同一笔询盘。';return;}const requestedLead=revealId;const mine=++version;$('[data-status]').textContent='正在加载询盘…';let q=supabase.from('website_enquiries_business').select('*').eq('is_test',false).order('first_contact_at',{ascending:false}).limit(150);if(requestedLead)q=q.eq('id',requestedLead);const filter=$('[data-filter]').value;activeFilter=filter;if(filter==='open')q=q.in('status',['pending','contacted','qualified','quoted']);else if(filter!=='all')q=q.eq('status',filter);
  try{const {data,error}=await q;if(!alive||mine!==version)return;if(!canLeave())return;if(error)throw error;$('[data-status]').textContent=`${data.length} 条（最新 150 条以内）`;panels.forEach(p=>p.destroy());panels.clear();$('[data-list]').replaceChildren();for(const lead of data){const card=document.createElement('article');card.className='cloud-intake';$('[data-list]').append(card);renderForm(card,lead);if(revealId===lead.id){card.querySelector('details').open=true;card.scrollIntoView({block:'start',behavior:'smooth'});}}revealId=null;return !requestedLead||data.some(l=>l.id===requestedLead);}
@@ -17,16 +18,55 @@ export function mountWebsiteEnquiries({root,supabase,onConvert,onOpenBooking,onC
  function renderForm(card,lead={}){
   const isNew=!lead.id;
   const statusLabel=lead.status==='pending'?'<span class="enquiry-pending">待处理</span>':esc(states[lead.status]);
-  card.innerHTML=`<details ${isNew?'open':''}><summary>${isNew?'新增其他渠道询盘':`${esc(lead.name)} · ${statusLabel} · ${esc(lead.service)}`}</summary>${!isNew?`<p>${esc(new Date(lead.first_contact_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 提交渠道 ${esc(lead.entry_channel)}</p><details><summary>原始询盘与来源</summary><p style="white-space:pre-wrap">${esc(lead.original_details??lead.details)}</p><p>UTM ${esc(lead.utm_source)} / ${esc(lead.utm_medium)} / ${esc(lead.utm_campaign)} · Referrer ${esc(lead.landing_referrer)}</p></details>`:''}${!isNew?'<div data-communication></div><div data-lead-conversion></div><details class="comm-lead-profile"><summary>客户资料与询盘进展</summary>':''}<form><div class="intake-fields"><label>姓名<input name="name" required maxlength="160" value="${esc(lead.name)}"></label><label>邮箱（或填写其他联系方式）<input name="email" type="email" maxlength="254" value="${esc(lead.email)}"></label><label>微信 / 电话<input name="contact" maxlength="240" value="${esc(lead.contact)}"></label><label>原始服务需求<input name="service" maxlength="120" required value="${esc(lead.service||'婚礼')}"></label><label>服务分类<select name="serviceType"><option value="">待分类</option>${Object.entries(services).map(([k,v])=>`<option value="${k}" ${lead.service_type===k?'selected':''}>${v}</option>`).join('')}</select></label><label>婚礼 / 服务日期<input name="eventDate" type="date" value="${esc(lead.event_date)}"></label><label>首次询盘日期<input name="firstContact" type="date" max="${today()}" value="${esc((lead.first_contact_at?new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto'}).format(new Date(lead.first_contact_at)):today()))}" required></label><label>进展<select name="status">${Object.entries(states).map(([k,v])=>`<option value="${k}" ${lead.status===k?'selected':''}>${v}</option>`).join('')}</select></label><label>实际获客来源<select name="source">${Object.entries(sources).map(([k,v])=>`<option value="${k}" ${lead.attribution_source===k?'selected':''}>${v}</option>`).join('')}</select></label><label>来源补充<input name="sourceDetail" maxlength="300" value="${esc(lead.attribution_detail)}"></label><label>报价 CAD<input name="quote" type="number" min="0" step="0.01" value="${esc(lead.quoted_amount)}"></label><label>负责人<select name="owner"><option value="">待分配</option>${owners.map(o=>`<option value="${esc(o.id)}" ${lead.handled_by===o.id?'selected':''}>${esc(o.display_name)}</option>`).join('')}</select></label><label>最后联系日期<input name="lastContact" type="date" max="${today()}" value="${lead.last_contact_at?esc(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto'}).format(new Date(lead.last_contact_at))):''}"></label><label>未成交原因<input name="lostReason" maxlength="1000" value="${esc(lead.lost_reason)}"></label></div><label>原始需求<textarea name="details" maxlength="4500">${esc(lead.details)}</textarea></label><div class="w23-actions"><input data-order-query aria-label="查找正式订单" placeholder="输入单号或客户姓名"><button type="button" data-find-order>查找正式订单</button></div><label>关联正式合同<select name="bookingId"><option value="">未关联</option>${lead.booking_id?`<option value="${esc(lead.booking_id)}" selected>已关联 ${esc(lead.booking_id)}</option>`:''}</select></label><p data-order-result class="cloud-note">已成交必须关联已确认的正式合同；同客户多笔订单请分别核对。</p><label>跟进记录 / 本次操作依据<textarea name="reason" maxlength="2000" required>${esc(lead.notes)}</textarea></label><label class="intake-consent"><input type="checkbox" name="confirmed" required>已核对询盘进展及订单关联</label><button type="submit" data-save-lead>保存询盘</button><p data-result role="status"></p></form>${!isNew?'</details>':''}</details>`;
+  card.innerHTML=`<details ${isNew?'open':''}><summary>${isNew?'新增其他渠道询盘':`${esc(lead.name)} · ${statusLabel} · ${esc(lead.service)}`}</summary>${!isNew?`<p>${esc(new Date(lead.first_contact_at).toLocaleString('zh-CN',{timeZone:'America/Toronto'}))} · 提交渠道 ${esc(lead.entry_channel)}</p><details><summary>原始询盘与来源</summary><p style="white-space:pre-wrap">${esc(lead.original_details??lead.details)}</p><p>UTM ${esc(lead.utm_source)} / ${esc(lead.utm_medium)} / ${esc(lead.utm_campaign)} · Referrer ${esc(lead.landing_referrer)}</p></details>`:''}${!isNew?'<details class="enquiry-communication"><summary>沟通记录</summary><div data-communication></div></details><div data-lead-conversion></div><details class="comm-lead-profile"><summary>客户资料与询盘进展</summary>':''}<form><div class="intake-fields"><label>姓名<input name="name" required maxlength="160" value="${esc(lead.name)}"></label><label>邮箱（或填写其他联系方式）<input name="email" type="email" maxlength="254" value="${esc(lead.email)}"></label><label>微信 / 电话<input name="contact" maxlength="240" value="${esc(lead.contact)}"></label><label>原始服务需求<input name="service" maxlength="120" required value="${esc(lead.service||'婚礼')}"></label><label>服务分类<select name="serviceType"><option value="">待分类</option>${Object.entries(services).map(([k,v])=>`<option value="${k}" ${lead.service_type===k?'selected':''}>${v}</option>`).join('')}</select></label><label>婚礼 / 服务日期<input name="eventDate" type="date" value="${esc(lead.event_date)}"></label><label>首次询盘日期<input name="firstContact" type="date" max="${today()}" value="${esc((lead.first_contact_at?new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto'}).format(new Date(lead.first_contact_at)):today()))}" required></label><label>进展<select name="status">${Object.entries(states).map(([k,v])=>`<option value="${k}" ${lead.status===k?'selected':''}>${v}</option>`).join('')}</select></label><label>实际获客来源<select name="source">${Object.entries(sources).map(([k,v])=>`<option value="${k}" ${lead.attribution_source===k?'selected':''}>${v}</option>`).join('')}</select></label><label>来源补充<input name="sourceDetail" maxlength="300" value="${esc(lead.attribution_detail)}"></label><label>报价 CAD<input name="quote" type="number" min="0" step="0.01" value="${esc(lead.quoted_amount)}"></label><label>负责人<select name="owner"><option value="">待分配</option>${owners.map(o=>`<option value="${esc(o.id)}" ${lead.handled_by===o.id?'selected':''}>${esc(o.display_name)}</option>`).join('')}</select></label><label>最后联系日期<input name="lastContact" type="date" max="${today()}" value="${lead.last_contact_at?esc(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto'}).format(new Date(lead.last_contact_at))):''}"></label><label>未成交原因<input name="lostReason" maxlength="1000" value="${esc(lead.lost_reason)}"></label></div><label>原始需求<textarea name="details" maxlength="4500">${esc(lead.details)}</textarea></label><div class="w23-actions"><input data-order-query aria-label="查找正式订单" placeholder="输入单号或客户姓名"><button type="button" data-find-order>查找正式订单</button></div><label>关联正式合同<select name="bookingId"><option value="">未关联</option>${lead.booking_id?`<option value="${esc(lead.booking_id)}" selected>已关联 ${esc(lead.booking_id)}</option>`:''}</select></label><p data-order-result class="cloud-note">已成交必须关联已确认的正式合同；同客户多笔订单请分别核对。</p><label>跟进记录 / 本次操作依据<textarea name="reason" maxlength="2000" required>${esc(lead.notes)}</textarea></label><label class="intake-consent"><input type="checkbox" name="confirmed" required>已核对询盘进展及订单关联</label><button type="submit" data-save-lead>保存询盘</button><p data-result role="status"></p></form>${!isNew?'</details>':''}</details>`;
   if(!isNew){
    card.dataset.leadId=lead.id;
    card.querySelector('details').addEventListener('toggle',()=>{if(card.querySelector('details').open&&!panels.has(lead.id)){panels.set(lead.id,mountCommunicationPanel({root:card.querySelector('[data-communication]'),supabase,type:'lead',id:lead.id,onChange:onCommunicationChange}));}});
    const convert=card.querySelector('[data-lead-conversion]');
+   card.querySelector('.enquiry-communication').before(convert);
    const button=document.createElement('button');button.type='button';
-   button.textContent=lead.booking_id?'查看关联订单':'转为订单 · 核对客户与服务';
-   button.onclick=()=>{if(!canLeave())return;lead.booking_id?onOpenBooking?.(lead.booking_id):onConvert?.(lead);};convert.append(button);
+   button.textContent=lead.booking_id?'查看关联订单':'转订单';
+   button.onclick=()=>{if(!canLeave()){const status=card.querySelector('[data-quick-result]');if(status)status.textContent='请先保存或撤销当前备注。';return;}lead.booking_id?onOpenBooking?.(lead.booking_id):onConvert?.(lead);};convert.append(button);
   }
   const form=card.querySelector('form'),msg=card.querySelector('[data-result]');let pending=null,saving=false,searchVersion=0,saved=false,needsRefresh=false;
+  let quickStatus=null;const noteToken={};
+  if(!isNew){
+   const actions=card.querySelector('[data-lead-conversion]');
+   actions.className='enquiry-actions';
+   const notes=document.createElement('div');
+   notes.className='enquiry-notes';
+   notes.innerHTML=`<label>备注<textarea data-quick-notes maxlength="2000" rows="2" placeholder="记录跟进情况…">${esc(lead.notes)}</textarea></label><div class="w23-actions"><button type="button" data-save-notes>保存备注</button>${lead.booking_id?'':'<button type="button" data-fail-lead>失败</button>'}</div><div data-failure-fields hidden><label>失败原因<select data-failure-reason><option value="">选择原因</option><option value="未回复">未回复</option><option value="拒绝">拒绝</option><option value="其他原因">其他原因</option></select></label><label data-failure-note-wrap hidden>备注原因<input data-failure-note maxlength="900"></label><div class="w23-actions"><button type="button" data-confirm-failure>确认失败</button><button type="button" data-cancel-failure>取消</button></div></div><p role="status" data-quick-result></p>`;
+   actions.append(notes);
+   quickStatus=notes.querySelector('[data-quick-result]');
+   const failFields=notes.querySelector('[data-failure-fields]');
+   const failureReason=notes.querySelector('[data-failure-reason]');
+   const notesInput=notes.querySelector('[data-quick-notes]');
+   const discard=document.createElement('button');discard.type='button';discard.textContent='撤销备注修改';discard.hidden=true;
+   notes.querySelector('.w23-actions').append(discard);
+   notesInput.oninput=()=>{noteDrafts.add(noteToken);discard.hidden=false;};
+   discard.onclick=()=>{notesInput.value=lead.notes||'';noteDrafts.delete(noteToken);discard.hidden=true;};
+   function quickSave(failure=false){
+    if(saving||saved||needsRefresh)return;
+    if(!pending){
+     const detail=notes.querySelector('[data-failure-note]').value.trim();
+     if(failure&&(!failureReason.value||failureReason.value==='其他原因'&&!detail)){
+      quickStatus.textContent='请选择失败原因，其他原因请填写备注。';return;
+     }
+     if(!failure&&!notesInput.value.trim()) {quickStatus.textContent='请填写备注。';return;}
+     form.elements.reason.value=notesInput.value.trim()||(failure?`标记失败：${failureReason.value}`:'');
+     if(failure){form.elements.status.value='lost';form.elements.lostReason.value=failureReason.value==='其他原因'?detail:failureReason.value;}
+     form.elements.confirmed.checked=true;
+    }
+    form.requestSubmit();
+   }
+   notes.querySelector('[data-save-notes]').onclick=()=>quickSave();
+   notes.querySelector('[data-fail-lead]')?.addEventListener('click',()=>{failFields.hidden=false;failureReason.focus();});
+   notes.querySelector('[data-cancel-failure]').onclick=()=>{failFields.hidden=true;};
+   failureReason.onchange=()=>{notes.querySelector('[data-failure-note-wrap]').hidden=failureReason.value!=='其他原因';};
+   notes.querySelector('[data-confirm-failure]').onclick=()=>quickSave(true);
+  }
+  const setResult=text=>{msg.textContent=text;if(quickStatus)quickStatus.textContent=text;};
+  const lock=disabled=>card.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=disabled);
   if(isNew){
    const advanced=document.createElement('details');advanced.className='comm-lead-profile';advanced.innerHTML='<summary>补充日期、来源与负责人（可稍后填写）</summary>';
    const grid=document.createElement('div');grid.className='intake-fields';
@@ -38,15 +78,15 @@ export function mountWebsiteEnquiries({root,supabase,onConvert,onOpenBooking,onC
   form.oninput=()=>form.elements.confirmed.checked=false;form.elements.confirmed.oninput=e=>e.stopPropagation();
   card.querySelector('[data-find-order]').onclick=async()=>{const mine=++searchVersion,query=card.querySelector('[data-order-query]').value.trim();try{const r=await intakeRpc(supabase,'sculpy_context',{p_booking_id:null,p_query:query,p_offset:0});if(!alive||!card.isConnected||mine!==searchVersion||saving||pending||saved||needsRefresh||card.querySelector('[data-order-query]').value.trim()!==query)return;form.elements.confirmed.checked=false;form.elements.bookingId.innerHTML='<option value="">未关联</option>'+r.bookings.filter(b=>['confirmed','completed'].includes(b.status)).map(b=>`<option value="${esc(b.id)}">${esc(b.order_number)} · ${esc(b.client)} · ${esc(b.service)} · ${esc(b.starts_at.slice(0,10))}</option>`).join('');card.querySelector('[data-order-result]').textContent='请选择对应合同（最多显示30条，必要时按单号细查）。';}catch(e){if(alive)card.querySelector('[data-order-result]').textContent=e.message;}};
   form.onsubmit=async e=>{e.preventDefault();if(saving||saved||needsRefresh||!alive)return;if(!pending){const values=Object.fromEntries(new FormData(form));const p={confirmed:true,...Object.fromEntries(['name','email','contact','service','serviceType','source','sourceDetail','status','reason','lostReason'].map(k=>[k,values[k]||null])),quote:values.quote||null,eventDate:values.eventDate||null,owner:values.owner||null,lastContact:values.lastContact||null,firstContact:values.firstContact||null,bookingId:values.bookingId||null,details:values.details||'',...(lead.id?{id:lead.id,revision:lead.revision}:{})};pending={p_request_id:crypto.randomUUID(),p_action:'save_lead',p_payload:p};}
-   saving=true;searchVersion++;writes.add(writeToken);form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=true);msg.textContent='保存中…';try{
+   saving=true;searchVersion++;writes.add(writeToken);lock(true);setResult('保存中…');try{
     const result=await intakeRpc(supabase,'sculpy_wedding_command',pending);revealId=result.leadId;
-    pending=null;saved=true;saving=false;writes.delete(writeToken);
+    pending=null;saved=true;saving=false;writes.delete(writeToken);noteDrafts.delete(noteToken);
     if(!alive)return;
-    msg.textContent='询盘已保存。';
+    setResult('询盘已保存。');
     void Promise.resolve().then(()=>onSaved?.()).catch(()=>{});
     if(isNew)$('[data-new]').replaceChildren();await load();
    }
-   catch(error){if(!alive)return;if(cloudWriteFailure(error)==='refresh'){pending=null;needsRefresh=true;msg.textContent=error.message+' 请刷新询盘，按最新权限和内容核对；本次未保存。';}else if(cloudWriteFailure(error)==='rejected'){pending=null;form.querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=false);form.elements.confirmed.checked=false;msg.textContent=error.message;}else{form.querySelector('[data-save-lead]').disabled=false;msg.textContent='未收到成功确认，请重试同一笔询盘。';}}
+   catch(error){if(!alive)return;if(cloudWriteFailure(error)==='refresh'){pending=null;needsRefresh=true;noteDrafts.delete(noteToken);setResult(error.message+' 请刷新询盘，按最新权限和内容核对；本次未保存。');}else if(cloudWriteFailure(error)==='rejected'){pending=null;lock(false);form.elements.confirmed.checked=false;setResult(error.message);}else{form.querySelector('[data-save-lead]').disabled=false;const retry=card.querySelector('[data-save-notes]');if(retry){retry.disabled=false;retry.textContent='重试保存';}setResult('未收到成功确认，请重试同一笔询盘。');}}
    finally{saving=false;if(!pending)writes.delete(writeToken);}
   };
  }

@@ -111,7 +111,7 @@
   overflow-wrap: anywhere;
 }
 .ps-item:last-child { border-bottom: 0; }
-.ps-item [data-ps-done], .ps-task-state {
+.ps-item [data-ps-done], .ps-item [data-ps-work-done], .ps-item [data-ps-marketing-done], .ps-task-state {
   width: 1.1rem;
   height: 1.1rem;
   margin: .3rem 0 0;
