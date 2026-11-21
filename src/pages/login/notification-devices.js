@@ -2,7 +2,6 @@ export function mountNotificationDevices({anchor,supabase,profile}) {
   if(!profile?.active || profile.username!=='sculp_jz' || profile.role!=='operations')return;
   const doc=anchor.ownerDocument;
   const panel=doc.createElement('details');
-  panel.className='account-create';
   panel.dataset.notificationDevices='';
   panel.innerHTML=`<summary>通知设备</summary><div class="notification-card">
     <div class="notification-actions"><button type="button" class="auth-secondary" data-refresh-devices>刷新</button></div>
