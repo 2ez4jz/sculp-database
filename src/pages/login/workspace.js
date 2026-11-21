@@ -1,4 +1,4 @@
-import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=personal-20261121';
+import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=daily-agenda-20261121';
 import {mountEmailCenter} from './gmail.js?v=gmail-setup-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
@@ -9,7 +9,7 @@ import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
-import {mountOsFoundation} from './os-foundation.js?v=personal-20261121';
+import {mountOsFoundation} from './os-foundation.js?v=daily-agenda-20261121';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -38,7 +38,10 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   const osRoot = document.createElement('div');
   let foundation=null,emailCenter=null,orderEmails=null,personalSchedule=null;
   const personalRoot=document.createElement('section');
-  if(canManagePersonalSchedule(profile)){root.append(personalRoot);personalSchedule=mountPersonalSchedule({root:personalRoot,supabase,profile});}
+  if(canManagePersonalSchedule(profile)){
+    root.append(personalRoot);
+    personalSchedule=mountPersonalSchedule({root:personalRoot,supabase,profile,onWorkTask:openPlannerTask});
+  }
   if(businessAdmin)root.prepend(osRoot);
   const reportRoot = document.createElement('section');
   let report = null, editor = null, business = null, communication = null;
@@ -115,12 +118,18 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   root.append(aiPage);pageGroups.ai.push(aiPage);
   const companyRules=$('.company-rules');if(companyRules)pageGroups.settings.push(companyRules);
   const allPages=[...new Set(Object.values(pageGroups).flat().filter(Boolean))];
+  function openPlannerTask(task){
+    if(!showPage('calendar'))return false;
+    foundation.openTaskEditor(task);
+    return true;
+  }
   function showPage(page){
     if(!pageGroups[page]||(page==='personal'&&!personalSchedule)||!canLeave())return false;
     activePage=page;
     if(page==='marketing'&&pageGroups.marketing[0])pageGroups.marketing[0].hidden=false;
     for(const element of allPages)element.classList.toggle('workspace-page-inactive',!pageGroups[page].includes(element));
     if(page==='personal')void personalSchedule?.refresh();
+    else personalSchedule?.closeCalendar();
     onPageChange?.(page);
     return true;
   }

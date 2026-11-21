@@ -3,17 +3,22 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {mountPersonalSchedule,canManagePersonalSchedule,scheduleOnDay} from '../src/pages/login/personal-schedule.js';
 const tick=()=>new Promise(r=>setTimeout(r,10));
-function setup(){
+function setup({schedule=[],tasks=[],onWorkTask,failTasks=false}={}){
  const dom=new JSDOM('<main id="root"></main>',{url:'https://fixture.test'}),root=dom.window.document.querySelector('#root');dom.window.confirm=()=>true;
- const rows=[],calls=[];let lose=false;
- const sdk={from(){let mode='select',data,filters=[];const q={select(){return q;},lte(){return q;},gte(){return q;},order(){return q;},range(){return q;},eq(k,v){filters.push([k,v]);return q;},insert(d){mode='insert';data=d;return q;},update(d){mode='update';data=d;return q;},delete(){mode='delete';return q;},maybeSingle(){return q;},then(resolve,reject){return Promise.resolve().then(()=>{
+ const rows=[...schedule],calls=[];let lose=false;
+ const sdk={rpc:async(name,args)=>{
+  assert.equal(name,'sculpy_miranda_daily_work_tasks');
+  calls.push({name,args});
+  if(failTasks)return {error:{code:'42501'}};
+  return {data:tasks.filter(task=>task.due_on>=args.p_from&&task.due_on<args.p_to).slice(args.p_offset,args.p_offset+100)};
+ },from(){let mode='select',data,filters=[];const q={select(){return q;},lte(){return q;},gte(){return q;},order(){return q;},range(){return q;},eq(k,v){filters.push([k,v]);return q;},insert(d){mode='insert';data=d;return q;},update(d){mode='update';data=d;return q;},delete(){mode='delete';return q;},maybeSingle(){return q;},then(resolve,reject){return Promise.resolve().then(()=>{
   calls.push({mode,data:structuredClone(data),filters});let found=rows.filter(row=>filters.every(([k,v])=>row[k]===v));
   if(mode==='insert'){if(rows.some(r=>r.id===data.id))return {error:{code:'23505'}};const item={...data,version:1,updated_by:'jz',updated_at:'2026-11-21T15:00:00Z'};rows.push(item);if(lose){lose=false;throw Error('lost response');}return {data:structuredClone(item)};}
   if(mode==='update'){const row=found[0];if(!row)return {data:null};Object.assign(row,data,{version:row.version+1});return {data:structuredClone(row)};}
   if(mode==='delete'){found.forEach(row=>rows.splice(rows.indexOf(row),1));return {data:found.map(x=>({id:x.id}))};}
   return {data:filters.length?structuredClone(found[0]||null):structuredClone(rows)};
  }).then(resolve,reject);}};return q;}};
- const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:'jz',username:'sculp_jz',role:'operations',active:true},now:()=>new Date('2026-11-21T15:00:00Z')});
+ const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:'jz',username:'sculp_jz',role:'operations',active:true},onWorkTask,now:()=>new Date('2026-11-21T15:00:00Z')});
  return {dom,root,rows,calls,app,lose:()=>{lose=true;},close(){app.destroy();dom.window.close();}};
 }
 const change=(x,el)=>el.dispatchEvent(new x.dom.window.Event('change',{bubbles:true}));
@@ -28,13 +33,74 @@ test('personal agenda: date-line/hotel spans and exact-account access',()=>{
  assert.equal(scheduleOnDay({starts_local:'2026-11-21T15:00:00',ends_local:'2026-11-24T11:00:00'},'2026-11-22'),true);
 });
 test('personal agenda: create, edit, complete, delete; escapes private text and guards draft navigation',async()=>{
- const x=setup();try{await tick();assert.equal(x.root.querySelectorAll('[data-ps-date]').length,42);
+ const x=setup();try{await tick();
   x.root.querySelector('[data-ps-new]').click();const f=x.root.querySelector('form').elements;
   f.title.value='<img src=x onerror=alert(1)>';f.notes.value='Bring passport';f.title.dispatchEvent(new x.dom.window.Event('input',{bubbles:true}));assert.equal(x.app.canLeave(),false);
   submit(x);await tick();assert.equal(x.rows.length,1);assert.equal(x.app.canLeave(),true);assert.equal(x.root.querySelector('.ps-item img'),null);assert.match(x.root.querySelector('.ps-item').textContent,/Bring passport/);
   x.root.querySelector('[data-ps-edit]').click();f.title.value='Hotel';f.category.value='hotel';f.end_date.value='2026-11-24';change(x,f.category);submit(x);await tick();assert.equal(x.rows[0].category,'hotel');
   const check=x.root.querySelector('[data-ps-done]');check.checked=true;change(x,check);await tick();assert.equal(x.rows[0].completed,true);
   x.root.querySelector('[data-ps-edit]').click();x.root.querySelector('[data-ps-delete]').click();await tick();assert.equal(x.rows.length,0);
+ }finally{x.close();}
+});
+
+test('personal agenda opens on today with a single list and changes date only when picked',async()=>{
+ const schedule=[{id:'flight',title:'Fictional flight',category:'flight',starts_local:'2026-11-21T20:15:00',ends_local:'2026-11-22T13:00:00',start_timezone:'America/Toronto',end_timezone:'Asia/Shanghai'}];
+ const tasks=[{id:'today',reason:'Studio today',status:'open',edit_version:'5',due_on:'2026-11-21'},{id:'tomorrow',reason:'Studio tomorrow',status:'done',due_on:'2026-11-22'},{id:'december',reason:'Studio in December',status:'open',due_on:'2026-12-01'}];
+ const opened=[];
+ const x=setup({schedule,tasks,onWorkTask:task=>opened.push(task)});
+ try{
+  const $=selector=>x.root.querySelector(selector);
+  await x.app.refresh();
+  const toggle=$('[data-ps-toggle]'),picker=$('[data-ps-picker]'),agenda=$('.ps-agenda');
+  assert(picker.hidden);
+  assert.match(toggle.textContent,/今天/);
+  assert.equal(agenda.children.length,2);
+  assert.match(agenda.textContent,/Fictional flight/);
+  assert.match(agenda.textContent,/Studio today/);
+  assert.doesNotMatch(agenda.textContent,/Studio tomorrow/);
+  $('[data-ps-work-task="today"]').click();
+  assert.equal(opened[0].edit_version,'5');
+
+  toggle.click();
+  assert.equal(toggle.getAttribute('aria-expanded'),'true');
+  assert.equal(picker.querySelectorAll('[data-ps-date]').length,42);
+  const selected=$('[data-ps-date="2026-11-21"]');
+  assert.equal(x.dom.window.document.activeElement,selected);
+  selected.dispatchEvent(new x.dom.window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
+  const nextDay=$('[data-ps-date="2026-11-22"]');
+  assert.equal(x.dom.window.document.activeElement,nextDay);
+  nextDay.click();
+  assert(picker.hidden);
+  assert.equal(x.dom.window.document.activeElement,toggle);
+  assert.match($('.ps-agenda').textContent,/Fictional flight/);
+  assert.match($('.ps-agenda .ps-completed').textContent,/Studio tomorrow/);
+  assert.doesNotMatch($('.ps-agenda').textContent,/Studio today/);
+
+  toggle.click();
+  $('[data-ps-next]').click();
+  assert.match($('.ps-agenda').textContent,/Studio tomorrow/);
+  $('[data-ps-date="2026-12-01"]').click();
+  await tick();
+  assert(picker.hidden);
+  assert.match($('.ps-agenda').textContent,/Studio in December/);
+  assert(!$('.ps-agenda').textContent.includes('Studio tomorrow'));
+
+  toggle.click();
+  picker.dispatchEvent(new x.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+  assert(picker.hidden);
+  toggle.click();
+  $('[data-ps-today]').click();
+  await tick();
+  assert.match($('.ps-agenda').textContent,/Studio today/);
+ }finally{x.close();}
+});
+
+test('personal agenda still shows plans when the work task request fails', async()=>{
+ const x=setup({schedule:[{id:'local',title:'Personal task',category:'todo',starts_local:'2026-11-21T00:00:00',all_day:true}],failTasks:true});
+ try{
+  await x.app.refresh();
+  assert.match(x.root.querySelector('.ps-agenda').textContent,/Personal task/);
+  assert.match(x.root.querySelector('.ps-read-error').textContent,/工作待办暂未读到/);
  }finally{x.close();}
 });
 test('personal agenda: lost insert acknowledgment retries same UUID; conflict retains draft',async()=>{
