@@ -39,7 +39,7 @@ test('personal agenda: create, edit, complete, delete; escapes private text and 
 });
 test('personal agenda: lost insert acknowledgment retries same UUID; conflict retains draft',async()=>{
  const x=setup();try{await tick();x.root.querySelector('[data-ps-new]').click();const f=x.root.querySelector('form').elements;f.title.value='Todo';x.lose();submit(x);await tick();
-  assert.equal(x.rows.length,1);assert.equal(x.app.canLeave(),false);assert.equal(f.title.disabled,true);
+  assert.equal(x.rows.length,1);assert.equal(x.app.canLeave(),false);assert.equal(f.title.disabled,true);await x.app.refresh();assert.equal(f.title.disabled,true);
   submit(x);await tick();assert.equal(x.rows.length,1);assert.equal(x.app.canLeave(),true);
   const inserts=x.calls.filter(c=>c.mode==='insert');assert.equal(inserts[0].data.id,inserts[1].data.id);
   x.root.querySelector('[data-ps-edit]').click();x.rows[0].version++;x.rows[0].title='Miranda changed it';f.title.value='My draft';submit(x);await tick();

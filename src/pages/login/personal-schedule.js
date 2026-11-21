@@ -32,7 +32,7 @@ export function mountPersonalSchedule({root,supabase,profile,now=()=>new Date()}
   const $=s=>root.querySelector(s),form=$('[data-ps-form]'),f=form.elements;
   for(const field of ['start_timezone','end_timezone'])f[field].innerHTML=zones.map(([id,label])=>`<option value="${id}">${label} · ${id}</option>`).join('');
   const message=text=>{if(alive)$('[data-ps-status]').textContent=text;};
-  function controls(){root.querySelectorAll('button').forEach(b=>b.disabled=busy);form.querySelectorAll('input,select,textarea').forEach(el=>el.disabled=busy);}
+  function controls(){root.querySelectorAll('button').forEach(b=>b.disabled=busy);form.querySelectorAll('input,select,textarea').forEach(el=>el.disabled=busy||!!pending);}
   function render(){
     const first=month+'-01',weekday=(new Date(first+'T12:00:00Z').getUTCDay()+6)%7,start=shiftDay(first,-weekday);
     $('[data-ps-calendar]').innerHTML=['一','二','三','四','五','六','日'].map(x=>`<span class="ps-weekday">${x}</span>`).join('')+Array.from({length:42},(_,i)=>{
