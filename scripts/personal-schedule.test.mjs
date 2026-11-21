@@ -104,6 +104,26 @@ test('personal agenda still shows plans when the work task request fails', async
  }finally{x.close();}
 });
 
+test('the daily list orders timed milestones before date-only items and marks flights and check-in',async()=>{
+ const schedule=[
+  {id:'stay',title:'Hotel stay',category:'hotel',starts_local:'2026-11-23T00:00:00',ends_local:'2026-11-25T00:00:00',all_day:true},
+  {id:'checkout',title:'Hotel checkout',category:'hotel',starts_local:'2026-11-23T15:00:00',ends_local:'2026-11-24T10:00:00'},
+  {id:'checkin',title:'Hotel check-in',category:'hotel',starts_local:'2026-11-24T00:00:00',ends_local:'2026-11-26T00:00:00',all_day:true},
+  {id:'depart',title:'Flight leaving today',category:'flight',starts_local:'2026-11-23T16:25:00',agenda_start_local:'2026-11-24T08:25:00',start_timezone:'America/Los_Angeles'},
+  {id:'arrive',title:'Overnight flight',category:'flight',starts_local:'2026-11-23T22:00:00',ends_local:'2026-11-24T06:30:00',completed:true},
+ ];
+ const tasks=[{id:'task',reason:'Date-only work task',due_at:'2026-11-24T00:00:00Z',due_on:'2026-11-24',status:'open'}];
+ const x=setup({schedule,tasks,now:()=>new Date('2026-11-24T04:00:00Z')});
+ try{
+  await x.app.refresh();
+  assert.deepEqual([...x.root.querySelectorAll('.ps-agenda strong')].map(el=>el.textContent),
+   ['Overnight flight','Flight leaving today','Hotel checkout','Hotel stay','Hotel check-in','Date-only work task']);
+  assert.deepEqual([...x.root.querySelectorAll('.ps-tag-milestone')].map(el=>el.textContent),['航班抵达','航班起飞','酒店入住']);
+  assert.equal(x.root.querySelector('[data-ps-item="checkout"] .ps-tag').textContent,'酒店');
+  assert.equal(x.root.querySelector('[data-ps-item="stay"] .ps-tag').textContent,'酒店');
+ }finally{x.close();}
+});
+
 test('planner switches to Beijing at local midnight and can focus a shifted flight from its notification',async()=>{
  const id='a1a1a1a1-1111-4111-8111-111111111111';
  const flight={id,title:'Fictional West Coast flight',category:'flight',starts_local:'2026-11-22T16:30:00',agenda_start_local:'2026-11-23T08:30:00',start_timezone:'America/Los_Angeles',location:'Fixture Terminal'};

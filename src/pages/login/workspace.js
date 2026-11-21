@@ -1,4 +1,4 @@
-import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=itinerary-push-20261121';
+import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=agenda-order-20261121';
 import {mountEmailCenter} from './gmail.js?v=gmail-setup-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
@@ -9,7 +9,7 @@ import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
-import {mountOsFoundation} from './os-foundation.js?v=daily-agenda-20261121';
+import {mountOsFoundation} from './os-foundation.js?v=agenda-order-20261121';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,

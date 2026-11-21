@@ -4,11 +4,11 @@ import {esc, money} from './wedding-dashboard.js';
 import {mountMarketingPlan} from './marketing-plan.js?v=marketing-pages-20261118';
 
 export const osNavigation = [
+  ['personal', 'Miranda｜个人行程', '[data-os-personal]'],
   ['dashboard', 'Dashboard｜工作台', '[data-os-home]'],
   ['crm', 'CRM｜客户与询盘', '[data-os-clients]'],
   ['orders', 'Orders｜订单管理', '[data-orders-section]'],
   ['calendar', 'Calendar｜日程与任务', '[data-os-calendar]'],
-  ['personal', 'Miranda｜个人行程', '[data-os-personal]'],
   ['communications', 'Communications｜沟通中心', '[data-gmail-center]'],
   ['finance', 'Finance｜财务中心', '.w23-dashboard'],
   ['marketing', 'Marketing｜营销中心', '[data-os-marketing]'],

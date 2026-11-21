@@ -8,7 +8,7 @@ export const personalScheduleFeature=[
 export const personalSchedulePageAction={task:'维护 Miranda 每日个人行程与待办',where:'Miranda｜个人行程→今日清单，点击日期切换。单项通知在编辑表单的「推送提醒」调整，个人订阅在设置中开启',needs:['正式有效 sculp_jz（operations）或 sculp_miranda（owner）账户','标题、类型、日期及已知当地时间和时区','用户核对后保存，删除需再次确认','推送需要明确时间、活跃设备和本账号的行程提醒偏好'],completion:'以共享行程的服务器保存结果为准。推送服务接收和实体手机展示需分别核验。聊天仅说明功能和入口'};
 export const personalScheduleReleaseFacts={
  knowledgeRevision:'2026-11-21-compact-itinerary-push',
- notReleased:[],
+ notReleased:[{name:'Miranda 行程时间排序',status:'pending_deployment',changes:['个人行程移到工作台前','按当天时间排定时事项，标注航班起飞、抵达及酒店入住']}],
  latestReleasedUpdate:{date:'2026-11-21',name:'Miranda 行程推送精简',revision:'compact-itinerary-push-20261121',status:'deployed',evidence:'docs/MIRANDA_PERSONAL_SCHEDULE.md',scope:'已开启 Miranda 行程提醒的用户设备。生产通知函数已核验，真实设备送达待验收',changes:['推送显示行程名称、相关当地时间和地点简称','航班优先显示机场代码与航站楼，点击推送后经权限校验打开行程']},
  latestBusinessRelease:{version:'SCULP OS 3.2 · Miranda个人行程',date:'2026-11-21',status:'deployed',acceptance:'pending_user_acceptance',evidence:'docs/MIRANDA_PERSONAL_SCHEDULE.md',scope:'个人行程页面、受限云端数据与设备推送。真实账号的跨设备操作及手机送达待验收',changes:['打开 Miranda 个人行程即见当天清单，日期按钮展开月历，原工作待办同列显示','个人安排由 JZ 和 Miranda 共同维护，支持版本冲突保护','自 11 月 23 日起用北京时间归日，关键时刻前及早起前夜推送行程名称、当地时间和简短地点']},
  includedBackendUpdate:{date:'2026-11-21',name:'个人行程功能说明',scope:'仅提供可信的产品能力、页面入口及已验证上线范围',changes:['说明日期切换、双账户权限、北京时间、提前及前夜提醒、设备订阅条件及简版通知']},
