@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {mountPersonalSchedule,canManagePersonalSchedule,scheduleOnDay} from '../src/pages/login/personal-schedule.js';
 const tick=()=>new Promise(r=>setTimeout(r,10));
-function setup({schedule=[],tasks=[],onWorkTask,failTasks=false}={}){
+function setup({schedule=[],tasks=[],onWorkTask,failTasks=false,now=()=>new Date('2026-11-21T15:00:00Z')}={}){
  const dom=new JSDOM('<main id="root"></main>',{url:'https://fixture.test'}),root=dom.window.document.querySelector('#root');dom.window.confirm=()=>true;
  const rows=[...schedule],calls=[];let lose=false;
  const sdk={rpc:async(name,args)=>{
@@ -18,7 +18,7 @@ function setup({schedule=[],tasks=[],onWorkTask,failTasks=false}={}){
   if(mode==='delete'){found.forEach(row=>rows.splice(rows.indexOf(row),1));return {data:found.map(x=>({id:x.id}))};}
   return {data:filters.length?structuredClone(found[0]||null):structuredClone(rows)};
  }).then(resolve,reject);}};return q;}};
- const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:'jz',username:'sculp_jz',role:'operations',active:true},onWorkTask,now:()=>new Date('2026-11-21T15:00:00Z')});
+ const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:'jz',username:'sculp_jz',role:'operations',active:true},onWorkTask,now});
  return {dom,root,rows,calls,app,lose:()=>{lose=true;},close(){app.destroy();dom.window.close();}};
 }
 const change=(x,el)=>el.dispatchEvent(new x.dom.window.Event('change',{bubbles:true}));
@@ -101,6 +101,41 @@ test('personal agenda still shows plans when the work task request fails', async
   await x.app.refresh();
   assert.match(x.root.querySelector('.ps-agenda').textContent,/Personal task/);
   assert.match(x.root.querySelector('.ps-read-error').textContent,/工作待办暂未读到/);
+ }finally{x.close();}
+});
+
+test('planner switches to Beijing at local midnight and can focus a shifted flight from its notification',async()=>{
+ const id='a1a1a1a1-1111-4111-8111-111111111111';
+ const flight={id,title:'Fictional West Coast flight',category:'flight',starts_local:'2026-11-22T16:30:00',agenda_start_local:'2026-11-23T08:30:00',start_timezone:'America/Los_Angeles',location:'Fixture Terminal'};
+ let now=new Date('2026-11-22T15:59:59Z');
+ const x=setup({schedule:[flight],now:()=>now});
+ const $=selector=>x.root.querySelector(selector);
+ try{
+  await x.app.refresh();
+  assert.equal($('[data-ps-clock]').textContent,'多伦多时间');
+  assert(!$('.ps-item'));
+  now=new Date('2026-11-22T16:00:00Z');
+  await x.app.refresh();
+  assert.equal($('[data-ps-clock]').textContent,'北京时间');
+  assert.match($('[data-ps-toggle]').textContent,/今天.*11月23日/);
+  assert.match($('.ps-meta').textContent,/16:30.*08:30 北京时间.*Fixture Terminal/);
+  assert.equal(await x.app.openReminder({id,date:'2026-11-23'}),true);
+  assert.equal(x.dom.window.document.activeElement,$(`[data-ps-item="${id}"]`));
+
+  $('[data-ps-new]').click();
+  const f=$('form').elements;
+  assert.equal(f.start_timezone.value,'Asia/Shanghai');
+  f.category.value='flight';change(x,f.category);
+  f.title.value='Fictional departure';f.start_time.value='07:30';
+  f.start_timezone.value='Asia/Tokyo';change(x,f.start_timezone);
+  f.start_date.value='2026-11-24';change(x,f.start_date);
+  assert.equal(f.start_timezone.value,'Asia/Tokyo');
+  f.reminder_start_minutes.value='120';change(x,f.reminder_start_minutes);
+  f.reminder_evening.value='always';change(x,f.reminder_evening);
+  submit(x);await tick();
+  const saved=x.rows.find(row=>row.title==='Fictional departure');
+  assert.equal(saved.reminder_start_minutes,120);
+  assert.equal(saved.reminder_evening,'always');
  }finally{x.close();}
 });
 test('personal agenda: lost insert acknowledgment retries same UUID; conflict retains draft',async()=>{

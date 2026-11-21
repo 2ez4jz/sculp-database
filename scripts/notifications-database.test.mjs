@@ -105,3 +105,92 @@ test('two PostgreSQL workers cannot claim the same push delivery',{skip:!process
   const ids=results.flatMap(r=>r.rows[0].d.items.map(x=>x.id));assert.equal(ids.length,2);assert.equal(new Set(ids).size,2);
  }finally{await a?.end();await b?.end();await db.close();}
 });
+
+test('itinerary warnings follow the Nov 23 clock change and hotel checkout time',async()=>{
+ const db=await createDatabase();
+ try{
+  await fixture(db);
+  await role(db,'postgres');
+  await db.query("update profiles set username='sculp_jz' where id=$1",[id(1)]);
+  await role(db,'authenticated');
+  await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id(1)]);
+  await db.exec(`insert into public.miranda_schedule(title,category,starts_local,ends_local,start_timezone,end_timezone,reminder_start_minutes,reminder_evening) values
+   ('Toronto morning','work','2026-11-22 08:00',null,'America/Toronto','America/Toronto',null,'auto'),
+   ('China morning','flight','2026-11-23 07:00',null,'Asia/Shanghai','Asia/Shanghai',null,'auto'),
+   ('West Coast flight','flight','2026-11-22 16:30',null,'America/Los_Angeles','America/Los_Angeles',null,'auto'),
+   ('China hotel','hotel','2026-11-23 15:00','2026-11-24 08:00','Asia/Shanghai','Asia/Shanghai',null,'auto'),
+   ('Night only','work','2026-11-23 10:00',null,'Asia/Shanghai','Asia/Shanghai',0,'always'),
+   ('Evening off','work','2026-11-24 07:00',null,'Asia/Shanghai','Asia/Shanghai',null,'off')`);
+  await db.exec("insert into public.miranda_schedule(title,category,starts_local,all_day) values('Date only','todo','2026-11-23 00:00',true)");
+  await role(db,'postgres');
+  const {rows}=await db.query(`select a.title,r.moment,r.alert,r.clock_zone,
+    to_char(a.agenda_start_local,'YYYY-MM-DD HH24:MI') as agenda_start,
+    to_char(r.due_at at time zone 'UTC','YYYY-MM-DD HH24:MI') as due_utc
+   from public.miranda_schedule a cross join lateral sculpy_private.itinerary_reminders(a) r
+   order by a.title,r.alert,r.moment`);
+  const alert=(title,moment,kind)=>rows.find(x=>x.title===title&&x.moment===moment&&x.alert===kind);
+  assert.equal(alert('Toronto morning','start','evening').due_utc,'2026-11-22 03:00');
+  assert.equal(alert('Toronto morning','start','evening').clock_zone,'America/Toronto');
+  assert.equal(alert('China morning','start','evening').due_utc,'2026-11-22 14:00');
+  assert.equal(alert('China morning','start','evening').clock_zone,'Asia/Shanghai');
+  assert.equal(alert('China morning','start','before').due_utc,'2026-11-22 20:00');
+  assert.equal(alert('West Coast flight','start','evening').agenda_start,'2026-11-23 08:30');
+  assert.equal(alert('West Coast flight','start','evening').due_utc,'2026-11-22 14:00');
+  assert.equal(alert('China hotel','start','evening'),undefined);
+  assert.equal(alert('China hotel','end','evening').due_utc,'2026-11-23 14:00');
+  assert.equal(alert('China hotel','end','before').due_utc,'2026-11-23 23:00');
+  assert.equal(alert('Night only','start','evening').due_utc,'2026-11-22 14:00');
+  assert.equal(alert('Night only','start','before'),undefined);
+  assert.equal(alert('Evening off','start','evening'),undefined);
+  assert(!rows.some(x=>x.title==='Date only'));
+ }finally{await db.close();}
+});
+
+test('itinerary push queues once for opted-in recipients, uses current location and rejects stale delivery',async()=>{
+ const db=await createDatabase();
+ try{
+  await fixture(db);
+  await role(db,'postgres');
+  await db.query("update profiles set username=case when id=$1 then 'sculp_jz' else 'sculp_miranda' end where id in ($1,$2)",[id(1),id(2)]);
+  const preferences={enabled:true,new_enquiry:true,overdue:true,itinerary:true};
+  await api(db,1,'preferences',preferences);
+  await api(db,3,'preferences',preferences);
+  assert.equal((await api(db,1,'state')).preferences.itinerary,true);
+  assert.equal((await api(db,2,'state')).preferences.itinerary,false);
+  assert.equal((await api(db,3,'state')).preferences.itinerary,false);
+  async function author(){await role(db,'authenticated');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id(1)]);}
+  const insert=async(n,title,offset)=>{
+   await author();
+   await db.query(`insert into public.miranda_schedule(id,title,category,starts_local,start_timezone,location,notes,reference,reminder_evening)
+    values($1,$2,'work',(now()+make_interval(mins=>$3)) at time zone 'Asia/Shanghai','Asia/Shanghai','Fixture address','PRIVATE NOTE','PRIVATE CODE','off')`,[id(n),title,offset]);
+  };
+  await insert(51,'Early appointment',29);
+  await insert(52,'Too late to send',-1);
+  await server(db,'tick');await server(db,'tick');
+  await role(db,'postgres');
+  const {rows}=await db.query("select id,recipient_id,itinerary_id from sculpy_private.push_notifications where kind='itinerary'");
+  assert.equal(rows.length,1);
+  assert.equal(rows[0].recipient_id,id(1));assert.equal(rows[0].itinerary_id,id(51));
+  const claim=await server(db,'claim');assert.equal(claim.items.length,1);
+  await author();
+  await db.query("update public.miranda_schedule set location='New fictional venue' where id=$1",[id(51)]);
+  const prepared=await server(db,'prepare',claim.items[0]);
+  assert.equal(prepared.notification.itinerary.place,'New fictional venue');
+  assert.equal(prepared.notification.itinerary.title,'Early appointment');
+  assert(prepared.notification.itinerary.ttl>0);
+  assert(!JSON.stringify(prepared.notification).includes('PRIVATE'));
+  await server(db,'finish',{...claim.items[0],result:'accepted',code:'http_201'});
+  const link=await api(db,1,'open',{id:rows[0].id});
+  assert.equal(link.type,'itinerary');assert.equal(link.id,id(51));assert.match(link.date,/^\d{4}-\d{2}-\d{2}$/);
+  await assert.rejects(()=>api(db,2,'open',{id:rows[0].id}),e=>e.code==='42501');
+
+  await insert(53,'Rescheduled after queuing',29);
+  await server(db,'tick');
+  const next=await server(db,'claim');assert.equal(next.items.length,1);
+  await author();
+  await db.query("update public.miranda_schedule set starts_local=starts_local+interval '1 day' where id=$1",[id(53)]);
+  assert.deepEqual(await server(db,'prepare',next.items[0]),{});
+  await role(db,'postgres');
+  assert.equal((await db.query('select status from sculpy_private.push_deliveries where id=$1',[next.items[0].id])).rows[0].status,'cancelled');
+ }finally{await db.close();}
+});

@@ -18,6 +18,7 @@
   min-width: 0;
 }
 .ps-heading .auth-primary, .ps-actions .auth-primary { width: auto; }
+.ps-clock { color: #57685a; font-size: .8rem; white-space: nowrap; }
 .personal-schedule button { font-size: .875rem; cursor: pointer; }
 .personal-schedule button:disabled { opacity: .55; cursor: default; }
 .personal-schedule .ps-date-toggle {
@@ -127,6 +128,8 @@
 
 .ps-editor { margin-top: 1rem; padding: 1rem; border: 1px solid #becdc0; border-radius: 12px; background: #f8faf7; }
 .ps-editor h4 { margin: 0 0 .5rem; font-size: 1.1rem; }
+.ps-reminder-settings { margin-top: .65rem; }
+.ps-reminder-settings summary { cursor: pointer; color: #345642; font-size: .9rem; }
 .personal-schedule label { display: flex; flex-direction: column; gap: .4rem; font-size: .875rem; }
 .personal-schedule input:not([type=checkbox]), .personal-schedule select, .personal-schedule textarea {
   box-sizing: border-box;
@@ -154,6 +157,7 @@
 
 @media (max-width: 600px) {
   .ps-heading h3 { flex-basis: 100%; }
+  .ps-clock { font-size: .75rem; }
   .ps-date-picker { inset-inline: 0 auto; }
   .ps-form-grid { grid-template-columns: 1fr; }
   .ps-form-grid > span:empty { display: none; }

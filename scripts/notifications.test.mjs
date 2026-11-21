@@ -58,3 +58,18 @@ test('push worker: private worker credential, immediate eligibility recheck and 
  assert.deepEqual(Object.keys(sent[0].payload).sort(),['body','id','kind','title']);assert.equal(sent[0].payload.title,'收到新的官网询盘');assert(!JSON.stringify(sent[0].payload).includes('SECRET'));
  assert(calls.findIndex(x=>x.p_action==='prepare')<calls.findIndex(x=>x.p_action==='finish'));assert.equal(calls.filter(x=>x.p_action==='finish').length,1);
 });
+
+test('itinerary push contains the agenda time and location with an event-bound TTL',async()=>{
+ const sent=[],key='a'.repeat(64);
+ const h=handler({admin:{rpc:async(name,{p_action})=>{
+  const states={authorize_worker:{authorized:true},tick:{enabled:true},identity:webpush.generateVAPIDKeys(),
+   claim:{items:[{id:uid,lease:sid}]},prepare:{subscription:subscription(),notification:{id:nid,kind:'itinerary',
+    itinerary:{title:'上海示例酒店',category:'hotel',moment:'end',alert:'evening',time:'11-24 08:00',zone:'Asia/Shanghai',
+     clockTime:'11-24 08:00',clockZone:'Asia/Shanghai',place:'示例路 100 号',ttl:47,reference:'PRIVATE'} }},finish:{ok:true}};
+  return {data:states[p_action]};
+ }},sendPush:async delivery=>{sent.push(delivery);return {status:201};}}).h;
+ const response=await h(req({}, {'x-sculpy-worker-key':key},'https://example.test/sculpy-notifications?worker=1'));
+ assert.equal(response.status,200);
+ assert.equal(sent[0].ttl,47);
+ assert.deepEqual(sent[0].payload,{id:nid,kind:'itinerary',title:'前夜提醒 · 上海示例酒店',body:'退房 11-24 08:00 北京时间\n地点：示例路 100 号'});
+});

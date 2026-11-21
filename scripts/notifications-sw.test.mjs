@@ -23,3 +23,13 @@ test('existing app windows receive an ID instead of a forced navigation that cou
  const demo=worker([{url:'https://2ez4jz.github.io/sculp-database/?demo=1',postMessage(){throw Error('Demo must not receive business notice');}}]);
  await event(demo.listeners.notificationclick,{notification:{data:{id},close(){}}});assert.equal(demo.opened.length,1);
 });
+
+test('an itinerary notification shows the detail text and opens through the authenticated notification ID',async()=>{
+ const w=worker();
+ await event(w.listeners.push,{data:{json:()=>({id,kind:'itinerary',title:'前夜提醒 · 示例航班',body:'起飞 11-23 07:00 北京时间\n地点：PVG T2',url:'https://example.test'})}});
+ assert.equal(w.shown[0].title,'前夜提醒 · 示例航班');
+ assert.match(w.shown[0].options.body,/11-23 07:00 北京时间\n地点：PVG T2/);
+ assert.deepEqual(Object.keys(w.shown[0].options.data),['id']);
+ await event(w.listeners.notificationclick,{notification:{data:w.shown[0].options.data,close(){}}});
+ assert.equal(w.opened[0],`https://2ez4jz.github.io/sculp-database/?notification=${id}`);
+});

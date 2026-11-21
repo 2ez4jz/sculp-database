@@ -1,11 +1,11 @@
-import {canManagePersonalSchedule} from './personal-schedule.js?v=daily-agenda-20261121';
+import {canManagePersonalSchedule} from './personal-schedule.js?v=itinerary-push-20261121';
 import {mountGmailSettings} from './gmail.js?v=gmail-setup-20261112';
-import { mountCloudWorkspace } from "./workspace.js?v=daily-agenda-20261121";
+import { mountCloudWorkspace } from "./workspace.js?v=itinerary-push-20261121";
 import {osNavigation} from './os-foundation.js?v=daily-agenda-20261121';
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
-import {mountNotificationSettings} from "./notification-settings.js?v=25";
-import {notificationApi,logoutPush,localPushCleanup} from "../../pwa/notifications.js?v=25";
+import {mountNotificationSettings} from "./notification-settings.js?v=itinerary-push-20261121";
+import {notificationApi,logoutPush,localPushCleanup} from "../../pwa/notifications.js?v=itinerary-push-20261121";
 import { config } from "../../config.js";
 import {
   authConfigured,
