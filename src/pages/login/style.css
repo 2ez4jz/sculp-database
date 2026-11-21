@@ -121,6 +121,21 @@
   font-size: 12px;
   color: #68776b;
 }
+.auth-card .auth-keep-signed-in {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  margin: 10px 0 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+.auth-keep-signed-in input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #314c3d;
+}
 .auth-primary {
   width: 100%;
   min-height: 49px;

@@ -49,6 +49,7 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
+ notReleased:[...personalScheduleReleaseFacts.notReleased,{name:'在此设备保持登录',status:'pending_deployment',scope:'正式账户登录页',changes:['登录时可选择保留会话，关闭再打开时重新验证账号']}],
 });
 
 export const toolCapabilities=Object.freeze({
