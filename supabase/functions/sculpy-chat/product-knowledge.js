@@ -55,8 +55,8 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- knowledgeRevision:'2026-11-21-hotel-checkout',
- latestReleasedUpdate:{date:'2026-11-21',name:'酒店退房标注',revision:'hotel-checkout-20261121',status:'deployed',scope:'JZ 和 Miranda 的每日酒店行程',evidence:'docs/CHANGELOG.md#酒店退房标注',changes:['退房当天显示酒店退房标注，包括仅填日期的预订','同日入住和退房同时标明，续住日使用普通酒店标签']},
+ knowledgeRevision:'2026-11-21-device-zone',
+ latestReleasedUpdate:{date:'2026-11-21',name:'行程自动时区',revision:'device-zone-20261121',status:'deployed',scope:'两位行程账户的设备时间显示与通知定位',evidence:'docs/CHANGELOG.md#行程自动时区',changes:['每天清单跟随当前设备时区，默认多伦多','机票保留机场当地时间，酒店预订日期固定，前夜提醒按行程时区','已适配温哥华 2026 年时区规则']},
  includedBackendUpdate:{date:'2026-11-21',name:'行程设备时区说明',scope:'日程的显示、录入与提醒时区',changes:['说明按本机时区查看日期与定时安排，多伦多为默认时区','机场当地时间、日期型预订及行程推送时刻分别保留']},
 });
 
