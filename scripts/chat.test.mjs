@@ -291,7 +291,7 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     assert.equal(knowledge.latestBusinessRelease.version,'SCULP OS 3.2 · Miranda个人行程');
     assert.equal(knowledge.latestBusinessRelease.acceptance,'pending_user_acceptance');assert.equal(knowledge.previousBusinessRelease.acceptance,'user_accepted');assert.equal(knowledge.pushNotifications.quietHours,false);
     assert.equal(knowledge.latestBusinessRelease.date,'2026-11-21');
-    assert.equal(knowledge.includedBackendUpdate.name,'酒店退房标注说明');
+    assert.equal(knowledge.includedBackendUpdate.name,'行程设备时区说明');
     assert.equal(knowledge.taskCapabilities.personalPageActions.some(x=>x.task==='在此设备保持登录'),context.mode!=='fictional_demo');
     assert.equal(knowledge.gmailIntegration.status,'deployed_setup_required');
     assert.equal(knowledge.taskCapabilities.existingPageActions.some(x=>x.task.includes('重新打开跟进任务')),context.actor?.role==='owner');

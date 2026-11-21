@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {mountPersonalSchedule,canManagePersonalSchedule,scheduleOnDay} from '../src/pages/login/personal-schedule.js';
 const tick=()=>new Promise(r=>setTimeout(r,10));
-function setup({schedule=[],tasks=[],marketing=[],comments=[],username="sculp_jz",loseComment,onWorkTask,onWorkWrite,failTasks=false,now=()=>new Date('2026-11-21T15:00:00Z')}={}){
+function setup({schedule=[],tasks=[],marketing=[],comments=[],username="sculp_jz",readDeviceZone=()=>null,loseComment,onWorkTask,onWorkWrite,failTasks=false,now=()=>new Date('2026-11-21T15:00:00Z')}={}){
  const dom=new JSDOM('<main id="root"></main>',{url:'https://fixture.test'}),root=dom.window.document.querySelector('#root');dom.window.confirm=()=>true;
  const rows=[...schedule],calls=[];let lose=false;
  const sdk={rpc:async(name,args)=>{
@@ -47,7 +47,7 @@ function setup({schedule=[],tasks=[],marketing=[],comments=[],username="sculp_jz
   if(mode==='delete'){found.forEach(row=>rows.splice(rows.indexOf(row),1));return {data:found.map(x=>({id:x.id}))};}
   return {data:filters.length?structuredClone(found[0]||null):structuredClone(rows)};
  }).then(resolve,reject);}};return q;}};
- const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:username.slice(6),username,role:username==='sculp_jz'?'operations':'owner',active:true},onWorkTask,now});
+ const app=mountPersonalSchedule({root,supabase:sdk,profile:{id:username.slice(6),username,role:username==='sculp_jz'?'operations':'owner',active:true},onWorkTask,now,readDeviceZone});
  return {dom,root,rows,calls,app,lose:()=>{lose=true;},close(){app.destroy();dom.window.close();}};
 }
 const change=(x,el)=>el.dispatchEvent(new x.dom.window.Event('change',{bubbles:true}));
@@ -136,7 +136,7 @@ test('personal agenda still shows plans when the work task request fails', async
 
 test('a same-day hotel booking shows both milestones while an open-ended booking only shows check-in',async()=>{
  const day='2026-11-24',hotel={category:'hotel',starts_local:day+'T09:00:00'};
- const x=setup({schedule:[{...hotel,id:'day-use',title:'Day use',ends_local:day+'T18:00:00'},{...hotel,id:'open',title:'Open stay'}],now:()=>new Date(day+'T04:00:00Z')});
+ const x=setup({schedule:[{...hotel,id:'day-use',title:'Day use',ends_local:day+'T18:00:00'},{...hotel,id:'open',title:'Open stay'}],readDeviceZone:()=>'Asia/Shanghai',now:()=>new Date(day+'T04:00:00Z')});
  try{
   await x.app.refresh();
   assert.equal(x.root.querySelector('[data-ps-item="day-use"] .ps-tag-milestone').textContent,'酒店入住 / 退房');
@@ -153,7 +153,7 @@ test('the daily list orders timed milestones before date-only items and marks fl
   {id:'arrive',title:'Overnight flight',category:'flight',starts_local:'2026-11-23T22:00:00',ends_local:'2026-11-24T06:30:00',completed:true},
  ];
  const tasks=[{id:'task',reason:'Date-only work task',due_at:'2026-11-24T00:00:00Z',due_on:'2026-11-24',status:'open'}];
- const x=setup({schedule,tasks,now:()=>new Date('2026-11-24T04:00:00Z')});
+ const x=setup({schedule,tasks,readDeviceZone:()=>'Asia/Shanghai',now:()=>new Date('2026-11-24T04:00:00Z')});
  try{
   await x.app.refresh();
   assert.deepEqual([...x.root.querySelectorAll('.ps-agenda strong')].map(el=>el.textContent),
@@ -193,19 +193,19 @@ test('shared work and marketing carry forward until completed, with safe replay 
  }finally{x.close();}
 });
 
-test('planner switches to Beijing at local midnight and can focus a shifted flight from its notification',async()=>{
+test('resuming on a device set to Beijing changes today and keeps airport wall time when opening a reminder',async()=>{
  const id='a1a1a1a1-1111-4111-8111-111111111111';
  const flight={id,title:'Fictional West Coast flight',category:'flight',starts_local:'2026-11-22T16:30:00',agenda_start_local:'2026-11-23T08:30:00',start_timezone:'America/Los_Angeles',location:'Fixture Terminal'};
- let now=new Date('2026-11-22T15:59:59Z');
- const x=setup({schedule:[flight],now:()=>now});
+ let now=new Date('2026-11-22T15:59:59Z'),zone='America/Toronto';
+ const x=setup({schedule:[flight],now:()=>now,readDeviceZone:()=>zone});
  const $=selector=>x.root.querySelector(selector);
  try{
   await x.app.refresh();
-  assert.equal($('[data-ps-clock]').textContent,'多伦多时间');
+  assert.equal($('[data-ps-clock]').textContent,'本机 · 多伦多');
   assert(!$('.ps-item'));
-  now=new Date('2026-11-22T16:00:00Z');
+  zone='Asia/Shanghai';now=new Date('2026-11-22T16:00:00Z');
   await x.app.refresh();
-  assert.equal($('[data-ps-clock]').textContent,'北京时间');
+  assert.equal($('[data-ps-clock]').textContent,'本机 · 北京时间');
   assert.match($('[data-ps-toggle]').textContent,/今天.*11月23日/);
   assert.match($('.ps-meta').textContent,/16:30.*08:30 北京时间.*Fixture Terminal/);
   assert.equal(await x.app.openReminder({id,date:'2026-11-23'}),true);
@@ -258,5 +258,33 @@ test('daily comments stay with their date; either account can mention, acknowled
   assert(comments[0].read_at);assert(!m.thread.querySelector('button'));
   m.mention.click();m.input.value+='收到';m.send.click();await tick();await jz.app.refresh();
   assert.match(j.thread.textContent,/Miranda.*@JZ 收到/s);
+ }finally{jz.close();miranda.close();}
+});
+
+
+test('each phone sees the same booking in its own day, with stable hotel dates and reminder navigation',async()=>{
+ const flight={id:'1a571234-1234-4234-8234-123456789abc',title:'Fictional flight',category:'flight',
+  starts_local:'2027-01-30T14:10:00',start_timezone:'America/Vancouver',starts_at:'2027-01-30T21:10:00Z',
+  ends_local:'2027-01-31T18:45:00',end_timezone:'Asia/Shanghai',ends_at:'2027-01-31T10:45:00Z'};
+ const hotel={id:'stay',title:'Fictional room',category:'hotel',all_day:true,starts_local:'2027-01-31T00:00:00',ends_local:'2027-02-01T00:00:00'};
+ const options={schedule:[flight,hotel],now:()=>new Date('2027-01-31T02:00:00Z')};
+ const jz=setup({...options,readDeviceZone:()=>{throw Error('unknown');}});
+ const miranda=setup({...options,readDeviceZone:()=>'Asia/Shanghai',username:'sculp_miranda'});
+ try{
+  await Promise.all([jz.app.refresh(),miranda.app.refresh()]);
+  const get=(x,s)=>x.root.querySelector(s);
+  assert.match(get(jz,'[data-ps-clock]').textContent,/默认.*多伦多/);
+  assert.match(get(jz,'[data-ps-toggle]').textContent,/1月30日/);
+  assert.match(get(jz,'.ps-meta').textContent,/14:10 温哥华.*16:10 多伦多/);
+  assert.equal(get(jz,'[data-ps-item="stay"]'),null);
+  assert.match(get(miranda,'[data-ps-toggle]').textContent,/1月31日/);
+  assert.match(get(miranda,'.ps-meta').textContent,/14:10 温哥华.*05:10 北京时间.*18:45 北京时间/);
+  assert.match(get(miranda,'[data-ps-item="stay"] .ps-tag').textContent,/入住/);
+  get(jz,'[data-ps-day-next]').click();await jz.app.refresh();
+  assert.match(get(jz,'[data-ps-item="stay"] .ps-tag').textContent,/入住/);
+  assert.equal(await jz.app.openReminder({id:flight.id,date:'2027-01-31',eventAt:flight.starts_at}),true);
+  assert.match(get(jz,'[data-ps-toggle]').textContent,/1月30日/);
+  assert.equal(await jz.app.openReminder({id:flight.id,date:'2027-01-31',eventAt:flight.ends_at}),true);
+  assert.match(get(jz,'[data-ps-toggle]').textContent,/1月31日/);
  }finally{jz.close();miranda.close();}
 });

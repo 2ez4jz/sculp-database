@@ -1,5 +1,5 @@
 // The composer stays mounted while the selected day's thread refreshes.
-export function mountAgendaComments({root,supabase,profile,zoneForDay,selectDay,readPages}) {
+export function mountAgendaComments({root,supabase,profile,zoneForInstant,selectDay,readPages}) {
   const doc=root.ownerDocument;
   const peer=profile.username==='sculp_jz'?'Miranda':'JZ';
   const self=peer==='JZ'?'Miranda':'JZ';
@@ -35,7 +35,7 @@ export function mountAgendaComments({root,supabase,profile,zoneForDay,selectDay,
     }catch{if(alive&&day===row.agenda_day){el.disabled=false;feedback.textContent='已读状态未确认，请重试。';}}
   }
   function renderRows(rows){
-    const key=JSON.stringify(rows);
+    const key=zoneForInstant(new Date())+JSON.stringify(rows);
     if(lastRows===key)return;
     lastRows=key;
     if(!rows.length){thread.textContent='当天还没有留言。';return;}
@@ -45,7 +45,7 @@ export function mountAgendaComments({root,supabase,profile,zoneForDay,selectDay,
       const time=doc.createElement('time'),body=doc.createElement('p');
       author.textContent=row.author_id===profile.id?self:peer;
       time.dateTime=row.created_at;
-      time.textContent=new Date(row.created_at).toLocaleString('zh-CN',{timeZone:zoneForDay(day),month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+      time.textContent=new Date(row.created_at).toLocaleString('zh-CN',{timeZone:zoneForInstant(row.created_at),month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
       header.append(author,time);
       if(row.mentioned_user_id===profile.id&&!row.read_at){
         const ack=button('@我 · 标为已读',()=>acknowledge(row,ack));

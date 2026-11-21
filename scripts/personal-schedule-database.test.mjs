@@ -15,6 +15,12 @@ test('personal agenda: shared CRUD, private access, active accounts, local dates
   await actor(db,1);
   const inserted=(await db.query(`insert into public.miranda_schedule(id,title,category,starts_local,ends_local,start_timezone,end_timezone)
    values($1,'QA flight','flight','2026-11-23 10:00','2026-11-24 15:00','America/Vancouver','Asia/Shanghai') returning *`,[uid(10)])).rows[0];
+  assert.equal(new Date(inserted.starts_at).toISOString(),'2026-11-23T17:00:00.000Z');
+  await db.exec('reset role');
+  const {rows:reminders}=await db.query("select event_at,due_at from sculpy_private.itinerary_reminders((select a from public.miranda_schedule a where id=$1)) where moment='start'",[uid(10)]);
+  await actor(db,1);
+  assert.equal(new Date(reminders[0].event_at).toISOString(),'2026-11-23T17:00:00.000Z');
+  assert.equal(new Date(reminders[0].due_at).toISOString(),'2026-11-23T14:00:00.000Z');
   assert.equal(Number(inserted.version),1);assert.equal(inserted.updated_by,uid(1));
   await actor(db,2);
   assert.equal((await db.query('select title from public.miranda_schedule')).rows[0].title,'QA flight');

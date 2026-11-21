@@ -1,13 +1,37 @@
-import {mountAgendaComments} from './agenda-comments.js?v=day-comments-20261121';
+import {mountAgendaComments} from './agenda-comments.js?v=device-zone-20261121';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const scheduleCategories = {flight:'航班',hotel:'酒店',work:'工作',todo:'待办',personal:'个人安排'};
 export const canManagePersonalSchedule = profile => profile?.active !== false &&
   (profile?.username === 'sculp_jz' && profile.role === 'operations' || profile?.username === 'sculp_miranda' && profile.role === 'owner');
 const dateAt = (value, timezone) => new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(value);
 const chinaStart = '2026-11-23';
-const chinaMidnight = Date.parse(`${chinaStart}T00:00:00+08:00`);
-export const itineraryTimeZone = now => Number(now)>=chinaMidnight ? 'Asia/Shanghai' : 'America/Toronto';
 const planZone = day => day>=chinaStart ? 'Asia/Shanghai' : 'America/Toronto';
+const defaultZone='America/Toronto';
+function displayClock(readDeviceZone) {
+  let zone=defaultZone,fromDevice=false;
+  try {
+    const device=readDeviceZone();
+    if(device){
+      zone=new Intl.DateTimeFormat('en',{timeZone:device}).resolvedOptions().timeZone;
+      fromDevice=true;
+    }
+  }catch { /* The schedule opens on Toronto time when detection is unavailable. */ }
+  const options={year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'};
+  const formatter=new Intl.DateTimeFormat('sv-SE',{...options,timeZone:zone});
+  const outdatedPacific=zone==='America/Vancouver' &&
+    formatter.format(new Date('2026-12-15T19:00:00Z')).includes('11:00:00');
+  const corrected=outdatedPacific?new Intl.DateTimeFormat('sv-SE',{...options,timeZone:'Etc/GMT+7'}):null;
+  const useCorrection=instant=>corrected && new Date(instant)>=new Date('2026-03-09T07:00:00Z');
+  return {zone,fromDevice,
+    stamp(instant){return (useCorrection(instant)?corrected:formatter).format(new Date(instant)).replace(' ','T');},
+    zoneAt(instant){return useCorrection(instant)?'Etc/GMT+7':zone;},
+  };
+}
+
+function inDisplayZone(item,clock) {
+  if(item.all_day||!item.starts_at)return item;
+  return {...item,agenda_start_local:clock.stamp(item.starts_at),agenda_end_local:item.ends_at?clock.stamp(item.ends_at):null};
+}
 const shiftDay = (day,n) => {const d=new Date(day+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
 const agendaTimes = item => [item.agenda_start_local || item.starts_local, item.agenda_end_local || item.ends_local];
 export function scheduleOnDay(item,day) {
@@ -29,16 +53,16 @@ const leadChoices = [[0,'关闭'],[15,'提前 15 分钟'],[30,'提前 30 分钟'
 const leadOptions = `<option value="">默认</option>${leadChoices.map(([value,label])=>`<option value="${value}">${label}</option>`).join('')}`;
 const leadLabel = Object.fromEntries(leadChoices);
 
-function localStamp(stamp, timezone, allDay, day, agendaStamp) {
+function localStamp(stamp, timezone, allDay, day, agendaStamp, displayZone) {
   const date = stamp.slice(0, 10);
   const local = [date !== day || allDay ? date : '', allDay ? '' : `${stamp.slice(11,16)} ${zoneNames[timezone] || timezone}`].filter(Boolean).join(' ');
   return !allDay && agendaStamp && stamp.slice(0,16)!==agendaStamp.slice(0,16)
-    ? `${local}（${localStamp(agendaStamp,'Asia/Shanghai',false,day)}）` : local;
+    ? `${local}（${localStamp(agendaStamp,displayZone,false,day)}）` : local;
 }
 
-function personalRow(item, day, milestone) {
-  const start = localStamp(item.starts_local, item.start_timezone, item.all_day, day,item.agenda_start_local);
-  const end = item.ends_local && localStamp(item.ends_local, item.end_timezone, item.all_day, day,item.agenda_end_local);
+function personalRow(item, day, milestone, displayZone) {
+  const start = localStamp(item.starts_local, item.start_timezone, item.all_day, day,item.agenda_start_local,displayZone);
+  const end = item.ends_local && localStamp(item.ends_local, item.end_timezone, item.all_day, day,item.agenda_end_local,displayZone);
   const time = end ? `${start} 至 ${end}` : !item.all_day ? start : item.category==='todo' ? '' : '全天 / 时间待定';
   const route = [item.location, item.destination].filter(Boolean).join(' 至 ');
   const meta = [time, item.flight_number, route].filter(Boolean).join(' · ');
@@ -58,7 +82,7 @@ function personalRow(item, day, milestone) {
   </li>`;
 }
 
-function scheduleEntry(item,day) {
+function scheduleEntry(item,day,displayZone) {
   const [start,end] = agendaTimes(item);
   const startsToday = start.slice(0,10) === day;
   const endsToday = end?.slice(0,10) === day;
@@ -68,7 +92,7 @@ function scheduleEntry(item,day) {
   return {
     time: !item.all_day && stamp ? stamp.slice(11) : afterTimedItems,
     done: Boolean(item.completed),
-    html: personalRow(item,day,milestone),
+    html: personalRow(item,day,milestone,displayZone),
   };
 }
 
@@ -102,14 +126,15 @@ async function readPages(pageSize, fetchPage, isCurrent) {
   return rows;
 }
 
-export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarketing,onWorkChange,now=()=>new Date()}) {
+export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarketing,onWorkChange,now=()=>new Date(),readDeviceZone=()=>Intl.DateTimeFormat().resolvedOptions().timeZone}) {
   if(!canManagePersonalSchedule(profile)){root.replaceChildren();return {canLeave:()=>true,refresh:async()=>{},destroy(){}};}
   const doc=root.ownerDocument,win=doc.defaultView;
-  const today = () => {const current=now();return dateAt(current,itineraryTimeZone(current));};
+  let clock=displayClock(readDeviceZone);
+  const today = () => clock.stamp(now()).slice(0,10);
   let alive=true, selected=today(), pickerMonth=selected.slice(0,7), loadVersion=0;
   let items=[], workTasks=[], marketingState=[], loaded=false, loadFailed=false, workFailed=false, marketingFailed=false, lastMarkup='';
   let workCommand=null;
-  let busy=false, dirty=false, editing=null, pending=null, followToday=true, changedZones=new Set();
+  let busy=false, dirty=false, editing=null, pending=null, followToday=true;
   root.className='cloud-orders personal-schedule';root.dataset.osPersonal='';
   root.innerHTML=`<header class="ps-heading">
     <h3>Miranda 行程</h3>
@@ -164,7 +189,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   <section class="ps-comments" data-ps-thread aria-label="当日留言"></section>`;
   const $=s=>root.querySelector(s),form=$('[data-ps-form]'),f=form.elements;
   const picker=$('[data-ps-picker]'), dateToggle=$('[data-ps-toggle]'), agenda=$('[data-ps-items]');
-  const comments=mountAgendaComments({root:$('[data-ps-thread]'),supabase,profile,zoneForDay:planZone,selectDay,readPages});
+  const comments=mountAgendaComments({root:$('[data-ps-thread]'),supabase,profile,zoneForInstant:instant=>clock.zoneAt(instant),selectDay,readPages});
   comments.setDay(selected);
   for(const field of ['start_timezone','end_timezone'])f[field].innerHTML=zones.map(([id,label])=>`<option value="${id}">${label} · ${id}</option>`).join('');
   const message=text=>{if(alive)$('[data-ps-status]').textContent=text;};
@@ -182,8 +207,9 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     const currentDay = today();
     const year = selected.slice(0,4)!==currentDay.slice(0,4) ? `${selected.slice(0,4)}年 ` : '';
     $('[data-ps-date-label]').textContent=(selected===currentDay ? '今天 · ' : year)+dayFormatter.format(asDate(selected));
-    $('[data-ps-clock]').textContent=planZone(selected)==='Asia/Shanghai' ? '北京时间' : '多伦多时间';
-    const schedule = items.filter(item => scheduleOnDay(item, selected));
+    const clockName=zoneNames[clock.zone]||clock.zone;
+    $('[data-ps-clock]').textContent=(clock.fromDevice?'本机 · ':'默认 · ')+clockName;
+    const schedule = items.map(item=>inDisplayZone(item,clock)).filter(item=>scheduleOnDay(item,selected));
     const dueTasks = workTasks.filter(task => task.status==='open'?task.due_on<=selected:task.due_on===selected||task.completed_on===selected);
     const postState=new Map(marketingState.map(state=>[state.post_id,state]));
     const posts=marketingFailed?[]:holidayContentPlan.filter(post=>{
@@ -192,7 +218,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
       return !state?.checked || post.date===selected || state.updated_at&&dateAt(new Date(state.updated_at),planZone(selected))===selected;
     });
     const rows = [
-      ...schedule.map(item => scheduleEntry(item,selected)),
+      ...schedule.map(item => scheduleEntry(item,selected,clock.zone)),
       ...dueTasks.map(task => ({time:afterTimedItems,done:task.status==='done',html:workTaskRow(task,selected)})),
       ...posts.map(post=>({time:afterTimedItems,done:Boolean(postState.get(post.id)?.checked),html:marketingRow(post,postState.get(post.id)?.checked,selected)})),
     ].sort((a,b) => a.time.localeCompare(b.time) || Number(a.done)-Number(b.done));
@@ -211,6 +237,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   }
   async function refresh() {
     if (!alive) return;
+    clock=displayClock(readDeviceZone);
     const currentDay = today();
     if (followToday && !dirty && !busy && !pending && !workCommand && comments.canLeave() && selected!==currentDay) {
       updateSelectedDay(currentDay);
@@ -224,9 +251,9 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     const to = next.toISOString().slice(0,10);
     const commentsLoaded=comments.refresh();
     const [schedule, tasks,marketing] = await Promise.allSettled([
-      // Airport dates can differ from the planner's day by one day in either direction.
+      // The largest civil timezone difference is 26 hours, spanning up to two date labels.
       readPages(500, offset => supabase.from('miranda_schedule').select('*')
-        .lte('first_day',to).gte('last_day',shiftDay(from,-1)).order('agenda_start_local').order('id').range(offset,offset+499), isCurrent),
+        .lte('first_day',shiftDay(to,1)).gte('last_day',shiftDay(from,-2)).order('agenda_start_local').order('id').range(offset,offset+499), isCurrent),
       readPages(100, offset => supabase.rpc('sculpy_shared_daily_work_tasks',{p_day:selected,p_offset:offset}), isCurrent),
       supabase.from('marketing_checklist_state').select('post_id,checked,updated_at').eq('campaign','holiday-2026').eq('task_index',50),
     ]);
@@ -260,16 +287,15 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     $('[data-ps-reminder-end-wrap]').hidden=!f.end_date.value;
     $('[data-ps-reminder-fields]').hidden=!timed;
     $('[data-ps-reminder-summary]').textContent=timed&&lead!=='关闭'?`推送提醒 · ${lead}`:'推送提醒';
-    $('[data-ps-reminder-help]').textContent=timed?'早起提醒使用行程页时钟。收到提醒需要在「设置」开启行程提醒和设备推送。':'填入具体时间后可设推送提醒。';
+    $('[data-ps-reminder-help]').textContent=timed?'早起提醒按行程时区计算（11 月 23 日起为北京时间）。收到提醒需要在「设置」开启行程提醒和设备推送。':'填入具体时间后可设推送提醒。';
   }
   function open(item=null){
     if(!approveLeave())return;editing=item;pending=null;form.reset();
     f.category.value=item?.category||'todo';f.title.value=item?.title||'';f.start_date.value=item?.starts_local.slice(0,10)||selected;f.start_time.value=item?.starts_local.slice(11,16)||'';
     f.end_date.value=item?.ends_local?.slice(0,10)||'';f.end_time.value=item?.ends_local?.slice(11,16)||'';f.all_day.checked=item?.all_day??true;f.completed.checked=item?.completed||false;
     for(const key of ['location','destination','flight_number','reference','notes'])f[key].value=item?.[key]||'';
-    changedZones=new Set();
     for(const side of ['start','end']){
-      const zone=item?.[side+'_timezone']||planZone(selected);
+      const zone=item?.[side+'_timezone']||clock.zone;
       f[side+'_timezone'].value=Object.hasOwn(zoneNames,zone)?zone:'UTC';
       f[side+'_custom_zone'].value=Object.hasOwn(zoneNames,zone)?'':zone;
     }
@@ -278,9 +304,9 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     f.reminder_evening.value=item?.reminder_evening||'auto';
     $('[data-ps-reminders]').open=false;
     const actor = item?.updated_by===profile.id ? '你' : profile.username==='sculp_jz' ? 'Miranda' : 'JZ';
-    const editZone = itineraryTimeZone(now());
+    const editZone = clock.zone;
     $('[data-ps-edit-meta]').textContent = item?.updated_at
-      ? `最近编辑：${actor} · ${new Date(item.updated_at).toLocaleString('zh-CN',{timeZone:editZone})}（${zoneNames[editZone]}）`
+      ? `最近编辑：${actor} · ${new Date(item.updated_at).toLocaleString('zh-CN',{timeZone:clock.zoneAt(item.updated_at)})}（${zoneNames[editZone]||editZone}）`
       : '';
     dirty=false;typeFields();$('[data-ps-editor]').hidden=false;$('[data-ps-editor-title]').textContent=item?'编辑安排':'新增安排';$('[data-ps-delete]').hidden=!item;$('[data-ps-form-status]').textContent='';controls();f.title.focus();
   }
@@ -312,11 +338,6 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   form.addEventListener('change',event=>{
     dirty=true;
     if(event.target===f.category&&f.category.value==='flight')f.all_day.checked=false;
-    for(const side of ['start','end']){
-      if(event.target===f[side+'_timezone']||event.target===f[side+'_custom_zone'])changedZones.add(side);
-      const dateField=f[side+'_date'];
-      if(!editing&&event.target===dateField&&dateField.value&&!changedZones.has(side))f[side+'_timezone'].value=planZone(dateField.value);
-    }
     typeFields();
   });
   form.onsubmit=async event=>{
@@ -379,7 +400,9 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     }
     closeCalendar(restoreFocus);
   }
-  async function openReminder({date,id}) {
+  async function openReminder({date,id,eventAt}) {
+    clock=displayClock(readDeviceZone);
+    if(eventAt && Number.isFinite(Date.parse(eventAt)))date=clock.stamp(eventAt).slice(0,10);
     if(!uuid.test(id||'')||!/^\d{4}-\d{2}-\d{2}$/.test(date||'')||date<firstDay||date>lastDay||!approveLeave()||(date!==selected&&!comments.canChangeDay()))return false;
     close();
     closeCalendar();
@@ -490,6 +513,8 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     catch(error){if(alive){busy=false;render(true);message(error.message);if(error.conflict)void refresh();}}
   });
   const focus=()=>{if(!busy&&!dirty&&!pending&&!workCommand&&!root.classList.contains('workspace-page-inactive'))void refresh();};
+  const onVisible=()=>{if(!doc.hidden)focus();};
+  doc.addEventListener('visibilitychange',onVisible);
   win.addEventListener('focus',focus);
   // Small bounded reads keep two open accounts in sync; no personal data in localStorage.
   const timer=win.setInterval(()=>{if(!doc.hidden&&!root.classList.contains('workspace-page-inactive'))focus();},30000);
@@ -504,6 +529,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
       comments.destroy();
       loadVersion++;
       win.clearInterval(timer);
+      doc.removeEventListener('visibilitychange',onVisible);
       win.removeEventListener('focus',focus);
       doc.removeEventListener('pointerdown',dismissPicker);
     },
