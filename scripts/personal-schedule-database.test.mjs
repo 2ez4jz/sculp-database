@@ -15,12 +15,12 @@ test('personal agenda: shared CRUD, private access, active accounts, local dates
   await actor(db,1);
   const inserted=(await db.query(`insert into public.miranda_schedule(id,title,category,starts_local,ends_local,start_timezone,end_timezone)
    values($1,'QA flight','flight','2026-11-23 10:00','2026-11-24 15:00','America/Vancouver','Asia/Shanghai') returning *`,[uid(10)])).rows[0];
-  assert.equal(inserted.version,1);assert.equal(inserted.updated_by,uid(1));
+  assert.equal(Number(inserted.version),1);assert.equal(inserted.updated_by,uid(1));
   await actor(db,2);
   assert.equal((await db.query('select title from public.miranda_schedule')).rows[0].title,'QA flight');
   const changed=await db.query('update public.miranda_schedule set completed=true,updated_by=$2 where id=$1 and version=1 returning *',[uid(10),uid(1)]);
   assert.equal(changed.rows[0].completed,true);assert.equal(changed.rows[0].updated_by,uid(2));
-  assert.equal(changed.rows[0].version,2);
+  assert.equal(Number(changed.rows[0].version),2);
   await actor(db,1);
   assert.equal((await db.query('update public.miranda_schedule set title=$2 where id=$1 and version=1 returning id',[uid(10),'stale'])).rows.length,0);
   // Westbound date-line crossing: arrival's local date can precede departure's.
