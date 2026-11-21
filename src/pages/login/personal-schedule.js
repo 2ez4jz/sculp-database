@@ -100,9 +100,13 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
   root.innerHTML=`<header class="ps-heading">
     <h3>Miranda 行程</h3>
     <div class="ps-heading-actions">
+      <div class="ps-day-navigation" role="group" aria-label="按天切换日期">
+      <button type="button" class="ps-day-step" data-ps-day-prev aria-label="前一天" title="前一天">‹</button>
       <button type="button" class="ps-date-toggle" data-ps-toggle aria-expanded="false" aria-controls="ps-date-picker">
-        <span class="sr-only">选择日期：</span><span data-ps-date-label></span>
+        <span class="sr-only">选择日期：</span><span data-ps-date-label aria-live="polite"></span>
       </button>
+      <button type="button" class="ps-day-step" data-ps-day-next aria-label="后一天" title="后一天">›</button>
+      </div>
       <small class="ps-clock" data-ps-clock></small>
       <button type="button" class="auth-primary" data-ps-new aria-label="新增行程或待办">新增</button>
     </div>
@@ -150,6 +154,8 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     root.querySelectorAll('button,[data-ps-done]').forEach(el => el.disabled=busy);
     $('[data-ps-prev]').disabled=busy || pickerMonth==='2000-01';
     $('[data-ps-next]').disabled=busy || pickerMonth==='2100-12';
+    $('[data-ps-day-prev]').disabled=busy || selected===firstDay;
+    $('[data-ps-day-next]').disabled=busy || selected===lastDay;
     form.querySelectorAll('input,select,textarea').forEach(el => el.disabled=busy || !!pending);
   }
   function render(force=false) {
@@ -329,7 +335,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     }
     return newMonth;
   }
-  function selectDay(day) {
+  function selectDay(day,restoreFocus=true) {
     if (day!==selected) {
       if (!approveLeave()) return;
       close();
@@ -337,7 +343,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
       if(updateSelectedDay(day))void refresh();
       render();
     }
-    closeCalendar(true);
+    closeCalendar(restoreFocus);
   }
   async function openReminder({date,id}) {
     if(!uuid.test(id||'')||!/^\d{4}-\d{2}-\d{2}$/.test(date||'')||date<firstDay||date>lastDay||!approveLeave())return false;
@@ -369,6 +375,8 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
   };
   $('[data-ps-prev]').onclick=()=>movePickerMonth(-1);
   $('[data-ps-next]').onclick=()=>movePickerMonth(1);
+  $('[data-ps-day-prev]').onclick=()=>selectDay(shiftDay(selected,-1),false);
+  $('[data-ps-day-next]').onclick=()=>selectDay(shiftDay(selected,1),false);
   $('[data-ps-today]').onclick=()=>selectDay(today());
   root.addEventListener('keydown',event=>{
     if (event.key==='Escape' && !picker.hidden) {
