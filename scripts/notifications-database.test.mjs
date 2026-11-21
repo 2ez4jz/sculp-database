@@ -194,3 +194,30 @@ test('itinerary push queues once for opted-in recipients, uses current location 
   assert.equal((await db.query('select status from sculpy_private.push_deliveries where id=$1',[next.items[0].id])).rows[0].status,'cancelled');
  }finally{await db.close();}
 });
+
+test('notification device overview is read-only for the named active JZ administrator',async()=>{
+ const db=await createDatabase();
+ try{
+  await fixture(db);await role(db,'postgres');
+  await db.query("update profiles set username=case id when $1 then 'sculp_jz' else 'sculp_miranda' end where id in ($1,$2)",[id(1),id(2)]);
+  await db.query("update auth.sessions set user_agent='Mozilla/5.0 (iPhone) Version/17.0 Mobile Safari/604.1' where id=$1",[id(102)]);
+  await db.query("update auth.sessions set not_after=now()-interval '1 minute' where id=$1",[id(103)]);
+  const asUser=async n=>{await role(db,'authenticated');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id(n)]);};
+  const list=async()=>(await db.query('select public.sculpy_jz_notification_devices() as response')).rows[0].response;
+  await asUser(1);
+  let result=await list();assert.equal(result.systemEnabled,true);assert.equal(result.devices.length,2);
+  const phone=result.devices.find(d=>d.account==='sculp_miranda');
+  assert.equal(phone.platform,'iPhone');assert.equal(phone.browser,'Safari');assert.equal(phone.itinerary,false);
+  assert.deepEqual(Object.keys(phone).sort(),['account','browser','enabled','itinerary','marketing','name','newEnquiry','overdue','platform','ref'].sort());
+  assert.equal(phone.ref.length,8);assert(!JSON.stringify(result).includes('FICTIONAL-'));
+  await role(db,'postgres');await db.query('update sculpy_private.push_devices set active=false where user_id=$1',[id(2)]);
+  await db.query('update sculpy_private.push_config set enabled=false');await asUser(1);
+  result=await list();assert.equal(result.systemEnabled,false);assert.equal(result.devices.length,1);
+  for(const n of [2,3]){await asUser(n);await assert.rejects(list,e=>e.code==='42501');}
+  await role(db,'postgres');await db.query("update profiles set role='operations' where id=$1",[id(4)]);
+  await asUser(4);await assert.rejects(list,e=>e.code==='42501');
+  await role(db,'postgres');await db.query('update profiles set active=false where id=$1',[id(1)]);
+  await asUser(1);await assert.rejects(list,e=>e.code==='42501');
+  await role(db,'anon');await assert.rejects(list,e=>e.code==='42501');
+ }finally{await db.close();}
+});
