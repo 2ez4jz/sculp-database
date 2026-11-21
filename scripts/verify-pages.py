@@ -11,12 +11,11 @@ base, directory, revision = argv[1:]
 if urlsplit(base).scheme != 'https':
     raise ValueError('Expected a live HTTPS Pages URL')
 site = Path(directory)
-expected = {p: (site / p).read_bytes() for p in (
-    'index.html', 'src/bootstrap.js', 'src/pages/login/workspace.js', 'src/services/sculpy.js',
-)}
+expected = {p.relative_to(site).as_posix(): p.read_bytes() for p in site.rglob('*') if p.is_file()}
 retired = ('monthly-demo.html', 'manifest-demo.webmanifest', 'src/app.js', 'src/data/demo.js',
            'scripts/fixtures/catalog/demo.js', 'docs/API_CONTRACT.md', 'package.json',
-           'supabase/migrations/001_initial_schema.sql')
+           'supabase/migrations/001_initial_schema.sql', 'src/domain/demo-workspace.js',
+           'assets/bridal-profile.jpg', 'supabase/functions/sculpy-ai/handler.ts')
 
 
 def verify(path):

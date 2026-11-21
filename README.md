@@ -62,4 +62,4 @@ V3.2 real-account cross-device acceptance remains pending.
 
 团队成员从 [SCULP OS](https://2ez4jz.github.io/sculp-database/) 登录。客户、询盘、订单、沟通记录、工作任务和行程按当前账号权限读取。设备安装、推送提醒和保持登录沿用正式工作区设置。
 
-开发测试使用本地测试数据。网站发布只包含正式页面运行所需的资源。
+开发测试使用本地测试数据。网站发布只包含正式页面运行所需的资源及其许可证。运行文件集合变化时，在仓库根目录执行 `python3 scripts/build-pages.py OUT --write-branch-config`，其中 OUT 为新的临时目录。发布后自动核对线上文件及应返回 404 的旧路径。

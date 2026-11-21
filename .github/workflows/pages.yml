@@ -26,7 +26,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api "repos/$GITHUB_REPOSITORY/pages" --jq '{build_type, source}' || echo 'Pages source metadata unavailable'
       - name: Stage authenticated site
-        run: python3 scripts/build-pages.py site-build
+        run: python3 scripts/build-pages.py site-build --check-branch-config
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site-build
