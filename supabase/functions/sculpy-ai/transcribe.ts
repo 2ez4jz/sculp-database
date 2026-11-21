@@ -3,7 +3,23 @@ import { json } from "./http.ts";
 import {audioUpload} from './audio-format.js';
 
 export async function transcribe(request: Request, origin: string) {
-  const incoming = await request.formData();
+  const maxRequest = 5_000_000 + 65_536;
+  if (Number(request.headers.get('content-length')) > maxRequest) return json(origin, {error:'录音过大。'}, 413);
+  if (!request.body) return json(origin, {error:'请提供录音。'}, 400);
+  const reader = request.body.getReader();
+  let bytes = 0;
+  const chunks: Uint8Array<ArrayBuffer>[] = [];
+  while (true) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    bytes += value.byteLength;
+    if (bytes > maxRequest) { await reader.cancel(); return json(origin, {error:'录音过大。'}, 413); }
+    chunks.push(new Uint8Array(value));
+  }
+  let incoming;
+  try {
+    incoming = await new Response(new Blob(chunks), {headers:request.headers}).formData();
+  } catch { return json(origin, {error:'录音格式无效。'}, 400); }
   const audio = incoming.get("audio");
   if (!(audio instanceof File))
     return json(origin, { error: "Audio file is required." }, 400);

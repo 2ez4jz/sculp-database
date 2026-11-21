@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {instructions} from '../supabase/functions/sculpy-chat/core.ts';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 import {demoReport, demoVisualSummary} from '../supabase/functions/sculpy-chat/demo-report.js';
 const base={from:'2026-01-01',to:'2026-12-31',service:null,channelId:null,artistId:null,bookingId:null,status:null,groupBy:null};
 const report=(patch={},rows=bookings)=>demoReport(rows,{...base,...patch},'2026-10-13');

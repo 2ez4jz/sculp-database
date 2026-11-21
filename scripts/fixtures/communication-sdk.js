@@ -39,7 +39,7 @@ const booking={id:bookingId,order_number:'612358',client:'Fictional Avery',servi
 export function createClient(){return {
  auth:{getSession:async()=>({data:{session:{access_token:'fictional-ui-session'}}}),getUser:async()=>({data:{user:{id:owner}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),signOut:async()=>({})},
  storage:{from:()=>({upload:async(path,file)=>{files.set(path,file);return {};},download:async path=>({data:files.get(path)})})},
- from:table=>{const q={select:()=>q,eq:()=>q,in:()=>q,order:()=>q,limit:()=>q,update:()=>q,single:async()=>({data:table==='profiles'?profile:table==='sculpy_company_rules'?{content:'虚构验收规则'}:{}}),then:resolve=>Promise.resolve({data:table==='website_enquiries_business'?leads:table==='profiles'?[profile]:[]}).then(resolve)};return q;},
+ from:table=>{const q={select:()=>q,eq:()=>q,neq:()=>q,is:()=>q,lte:()=>q,gte:()=>q,range:()=>q,in:()=>q,order:()=>q,limit:()=>q,update:()=>q,single:async()=>({data:table==='profiles'?profile:table==='sculpy_company_rules'?{content:'虚构验收规则'}:{}}),then:resolve=>Promise.resolve({data:table==='website_enquiries_business'?leads:table==='profiles'?[profile]:[]}).then(resolve)};return q;},
  rpc:async(name,args={})=>{
   (globalThis.qaCalls??=[]).push({name,args:structuredClone(args)});
   if(name==='list_account_welcomes'){

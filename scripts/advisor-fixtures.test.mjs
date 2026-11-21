@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {generateAdvisorFixtures,fixtureSummary,FIXTURE_VERSION} from '../src/data/advisor-fixtures.js';
+import {generateAdvisorFixtures,fixtureSummary,FIXTURE_VERSION} from './fixtures/catalog/advisor-fixtures.js';
 const a=generateAdvisorFixtures(),b=generateAdvisorFixtures(),s=fixtureSummary(a);
 test('300 stable fictional orders, exact business mix',()=>{assert.equal(FIXTURE_VERSION,'sculp-300-v1');assert.equal(s.total,300);assert.deepEqual(s.counts,{bridal:100,occasion:110,lesson:60,commercial:30});assert.deepEqual(a,b);assert.equal(new Set(a.map(r=>r.id)).size,300);assert.ok(a.every(r=>r.fictional));});
 test('bridal summer concentration and monthly checksum',()=>{assert.deepEqual(s.bridalByMonth,[2,2,4,6,12,16,19,18,12,5,2,2]);assert.equal(s.bridalByMonth.slice(4,9).reduce((x,y)=>x+y,0),77);});

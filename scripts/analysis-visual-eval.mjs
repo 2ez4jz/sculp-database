@@ -1,10 +1,10 @@
 // Actual deployed AI plus the same browser adapter, using only the 300 fictional orders.
 import {spawn} from 'node:child_process';
 import {writeFileSync} from 'node:fs';
-import {bookings,clients,artists,partners} from '../src/data/demo.js';
+import {bookings,clients,artists,partners} from './fixtures/catalog/demo.js';
 import {searchCatalog} from '../src/domain/sculpy.js';
 import {advisorRowsFromBookings} from '../src/domain/demo-workspace.js';
-import {demoChatAdapter} from '../src/services/chat.js';
+import {demoChatAdapter} from './fixtures/demo-chat.js';
 const output=process.argv[2]||'/tmp/sculp-visual-eval.json',results=[];
 const memory=new Map();globalThis.localStorage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,v)};globalThis.window={DemoI18n:{language:'zh'}};
 globalThis.fetch=async (url,opts)=>new Promise((resolve,reject)=>{

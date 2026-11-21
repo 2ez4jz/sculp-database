@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {generateAdvisorFixtures} from '../src/data/advisor-fixtures.js';
+import {generateAdvisorFixtures} from './fixtures/catalog/advisor-fixtures.js';
 import {advisorMetrics,advisorInsight,proposeKnowledge} from '../src/domain/advisor-engine.js';
 const rows=generateAdvisorFixtures();
 for(const [label,params] of [['all',{}],['bridal',{service:'bridal'}],['lesson',{service:'lesson'}],['Google',{channel:'Google'}],['June',{month:'2026-06'}],['bridal Google June',{service:'bridal',channel:'Google',month:'2026-06'}]]){

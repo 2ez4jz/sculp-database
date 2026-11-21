@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {allocateOrderNumber,orderNumberPattern,serviceNumberCodes} from '../src/domain/order-numbers.js';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 import {workspaceBookings} from '../src/domain/demo-workspace.js';
-import {generateAdvisorFixtures} from '../src/data/advisor-fixtures.js';
-import {venues} from '../src/data/demo.js';
+import {generateAdvisorFixtures} from './fixtures/catalog/advisor-fixtures.js';
+import {venues} from './fixtures/catalog/demo.js';
 import {validateNewEntity} from '../src/domain/intake.js';
 
 test('300 existing references are unique, fixed, category-specific and never contain 4',()=>{

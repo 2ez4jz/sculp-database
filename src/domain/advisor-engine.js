@@ -1,5 +1,5 @@
 // Strictly read-only domain analytics. No SQL generation and no writes.
-import {fixtureSummary} from '../data/advisor-fixtures.js';
+import {fixtureSummary} from '../../scripts/fixtures/catalog/advisor-fixtures.js';
 export function advisorMetrics(rows,{service=null,channel=null,month=null}={}) {
   const chosen=rows.filter(r=>(!service||r.service===service)&&(!channel||r.channel===channel)&&(!month||r.month===month));
   const completed=chosen.filter(r=>r.status==='completed');

@@ -57,7 +57,7 @@ export const productKnowledge=Object.freeze({
  ...personalScheduleReleaseFacts,
  knowledgeRevision:'2026-11-21-device-row',
  latestReleasedUpdate:{date:'2026-11-21',name:'通知设备总览',revision:'device-row-20261121',status:'deployed',scope:'JZ 账户管理中的通知设备清单',evidence:'docs/CHANGELOG.md#通知设备总览',changes:['在团队账户标题下方展开独立的「通知设备」行，可查看订阅、平台、浏览器及通知类别','刷新可读取最新清单，跨账号查询仅向具名 JZ 系统管理员开放']},
- includedBackendUpdate:{date:'2026-11-21',name:'通知设备总览说明',scope:'JZ 账户管理中的只读设备清单',changes:['在团队账户标题与成员列表之间展开「通知设备」，可读取最新订阅和已开启的通知类型','服务端按当前有效的 sculp_jz 系统管理员身份授权，实体设备送达需单独验证']},
+ includedBackendUpdate:{date:'2026-11-21',name:'正式工作区说明',scope:'成员登录、语音和正式工作区发布范围',changes:['旧演示书签进入团队登录流程','只有已登录且有效的团队账号可使用语音转写，聊天根据当前账号权限读取资料']},
 });
 
 export const toolCapabilities=Object.freeze({
@@ -70,8 +70,9 @@ export const toolCapabilities=Object.freeze({
 export function productKnowledgeInstructions({context={},toolNames=[],canPropose=false}={}){
  const demo=context.mode==='fictional_demo';
  const admin=!demo&&['owner','operations'].includes(context.actor?.role);
- const knowledge={...productKnowledge,
-  currentEnvironment:demo?'虚构演示工作区；不是真实业务数据库':'正式账号工作区；数据由服务端权限过滤',
+ const {latestDemoRelease,previousDemoRelease,...teamKnowledge}=productKnowledge;
+ const knowledge={...(demo?productKnowledge:teamKnowledge),
+  currentEnvironment:demo?'虚构演示工作区；不是真实业务数据库':'正式账号工作区；需要有效团队登录，数据由服务端权限过滤。公开演示已下线',
   currentRole:demo?'演示身份仅用于界面模拟':context.actor?.role||'未提供角色，不推断管理员权限',
   assistantCapabilities:[
    '自然聊天、中英文沟通、解释、写作和经营思路讨论',

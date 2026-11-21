@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
 import {buildAnalysisCharts,renderAnalysisCharts} from '../src/components/analysis/charts.js';
 const day='2026-10-11';

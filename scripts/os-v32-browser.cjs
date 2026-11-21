@@ -15,7 +15,7 @@ const assert=require('node:assert/strict');
   await page.locator('[data-os-client-detail]').getByText('+1 416 555 0200',{exact:true}).waitFor();
   const edits=await page.evaluate(()=>window.osCalls.filter(x=>x.name==='sculpy_os_update_client'));assert.equal(edits.length,2);assert.deepEqual(edits[0].args,edits[1].args);
   for(const width of [320,390,1440]){await page.setViewportSize({width,height:900});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`customer overflow ${width}`);await page.locator('[data-os-client-detail]').screenshot({path:`qa-screens/os32-customer-${width}.png`});}
-  await page.locator('[data-os-nav=calendar]').click();await page.locator('[data-os-new-task]').click();const task=page.locator('[data-os-task-form]');
+  await page.locator('[data-os-nav=dashboard]').click();await page.locator('[data-os-new-task]').click();const task=page.locator('[data-os-task-form]');
   await task.locator('[name=title]').fill('Delegated review');await task.locator('[name=dueOn]').fill('2026-12-01');await task.locator('[name=assignedTo]').selectOption('24000000-0000-4000-8000-000000000002');await task.locator('[name=confirmed]').check();
   await task.getByRole('button',{name:'确认添加任务'}).click();await task.getByText('已保存。',{exact:true}).waitFor();
   const created=await page.evaluate(()=>window.osCalls.filter(x=>x.name==='sculpy_os_create_task_v32').at(-1));assert.equal(created.args.p_assigned_to,'24000000-0000-4000-8000-000000000002');

@@ -1,17 +1,11 @@
-import {readBoundedJSON} from "../supabase/functions/sculpy-chat/tool-policy.js";
-import {catalogHistoryFrom} from "../supabase/functions/sculpy-chat/period-policy.js";
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import {stripTypeScriptTypes} from 'node:module';
-import vm from 'node:vm';
 import {boundedDemoRequest} from '../src/domain/chat-history.js';
 import {buildAnalysisCharts,chartCommentary,renderAnalysisCharts} from '../src/components/analysis/charts.js';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 import {advisorRowsFromBookings,advisorSnapshot} from '../src/domain/demo-workspace.js';
 import {advisorMetrics} from '../src/domain/advisor-engine.js';
 import {demoReport,compactDemoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
-import {structuredIntent} from '../supabase/functions/sculpy-chat/skills.js';
 import {isAnalystQuestion} from '../supabase/functions/sculpy-chat/agent-routing.js';
 import {serviceRevenue} from '../src/domain/analytics.js';
 import {converse} from '../supabase/functions/sculpy-chat/core.ts';
@@ -59,23 +53,19 @@ test('SDK routing keeps order queries, notes and record changes on the original 
  assert.equal(isAnalystQuestion('继续',{length:1}),false);
  assert.equal(isAnalystQuestion('用图看看',[{demoReportSources:[{}]}]),true);
 });
-test('actual handler gates SDK by scope/fixture and safely falls back on runtime failure',async()=>{
- const raw=readFileSync(new URL('../supabase/functions/sculpy-chat/handler.ts',import.meta.url),'utf8');
- const source=stripTypeScriptTypes(raw).replace(/^import .*;\n/gm,'').replace('export async function','async function').replace('import("./agent.ts")','Promise.resolve({runSculpyDemoAgent:sdk})');
- let sdkCalls=0,legacyCalls=0,fail=false;
- const ctx={readBoundedJSON,catalogHistoryFrom,Request,Response,Intl,Date,Set,Map,JSON,String,Number,Error,TextEncoder,console:{error:()=>{}},demoReport,isAnalystQuestion,structuredIntent,Deno:{env:{get:()=>''}},converse:async()=>{legacyCalls++;return {answer:'legacy reply',references:[],proposals:[],sourceIds:[]};},sdk:async()=>{sdkCalls++;if(fail)throw Error('SDK unavailable');return {answer:'SDK reply',references:[],proposals:[],sourceIds:[]};}};
- vm.runInNewContext(source+';globalThis.entry=handleRequest;',ctx);
- const send=async patch=>{
-  const response=await ctx.entry(new Request('https://example.test',{method:'POST',headers:{origin:'http://localhost:4173'},body:JSON.stringify({mode:'demo',agentMode:'sdk',message:'比较8月9月收入',requestId:crypto.randomUUID(),catalog:{bookings:[]},advisorFixture:{version:'sculp-unified-300-v2',fictional:true},...patch})}));
-  return {status:response.status,...await response.json()};
- };
- assert.equal((await send({})).turn.engine,'sdk');
- assert.equal((await send({bookingId:'b0'})).turn.engine,'legacy');
- assert.equal((await send({advisorFixture:null})).turn.engine,'legacy');
- assert.equal((await send({message:'记一下9月收入要核对'})).turn.engine,'legacy');
- fail=true;const fallback=await send({});assert.equal(fallback.turn.engine,'legacy');assert.equal(fallback.turn.agentFallback,true);
- assert.equal((await send({mode:'cloud'})).status,401);
- assert.equal(sdkCalls,2);assert.equal(legacyCalls,4);
+test('retired demo history and chat stop before authentication or model calls', async () => {
+ const previous=globalThis.fetch, previousDeno=globalThis.Deno;
+ globalThis.Deno={env:{get:()=>''}};
+ let requests=0;
+ globalThis.fetch=async()=>{requests++;throw Error('Unexpected external call');};
+ try {
+  const {handleRequest}=await import('../supabase/functions/sculpy-chat/handler.ts');
+  for(const [body,expected] of [[{mode:'demo',action:'history'},410],[{mode:'demo',agentMode:'sdk'},410],[{action:'memory_preview'},410],[{action:'history'},401]]){
+   const req=new Request('https://team.test',{method:'POST',headers:{origin:'http://localhost:4173'},body:JSON.stringify(body)});
+   assert.equal((await handleRequest(req)).status,expected);
+  }
+  assert.equal(requests,0);
+ } finally {globalThis.fetch=previous;globalThis.Deno=previousDeno;}
 });
 
 test('saved report summaries exclude full samples/groups and keep follow-up payload bounded',()=>{

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {buildDashboardCharts,dashboardRange,validDashboardRange} from '../src/components/analysis/sculpy-dashboard.js';
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 
 test('calendar ranges handle January rollover and leap-year month ends',()=>{
  assert.deepEqual(dashboardRange('month','2026-10-15'),{from:'2026-10-01',to:'2026-10-15'});

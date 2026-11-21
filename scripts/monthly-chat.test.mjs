@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {analyzeMonthlyQuestion,renderMonthlyChatChart} from "../src/domain/monthly-chat.js";
-import {bookings} from "../src/data/demo.js";
+import {bookings} from "./fixtures/catalog/demo.js";
 const admin={role:"admin",localDate:"2026-10-10"};
 test("three-month question produces verified deterministic values and a chart",()=>{
  const r=analyzeMonthlyQuestion("过去三个月的收入和订单变化，分析一下",bookings,admin);

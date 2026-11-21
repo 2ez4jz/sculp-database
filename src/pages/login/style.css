@@ -174,16 +174,6 @@
   color: #7b827b;
   margin-top: 22px;
 }
-.auth-divider {
-  height: 1px;
-  background: #e2e5df;
-  margin: 32px 0 24px;
-}
-.auth-demo {
-  font-size: 13px;
-  color: #405e48;
-  text-decoration: none;
-}
 .auth-small {
   font-size: 11px;
 }
@@ -227,11 +217,6 @@
 .account-result {
   color: #405e48;
 }
-.demo-exit {
-  font-size: 12px;
-  color: #607362;
-  white-space: nowrap;
-}
 .auth-workspace {
   max-width: 480px;
 }
@@ -270,9 +255,6 @@
   }
   .top-actions {
     gap: 6px;
-  }
-  .demo-exit {
-    font-size: 10px;
   }
 }
 .auth-primary:hover {

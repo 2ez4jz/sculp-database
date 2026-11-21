@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');const fs=require('node:fs');
  try{
   const page=await browser.newPage({viewport:{width:1920,height:1080}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/src/vendor/supabase.js',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('scripts/fixtures/communication-sdk.js','utf8')}));
-  await page.goto('http://localhost:4173/');await page.getByRole('heading',{name:'业务工作台'}).waitFor();await page.locator('.w23-headline').waitFor();
+  await page.goto('http://localhost:4173/');await page.getByRole('heading',{name:'业务工作台'}).waitFor();await page.locator('[data-os-nav=finance]').click();await page.locator('.w23-headline').waitFor();
   assert.equal(await page.locator('.auth-story').count(),0);
   for(const width of [1920,1440,1024,768,390,360,320]){
    await page.setViewportSize({width,height:900});
@@ -14,7 +14,7 @@ const assert=require('node:assert/strict');const fs=require('node:fs');
    await page.screenshot({path:`qa-screens/v24-workspace-${width}.png`,fullPage:true});
   }
   await page.setViewportSize({width:1440,height:1000});
-  await page.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await page.locator('.enquiry-communication > summary').click();await page.locator('.communication-panel [data-text]').waitFor();
+  await page.locator('[data-os-nav=communications]').click();await page.getByRole('button',{name:/Fictional Avery · 1 条待整理/}).click();await page.locator('.enquiry-communication > summary').click();await page.locator('.communication-panel [data-text]').waitFor();
   const panel=page.locator('.communication-panel').first();
   await panel.locator('[data-text]').fill('虚构记录：客户从半天改为全天，价格待确认。');
   const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jltkAAAAASUVORK5CYII=','base64');

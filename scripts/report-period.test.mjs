@@ -1,4 +1,4 @@
-import {bookings} from '../src/data/demo.js';
+import {bookings} from './fixtures/catalog/demo.js';
 import {advisorRowsFromBookings} from '../src/domain/demo-workspace.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -23,7 +23,7 @@ test('explicit months, ranges, years and quarters respect their requested calend
 });
 
 // Import the actual browser adapter so module syntax and wiring are checked before browser CI.
-import {demoChatAdapter} from '../src/services/chat.js';
+import {demoChatAdapter} from './fixtures/demo-chat.js';
 test('demo adapter attaches only requested fixture chart months and never calls cloud reporting',async()=>{
  const oldFetch=globalThis.fetch, oldStorage=globalThis.localStorage, oldWindow=globalThis.window,oldLocation=globalThis.location;
  const state=new Map();let payload;

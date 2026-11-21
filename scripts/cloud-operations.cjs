@@ -94,6 +94,7 @@ const assert=require('node:assert/strict');
           return {data:{bookings:[booking],total:1,edit:name==='sculpy_order_detail'?{...window.base,version:window.workspaceCalls.length+1,location:booking.venue}:undefined}};
         },from:()=>{const q={select:()=>q,eq:()=>q,in:()=>q,order:()=>q,limit:()=>q,single:async()=>({data:{content:''}}),then:resolve=>Promise.resolve({data:[]}).then(resolve)};return q;}}});
     });
+    await page.evaluate(()=>window.workspace.showPage('orders'));
     await page.locator('[data-booking=order1]').click();await page.locator('[data-order-detail]').getByText('修改订单',{exact:true}).click();
     await page.locator('[data-edit-form] [name=location]').fill('Richmond Hill');await page.locator('[data-edit-form] [name=reason]').fill('Workspace integration');
     await page.getByRole('button',{name:'核对修改',exact:true}).click();await page.locator('[data-confirm-change]').click();

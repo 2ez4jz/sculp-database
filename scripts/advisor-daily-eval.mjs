@@ -1,7 +1,7 @@
 // Real deployed-model evaluation: sole 300-order fictional baseline, no business writes.
 import {spawn} from 'node:child_process';
 import {writeFileSync,mkdirSync} from 'node:fs';
-import {bookings,clients,artists,partners} from '../src/data/demo.js';
+import {bookings,clients,artists,partners} from './fixtures/catalog/demo.js';
 import {advisorRowsFromBookings,advisorSnapshot} from '../src/domain/demo-workspace.js';
 import {searchCatalog} from '../src/domain/sculpy.js';
 import {config} from '../src/config.js';

@@ -1,4 +1,4 @@
-name: Deploy SCULP Memory Demo
+name: Deploy SCULP OS
 on:
   push:
     branches: [main]
@@ -21,9 +21,11 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Stage authenticated site
+        run: python3 scripts/build-pages.py site-build
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: site-build
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

@@ -1,4 +1,4 @@
-import {bookings,venues} from '../src/data/demo.js';
+import {bookings,venues} from './fixtures/catalog/demo.js';
 import {advisorRowsFromBookings,advisorSnapshot} from '../src/domain/demo-workspace.js';
 import {demoReport} from '../supabase/functions/sculpy-chat/demo-report.js';
 import {mkdir,writeFile} from 'node:fs/promises';

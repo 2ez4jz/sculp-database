@@ -25,12 +25,9 @@ const base = process.env.SCULPY_PWA_TEST_BASE || 'http://localhost:4173/';
     // Inspect the actual parsed Chromium manifest, independently of JSON parsing.
     const cdp=await context.newCDPSession(page);
     const parsed=await cdp.send('Page.getAppManifest');assert.deepEqual(parsed.errors,[]);
-    await page.goto(base+'?demo=1&lang=zh#settings');await page.locator('#main h1').waitFor();assert.equal(await page.locator('[data-pwa-card]').count(),0);
-    const demoManifest = await page.evaluate(async()=>{const url=document.querySelector('link[rel=manifest]').href;return {url,data:await (await fetch(url)).json()};});
-    assert.notEqual(demoManifest.data.id,manifest.data.id);
-    const launch=new URL(demoManifest.data.start_url,demoManifest.url);
-    assert.equal(launch.searchParams.get('demo'),'1');assert.equal(launch.hash,'#bookings');
-    await page.goto(launch.href);await page.locator('[data-action=new-booking]').waitFor();
+    await page.goto(base+'?demo=1#settings');await page.locator('#login-form').waitFor();
+    assert.equal(new URL(page.url()).searchParams.has('demo'),false);
+    assert.equal(await page.locator('link[rel=manifest]').evaluate(el=>el.href),manifest.url);
     // The app never opens an install prompt or injects installation UI.
     await page.evaluate(()=>{
       window.installCalls=0;
@@ -41,7 +38,7 @@ const base = process.env.SCULPY_PWA_TEST_BASE || 'http://localhost:4173/';
     });
     assert.equal(await page.evaluate(()=>window.installCalls),0);
     assert.equal(await page.evaluate(()=>window.installPrevented),true);
-    await page.locator('#menu').click();
+
     assert.equal(await page.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
     await page.screenshot({path:'qa-screens/pwa-manual-only-mobile.png'});
     // A worker on a GitHub project subpath must only cache its data-free fallback.
@@ -49,17 +46,17 @@ const base = process.env.SCULPY_PWA_TEST_BASE || 'http://localhost:4173/';
     assert.equal(scope,base);
     await context.setOffline(true);await page.reload();
     await page.getByRole('heading',{name:'连接恢复后，继续工作。'}).waitFor();
-    assert.equal(new URL(page.url()).searchParams.get('demo'),'1');
+    assert.equal(new URL(page.url()).searchParams.has('demo'),false);
     await page.screenshot({path:'qa-screens/pwa-offline-mobile.png'});
     await context.setOffline(false);await page.getByRole('button',{name:'重新连接 · Retry'}).click();
-    await page.locator('[data-action=new-booking]').waitFor();
+    await page.locator('#login-form').waitFor();
     const cached = await page.evaluate(async()=>{
       const entries=[];for(const key of await caches.keys())for(const request of await (await caches.open(key)).keys())entries.push(request.url);return entries;
     });
     assert.deepEqual(cached,[new URL('offline.html',base).href]);
     const ios=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'});
     const phone=await ios.newPage();await phone.addInitScript(()=>localStorage.setItem('memora-demo-language','zh'));
-    await phone.goto(base+'?demo=1&lang=zh#settings');await phone.locator('#main h1').waitFor();
+    await phone.goto(base+'?demo=1&lang=zh#settings');await phone.locator('#login-form').waitFor();
     assert.equal(await phone.locator('[data-pwa-open],.pwa-install-link,.pwa-install-dialog,[data-pwa-card]').count(),0);
     await phone.screenshot({path:'qa-screens/pwa-ios-manual-only.png'});
     await ios.close();
@@ -68,6 +65,6 @@ const base = process.env.SCULPY_PWA_TEST_BASE || 'http://localhost:4173/';
     const app=await standalone.newPage();await app.goto(base);await app.locator('#login-form').waitFor();
     assert.equal(await app.locator('[data-pwa-open]:visible').count(),0);await standalone.close();
     assert.deepEqual(errors,[]);await context.close();
-    console.log('PWA: icons/parsed manifest, separate production/demo launches, no app installation controls/prompts on desktop/mobile/iPhone, scoped worker, offline/reconnect and no business caches passed.');
+    console.log('PWA: icons/parsed manifest, authenticated and legacy launches, no app installation controls/prompts on desktop/mobile/iPhone, scoped worker, offline/reconnect and no business caches passed.');
   } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1)});

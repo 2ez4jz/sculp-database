@@ -1,5 +1,5 @@
-import {demoOrderNumbers} from '../data/demo-order-numbers.js';
-import { fixtureSummary } from '../data/advisor-fixtures.js';
+import {demoOrderNumbers} from '../../scripts/fixtures/catalog/demo-order-numbers.js';
+import { fixtureSummary } from '../../scripts/fixtures/catalog/advisor-fixtures.js';
 import { advisorMetrics, advisorInsight } from './advisor-engine.js';
 const services={bridal:'Wedding',occasion:'Event',lesson:'Education',commercial:'Commercial'};
 const statuses={completed:'Completed',confirmed:'Confirmed',inquiry:'Inquiry',cancelled:'Cancelled'};
