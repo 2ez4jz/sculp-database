@@ -181,7 +181,7 @@ test('itinerary push queues once for opted-in recipients, uses current location 
   assert(!JSON.stringify(prepared.notification).includes('PRIVATE'));
   await server(db,'finish',{...claim.items[0],result:'accepted',code:'http_201'});
   const link=await api(db,1,'open',{id:rows[0].id});
-  assert.equal(link.type,'itinerary');assert.equal(link.id,id(51));assert.match(link.date,/^\d{4}-\d{2}-\d{2}$/);
+  assert(Number.isFinite(Date.parse(link.eventAt)));assert.equal(link.type,'itinerary');assert.equal(link.id,id(51));assert.match(link.date,/^\d{4}-\d{2}-\d{2}$/);
   await assert.rejects(()=>api(db,2,'open',{id:rows[0].id}),e=>e.code==='42501');
 
   await insert(53,'Rescheduled after queuing',29);

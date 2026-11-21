@@ -57,7 +57,7 @@ export const productKnowledge=Object.freeze({
  ...personalScheduleReleaseFacts,
  knowledgeRevision:'2026-11-21-hotel-checkout',
  latestReleasedUpdate:{date:'2026-11-21',name:'酒店退房标注',revision:'hotel-checkout-20261121',status:'deployed',scope:'JZ 和 Miranda 的每日酒店行程',evidence:'docs/CHANGELOG.md#酒店退房标注',changes:['退房当天显示酒店退房标注，包括仅填日期的预订','同日入住和退房同时标明，续住日使用普通酒店标签']},
- includedBackendUpdate:{date:'2026-11-21',name:'酒店退房标注说明',scope:'两位行程账户的每日酒店展示',changes:['按已录入的入住及退房日期显示对应标注，续住日保留普通标签']},
+ includedBackendUpdate:{date:'2026-11-21',name:'行程设备时区说明',scope:'日程的显示、录入与提醒时区',changes:['说明按本机时区查看日期与定时安排，多伦多为默认时区','机场当地时间、日期型预订及行程推送时刻分别保留']},
 });
 
 export const toolCapabilities=Object.freeze({
