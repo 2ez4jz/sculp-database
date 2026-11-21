@@ -1,3 +1,4 @@
+import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=personal-20261121';
 import {mountEmailCenter} from './gmail.js?v=gmail-setup-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
@@ -8,7 +9,7 @@ import { mountOrderEditor } from './order-editor.js?v=cloud-write-20261022';
 import { mountMonthlyReport } from './monthly-report.js';
 import { createChatPanel } from "../../components/chat/panel.js?v=ios-audio-20261015";
 import { cloudChatAdapter } from "../../services/chat.js";
-import {mountOsFoundation} from './os-foundation.js?v=os32-20261116';
+import {mountOsFoundation} from './os-foundation.js?v=personal-20261121';
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -35,7 +36,9 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
     panel.open();
   };
   const osRoot = document.createElement('div');
-  let foundation=null,emailCenter=null,orderEmails=null;
+  let foundation=null,emailCenter=null,orderEmails=null,personalSchedule=null;
+  const personalRoot=document.createElement('section');
+  if(canManagePersonalSchedule(profile)){root.append(personalRoot);personalSchedule=mountPersonalSchedule({root:personalRoot,supabase,profile});}
   if(businessAdmin)root.prepend(osRoot);
   const reportRoot = document.createElement('section');
   let report = null, editor = null, business = null, communication = null;
@@ -47,7 +50,7 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   let enquiries=null;
   if(businessAdmin){$('.cloud-workspace-actions').after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox,onSaved:()=>foundation?.refresh()});
     const quick=document.createElement('button');quick.type='button';quick.className='auth-primary';quick.dataset.quickLead='';quick.textContent='新建客户询盘';quick.onclick=()=>enquiries.openNew();$('.cloud-workspace-actions').prepend(quick);void refreshInbox();}
-  const canLeave=()=>[editor,business,intake,enquiries,communication,foundation,emailCenter,orderEmails].every(part=>!part?.canLeave||part.canLeave());
+  const canLeave=()=>[editor,business,intake,enquiries,communication,foundation,emailCenter,orderEmails,personalSchedule].every(part=>!part?.canLeave||part.canLeave());
   const beforeUnload=event=>{if(!canLeave()){event.preventDefault();event.returnValue='';}};
   window.addEventListener('beforeunload',beforeUnload);
   let detailVersion = 0;
@@ -102,6 +105,7 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
     crm:[osRoot.querySelector('[data-os-clients]'),enquiriesRoot],
     orders:[$('[data-orders-section]'),$('[data-order-detail]'),$('[data-intake-root]')],
     calendar:[osRoot.querySelector('[data-os-calendar]')],
+    personal:personalSchedule?[personalRoot]:[],
     communications:[$('.comm-inbox'),emailRoot],
     finance:[reportRoot],marketing:[osRoot.querySelector('[data-os-marketing]')],
     ai:[],settings:[],
@@ -112,10 +116,11 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   const companyRules=$('.company-rules');if(companyRules)pageGroups.settings.push(companyRules);
   const allPages=[...new Set(Object.values(pageGroups).flat().filter(Boolean))];
   function showPage(page){
-    if(!pageGroups[page])return false;
+    if(!pageGroups[page]||(page==='personal'&&!personalSchedule)||!canLeave())return false;
     activePage=page;
     if(page==='marketing'&&pageGroups.marketing[0])pageGroups.marketing[0].hidden=false;
     for(const element of allPages)element.classList.toggle('workspace-page-inactive',!pageGroups[page].includes(element));
+    if(page==='personal')void personalSchedule?.refresh();
     onPageChange?.(page);
     return true;
   }
@@ -232,7 +237,7 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
       editor?.destroy();
       business?.destroy();
       communication?.destroy();
-      foundation?.destroy();emailCenter?.destroy();orderEmails?.destroy();
+      foundation?.destroy();emailCenter?.destroy();orderEmails?.destroy();personalSchedule?.destroy();
       report?.destroy();
       panel.destroy();
     },

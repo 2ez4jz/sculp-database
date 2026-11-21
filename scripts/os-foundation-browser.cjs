@@ -9,7 +9,7 @@ const assert=require('node:assert/strict');
   await page.goto('http://localhost:4173/?qa_pending=1');
   await page.locator('[data-os-metrics] dd').first().waitFor();
   assert.equal(await page.locator('[data-os-metrics] dd').count(),5);
-  assert.equal(await page.locator('[data-os-nav]').count(),9);
+  assert.equal(await page.locator('[data-os-nav]').count(),10);
   assert.equal(await page.locator('[data-os-metrics] dd').first().innerText(),'5');
   for(const width of [320,375,390,768,1440]){
    await page.setViewportSize({width,height:900});

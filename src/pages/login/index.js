@@ -1,6 +1,7 @@
+import {canManagePersonalSchedule} from './personal-schedule.js?v=personal-20261121';
 import {mountGmailSettings} from './gmail.js?v=gmail-setup-20261112';
-import { mountCloudWorkspace } from "./workspace.js?v=marketing-pages-20261118";
-import {osNavigation} from './os-foundation.js?v=marketing-pages-20261118';
+import { mountCloudWorkspace } from "./workspace.js?v=personal-20261121";
+import {osNavigation} from './os-foundation.js?v=personal-20261121';
 import { accountIdentifier, normalizeUsername, accountRoles } from "../../domain/accounts.js?v=roles-20261102";
 import { mountWelcomeEditor } from "./welcome-editor.js?v=20261102";
 import {mountNotificationSettings} from "./notification-settings.js?v=25";
@@ -113,7 +114,7 @@ async function showWorkspace() {
   layout.className='studio-layout';
   const story=layout.querySelector('.auth-story');
   story.className='studio-sidebar';
-  story.innerHTML=`<a class="auth-brand" href="./">SCULP OS<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?osNavigation.map(([key,label,target],i)=>`<button type="button" data-os-nav="${key}" data-studio-nav="${esc(target)}"${i===0?' aria-current="page"':''}>${esc(label)}</button>`).join(''):'<button type="button" data-studio-nav="[data-orders-section]" aria-current="page">我的订单</button>'}</nav><small>SCULP Studio 团队工作区<br>V3.2 · 客户维护与历史导入</small>`;
+  story.innerHTML=`<a class="auth-brand" href="./">SCULP OS<span>SCULP STUDIO</span></a><p class="studio-sidebar-label">团队工作空间</p><nav aria-label="工作区导航">${['owner','operations'].includes(profile.role)?osNavigation.filter(([key])=>key!=='personal'||canManagePersonalSchedule(profile)).map(([key,label,target],i)=>`<button type="button" data-os-nav="${key}" data-studio-nav="${esc(target)}"${i===0?' aria-current="page"':''}>${esc(label)}</button>`).join(''):'<button type="button" data-studio-nav="[data-orders-section]" aria-current="page">我的订单</button>'}</nav><small>SCULP Studio 团队工作区<br>V3.2 · 客户维护与历史导入</small>`;
   layout.querySelector('.auth-content').classList.add('studio-content');
   root.querySelectorAll('[data-studio-nav]').forEach(button=>button.onclick=()=>{
     if(!workspace.canLeave()){message('请先完成当前保存，再切换页面。');return;}
