@@ -13,13 +13,15 @@ self.addEventListener('fetch',event => {
   event.respondWith(fetch(event.request).catch(async()=> (await caches.open(CACHE)).match(offlineUrl).then(page=>page || new Response('Sculpy needs an internet connection. Please reconnect and reload.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}}))));
 });
 
-// Payloads and lock-screen text contain no customer or financial details.
+// Work notices use generic text. Itinerary details are sent only after opt-in.
 const notificationIdPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 self.addEventListener('push',event=>{
  let data={};try{data=event.data?.json()||{};}catch{}
  const id=notificationIdPattern.test(data.id||'')?data.id:null;
- const title=data.kind==='test'?'Sculpy 推送测试':data.kind==='overdue'?'有询盘等待跟进':data.kind==='new_enquiry'?(data.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘'):'Sculpy 工作提醒';
- event.waitUntil(self.registration.showNotification(title,{body:'请打开 Sculpy 查看。',tag:id||'sculpy-work',renotify:false,
+ const itinerary=Boolean(id&&data.kind==='itinerary'&&typeof data.title==='string'&&data.title&&typeof data.body==='string'&&data.body);
+ const title=itinerary?Array.from(data.title).slice(0,140).join(''):data.kind==='test'?'Sculpy 推送测试':data.kind==='overdue'?'有询盘等待跟进':data.kind==='new_enquiry'?(data.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘'):'Sculpy 工作提醒';
+ const body=itinerary?Array.from(data.body).slice(0,700).join(''):'请打开 Sculpy 查看。';
+ event.waitUntil(self.registration.showNotification(title,{body,tag:id||'sculpy-work',renotify:false,
   icon:new URL('assets/sculpy-icon-192.png',self.registration.scope).href,data:{id}}));
 });
 self.addEventListener('notificationclick',event=>{

@@ -20,6 +20,29 @@ export function deliveryOutcome(status,retryAfter){
  const seconds=/^\d+$/.test(retryAfter||'')?Math.min(3600,Number(retryAfter)):0;
  return {result:status>=200&&status<300?'accepted':[404,410].includes(status)?'gone':status===0||status===408||status===429||status>=500?'retry':'failed',code:status?`http_${status}`:'network',retryAfter:seconds};
 }
+function pushText(value, length) {
+ if (typeof value!=='string') return '';
+ return Array.from(value.replace(/[\u0000-\u001f\u007f]/g,' ').trim()).slice(0,length).join('');
+}
+const zoneLabels={'Asia/Shanghai':'北京时间','America/Toronto':'多伦多时间','America/Vancouver':'温哥华时间'};
+function itineraryPayload(notice) {
+ const detail=notice.itinerary;
+ if (!detail || !UUID.test(notice.id) || !Number.isInteger(detail.ttl) || detail.ttl<1 || detail.ttl>300) return null;
+ const title=pushText(detail.title,125), time=pushText(detail.time,20), zone=pushText(detail.zone,65);
+ if (!title || !time || !zone) return null;
+ const label=detail.category==='flight'?(detail.moment==='end'?'到达':'起飞'):
+  detail.category==='hotel'?(detail.moment==='end'?'退房':'入住'):(detail.moment==='end'?'结束':'开始');
+ const when=`${label} ${time} ${zoneLabels[zone]||zone}`;
+ const clock=pushText(detail.clockZone,65), clockTime=pushText(detail.clockTime,20);
+ const equivalent=clock&&clock!==zone&&clockTime?`（${zoneLabels[clock]||clock} ${clockTime}）`:'';
+ const place=pushText(detail.place,420), flight=pushText(detail.flight,36);
+ return {
+  ttl:detail.ttl,
+  payload:{id:notice.id,kind:'itinerary',title:`${detail.alert==='evening'?'前夜提醒':'行程提醒'} · ${title}`,
+   body:`${when}${equivalent}${flight?' · '+flight:''}\n${place?'地点：'+place:'地点待补充'}`},
+ };
+}
+
 // Dependencies keep credentials out of tests and let the transport use fetch on Edge.
 export function notificationHandler({admin,callerFor,allowedOrigins,generateKeys,sendPush}){
  const server=async(action,data={})=>{const r=await admin.rpc('sculpy_push_server',{p_action:action,p_data:data});if(r.error)throw r.error;return r.data;};
@@ -34,11 +57,14 @@ export function notificationHandler({admin,callerFor,allowedOrigins,generateKeys
     if(!validEndpoint(prepared.subscription?.endpoint))outcome={result:'failed',code:'invalid_endpoint'};
     else{
      const n=prepared.notification;
-     // Rebuild the payload from an allowlist. No customer, date, venue or money fields.
+     // Only an opted-in itinerary carries details. Business notices stay generic.
      const title=n.kind==='test'?'Sculpy 推送测试':n.kind==='marketing_mention'?'有新的社媒任务留言':n.kind==='overdue'?'有询盘等待跟进':n.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘';
-     const payload={id:n.id,kind:n.kind,title,body:'请打开 Sculpy 查看。'};
-     const response=await sendPush({subscription:prepared.subscription,payload,keys,topic:n.id.replace(/-/g,'')});
-     outcome=deliveryOutcome(response.status,response.retryAfter);
+     const message=n.kind==='itinerary'?itineraryPayload(n):{payload:{id:n.id,kind:n.kind,title,body:'请打开 Sculpy 查看。'}};
+     if (!message) outcome={result:'failed',code:'itinerary_unavailable'};
+     else {
+      const response=await sendPush({subscription:prepared.subscription,...message,keys,topic:n.id.replace(/-/g,'')});
+      outcome=deliveryOutcome(response.status,response.retryAfter);
+     }
     }
    }catch(error){outcome=error?.kind==='encoding'?{result:'failed',code:'encoding_failed'}:deliveryOutcome(0);}
    await server('finish',{...item,...outcome});if(outcome.result==='accepted')accepted++;

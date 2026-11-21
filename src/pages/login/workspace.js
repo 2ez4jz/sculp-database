@@ -1,4 +1,4 @@
-import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=daily-agenda-20261121';
+import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=itinerary-push-20261121';
 import {mountEmailCenter} from './gmail.js?v=gmail-setup-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
@@ -123,12 +123,12 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
     foundation.openTaskEditor(task);
     return true;
   }
-  function showPage(page){
+  function showPage(page,{refreshPersonal=true}={}){
     if(!pageGroups[page]||(page==='personal'&&!personalSchedule)||!canLeave())return false;
     activePage=page;
     if(page==='marketing'&&pageGroups.marketing[0])pageGroups.marketing[0].hidden=false;
     for(const element of allPages)element.classList.toggle('workspace-page-inactive',!pageGroups[page].includes(element));
-    if(page==='personal')void personalSchedule?.refresh();
+    if(page==='personal'&&refreshPersonal)void personalSchedule?.refresh();
     else personalSchedule?.closeCalendar();
     onPageChange?.(page);
     return true;
@@ -224,9 +224,11 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   return {
     canLeave,
     async openNotificationTarget(target){
-      if(!target||!['lead','booking','marketing'].includes(target.type))throw Error('无效通知目标');
+      if(!target||!['lead','booking','marketing','itinerary'].includes(target.type))throw Error('无效通知目标');
       if(!canLeave())throw Error('请先完成当前保存');
-      if(target.type==='marketing'){
+      if(target.type==='itinerary'){
+        if(!personalSchedule||!showPage('personal',{refreshPersonal:false})||!await personalSchedule.openReminder(target))throw Error('该行程目前不可查看');
+      }else if(target.type==='marketing'){
         if(!businessAdmin||!Number.isInteger(target.postId)||target.postId<1||target.postId>24)throw Error('社媒任务不可查看');
         showPage('marketing');
         foundation?.openMarketingPost(target.postId);

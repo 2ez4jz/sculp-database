@@ -5,7 +5,7 @@ export function pushSupport(){
  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
  if(ios&&!standalone)return {supported:false,message:'请从 iPhone 主屏幕打开 Sculpy，再开启通知。'};
  if(!isSecureContext||!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))return {supported:false,message:'当前浏览器暂不支持推送，请使用支持 Web Push 的浏览器。'};
- return {supported:true,message:'由你主动开启，锁屏只显示通用工作提醒。'};
+ return {supported:true,message:'开启后，这台设备会接收你选择的通知。'};
 }
 export async function notificationApi(supabase,action,data={}){
  const result=await supabase.auth.getSession();const token=result.data?.session?.access_token;

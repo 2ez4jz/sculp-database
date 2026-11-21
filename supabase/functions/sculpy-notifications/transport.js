@@ -1,7 +1,7 @@
 // Use the maintained RFC Web Push implementation; fetch keeps transport portable to Edge.
 export function createPushTransport(webpush,fetchImpl=fetch){
- function request(subscription,payload,keys,topic){
-  try{return webpush.generateRequestDetails(subscription,JSON.stringify(payload),{TTL:300,urgency:'normal',topic,contentEncoding:'aes128gcm',
+ function request(subscription,payload,keys,topic,ttl=300){
+  try{return webpush.generateRequestDetails(subscription,JSON.stringify(payload),{TTL:ttl,urgency:'normal',topic,contentEncoding:'aes128gcm',
    vapidDetails:{subject:'https://sculpstudio.ca/',publicKey:keys.publicKey,privateKey:keys.privateKey}});}catch{throw Object.assign(Error('Push encoding failed'),{kind:'encoding'});}
  }
  return {
@@ -13,8 +13,8 @@ export function createPushTransport(webpush,fetchImpl=fetch){
    if(!check.body?.length)throw Error('Push encoding unavailable');
    return keys;
   },
-  async sendPush({subscription,payload,keys,topic}){
-   const r=request(subscription,payload,keys,topic);
+  async sendPush({subscription,payload,keys,topic,ttl}){
+   const r=request(subscription,payload,keys,topic,ttl);
    const response=await fetchImpl(r.endpoint,{method:r.method,headers:r.headers,body:new Uint8Array(r.body),redirect:'error',signal:AbortSignal.timeout(5000)});
    const result={status:response.status,retryAfter:response.headers.get('retry-after')};await response.body?.cancel();return result;
   },
