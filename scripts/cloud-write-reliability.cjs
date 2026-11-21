@@ -73,7 +73,7 @@ module.exports=async function verifyCloudWrites(page,fixture){
   },from:()=>{const q={select:()=>q,in:()=>q,eq:()=>q,order:()=>q,limit:()=>q,single:()=>q,then:resolve=>Promise.resolve({data:[]}).then(resolve)};return q;}};
   window.workspace=mountCloudWorkspace({root:document.querySelector('#test-root'),supabase,profile:{id:'fixture-owner',role:'owner'}});
  });
- await page.getByRole('button',{name:'手动新增询盘'}).click();lead=page.locator('[data-new] form');
+ await page.locator('[data-quick-lead]').click();lead=page.locator('[data-new] form');
  await lead.locator('[name=name]').fill('Fictional pending');await lead.locator('[name=contact]').fill('fictional');
  await lead.locator('[name=reason]').fill('Fictional evidence');await lead.locator('[name=confirmed]').check();
  await lead.getByRole('button',{name:'保存询盘'}).click();await lead.getByText(/未收到成功确认/).waitFor();

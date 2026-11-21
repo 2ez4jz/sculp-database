@@ -51,8 +51,8 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
   }
   const enquiriesRoot=document.createElement('div');
   let enquiries=null;
-  if(businessAdmin){$('.cloud-workspace-actions').after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>intake.open({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox,onSaved:()=>foundation?.refresh()});
-    const quick=document.createElement('button');quick.type='button';quick.className='auth-primary';quick.dataset.quickLead='';quick.textContent='新建客户询盘';quick.onclick=()=>enquiries.openNew();$('.cloud-workspace-actions').prepend(quick);void refreshInbox();}
+  if(businessAdmin){$('.cloud-workspace-actions').after(enquiriesRoot);enquiries=mountWebsiteEnquiries({root:enquiriesRoot,supabase,onConvert:lead=>newOrder({lead}),onOpenBooking:id=>void openOrder(id).catch(()=>{}),onCommunicationChange:refreshInbox,onSaved:()=>foundation?.refresh()});
+    const quick=document.createElement('button');quick.type='button';quick.className='auth-primary';quick.dataset.quickLead='';quick.textContent='新建客户询盘';quick.onclick=()=>{if(showPage('crm'))enquiries.openNew();};$('.cloud-workspace-actions').prepend(quick);void refreshInbox();}
   const canLeave=()=>[editor,business,intake,enquiries,communication,foundation,emailCenter,orderEmails,personalSchedule].every(part=>!part?.canLeave||part.canLeave());
   const beforeUnload=event=>{if(!canLeave()){event.preventDefault();event.returnValue='';}};
   window.addEventListener('beforeunload',beforeUnload);
@@ -63,7 +63,7 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
       if(status)status.textContent='修改仍在保存或尚未收到确认，请先重试同一笔修改。';
       return;
     }
-    showPage('orders');
+    if(!showPage('orders'))return;
     orderEmails?.destroy();orderEmails=null;
     editor?.destroy(); editor=null; business?.destroy();business=null;communication?.destroy();communication=null;
     const mine = ++detailVersion;
@@ -89,11 +89,17 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
     }
   }
   const intake = ["operations","owner"].includes(profile.role) ? mountCloudIntake({root:$("[data-intake-root]"),supabase,onSaved:async id=>{await load();await openOrder(id);void enquiries?.refresh();void refreshInbox();void foundation?.refresh();void foundation?.refreshClients();}}) : null;
-  if (businessAdmin) $("[data-new-booking]").onclick = () => intake.open();
+  function newOrder(options) {
+    if(showPage('orders')) intake.open(options);
+  }
+  function showLead(id) {
+    if(showPage('crm')) void enquiries.openLead(id);
+  }
+  if (businessAdmin) $("[data-new-booking]").onclick = () => newOrder();
   if(businessAdmin)foundation=mountOsFoundation({root:osRoot,supabase,profile,
     onOrder:id=>void openOrder(id).catch(()=>{}),
-    onLead:id=>{if(canLeave()){showPage('crm');void enquiries.openLead(id);}},
-    onNewOrder:()=>{if(canLeave())intake.open();},onClientEmails:openClientEmails,
+    onLead:showLead,
+    onNewOrder:()=>newOrder(),onClientEmails:openClientEmails,
     onNavigate:showPage,
   });
   if(businessAdmin){const note=document.createElement('p');note.className='cloud-note';note.textContent='沟通中心：询盘和订单的沟通记录已接入。外部邮件尚未接入。';$('.comm-inbox h3').after(note);}
@@ -138,14 +144,14 @@ export function mountCloudWorkspace({ root, supabase, profile, onPageChange }) {
     onPageChange?.(page);
     return true;
   }
-  showPage('dashboard');
+  showPage(businessAdmin?'dashboard':'orders');
   async function refreshInbox(){
     if(!businessAdmin||destroyed)return;
     try{const {data,error}=await supabase.rpc('sculpy_communication_inbox',{});
     if(destroyed)return;const host=$('[data-inbox]');host.parentElement.hidden=false;
     if(error||!Array.isArray(data)){host.textContent='待整理列表暂时无法读取，请稍后刷新。';return;}
     host.innerHTML=data.length?data.map(x=>`<button type="button" data-inbox-id="${esc(x.id)}" data-inbox-type="${esc(x.type)}">${esc(x.label)} · ${x.pending} 条待整理 ↗</button>`).join(''):'<p class="cloud-note">暂无待整理记录。可以从客户询盘或订单详情留下第一条沟通。</p>';
-    host.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.inboxType==='lead'?void enquiries.openLead(b.dataset.inboxId):void openOrder(b.dataset.inboxId).catch(()=>{}));
+    host.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.inboxType==='lead'?showLead(b.dataset.inboxId):void openOrder(b.dataset.inboxId).catch(()=>{}));
     }catch{if(!destroyed){$('[data-inbox]').parentElement.hidden=false;$('[data-inbox]').textContent='待整理列表暂时无法读取，请稍后刷新。';}}
   }
   async function load() {

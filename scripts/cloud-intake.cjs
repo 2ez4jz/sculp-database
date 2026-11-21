@@ -46,7 +46,7 @@ const assert=require('node:assert/strict');
  });
  await page.locator('[data-new-booking]').click();assert.equal(await page.locator('[data-intake-root] details').evaluate(el=>el.open),true);assert.equal(await page.locator('[data-source]').evaluate(el=>el===document.activeElement),true);
  await page.locator('[data-booking=order1]').click();await page.locator('[data-order-detail]').getByText('预算：1800 CAD · 成交价：未确定').waitFor();
- await page.locator('[data-order-detail] summary').click();assert.equal(await page.locator('[data-order-detail] pre').textContent(),'  <script>unsafe</script> 原文  ');assert.equal(await page.locator('[data-order-detail] script').count(),0);
+ await page.getByText('查看原始记录与时间',{exact:true}).click();assert.equal(await page.locator('[data-order-detail] pre').textContent(),'  <script>unsafe</script> 原文  ');assert.equal(await page.locator('[data-order-detail] script').count(),0);
  await page.evaluate(()=>window.workspace.destroy());
  assert.deepEqual(errors,[]);console.log('Cloud intake UI passed: confirmation, retry identity, source invalidation, explicit matching, mobile layout.');
  }finally{await browser.close()}
