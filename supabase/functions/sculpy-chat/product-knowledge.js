@@ -3,6 +3,12 @@ import {v32ReleaseFacts,v32FeatureDescription,v32PageActions} from '../_shared/v
 import {v31ReleaseFacts,v31FeatureDescription,v31PageActions} from '../_shared/v31-release.js';
 import {v30ReleaseFacts,v30FeatureDescription,v30PageActions} from '../_shared/v30-release.js';
 import {v24ReleaseFacts,v24FeatureDescription,v24PageAction,v241AccountPageAction,welcomeEditorPageAction,v25FeatureDescription,v25NotificationPageAction} from '../_shared/v24-release.js';
+const keepSignInPageAction={
+ task:'在此设备保持登录',
+ where:'正式账户登录页的「在此设备保持登录」',
+ needs:['本人有效的正式账户','允许保存会话的浏览器','登录时主动勾选'],
+ completion:'同一浏览器或已安装的应用再次打开时，服务端验证有效会话后进入工作区。主动退出会清除已保存会话。聊天仅说明使用方式。',
+};
 // Maintained with releases, shipped with the backend, never supplied by a browser
 // catalog or business memory. A source commit is not evidence of a deployment.
 export const productKnowledge=Object.freeze({
@@ -49,7 +55,9 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- notReleased:[...personalScheduleReleaseFacts.notReleased,{name:'在此设备保持登录',status:'pending_deployment',scope:'正式账户登录页',changes:['登录时可选择保留会话，关闭再打开时重新验证账号']}],
+ knowledgeRevision:'2026-11-21-keep-sign-in',
+ latestReleasedUpdate:{date:'2026-11-21',name:'在此设备保持登录',revision:'keep-sign-in-20261121',status:'deployed',scope:'SCULP OS 正式账户登录页',evidence:'docs/CHANGELOG.md#保持登录',changes:['登录时可主动勾选保存有效会话','同一浏览器或已安装的应用重开后重新验证登录','主动退出清除保存的会话']},
+ includedBackendUpdate:{date:'2026-11-21',name:'保持登录功能说明',scope:'正式登录页的选择、会话恢复及退出流程',changes:['说明保持登录的入口、适用设备和验证条件']},
 });
 
 export const toolCapabilities=Object.freeze({
@@ -95,7 +103,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    proposals:{available:canPropose,scope:'已读取且有权限的具体订单备注、事项或待审核变更',
     preconditions:['用户明确要求记录；未说先别改','目标订单已查询且身份明确','当前路径支持确认卡；后端再次校验权限'],
     completion:'生成卡片只算待确认；用户确认且服务器返回保存成功后才算已保存。日期、金额及付款变更卡仅是建议，不等于正式字段已修改'},
-   personalPageActions:!demo&&context.actor?.role?[v25NotificationPageAction]:[],
+   personalPageActions:!demo&&context.actor?.role?[v25NotificationPageAction,keepSignInPageAction]:[],
    existingPageActions:admin?[
     ...v30PageActions,
     ...v31PageActions,

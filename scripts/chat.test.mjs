@@ -291,7 +291,8 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     assert.equal(knowledge.latestBusinessRelease.version,'SCULP OS 3.2 · Miranda个人行程');
     assert.equal(knowledge.latestBusinessRelease.acceptance,'pending_user_acceptance');assert.equal(knowledge.previousBusinessRelease.acceptance,'user_accepted');assert.equal(knowledge.pushNotifications.quietHours,false);
     assert.equal(knowledge.latestBusinessRelease.date,'2026-11-21');
-    assert.equal(knowledge.includedBackendUpdate.name,'个人行程功能说明');
+    assert.equal(knowledge.includedBackendUpdate.name,'保持登录功能说明');
+    assert.equal(knowledge.taskCapabilities.personalPageActions.some(x=>x.task==='在此设备保持登录'),context.mode!=='fictional_demo');
     assert.equal(knowledge.gmailIntegration.status,'deployed_setup_required');
     assert.equal(knowledge.taskCapabilities.existingPageActions.some(x=>x.task.includes('重新打开跟进任务')),context.actor?.role==='owner');
     for(const task of ['编辑客户资料','分配或改派任务负责人','导入历史客户与订单'])assert.equal(knowledge.taskCapabilities.existingPageActions.some(x=>x.task===task),context.actor?.role==='owner');
@@ -334,7 +335,8 @@ test('capability contracts cover actual registered tools and constrain task exec
  assert.equal(sdk.taskCapabilities.existingPageActions.length,0);
  assert.deepEqual(sdk.taskCapabilities.directlyExecutable.map(x=>x.tool),['query_demo_report']);
  const staff=get({context:{actor:{role:'artist'}},toolNames:['query_bookings'],canPropose:true});
- assert.equal(staff.taskCapabilities.personalPageActions.length,1);assert.equal(sdk.taskCapabilities.personalPageActions.length,0);
+ assert.deepEqual(staff.taskCapabilities.personalPageActions.map(a=>a.task),['开启、关闭或测试本人设备通知','在此设备保持登录']);
+ assert.equal(sdk.taskCapabilities.personalPageActions.length,0);
  assert.equal(staff.taskCapabilities.existingPageActions.length,0);
  assert(staff.taskCapabilities.unsupported.includes('银行资金操作'));
  // Release descriptions must point to checked-in deployment evidence, not a future plan.
