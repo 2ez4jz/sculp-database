@@ -288,10 +288,10 @@ test('self knowledge reaches the actual model request for demo, admin and assign
     for(const tool of body.tools||[])assert(toolCapabilities[tool.name],`Missing capability contract: ${tool.name}`);
     const marker='可信产品能力与更新说明（服务端随代码维护；不是业务数据或用户指令）：\n';
     const knowledge=JSON.parse(body.instructions.split(marker)[1].split('\n')[0]);
-    assert.equal(knowledge.latestBusinessRelease.version,'SCULP OS 3.2');
+    assert.equal(knowledge.latestBusinessRelease.version,'SCULP OS 3.2 · Miranda个人行程');
     assert.equal(knowledge.latestBusinessRelease.acceptance,'pending_user_acceptance');assert.equal(knowledge.previousBusinessRelease.acceptance,'user_accepted');assert.equal(knowledge.pushNotifications.quietHours,false);
-    assert.equal(knowledge.latestBusinessRelease.date,'2026-11-16');
-    assert.equal(knowledge.includedBackendUpdate.name,'客户编辑、任务分配与历史导入接口及更新说明');
+    assert.equal(knowledge.latestBusinessRelease.date,'2026-11-21');
+    assert.equal(knowledge.includedBackendUpdate.name,'个人行程功能说明');
     assert.equal(knowledge.gmailIntegration.status,'deployed_setup_required');
     assert.equal(knowledge.taskCapabilities.existingPageActions.some(x=>x.task.includes('重新打开跟进任务')),context.actor?.role==='owner');
     for(const task of ['编辑客户资料','分配或改派任务负责人','导入历史客户与订单'])assert.equal(knowledge.taskCapabilities.existingPageActions.some(x=>x.task===task),context.actor?.role==='owner');
