@@ -55,8 +55,8 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- knowledgeRevision:'2026-11-21-day-comments',
- latestReleasedUpdate:{date:'2026-11-21',name:'每日行程留言',revision:'day-comments-20261121',status:'deployed',scope:'JZ 和 Miranda 的每日行程页面',evidence:'docs/CHANGELOG.md#每日行程留言',changes:['在所选日期下方留言，可输入或点选对方的 @ 名称','在行程页可跳至其他日期的未读提及并标记已读']},
+ knowledgeRevision:'2026-11-21-hotel-checkout',
+ latestReleasedUpdate:{date:'2026-11-21',name:'酒店退房标注',revision:'hotel-checkout-20261121',status:'deployed',scope:'JZ 和 Miranda 的每日酒店行程',evidence:'docs/CHANGELOG.md#酒店退房标注',changes:['退房当天显示酒店退房标注，包括仅填日期的预订','同日入住和退房同时标明，续住日使用普通酒店标签']},
  includedBackendUpdate:{date:'2026-11-21',name:'酒店退房标注说明',scope:'两位行程账户的每日酒店展示',changes:['按已录入的入住及退房日期显示对应标注，续住日保留普通标签']},
 });
 
