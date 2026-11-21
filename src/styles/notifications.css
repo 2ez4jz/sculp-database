@@ -16,6 +16,26 @@
 .notification-history-row strong{display:block;font-size:13px;font-weight:600}.notification-history-row small{display:block;font-size:11px;color:var(--ui-muted);margin:5px 0}.notification-history-row span{font-size:11px;color:#69756b}
 .notification-card details{font-size:12px;margin-top:15px}.notification-card [data-diagnostics]{margin:12px 0;line-height:1.8;overflow-wrap:anywhere}
 .notification-settings>[data-status]{font-size:13px;line-height:1.7;margin:14px 0;color:var(--ui-accent)}
+[data-notification-devices] {
+  border-top: 1px solid var(--ui-line);
+  border-bottom: 1px solid var(--ui-line);
+}
+[data-notification-devices] > summary {
+  padding: 13px clamp(16px, 2vw, 24px);
+  color: var(--ui-accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-notification-devices] > summary:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: -2px;
+}
+[data-notification-devices] > .notification-card {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
 @media(max-width:760px){
  .studio-content #workspace-settings{min-height:44px}.notification-heading{gap:12px}.notification-heading h3{font-size:21px}.notification-heading p{font-size:12px}
  .notification-card{padding:18px 15px;border-radius:9px;margin-bottom:15px}.notification-card h4{font-size:15px}.notification-card p{font-size:11px}

@@ -88,16 +88,21 @@ test('itinerary push shows one local time and a short location with an event-bou
 test('only JZ can open and refresh the read-only device panel',async()=>{
  const {JSDOM}=await import('jsdom');
  const {mountNotificationDevices}=await import('../src/pages/login/notification-devices.js');
- const dom=new JSDOM('<section><h3>团队账户</h3></section>'),doc=dom.window.document;
+ const {readFile}=await import('node:fs/promises');
+ const polish=await readFile(new URL('../src/styles/studio-polish.css',import.meta.url),'utf8');
+ const dom=new JSDOM('<main class="studio-content"><section id="account-list"><h3>团队账户</h3><details class="account-create"><summary>新建账户</summary></details></section></main>'),doc=dom.window.document;
+ const styles=doc.createElement('style');styles.textContent=polish;doc.head.append(styles);
  const anchor=doc.querySelector('h3'),profile={active:true,username:'sculp_jz',role:'operations'};
  let result={data:{systemEnabled:true,devices:[{name:'Fixture <em>',platform:'iPhone',browser:'Safari',ref:'1234abcd',enabled:true,marketing:true,itinerary:false}]}},reads=0;
  const supabase={rpc:async(name)=>{assert.equal(name,'sculpy_jz_notification_devices');reads++;return result;}};
  try{
   for(const other of [{...profile,active:false},{...profile,username:'sculp_other'},{...profile,role:'owner'}])
    mountNotificationDevices({anchor,supabase,profile:other});
-  assert.equal(doc.querySelector('details'),null);
+  assert.equal(doc.querySelector('[data-notification-devices]'),null);
   mountNotificationDevices({anchor,supabase,profile});
-  const panel=doc.querySelector('details');assert(panel);assert.equal(reads,0);
+  const panel=doc.querySelector('[data-notification-devices]');assert(panel);assert.equal(reads,0);
+ assert.equal(dom.window.getComputedStyle(doc.querySelector('.account-create summary')).position,'absolute');
+ assert.notEqual(dom.window.getComputedStyle(panel.querySelector('summary')).position,'absolute');
   panel.open=true;await new Promise(resolve=>setTimeout(resolve,15));
   assert.match(panel.textContent,/Fixture <em> · iPhone · Safari/);assert.equal(panel.querySelector('em'),null);
   assert.match(panel.textContent,/行程提醒已关闭/);

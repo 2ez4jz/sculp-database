@@ -92,7 +92,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
    '经营记忆面板：提出、管理员确认、更正、撤销、审计；仅已确认且当前有效的记录供后续回答使用，不是讨论自动永久记住',
    '个人回复偏好、按权限保存的对话、手机自适应布局；添加到桌面由使用者通过浏览器菜单手工操作',
    'SCULP OS 各类导航各自为独立页面，不会滚动进入其他分类；Marketing｜营销中心：Holiday 2026 四周24篇共享发布日历，逐张素材安排、完整文案及每篇一项已完成勾和团队留言；owner和operations的完成状态云端同步，@具体团队账户会向其已订阅设备排队发送通用提醒，未订阅不保证推送；不自动发布，不是聊天可执行工具',
-   'JZ 可在账户管理展开「通知设备」读取最新的团队有效订阅，查看账号、平台、浏览器及通知类别。仅具名的 sculp_jz 有效系统管理员可以查看，聊天可说明入口。',
+   'JZ 可在账户管理的「团队账户」标题下方、成员列表上方展开「通知设备」读取最新的团队有效订阅，查看账号、平台、浏览器及通知类别。仅具名的 sculp_jz 有效系统管理员可以查看，聊天可说明入口。',
    personalScheduleFeature,
    '询盘管理的主操作为转订单、备注保存和失败。失败原因可选未回复、拒绝、其他原因，其他原因须填备注。客户资料与询盘进展、沟通记录可按需展开。转订单进入已有核对与保存流程。',
    v24FeatureDescription,v25FeatureDescription,v30FeatureDescription,v31FeatureDescription,v32FeatureDescription,

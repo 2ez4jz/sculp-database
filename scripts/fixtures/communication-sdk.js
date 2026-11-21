@@ -57,6 +57,7 @@ export function createClient(){return {
    if(globalThis.qaLoseWelcome){globalThis.qaLoseWelcome=false;return {error:{message:'Fictional lost acknowledgment'}};}
    return {data:structuredClone(row)};
   }
+  if(name==='sculpy_jz_notification_devices')return {data:{systemEnabled:true,devices:[]}};
   if(name==='list_managed_accounts')return {data:[{...profile,username:'sculp_jz'},{id:'24000000-0000-4000-8000-000000000002',display_name:'Fictional Miranda',username:'sculp_miranda',role:'owner',active:true}]};
   if(name==='sculpy_wedding_report')return {data:fixture.report};
   if(name==='sculpy_context')return {data:{bookings:[booking],total:1}};
