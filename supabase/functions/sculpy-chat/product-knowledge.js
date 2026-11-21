@@ -55,9 +55,9 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- knowledgeRevision:'2026-11-21-shared-work',
- latestReleasedUpdate:{date:'2026-11-21',name:'询盘精简与共享任务',revision:'shared-work-20261121',status:'deployed',scope:'正式询盘管理及 JZ/Miranda 的共享行程任务',evidence:'docs/CHANGELOG.md#询盘精简与共享任务',changes:['询盘转订单、备注及失败快捷操作，资料与沟通记录可展开','行程包含两位账户的工作与 Marketing 任务，可直接勾选并共享完成状态','未完成任务顺延到后续日期，保留原定日期']},
- includedBackendUpdate:{date:'2026-11-21',name:'共享任务与询盘功能说明',scope:'页面操作及已验证发布范围',changes:['说明询盘失败原因、备注及转订单入口','说明行程内任务勾选、共享状态和未完成顺延']},
+ knowledgeRevision:'2026-11-21-day-comments',
+ latestReleasedUpdate:{date:'2026-11-21',name:'每日行程留言',revision:'day-comments-20261121',status:'deployed',scope:'JZ 和 Miranda 的每日行程页面',evidence:'docs/CHANGELOG.md#每日行程留言',changes:['在所选日期下方留言，可输入或点选对方的 @ 名称','在行程页可跳至其他日期的未读提及并标记已读']},
+ includedBackendUpdate:{date:'2026-11-21',name:'每日行程留言功能说明',scope:'行程留言权限、归属日期及站内提及',changes:['记录两位账号的留言操作，消息按日期保存','说明站内未读提及的查看和确认方式']},
 });
 
 export const toolCapabilities=Object.freeze({
