@@ -59,17 +59,28 @@ test('push worker: private worker credential, immediate eligibility recheck and 
  assert(calls.findIndex(x=>x.p_action==='prepare')<calls.findIndex(x=>x.p_action==='finish'));assert.equal(calls.filter(x=>x.p_action==='finish').length,1);
 });
 
-test('itinerary push contains the agenda time and location with an event-bound TTL',async()=>{
+test('itinerary push shows one local time and a short location with an event-bound TTL',async()=>{
  const sent=[],key='a'.repeat(64);
- const h=handler({admin:{rpc:async(name,{p_action})=>{
+ const details={
+  [uid]:{title:'上海示例酒店',category:'hotel',moment:'end',alert:'evening',time:'11-25 08:00',zone:'Asia/Shanghai',
+   place:'上海示例酒店 · 示例路 100 号',ttl:47,reference:'PRIVATE'},
+  [sid]:{title:'QA27 虚构城市 → 虚构目的地',flight:'QA27',category:'flight',moment:'start',alert:'before',time:'11-26 13:40',zone:'America/Vancouver',
+   clockTime:'11-27 05:40',clockZone:'Asia/Shanghai',place:'示例机场 YVR，T2 · 900 Fictional Street',ttl:47},
+  [nid]:{title:'示例约见',category:'personal',moment:'start',alert:'before',time:'11-27 12:30',zone:'Asia/Shanghai',
+   place:'示例区实测路100号',ttl:47},
+ };
+ const h=handler({admin:{rpc:async(name,{p_action,p_data})=>{
   const states={authorize_worker:{authorized:true},tick:{enabled:true},identity:webpush.generateVAPIDKeys(),
-   claim:{items:[{id:uid,lease:sid}]},prepare:{subscription:subscription(),notification:{id:nid,kind:'itinerary',
-    itinerary:{title:'上海示例酒店',category:'hotel',moment:'end',alert:'evening',time:'11-24 08:00',zone:'Asia/Shanghai',
-     clockTime:'11-24 08:00',clockZone:'Asia/Shanghai',place:'示例路 100 号',ttl:47,reference:'PRIVATE'} }},finish:{ok:true}};
+   claim:{items:Object.keys(details).map(id=>({id,lease:sid}))},finish:{ok:true}};
+  if(p_action==='prepare')return {data:{subscription:subscription(),notification:{id:p_data.id,kind:'itinerary',itinerary:details[p_data.id]}}};
   return {data:states[p_action]};
  }},sendPush:async delivery=>{sent.push(delivery);return {status:201};}}).h;
  const response=await h(req({}, {'x-sculpy-worker-key':key},'https://example.test/sculpy-notifications?worker=1'));
  assert.equal(response.status,200);
- assert.equal(sent[0].ttl,47);
- assert.deepEqual(sent[0].payload,{id:nid,kind:'itinerary',title:'前夜提醒 · 上海示例酒店',body:'退房 11-24 08:00 北京时间\n地点：示例路 100 号'});
+ assert.equal(sent.length,3);
+ assert(sent.every(delivery=>delivery.ttl===47));
+ const byId=Object.fromEntries(sent.map(({payload})=>[payload.id,payload]));
+ assert.deepEqual(byId[uid],{id:uid,kind:'itinerary',title:'前夜提醒 · 上海示例酒店',body:'11-25 08:00 北京时间退房'});
+ assert.deepEqual(byId[sid],{id:sid,kind:'itinerary',title:'行程提醒 · QA27 虚构城市 → 虚构目的地',body:'11-26 13:40 温哥华时间起飞 · YVR T2'});
+ assert.equal(byId[nid].body,'11-27 12:30 北京时间开始');
 });
