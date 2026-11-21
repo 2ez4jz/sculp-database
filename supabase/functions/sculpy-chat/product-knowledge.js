@@ -55,8 +55,8 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- knowledgeRevision:'2026-11-21-device-zone',
- latestReleasedUpdate:{date:'2026-11-21',name:'行程自动时区',revision:'device-zone-20261121',status:'deployed',scope:'两位行程账户的设备时间显示与通知定位',evidence:'docs/CHANGELOG.md#行程自动时区',changes:['每天清单跟随当前设备时区，默认多伦多','机票保留机场当地时间，酒店预订日期固定，前夜提醒按行程时区','已适配温哥华 2026 年时区规则']},
+ knowledgeRevision:'2026-11-21-jz-devices',
+ latestReleasedUpdate:{date:'2026-11-21',name:'通知设备总览',revision:'jz-devices-20261121',status:'deployed',scope:'JZ 账户管理中的通知设备清单',evidence:'docs/CHANGELOG.md#通知设备总览',changes:['展开通知设备可查看有效的设备订阅、平台、浏览器及已开启的通知类别','刷新可读取最新清单，跨账号查询仅向具名 JZ 系统管理员开放']},
  includedBackendUpdate:{date:'2026-11-21',name:'通知设备总览说明',scope:'JZ 账户管理中的只读设备清单',changes:['在账户管理展开通知设备可读取最新订阅和已开启的通知类型','服务端按当前有效的 sculp_jz 系统管理员身份授权，实体设备送达需单独验证']},
 });
 
