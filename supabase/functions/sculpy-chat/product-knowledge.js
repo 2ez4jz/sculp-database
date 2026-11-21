@@ -55,9 +55,9 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
- knowledgeRevision:'2026-11-21-jz-devices',
- latestReleasedUpdate:{date:'2026-11-21',name:'通知设备总览',revision:'jz-devices-20261121',status:'deployed',scope:'JZ 账户管理中的通知设备清单',evidence:'docs/CHANGELOG.md#通知设备总览',changes:['展开通知设备可查看有效的设备订阅、平台、浏览器及已开启的通知类别','刷新可读取最新清单，跨账号查询仅向具名 JZ 系统管理员开放']},
- includedBackendUpdate:{date:'2026-11-21',name:'通知设备总览说明',scope:'JZ 账户管理中的只读设备清单',changes:['在账户管理展开通知设备可读取最新订阅和已开启的通知类型','服务端按当前有效的 sculp_jz 系统管理员身份授权，实体设备送达需单独验证']},
+ knowledgeRevision:'2026-11-21-device-row',
+ latestReleasedUpdate:{date:'2026-11-21',name:'通知设备总览',revision:'device-row-20261121',status:'deployed',scope:'JZ 账户管理中的通知设备清单',evidence:'docs/CHANGELOG.md#通知设备总览',changes:['在团队账户标题下方展开独立的「通知设备」行，可查看订阅、平台、浏览器及通知类别','刷新可读取最新清单，跨账号查询仅向具名 JZ 系统管理员开放']},
+ includedBackendUpdate:{date:'2026-11-21',name:'通知设备总览说明',scope:'JZ 账户管理中的只读设备清单',changes:['在团队账户标题与成员列表之间展开「通知设备」，可读取最新订阅和已开启的通知类型','服务端按当前有效的 sculp_jz 系统管理员身份授权，实体设备送达需单独验证']},
 });
 
 export const toolCapabilities=Object.freeze({
