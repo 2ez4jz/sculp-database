@@ -1,4 +1,4 @@
-import {canManagePersonalSchedule} from './personal-schedule.js?v=itinerary-push-20261121';
+import {canManagePersonalSchedule} from './personal-schedule.js?v=agenda-order-20261121';
 import {notificationApi,pushSupport,preparePush,currentDeviceId,enableDevice,disableDevice,localPushCleanup} from '../../pwa/notifications.js?v=itinerary-push-20261121';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={pending:'待发送',sending:'发送中',accepted:'推送服务已接收',failed:'发送失败',cancelled:'已取消'};

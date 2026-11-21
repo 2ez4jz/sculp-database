@@ -31,6 +31,7 @@ test('OS DOM: real-data rendering, XSS escaping, 10 navigation targets and emplo
   assert.equal(x.root.querySelector('[data-os-today] img'),null);
   assert.equal(x.root.querySelector('[data-os-followups] script'),null);
   assert.equal(osNavigation.length,10);assert.equal(new Set(osNavigation.map(x=>x[0])).size,10);
+  assert.deepEqual(osNavigation.slice(0,2).map(([key])=>key),['personal','dashboard']);
   assert.equal(x.root.querySelector('[data-os-marketing]').hidden,true);
  }finally{x.close();}
  const staff=setup(null,'artist');try{assert.equal(staff.root.childElementCount,0);assert.equal(staff.calls.length,0);}finally{staff.close();}

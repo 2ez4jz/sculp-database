@@ -8,12 +8,14 @@ const chinaMidnight = Date.parse(`${chinaStart}T00:00:00+08:00`);
 export const itineraryTimeZone = now => Number(now)>=chinaMidnight ? 'Asia/Shanghai' : 'America/Toronto';
 const planZone = day => day>=chinaStart ? 'Asia/Shanghai' : 'America/Toronto';
 const shiftDay = (day,n) => {const d=new Date(day+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
+const agendaTimes = item => [item.agenda_start_local || item.starts_local, item.agenda_end_local || item.ends_local];
 export function scheduleOnDay(item,day) {
-  const start = (item.agenda_start_local || item.starts_local).slice(0,10);
-  const end = (item.agenda_end_local || item.ends_local)?.slice(0,10) || start;
-  const [first,last] = [start,end].sort();
+  const [start,end] = agendaTimes(item);
+  const [first,last] = [start.slice(0,10),(end || start).slice(0,10)].sort();
   return day >= first && day <= last;
 }
+const afterTimedItems = '24:00';
+const milestoneLabels = {flight:{start:'航班起飞',end:'航班抵达'},hotel:{start:'酒店入住'}};
 const zones = [['America/Toronto','多伦多'],['America/Vancouver','温哥华'],['Asia/Shanghai','北京时间'],['America/New_York','纽约 / 奥兰多'],['America/Los_Angeles','洛杉矶'],['Asia/Tokyo','东京'],['Asia/Hong_Kong','香港'],['Europe/London','伦敦'],['Europe/Paris','巴黎'],['UTC','UTC']];
 const zoneNames = Object.fromEntries(zones);
 const dayFormatter = new Intl.DateTimeFormat('zh-CN', {timeZone:'UTC', month:'long', day:'numeric', weekday:'short'});
@@ -33,7 +35,7 @@ function localStamp(stamp, timezone, allDay, day, agendaStamp) {
     ? `${local}（${localStamp(agendaStamp,'Asia/Shanghai',false,day)}）` : local;
 }
 
-function personalRow(item, day) {
+function personalRow(item, day, milestone) {
   const start = localStamp(item.starts_local, item.start_timezone, item.all_day, day,item.agenda_start_local);
   const end = item.ends_local && localStamp(item.ends_local, item.end_timezone, item.all_day, day,item.agenda_end_local);
   const time = end ? `${start} 至 ${end}` : !item.all_day ? start : item.category==='todo' ? '' : '全天 / 时间待定';
@@ -48,11 +50,23 @@ function personalRow(item, day) {
   return `<li class="ps-item${item.completed ? ' ps-completed' : ''}" data-ps-item="${esc(item.id)}" tabindex="-1">
     <input type="checkbox" data-ps-done="${esc(item.id)}" aria-label="完成 ${esc(item.title)}" ${item.completed ? 'checked' : ''}>
     <div class="ps-item-body">
-      <div class="ps-item-title"><strong>${esc(item.title)}</strong><span class="ps-tag">${esc(scheduleCategories[item.category])}</span></div>
+      <div class="ps-item-title"><strong>${esc(item.title)}</strong><span class="ps-tag${milestone ? ' ps-tag-milestone' : ''}">${esc(milestone || scheduleCategories[item.category])}</span></div>
       ${meta ? `<p class="ps-meta">${esc(meta)}</p>` : ''}${details}
     </div>
     <button type="button" class="ps-row-action" data-ps-edit="${esc(item.id)}" aria-label="编辑 ${esc(item.title)}">编辑</button>
   </li>`;
+}
+
+function scheduleEntry(item,day) {
+  const [start,end] = agendaTimes(item);
+  const startsToday = start.slice(0,10) === day;
+  const stamp = startsToday ? start : end?.slice(0,10) === day ? end : null;
+  const milestone = stamp && milestoneLabels[item.category]?.[startsToday ? 'start' : 'end'];
+  return {
+    time: !item.all_day && stamp ? stamp.slice(11) : afterTimedItems,
+    done: Boolean(item.completed),
+    html: personalRow(item,day,milestone),
+  };
 }
 
 function workTaskRow(task) {
@@ -146,9 +160,9 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     const schedule = items.filter(item => scheduleOnDay(item, selected));
     const dueTasks = workTasks.filter(task => task.due_on===selected);
     const rows = [
-      ...schedule.map(item => ({done:item.completed, html:personalRow(item, selected)})),
-      ...dueTasks.map(task => ({done:task.status==='done', html:workTaskRow(task)})),
-    ].sort((a,b) => Number(a.done)-Number(b.done));
+      ...schedule.map(item => scheduleEntry(item,selected)),
+      ...dueTasks.map(task => ({time:afterTimedItems,done:task.status==='done',html:workTaskRow(task)})),
+    ].sort((a,b) => a.time.localeCompare(b.time) || Number(a.done)-Number(b.done));
     const errors = [loadFailed && '行程', workFailed && '工作待办'].filter(Boolean);
     const note = errors.length ? `<div class="ps-read-error"><p>${errors.join('和')}暂未读到。</p><button type="button" data-ps-retry>重试</button></div>` : '';
     const content = rows.length ? `<ul class="ps-agenda">${rows.map(row => row.html).join('')}</ul>` : '';
