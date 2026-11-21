@@ -159,5 +159,5 @@ export function mountOsFoundation({root, supabase, profile, onOrder, onLead, onN
   historyImport=mountHistoryImport({root:$('[data-os-import-root]'),supabase,onSaved:async()=>{await loadClients();await refresh();},onClient:id=>operations.openClient(id),onOrder});
   async function refresh(){await Promise.all([refreshOverview(),operations?.refreshTasks()]);}
   void refresh();void loadClients();
-  return {canLeave,refresh,refreshClients:loadClients,openTask,openTaskEditor:operations.openTaskEditor,openMarketingPost(id){const section=$('[data-os-marketing]');section.hidden=false;marketingPlan?.openPost(id);},destroy(){alive=false;overviewVersion++;clientsVersion++;operations?.destroy();historyImport?.destroy();marketingPlan?.destroy();}};
+  return {canLeave,refresh,refreshMarketing:()=>marketingPlan?.refresh(),refreshClients:loadClients,openTask,openTaskEditor:operations.openTaskEditor,openMarketingPost(id){const section=$('[data-os-marketing]');section.hidden=false;marketingPlan?.openPost(id);},destroy(){alive=false;overviewVersion++;clientsVersion++;operations?.destroy();historyImport?.destroy();marketingPlan?.destroy();}};
 }

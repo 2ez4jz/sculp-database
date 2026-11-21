@@ -69,12 +69,22 @@ function scheduleEntry(item,day) {
   };
 }
 
-function workTaskRow(task) {
+function workTaskRow(task,day) {
   const done = task.status === 'done';
   return `<li class="ps-item${done ? ' ps-completed' : ''}">
-    <span class="ps-task-state" role="img" aria-label="${done ? '已完成' : '待完成'}"></span>
-    <div class="ps-item-title"><strong>${esc(task.reason)}</strong><span class="ps-tag">工作待办</span></div>
+    <input type="checkbox" data-ps-work-done="${esc(task.id)}" aria-label="完成 ${esc(task.reason)}" ${done?'checked':''}>
+    <div class="ps-item-body"><div class="ps-item-title"><strong>${esc(task.reason)}</strong><span class="ps-tag">${esc(task.assignee||'工作待办')}</span></div>
+    ${task.due_on<day?`<p class="ps-meta">原定 ${esc(task.due_on)}</p>`:''}</div>
     <button type="button" class="ps-row-action" data-ps-work-task="${esc(task.id)}" aria-label="处理 ${esc(task.reason)}">处理</button>
+  </li>`;
+}
+
+function marketingRow(post,checked,day) {
+  return `<li class="ps-item${checked?' ps-completed':''}">
+    <input type="checkbox" data-ps-marketing-done="${post.id}" aria-label="完成 ${esc(post.title)}" ${checked?'checked':''}>
+    <div class="ps-item-body"><div class="ps-item-title"><strong>${esc(post.title)}</strong><span class="ps-tag">Marketing · ${esc(post.platform)}</span></div>
+    ${post.date<day?`<p class="ps-meta">原定 ${esc(post.date)}</p>`:''}</div>
+    <button type="button" class="ps-row-action" data-ps-marketing="${post.id}">查看</button>
   </li>`;
 }
 
@@ -89,12 +99,13 @@ async function readPages(pageSize, fetchPage, isCurrent) {
   return rows;
 }
 
-export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>new Date()}) {
+export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarketing,onWorkChange,now=()=>new Date()}) {
   if(!canManagePersonalSchedule(profile)){root.replaceChildren();return {canLeave:()=>true,refresh:async()=>{},destroy(){}};}
   const doc=root.ownerDocument,win=doc.defaultView;
   const today = () => {const current=now();return dateAt(current,itineraryTimeZone(current));};
   let alive=true, selected=today(), pickerMonth=selected.slice(0,7), loadVersion=0;
-  let items=[], workTasks=[], loaded=false, loadFailed=false, workFailed=false, lastMarkup='';
+  let items=[], workTasks=[], marketingState=[], loaded=false, loadFailed=false, workFailed=false, marketingFailed=false, lastMarkup='';
+  let workCommand=null;
   let busy=false, dirty=false, editing=null, pending=null, followToday=true, changedZones=new Set();
   root.className='cloud-orders personal-schedule';root.dataset.osPersonal='';
   root.innerHTML=`<header class="ps-heading">
@@ -122,6 +133,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
   </header>
   <div data-ps-items aria-label="当天行程与待办"></div>
   <p class="ps-status" role="status" data-ps-status></p>
+  <button type="button" data-ps-work-retry hidden>重试完成状态</button>
   <section class="ps-editor" data-ps-editor hidden><h4 data-ps-editor-title>新增安排</h4><form data-ps-form>
   <div class="ps-form-grid"><label>类型<select name="category">${Object.entries(scheduleCategories).map(([key,label])=>`<option value="${key}">${label}</option>`).join('')}</select></label><label>标题<input name="title" required maxlength="200" placeholder="航班、酒店、工作或待办事项"></label>
   <label class="ps-check"><input name="all_day" type="checkbox">全天 / 时间待定</label><span></span>
@@ -151,12 +163,14 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
   for(const field of ['start_timezone','end_timezone'])f[field].innerHTML=zones.map(([id,label])=>`<option value="${id}">${label} · ${id}</option>`).join('');
   const message=text=>{if(alive)$('[data-ps-status]').textContent=text;};
   function controls() {
-    root.querySelectorAll('button,[data-ps-done]').forEach(el => el.disabled=busy);
+    root.querySelectorAll('button,[data-ps-done],[data-ps-work-done],[data-ps-marketing-done]').forEach(el => el.disabled=busy||!!workCommand);
+    $('[data-ps-work-retry]').hidden=!workCommand;
+    $('[data-ps-work-retry]').disabled=busy;
     $('[data-ps-prev]').disabled=busy || pickerMonth==='2000-01';
     $('[data-ps-next]').disabled=busy || pickerMonth==='2100-12';
     $('[data-ps-day-prev]').disabled=busy || selected===firstDay;
     $('[data-ps-day-next]').disabled=busy || selected===lastDay;
-    form.querySelectorAll('input,select,textarea').forEach(el => el.disabled=busy || !!pending);
+    form.querySelectorAll('input,select,textarea').forEach(el => el.disabled=busy || !!pending || !!workCommand);
   }
   function render(force=false) {
     const currentDay = today();
@@ -164,12 +178,19 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     $('[data-ps-date-label]').textContent=(selected===currentDay ? '今天 · ' : year)+dayFormatter.format(asDate(selected));
     $('[data-ps-clock]').textContent=planZone(selected)==='Asia/Shanghai' ? '北京时间' : '多伦多时间';
     const schedule = items.filter(item => scheduleOnDay(item, selected));
-    const dueTasks = workTasks.filter(task => task.due_on===selected);
+    const dueTasks = workTasks.filter(task => task.status==='open'?task.due_on<=selected:task.due_on===selected||task.completed_on===selected);
+    const postState=new Map(marketingState.map(state=>[state.post_id,state]));
+    const posts=marketingFailed?[]:holidayContentPlan.filter(post=>{
+      if(post.date>selected)return false;
+      const state=postState.get(post.id);
+      return !state?.checked || post.date===selected || state.updated_at&&dateAt(new Date(state.updated_at),planZone(selected))===selected;
+    });
     const rows = [
       ...schedule.map(item => scheduleEntry(item,selected)),
-      ...dueTasks.map(task => ({time:afterTimedItems,done:task.status==='done',html:workTaskRow(task)})),
+      ...dueTasks.map(task => ({time:afterTimedItems,done:task.status==='done',html:workTaskRow(task,selected)})),
+      ...posts.map(post=>({time:afterTimedItems,done:Boolean(postState.get(post.id)?.checked),html:marketingRow(post,postState.get(post.id)?.checked,selected)})),
     ].sort((a,b) => a.time.localeCompare(b.time) || Number(a.done)-Number(b.done));
-    const errors = [loadFailed && '行程', workFailed && '工作待办'].filter(Boolean);
+    const errors = [loadFailed && '行程', workFailed && '工作待办',marketingFailed&&'Marketing 任务'].filter(Boolean);
     const note = errors.length ? `<div class="ps-read-error"><p>${errors.join('和')}暂未读到。</p><button type="button" data-ps-retry>重试</button></div>` : '';
     const content = rows.length ? `<ul class="ps-agenda">${rows.map(row => row.html).join('')}</ul>` : '';
     const empty = !loaded ? '正在读取当天安排…' : !rows.length && !note ? '当天暂无行程或待办。' : '';
@@ -185,7 +206,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
   async function refresh() {
     if (!alive) return;
     const currentDay = today();
-    if (followToday && !dirty && !busy && !pending && selected!==currentDay) {
+    if (followToday && !dirty && !busy && !pending && !workCommand && selected!==currentDay) {
       updateSelectedDay(currentDay);
       render();
     }
@@ -195,21 +216,24 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     const next = asDate(from);
     next.setUTCMonth(next.getUTCMonth()+1);
     const to = next.toISOString().slice(0,10);
-    const [schedule, tasks] = await Promise.allSettled([
+    const [schedule, tasks,marketing] = await Promise.allSettled([
       // Airport dates can differ from the planner's day by one day in either direction.
       readPages(500, offset => supabase.from('miranda_schedule').select('*')
         .lte('first_day',to).gte('last_day',shiftDay(from,-1)).order('agenda_start_local').order('id').range(offset,offset+499), isCurrent),
-      readPages(100, offset => supabase.rpc('sculpy_miranda_daily_work_tasks',{p_from:from,p_to:to,p_offset:offset}), isCurrent),
+      readPages(100, offset => supabase.rpc('sculpy_shared_daily_work_tasks',{p_day:selected,p_offset:offset}), isCurrent),
+      supabase.from('marketing_checklist_state').select('post_id,checked,updated_at').eq('campaign','holiday-2026').eq('task_index',50),
     ]);
     if (!isCurrent()) return;
     items=schedule.value ?? [];
     workTasks=tasks.value ?? [];
+    marketingState=marketing.value?.data??[];
     loadFailed=schedule.status==='rejected';
     workFailed=tasks.status==='rejected';
+    marketingFailed=marketing.status==='rejected'||!!marketing.value?.error||!Array.isArray(marketing.value?.data);
     loaded=true;
     render();
   }
-  function approveLeave(){if(busy||pending){message('当前保存尚未确认，请先重试。');return false;}return !dirty||win.confirm('放弃尚未保存的行程修改？');}
+  function approveLeave(){if(busy||pending||workCommand){message('当前保存尚未确认，请先重试。');return false;}return !dirty||win.confirm('放弃尚未保存的行程修改？');}
   function close(){editing=null;pending=null;dirty=false;$('[data-ps-editor]').hidden=true;}
   function typeFields(){
     const flight=f.category.value==='flight',hotel=f.category.value==='hotel';
@@ -340,7 +364,8 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
       if (!approveLeave()) return;
       close();
       followToday=day===today();
-      if(updateSelectedDay(day))void refresh();
+      updateSelectedDay(day);
+      void refresh();
       render();
     }
     closeCalendar(restoreFocus);
@@ -408,13 +433,46 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     if (!button || busy) return;
     if (button.dataset.psDate) selectDay(button.dataset.psDate);
     if (button.hasAttribute('data-ps-retry')) void refresh();
+    if (button.hasAttribute('data-ps-work-retry')) void saveWorkCommand();
+    if (button.dataset.psMarketing&&approveLeave()) {close();onMarketing?.(Number(button.dataset.psMarketing));}
     if (button.dataset.psEdit) open(items.find(item=>item.id===button.dataset.psEdit));
     if (button.dataset.psWorkTask) {
       const task = workTasks.find(item=>item.id===button.dataset.psWorkTask);
       if (task && onWorkTask?.(task)===false) message('请先保存或取消正在编辑的安排。');
     }
   });
+  async function saveWorkCommand(){
+    if(!workCommand||busy)return;
+    busy=true;controls();message('正在保存完成状态…');
+    try{
+      const {method,args}=workCommand;
+      const {data,error}=await supabase.rpc(method,args);
+      if(error)throw error;
+      if(method==='sculpy_os_update_task'?(data?.id!==args.p_task_id||data?.requestId!==args.p_request_id):data?.checked!==args.p_checked)throw Error('Unconfirmed task update');
+      workCommand=null;busy=false;
+      if(!alive)return;
+      await refresh();
+      message('完成状态已保存并同步。');
+      void Promise.resolve().then(()=>onWorkChange?.()).catch(()=>{});
+    }catch(error){
+      if(!alive)return;
+      busy=false;
+      if(/^(22|23|42|P0|40001)/.test(error.code||'')){
+        workCommand=null;await refresh();message(error.code==='40001'?'任务已被另一人修改，请核对最新状态。':'状态未保存，请核对权限后重试。');
+      }else message('保存尚未确认，请重试同一笔完成状态。');
+    }finally{if(alive)controls();}
+  }
   root.addEventListener('change',async event=>{
+    const workCheck=event.target.closest('[data-ps-work-done],[data-ps-marketing-done]');
+    if(workCheck){
+      if(busy||!approveLeave()){render(true);return;}
+      close();
+      if(workCheck.dataset.psWorkDone){
+        const task=workTasks.find(t=>t.id===workCheck.dataset.psWorkDone);if(!task)return;
+        workCommand={method:'sculpy_os_update_task',args:{p_request_id:win.crypto.randomUUID(),p_task_id:task.id,p_expected_version:task.edit_version,p_action:workCheck.checked?'complete':'reopen',p_due_on:null,p_confirmed:true}};
+      }else workCommand={method:'sculpy_marketing_set_check',args:{p_post_id:Number(workCheck.dataset.psMarketingDone),p_task_index:50,p_checked:workCheck.checked}};
+      await saveWorkCommand();return;
+    }
     const check=event.target.closest('[data-ps-done]');if(!check||busy)return;
     if(pending){render(true);message('请先重试当前未确认的保存。');return;}
     const item=items.find(x=>x.id===check.dataset.psDone);if(!item)return;
@@ -422,13 +480,13 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     try{await persist({id:item.id,version:item.version,data:{completed:check.checked}});if(!alive)return;busy=false;await refresh();if(!loadFailed)message('完成状态已保存。');}
     catch(error){if(alive){busy=false;render(true);message(error.message);if(error.conflict)void refresh();}}
   });
-  const focus=()=>{if(!busy&&!dirty&&!pending&&!root.classList.contains('workspace-page-inactive'))void refresh();};
+  const focus=()=>{if(!busy&&!dirty&&!pending&&!workCommand&&!root.classList.contains('workspace-page-inactive'))void refresh();};
   win.addEventListener('focus',focus);
   // Small bounded reads keep two open accounts in sync; no personal data in localStorage.
   const timer=win.setInterval(()=>{if(!doc.hidden&&!root.classList.contains('workspace-page-inactive'))focus();},30000);
   render();void refresh();
   return {
-    canLeave:()=>!busy&&!dirty&&!pending,
+    canLeave:()=>!busy&&!dirty&&!pending&&!workCommand,
     refresh,
     closeCalendar,
     openReminder,
@@ -441,3 +499,4 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,now=()=>
     },
   };
 }
+import {holidayContentPlan} from './marketing-plan.js?v=marketing-pages-20261118';

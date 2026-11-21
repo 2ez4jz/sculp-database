@@ -71,3 +71,26 @@ test('personal agenda work tasks: Toronto date boundaries, Miranda assignment, a
   await assert.rejects(()=>db.query("select * from public.sculpy_miranda_daily_work_tasks('2026-03-08','2026-05-01')"),error=>error.code==='22023');
  }finally{await db.close();}
 });
+
+test('shared daily work includes JZ and Miranda overdue tasks and enforces the two-account boundary',async()=>{
+ const db=await createDatabase();
+ try{
+  for(const [n,role,username] of [[1,'operations','sculp_jz'],[2,'owner','sculp_miranda'],[3,'artist','sculp_qastaff'],[4,'operations','sculp_other']]){
+   await db.query('insert into auth.users(id) values($1)',[uid(n)]);
+   await db.query('insert into public.profiles(id,display_name,role,username) values($1,$2::text,$2::public.app_role,$3)',[uid(n),role,username]);
+  }
+  await db.query(`insert into public.reminders(id,assigned_to,due_at,status,reason) values
+   ($1,$2,'2026-03-07T15:00:00Z','open','JZ overdue'),
+   ($3,$4,'2026-03-08T15:00:00Z','open','Miranda today'),
+   ($5,$4,'2026-03-09T15:00:00Z','open','Future'),
+   ($6,$7,'2026-03-08T15:00:00Z','open','Other account')`,[uid(10),uid(1),uid(11),uid(2),uid(12),uid(13),uid(4)]);
+  const read=()=>db.query("select * from public.sculpy_shared_daily_work_tasks('2026-03-08') order by id");
+  await actor(db,1);const rows=(await read()).rows;
+  assert.deepEqual(rows.map(r=>r.id),[uid(10),uid(11)]);
+  await db.query("select public.sculpy_os_update_task($1,$2,$3,'complete',null,true)",[uid(20),uid(11),rows[1].edit_version]);
+  await actor(db,2);assert.deepEqual((await read()).rows.map(r=>r.status),['open','done']);
+  assert.deepEqual((await db.query("select id from public.sculpy_shared_daily_work_tasks('2026-03-09') order by id")).rows.map(r=>r.id),[uid(10),uid(12)]);
+  for(const n of [3,4]){await actor(db,n);await assert.rejects(read,error=>error.code==='42501');}
+  await actor(db,0,'anon');await assert.rejects(read,error=>error.code==='42501');
+ }finally{await db.close();}
+});

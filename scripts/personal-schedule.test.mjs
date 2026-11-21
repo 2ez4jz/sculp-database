@@ -3,15 +3,23 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {mountPersonalSchedule,canManagePersonalSchedule,scheduleOnDay} from '../src/pages/login/personal-schedule.js';
 const tick=()=>new Promise(r=>setTimeout(r,10));
-function setup({schedule=[],tasks=[],onWorkTask,failTasks=false,now=()=>new Date('2026-11-21T15:00:00Z')}={}){
+function setup({schedule=[],tasks=[],marketing=[],onWorkTask,onWorkWrite,failTasks=false,now=()=>new Date('2026-11-21T15:00:00Z')}={}){
  const dom=new JSDOM('<main id="root"></main>',{url:'https://fixture.test'}),root=dom.window.document.querySelector('#root');dom.window.confirm=()=>true;
  const rows=[...schedule],calls=[];let lose=false;
  const sdk={rpc:async(name,args)=>{
-  assert.equal(name,'sculpy_miranda_daily_work_tasks');
   calls.push({name,args});
+  if(name==='sculpy_os_update_task')return onWorkWrite(args);
+  if(name==='sculpy_marketing_set_check'){
+   let state=marketing.find(s=>s.post_id===args.p_post_id);
+   if(!state){state={post_id:args.p_post_id};marketing.push(state);}
+   Object.assign(state,{checked:args.p_checked,updated_at:now().toISOString()});
+   return {data:{checked:state.checked}};
+  }
+  assert.equal(name,'sculpy_shared_daily_work_tasks');
   if(failTasks)return {error:{code:'42501'}};
-  return {data:tasks.filter(task=>task.due_on>=args.p_from&&task.due_on<args.p_to).slice(args.p_offset,args.p_offset+100)};
- },from(){let mode='select',data,filters=[];const q={select(){return q;},lte(){return q;},gte(){return q;},order(){return q;},range(){return q;},eq(k,v){filters.push([k,v]);return q;},insert(d){mode='insert';data=d;return q;},update(d){mode='update';data=d;return q;},delete(){mode='delete';return q;},maybeSingle(){return q;},then(resolve,reject){return Promise.resolve().then(()=>{
+  return {data:tasks.filter(task=>task.status==='open'?task.due_on<=args.p_day:task.due_on===args.p_day||task.completed_on===args.p_day).slice(args.p_offset,args.p_offset+100)};
+ },from(table){let mode='select',data,filters=[];const q={select(){return q;},lte(){return q;},gte(){return q;},order(){return q;},range(){return q;},eq(k,v){filters.push([k,v]);return q;},insert(d){mode='insert';data=d;return q;},update(d){mode='update';data=d;return q;},delete(){mode='delete';return q;},maybeSingle(){return q;},then(resolve,reject){return Promise.resolve().then(()=>{
+  if(table==='marketing_checklist_state')return {data:structuredClone(marketing)};
   calls.push({mode,data:structuredClone(data),filters});let found=rows.filter(row=>filters.every(([k,v])=>row[k]===v));
   if(mode==='insert'){if(rows.some(r=>r.id===data.id))return {error:{code:'23505'}};const item={...data,version:1,updated_by:'jz',updated_at:'2026-11-21T15:00:00Z'};rows.push(item);if(lose){lose=false;throw Error('lost response');}return {data:structuredClone(item)};}
   if(mode==='update'){const row=found[0];if(!row)return {data:null};Object.assign(row,data,{version:row.version+1});return {data:structuredClone(row)};}
@@ -70,11 +78,12 @@ test('personal agenda opens on today with a single list and changes date only wh
   const nextDay=$('[data-ps-date="2026-11-22"]');
   assert.equal(x.dom.window.document.activeElement,nextDay);
   nextDay.click();
+  await tick();
   assert(picker.hidden);
   assert.equal(x.dom.window.document.activeElement,toggle);
   assert.match($('.ps-agenda').textContent,/Fictional flight/);
   assert.match($('.ps-agenda .ps-completed').textContent,/Studio tomorrow/);
-  assert.doesNotMatch($('.ps-agenda').textContent,/Studio today/);
+  assert.match($('.ps-agenda').textContent,/Studio today/);
 
   toggle.click();
   $('[data-ps-next]').click();
@@ -117,10 +126,36 @@ test('the daily list orders timed milestones before date-only items and marks fl
  try{
   await x.app.refresh();
   assert.deepEqual([...x.root.querySelectorAll('.ps-agenda strong')].map(el=>el.textContent),
-   ['Overnight flight','Flight leaving today','Hotel checkout','Hotel stay','Hotel check-in','Date-only work task']);
+   ['Overnight flight','Flight leaving today','Hotel checkout','Hotel stay','Hotel check-in','Date-only work task','Bridal Soft Glam','圣诞限定妆容体验']);
   assert.deepEqual([...x.root.querySelectorAll('.ps-tag-milestone')].map(el=>el.textContent),['航班抵达','航班起飞','酒店入住']);
   assert.equal(x.root.querySelector('[data-ps-item="checkout"] .ps-tag').textContent,'酒店');
   assert.equal(x.root.querySelector('[data-ps-item="stay"] .ps-tag').textContent,'酒店');
+ }finally{x.close();}
+});
+
+test('shared work and marketing carry forward until completed, with safe replay after an uncertain write',async()=>{
+ const task={id:'work',reason:'JZ follow-up',assignee:'JZ',due_on:'2026-11-23',status:'open',edit_version:'1'};
+ const writes=[];
+ let fail=true;
+ const x=setup({tasks:[task],now:()=>new Date('2026-11-24T05:00:00Z'),onWorkWrite:args=>{
+  writes.push(structuredClone(args));task.status='done';task.completed_on='2026-11-24';
+  if(fail){fail=false;throw Error('lost acknowledgment');}
+  return {data:{id:args.p_task_id,requestId:args.p_request_id}};
+ }});
+ try{
+  await x.app.refresh();
+  assert.match(x.root.textContent,/原定 2026-11-23/);
+  const check=x.root.querySelector('[data-ps-work-done="work"]');check.checked=true;change(x,check);await tick();
+  assert.equal(x.app.canLeave(),false);
+  x.root.querySelector('[data-ps-work-retry]').click();await tick();
+  assert.deepEqual(writes[0],writes[1]);assert.equal(x.app.canLeave(),true);
+  assert(x.root.querySelector('[data-ps-work-done="work"]').checked);
+  const marketing=x.root.querySelector('[data-ps-marketing-done="1"]');marketing.checked=true;change(x,marketing);await tick();
+  assert(x.root.querySelector('[data-ps-marketing-done="1"]').checked);
+  x.root.querySelector('[data-ps-day-next]').click();await tick();
+  assert.equal(x.root.querySelector('[data-ps-work-done="work"]'),null);
+  assert.equal(x.root.querySelector('[data-ps-marketing-done="1"]'),null);
+  assert(x.root.querySelector('[data-ps-marketing-done="2"]'));
  }finally{x.close();}
 });
 

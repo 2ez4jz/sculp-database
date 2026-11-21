@@ -130,6 +130,11 @@
   font-size: 13px;
   cursor: pointer;
 }
+.enquiry-actions { display: grid; gap: 12px; margin: 16px 0; }
+.enquiry-actions > button { justify-self: start; }
+.enquiry-notes textarea { box-sizing: border-box; width: 100%; min-height: 78px; padding: 10px; font: inherit; }
+.enquiry-notes label { margin: 8px 0; }
+.enquiry-notes [hidden] { display: none !important; }
 .auth-keep-signed-in input {
   width: 16px;
   height: 16px;

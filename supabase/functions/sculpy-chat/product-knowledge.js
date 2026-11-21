@@ -55,6 +55,7 @@ export const productKnowledge=Object.freeze({
  ...v31ReleaseFacts,
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
+ notReleased:[...personalScheduleReleaseFacts.notReleased,{name:'询盘精简与共享任务',status:'pending_deployment',changes:['精简询盘备注、转订单和失败操作','行程内共享工作与 Marketing 任务，未完成顺延']}],
  knowledgeRevision:'2026-11-21-agenda-day-step',
  latestReleasedUpdate:{date:'2026-11-21',name:'Miranda 行程按天切换',revision:'agenda-day-step-20261121',status:'deployed',scope:'JZ 和 Miranda 的个人行程页',evidence:'docs/MIRANDA_PERSONAL_SCHEDULE.md#按天切换',changes:['日期左右的前一天、后一天按钮可单击切换一天']},
  includedBackendUpdate:{date:'2026-11-21',name:'保持登录功能说明',scope:'正式登录页的选择、会话恢复及退出流程',changes:['说明保持登录的入口、适用设备和验证条件']},
