@@ -94,3 +94,29 @@ test('shared daily work includes JZ and Miranda overdue tasks and enforces the t
   await actor(db,0,'anon');await assert.rejects(read,error=>error.code==='42501');
  }finally{await db.close();}
 });
+
+test('day comments protect authors, date, reciprocal mentions and recipient-only acknowledgements',async()=>{
+ const db=await createDatabase();
+ try{
+  for(const [n,role,name] of [[1,'operations','sculp_jz'],[2,'owner','sculp_miranda'],[3,'owner','sculp_other']]){
+   await db.query('insert into auth.users(id) values($1)',[uid(n)]);
+   await db.query('insert into public.profiles(id,display_name,role,username) values($1,$3,$2::public.app_role,$3)',[uid(n),role,name]);
+  }
+  const post=(id,body)=>db.query("insert into public.miranda_day_comments(id,agenda_day,body) values($1,'2026-11-24',$2) returning *",[uid(id),body]);
+  await actor(db,1);
+  const first=(await post(10,'明早 @Miranda 确认')).rows[0];
+  assert.equal(first.author_id,uid(1));assert.equal(first.mentioned_user_id,uid(2));
+  assert.equal((await post(11,'mail@example.com and someone@Miranda.com')).rows[0].mentioned_user_id,null);
+  assert.equal((await db.query('update public.miranda_day_comments set read_at=now() returning id')).rows.length,0);
+  await assert.rejects(()=>post(10,'repeat'),e=>e.code==='23505');
+  await assert.rejects(()=>db.query("insert into public.miranda_day_comments(id,agenda_day,body,author_id) values($1,current_date,'x',$2)",[uid(20),uid(2)]),e=>e.code==='42501');
+  await actor(db,2);
+  assert.equal((await db.query("select count(*)::int n from public.miranda_day_comments where agenda_day='2026-11-25'")).rows[0].n,0);
+  assert.equal((await db.query('update public.miranda_day_comments set read_at=now() where id=$1 returning id',[uid(10)])).rows.length,1);
+  assert.equal((await post(12,'收到＠Jz。')).rows[0].mentioned_user_id,uid(1));
+  await assert.rejects(()=>db.query("update public.miranda_day_comments set body='other'"),e=>e.code==='42501');
+  await actor(db,3);assert.equal((await db.query('select * from public.miranda_day_comments')).rows.length,0);
+  await assert.rejects(()=>post(13,'outside'),e=>e.code==='42501');
+  await actor(db,0,'anon');await assert.rejects(()=>db.query('select * from public.miranda_day_comments'),e=>e.code==='42501');
+ }finally{await db.close();}
+});

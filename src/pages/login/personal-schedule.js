@@ -1,3 +1,4 @@
+import {mountAgendaComments} from './agenda-comments.js?v=day-comments-20261121';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const scheduleCategories = {flight:'航班',hotel:'酒店',work:'工作',todo:'待办',personal:'个人安排'};
 export const canManagePersonalSchedule = profile => profile?.active !== false &&
@@ -157,13 +158,16 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   </details>
   <label class="ps-check"><input name="completed" type="checkbox">已完成</label><p class="cloud-note">航班填写出发和到达的当地时间。酒店填写入住和退房日期。</p>
   <p class="ps-edit-meta" data-ps-edit-meta></p>
-  <div class="ps-actions"><button type="submit" class="auth-primary" data-ps-save>保存安排</button><button type="button" data-ps-cancel>取消</button><button type="button" data-ps-delete hidden>删除安排</button></div><p role="status" aria-live="polite" data-ps-form-status></p></form></section>`;
+  <div class="ps-actions"><button type="submit" class="auth-primary" data-ps-save>保存安排</button><button type="button" data-ps-cancel>取消</button><button type="button" data-ps-delete hidden>删除安排</button></div><p role="status" aria-live="polite" data-ps-form-status></p></form></section>
+  <section class="ps-comments" data-ps-thread aria-label="当日留言"></section>`;
   const $=s=>root.querySelector(s),form=$('[data-ps-form]'),f=form.elements;
   const picker=$('[data-ps-picker]'), dateToggle=$('[data-ps-toggle]'), agenda=$('[data-ps-items]');
+  const comments=mountAgendaComments({root:$('[data-ps-thread]'),supabase,profile,zoneForDay:planZone,selectDay,readPages});
+  comments.setDay(selected);
   for(const field of ['start_timezone','end_timezone'])f[field].innerHTML=zones.map(([id,label])=>`<option value="${id}">${label} · ${id}</option>`).join('');
   const message=text=>{if(alive)$('[data-ps-status]').textContent=text;};
   function controls() {
-    root.querySelectorAll('button,[data-ps-done],[data-ps-work-done],[data-ps-marketing-done]').forEach(el => el.disabled=busy||!!workCommand);
+    root.querySelectorAll('button:not([data-ps-thread] button),[data-ps-done],[data-ps-work-done],[data-ps-marketing-done]').forEach(el => el.disabled=busy||!!workCommand);
     $('[data-ps-work-retry]').hidden=!workCommand;
     $('[data-ps-work-retry]').disabled=busy;
     $('[data-ps-prev]').disabled=busy || pickerMonth==='2000-01';
@@ -206,7 +210,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   async function refresh() {
     if (!alive) return;
     const currentDay = today();
-    if (followToday && !dirty && !busy && !pending && !workCommand && selected!==currentDay) {
+    if (followToday && !dirty && !busy && !pending && !workCommand && comments.canLeave() && selected!==currentDay) {
       updateSelectedDay(currentDay);
       render();
     }
@@ -216,6 +220,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     const next = asDate(from);
     next.setUTCMonth(next.getUTCMonth()+1);
     const to = next.toISOString().slice(0,10);
+    const commentsLoaded=comments.refresh();
     const [schedule, tasks,marketing] = await Promise.allSettled([
       // Airport dates can differ from the planner's day by one day in either direction.
       readPages(500, offset => supabase.from('miranda_schedule').select('*')
@@ -232,6 +237,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     marketingFailed=marketing.status==='rejected'||!!marketing.value?.error||!Array.isArray(marketing.value?.data);
     loaded=true;
     render();
+    await commentsLoaded;
   }
   function approveLeave(){if(busy||pending||workCommand){message('当前保存尚未确认，请先重试。');return false;}return !dirty||win.confirm('放弃尚未保存的行程修改？');}
   function close(){editing=null;pending=null;dirty=false;$('[data-ps-editor]').hidden=true;}
@@ -351,6 +357,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   function updateSelectedDay(day) {
     const newMonth=selected.slice(0,7)!==day.slice(0,7);
     selected=day;
+    comments.setDay(day);
     message('');
     if(newMonth){
       items=[];
@@ -361,7 +368,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   }
   function selectDay(day,restoreFocus=true) {
     if (day!==selected) {
-      if (!approveLeave()) return;
+      if (!approveLeave()||!comments.canChangeDay()) return;
       close();
       followToday=day===today();
       updateSelectedDay(day);
@@ -371,7 +378,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     closeCalendar(restoreFocus);
   }
   async function openReminder({date,id}) {
-    if(!uuid.test(id||'')||!/^\d{4}-\d{2}-\d{2}$/.test(date||'')||date<firstDay||date>lastDay||!approveLeave())return false;
+    if(!uuid.test(id||'')||!/^\d{4}-\d{2}-\d{2}$/.test(date||'')||date<firstDay||date>lastDay||!approveLeave()||(date!==selected&&!comments.canChangeDay()))return false;
     close();
     closeCalendar();
     followToday=date===today();
@@ -486,12 +493,13 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
   const timer=win.setInterval(()=>{if(!doc.hidden&&!root.classList.contains('workspace-page-inactive'))focus();},30000);
   render();void refresh();
   return {
-    canLeave:()=>!busy&&!dirty&&!pending&&!workCommand,
+    canLeave:()=>!busy&&!dirty&&!pending&&!workCommand&&comments.canLeave(),
     refresh,
     closeCalendar,
     openReminder,
     destroy(){
       alive=false;
+      comments.destroy();
       loadVersion++;
       win.clearInterval(timer);
       win.removeEventListener('focus',focus);

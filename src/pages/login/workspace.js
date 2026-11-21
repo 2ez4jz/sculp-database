@@ -1,4 +1,4 @@
-import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=shared-work-20261121';
+import {mountPersonalSchedule,canManagePersonalSchedule} from './personal-schedule.js?v=day-comments-20261121';
 import {mountEmailCenter} from './gmail.js?v=gmail-setup-20261112';
 import {mountCommunicationPanel} from '../../components/communication/panel.js?v=communication-drop-box-20261102';
 import {mountBookingBusiness} from './booking-business.js?v=cloud-write-20261022';
