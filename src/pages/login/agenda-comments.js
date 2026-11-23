@@ -43,6 +43,8 @@ export function mountAgendaComments({root,supabase,profile,zoneForInstant,select
     for(const row of rows){
       const entry=doc.createElement('article'),header=doc.createElement('header'),author=doc.createElement('strong');
       const time=doc.createElement('time'),body=doc.createElement('p');
+      entry.dataset.agendaComment=row.id;
+      entry.tabIndex=-1;
       author.textContent=row.author_id===profile.id?self:peer;
       time.dateTime=row.created_at;
       time.textContent=new Date(row.created_at).toLocaleString('zh-CN',{timeZone:zoneForInstant(row.created_at),month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});

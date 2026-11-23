@@ -1,4 +1,4 @@
-import {mountAgendaComments} from './agenda-comments.js?v=device-zone-20261121';
+import {mountAgendaComments} from './agenda-comments.js?v=agenda-mention-20261122';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const scheduleCategories = {flight:'航班',hotel:'酒店',work:'工作',todo:'待办',personal:'个人安排'};
 export const canManagePersonalSchedule = profile => profile?.active !== false &&
@@ -400,7 +400,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     }
     closeCalendar(restoreFocus);
   }
-  async function openReminder({date,id,eventAt}) {
+  async function openReminder({type,date,id,eventAt}) {
     clock=displayClock(readDeviceZone);
     if(eventAt && Number.isFinite(Date.parse(eventAt)))date=clock.stamp(eventAt).slice(0,10);
     if(!uuid.test(id||'')||!/^\d{4}-\d{2}-\d{2}$/.test(date||'')||date<firstDay||date>lastDay||!approveLeave()||(date!==selected&&!comments.canChangeDay()))return false;
@@ -410,7 +410,7 @@ export function mountPersonalSchedule({root,supabase,profile,onWorkTask,onMarket
     updateSelectedDay(date);
     render();
     await refresh();
-    const row=$(`[data-ps-item="${id}"]`);
+    const row=type==='agenda_mention'?$(`[data-agenda-comment="${id}"]`):$(`[data-ps-item="${id}"]`);
     if(!row||root.classList.contains('workspace-page-inactive'))return false;
     row.focus({preventScroll:true});
     row.scrollIntoView?.({block:'center'});

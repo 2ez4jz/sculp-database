@@ -66,7 +66,7 @@ export function notificationHandler({admin,callerFor,allowedOrigins,generateKeys
     else{
      const n=prepared.notification;
      // Only an opted-in itinerary carries details. Business notices stay generic.
-     const title=n.kind==='test'?'Sculpy 推送测试':n.kind==='marketing_mention'?'有新的社媒任务留言':n.kind==='overdue'?'有询盘等待跟进':n.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘';
+     const title=n.kind==='test'?'Sculpy 推送测试':n.kind==='marketing_mention'?'有新的社媒任务留言':n.kind==='agenda_mention'?'有人在日程留言中 @ 你':n.kind==='overdue'?'有询盘等待跟进':n.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘';
      const message=n.kind==='itinerary'?itineraryPayload(n):{payload:{id:n.id,kind:n.kind,title,body:'请打开 Sculpy 查看。'}};
      if (!message) outcome={result:'failed',code:'itinerary_unavailable'};
      else {

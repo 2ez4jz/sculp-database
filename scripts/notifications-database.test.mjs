@@ -221,3 +221,33 @@ test('notification device overview is read-only for the named active JZ administ
   await role(db,'anon');await assert.rejects(list,e=>e.code==='42501');
  }finally{await db.close();}
 });
+
+test('agenda mention queues only the recipient and opens the linked comment',async()=>{
+ const db=await createDatabase();
+ try{
+  await fixture(db);
+  await role(db,'postgres');
+  await db.query("update public.profiles set username=case when id=$1 then 'sculp_jz' else 'sculp_miranda' end where id in ($1,$2)",[id(1),id(2)]);
+  await role(db,'authenticated');
+  await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id(1)]);
+  const write=(n,body)=>db.query("insert into public.miranda_day_comments(id,agenda_day,body) values($1,'2026-11-22',$2)",[id(n),body]);
+  await write(501,'Ordinary comment');
+  await write(502,'@Miranda Private comment');
+  await assert.rejects(()=>write(502,'@Miranda Private comment'),e=>e.code==='23505');
+  const jz=await api(db,1,'history');
+  const miranda=await api(db,2,'history');
+  assert.equal(jz.items.length,0);
+  assert.equal(miranda.items.length,1);
+  const [notice]=miranda.items;
+  assert.equal(notice.kind,'agenda_mention');
+  assert.equal(notice.deliveries.length,1);
+  await assert.rejects(()=>api(db,1,'open',{id:notice.id}),e=>e.code==='42501');
+  const {items}=await server(db,'claim');
+  assert.equal(items.length,1);
+  const prepared=await server(db,'prepare',items[0]);
+  assert.equal(prepared.notification.kind,'agenda_mention');
+  assert(!JSON.stringify(prepared.notification).includes('Private comment'));
+  assert.deepEqual(await api(db,2,'open',{id:notice.id}),
+   {type:'agenda_mention',id:id(502),date:'2026-11-22'});
+ }finally{await db.close();}
+});

@@ -112,7 +112,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
     ...v31PageActions,
     ...v32PageActions,
     personalSchedulePageAction,
-    {task:'在每日行程留言或 @ 对方',where:'Miranda｜个人行程 → 选择日期 → 当日留言',needs:['获准查看个人行程的两个有效账号之一','选择留言所属日期，填写正文，可点选对方的 @ 名称','点发送留言'],completion:'服务器回执确认后在该日可见，对方可在行程页查看提及并标为已读'},
+    {task:'在每日行程留言或 @ 对方',where:'Miranda｜个人行程 → 选择日期 → 当日留言',needs:['获准查看个人行程的两个有效账号之一','选择留言所属日期，填写正文，可点选对方的 @ 名称','点发送留言'],completion:'服务器回执确认后在该日可见，对方可在行程页查看提及并标为已读。行程 @ 手机推送需部署验收，设备送达以推送记录及实机检查为准'},
     {task:'查看或维护 Holiday 社媒完成状态和留言',where:'Marketing｜营销中心→四周日历→对应内容',needs:['当前有效 owner/operations 账户','明确社媒内容','单篇已完成勾选或明确输入留言；@需选择具体有效管理账户'],completion:'云端完成状态或留言保存成功；@排队不代表设备实际送达；不会自动发 Instagram / 小红书'},
     ...(context.actor?.role==='operations'?[v241AccountPageAction,welcomeEditorPageAction]:[]),
     v24PageAction,

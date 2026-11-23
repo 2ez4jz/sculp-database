@@ -8,4 +8,4 @@ if (url.searchParams.has('demo')) {
   history.replaceState(history.state, '', url);
 }
 setupWebApp();
-await import('./pages/login/index.js?v=team-20261121');
+await import('./pages/login/index.js?v=agenda-mention-20261122');
