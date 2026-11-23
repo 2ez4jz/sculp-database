@@ -23,10 +23,49 @@ const esc = (value) =>
   );
 const roles = accountRoles;
 let supabase, subscription, workspace, welcomeEditor, notificationSettings, gmailSettings, openNotification;
+let destroySystemNotices;
+function mountSystemNotices(container){
+  let timer, expiryTimer, pending=false;
+  function render(rows){
+    clearTimeout(expiryTimer);
+    const visible=rows.filter(row=>Date.parse(row.expires_at)>Date.now());
+    container.innerHTML=visible.map(row=>`<article class="system-notice"><strong>${esc(row.title)}</strong><p>${esc(row.body)}</p></article>`).join("");
+    container.hidden=!visible.length;
+    if(visible.length){
+      const nextExpiry=Math.min(...visible.map(row=>Date.parse(row.expires_at)));
+      expiryTimer=setTimeout(()=>render(visible),Math.max(1,nextExpiry-Date.now()));
+    }
+  }
+  async function refresh(){
+    if(pending||!container.isConnected)return;
+    pending=true;
+    try{
+      const {data,error}=await supabase.rpc("sculpy_active_system_notices");
+      if(!error&&container.isConnected)render(data??[]);
+    }catch{/* A later refresh can retry a transient failure. */}
+    finally{pending=false;}
+  }
+  function reveal(){
+    void refresh().then(()=>{if(!container.hidden)container.scrollIntoView?.({block:"nearest"});});
+  }
+  window.addEventListener("focus",refresh);
+  container.addEventListener("sculpy-reveal-notice",reveal);
+  timer=setInterval(refresh,30000);
+  void refresh();
+  return ()=>{
+    clearInterval(timer);
+    clearTimeout(expiryTimer);
+    window.removeEventListener("focus",refresh);
+    container.removeEventListener("sculpy-reveal-notice",reveal);
+  };
+}
 const noticePattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 navigator.serviceWorker?.addEventListener("message",event=>{
   const source=event.source?.scriptURL;
   if(!source||new URL(source).pathname!==new URL("../../../sw.js",import.meta.url).pathname)return;
+  if(event.data?.type==="sculpy-open-system-notice"){
+    root.querySelector("#system-notices")?.dispatchEvent(new Event("sculpy-reveal-notice"));
+  }
   if(event.data?.type==="sculpy-open-notification"&&noticePattern.test(event.data.id||"")){
     const url=new URL(location.href);url.searchParams.set("notification",event.data.id);history.replaceState(null,"",url);
     if(openNotification)void openNotification(event.data.id);else message("请登录后查看工作通知。");
@@ -41,6 +80,8 @@ function message(text) {
 export async function showLogin() {
   subscription?.unsubscribe?.();
   subscription = null;
+  destroySystemNotices?.();
+  destroySystemNotices=null;
   workspace?.destroy();
   welcomeEditor?.destroy();
   gmailSettings?.destroy();gmailSettings=null;
@@ -108,8 +149,10 @@ async function showWorkspace() {
   const heading = profile.welcome_message?.trim() || "业务工作台";
   const headerActions = `<div class="studio-header-actions">${profile.role==='operations'?'<button class="auth-secondary" id="manage-accounts" type="button" aria-expanded="false" aria-controls="account-list">账户管理 <span>↗</span></button><button type="button" class="auth-secondary" id="edit-welcome" aria-expanded="false" aria-controls="welcome-editor">编辑欢迎语</button>':''}<button type="button" class="auth-secondary" id="workspace-settings" aria-expanded="false" aria-controls="notification-settings">设置</button></div>`;
   frame(
-    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${headerActions}</header><section id="notification-settings" aria-label="通知设置" hidden></section><section id="gmail-settings" aria-label="Gmail 设置" hidden></section>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户" hidden></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
+    `<div class="auth-card auth-workspace"><header class="studio-page-header"><div><span class="auth-eyebrow">SCULP STUDIO</span><h2${personalWelcome ? ' class="studio-personal-welcome"' : ""}>${esc(heading)}</h2><p class="auth-muted">${esc(profile.display_name)} <span>·</span> ${esc(roles[profile.role] || "团队成员")}</p></div>${headerActions}</header><section id="system-notices" aria-label="系统通知" aria-live="polite" hidden></section><section id="notification-settings" aria-label="通知设置" hidden></section><section id="gmail-settings" aria-label="Gmail 设置" hidden></section>${profile.role === "operations" ? '<section id="welcome-editor" aria-label="欢迎语设置" hidden></section><section id="account-list" aria-label="团队账户" hidden></section>' : ""}<div id="cloud-workspace"></div><p role="status" aria-live="polite" class="auth-status"></p><button class="auth-secondary" id="logout">退出登录</button></div>`,
   );
+  destroySystemNotices?.();
+  destroySystemNotices=null;
   workspace?.destroy();
   welcomeEditor?.destroy();
   gmailSettings?.destroy();gmailSettings=null;
@@ -130,6 +173,7 @@ async function showWorkspace() {
     if(button.dataset.osNav!=='settings')workspace.showPage(button.dataset.osNav||'orders');
     root.querySelector('.studio-page-header')?.scrollIntoView({behavior:'auto',block:'start'});
   });
+  if(canManagePersonalSchedule(profile))destroySystemNotices=mountSystemNotices(root.querySelector("#system-notices"));
   workspace = mountCloudWorkspace({
     root: root.querySelector("#cloud-workspace"),
     supabase,
@@ -150,7 +194,7 @@ async function showWorkspace() {
     title.classList.toggle("studio-personal-welcome",!open&&Boolean(profile.welcome_message?.trim()));
     if(open){
       for(const [id,button] of [["account-list","manage-accounts"],["welcome-editor","edit-welcome"]]){const el=root.querySelector("#"+id);if(el)el.hidden=true;root.querySelector("#"+button)?.setAttribute("aria-expanded","false");}
-      if(!notificationSettings)notificationSettings=mountNotificationSettings({root:root.querySelector("#notification-settings"),supabase,profile,onBack:()=>setSettings(false),onOpen:async target=>{if(target.type==='settings')return;if(!setSettings(false))return;await workspace.openNotificationTarget(target);}});
+      if(!notificationSettings)notificationSettings=mountNotificationSettings({root:root.querySelector("#notification-settings"),supabase,profile,onBack:()=>setSettings(false),onOpen:async target=>{if(target.type==='settings')return;if(target.type==='system_notice'){root.querySelector('#system-notices')?.dispatchEvent(new Event('sculpy-reveal-notice'));return;}if(!setSettings(false))return;await workspace.openNotificationTarget(target);}});
       if(!gmailSettings&&['operations','owner'].includes(profile.role)){gmailSettings=mountGmailSettings({root:root.querySelector('#gmail-settings'),supabase});}
     }
     return true;
@@ -160,7 +204,8 @@ async function showWorkspace() {
     if(!workspace.canLeave()||(welcomeEditor&&!welcomeEditor.canLeave())||(notificationSettings&&!notificationSettings.canLeave())||(gmailSettings&&!gmailSettings.canLeave())){message("请先完成当前保存，再到通知记录查看这条提醒。");return;}
     try{
       const target=await notificationApi(supabase,"open",{id});
-      if(target.type==='settings')setSettings(true);else{setSettings(false);await workspace.openNotificationTarget(target);}
+      if(target.type==='system_notice')root.querySelector("#system-notices")?.dispatchEvent(new Event("sculpy-reveal-notice"));
+      else if(target.type==='settings')setSettings(true);else{setSettings(false);await workspace.openNotificationTarget(target);}
     }catch{message("此通知当前不可查看，请检查登录账户或到通知设置查看记录。");}
     finally{const url=new URL(location.href);url.searchParams.delete("notification");history.replaceState(null,"",url);}
   };

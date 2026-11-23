@@ -251,3 +251,32 @@ test('agenda mention queues only the recipient and opens the linked comment',asy
    {type:'agenda_mention',id:id(502),date:'2026-11-22'});
  }finally{await db.close();}
 });
+
+test('temporary system notices are private, expire, and use the subscribed device queue',async()=>{
+ const db=await createDatabase();
+ try{
+  await fixture(db);
+  await role(db,'postgres');
+  await db.query("update profiles set username=case when id=$1 then 'sculp_jz' else 'sculp_miranda' end where id in ($1,$2)",[id(1),id(2)]);
+  await db.query(`insert into sculpy_private.push_notifications(id,recipient_id,kind,title,event_key,system_body,created_at,system_expires_at)
+   values($1,$2,'system_notice','Test notice','test-active','Fixture text',now(),now()+interval '12 hours'),
+   ($3,$2,'system_notice','Expired','test-expired','Expired fixture',now()-interval '13 hours',now()-interval '1 hour')`,[id(601),id(1),id(602)]);
+  await db.query(`insert into sculpy_private.push_deliveries(notification_id,device_id,expires_at)
+   select $1,id,now()+interval '12 hours' from sculpy_private.push_devices where user_id=$2`,[id(601),id(1)]);
+  await role(db,'authenticated');
+  for(const [actor,expected] of [[1,1],[2,0],[3,0]]){
+   await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id(actor)]);
+   const {rows}=await db.query('select body from public.sculpy_active_system_notices()');
+   assert.equal(rows.length,expected);
+   if(expected)assert.equal(rows[0].body,'Fixture text');
+  }
+  await assert.rejects(()=>api(db,2,'open',{id:id(601)}),e=>e.code==='42501');
+  await assert.rejects(()=>api(db,1,'open',{id:id(602)}),e=>e.code==='42501');
+  assert.deepEqual(await api(db,1,'open',{id:id(601)}),{type:'system_notice'});
+  const {items}=await server(db,'claim');
+  assert.equal(items.length,1);
+  const {notification}=await server(db,'prepare',items[0]);
+  assert.equal(notification.body,'Fixture text');
+  assert(notification.ttl>0&&notification.ttl<=43200);
+ }finally{await db.close();}
+});

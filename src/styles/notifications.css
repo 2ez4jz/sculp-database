@@ -45,3 +45,17 @@
  .notification-history-row{gap:12px}.notification-history-row>div{min-width:0;overflow-wrap:anywhere}.notification-history-row strong{font-size:12px}
  .studio-content .notification-settings form .auth-primary{min-height:44px;width:100%}
 }
+
+.system-notice {
+  margin: 0 0 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid #ded1bf;
+  border-radius: 12px;
+  background: #fbf3e9;
+  color: #372c25;
+}
+.system-notice p {
+  margin: .45rem 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

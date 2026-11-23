@@ -19,10 +19,12 @@ self.addEventListener('push',event=>{
  let data={};try{data=event.data?.json()||{};}catch{}
  const id=notificationIdPattern.test(data.id||'')?data.id:null;
  const itinerary=Boolean(id&&data.kind==='itinerary'&&typeof data.title==='string'&&data.title&&typeof data.body==='string'&&data.body);
- const title=itinerary?Array.from(data.title).slice(0,140).join(''):data.kind==='test'?'Sculpy 推送测试':id&&data.kind==='agenda_mention'?'有人在日程留言中 @ 你':data.kind==='overdue'?'有询盘等待跟进':data.kind==='new_enquiry'?(data.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘'):'Sculpy 工作提醒';
- const body=itinerary?Array.from(data.body).slice(0,700).join(''):'请打开 Sculpy 查看。';
+ const systemNotice=Boolean(id&&data.systemNotice===true&&typeof data.title==='string'&&typeof data.body==='string');
+ if(systemNotice&&!(Date.parse(data.expiresAt)>Date.now()))return;
+ const title=itinerary||systemNotice?Array.from(data.title).slice(0,140).join(''):data.kind==='test'?'Sculpy 推送测试':id&&data.kind==='agenda_mention'?'有人在日程留言中 @ 你':data.kind==='overdue'?'有询盘等待跟进':data.kind==='new_enquiry'?(data.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘'):'Sculpy 工作提醒';
+ const body=itinerary||systemNotice?Array.from(data.body).slice(0,700).join(''):'请打开 Sculpy 查看。';
  event.waitUntil(self.registration.showNotification(title,{body,tag:id||'sculpy-work',renotify:false,
-  icon:new URL('assets/sculpy-icon-192.png',self.registration.scope).href,data:{id}}));
+  icon:new URL('assets/sculpy-icon-192.png',self.registration.scope).href,data:systemNotice?{systemNotice:true}:{id}}));
 });
 self.addEventListener('notificationclick',event=>{
  event.notification.close();const id=event.notification.data?.id;
@@ -30,7 +32,7 @@ self.addEventListener('notificationclick',event=>{
  event.waitUntil((async()=>{
   const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});
   const existing=windows.find(c=>c.url.startsWith(self.registration.scope)&&new URL(c.url).searchParams.get('demo')!=='1');
-  if(existing){existing.postMessage({type:'sculpy-open-notification',id});await existing.focus();}
+  if(existing){existing.postMessage(event.notification.data?.systemNotice?{type:'sculpy-open-system-notice'}:{type:'sculpy-open-notification',id});await existing.focus();}
   else await self.clients.openWindow(url.href);
  })());
 });

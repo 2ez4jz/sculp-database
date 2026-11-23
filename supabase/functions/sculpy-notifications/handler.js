@@ -67,8 +67,12 @@ export function notificationHandler({admin,callerFor,allowedOrigins,generateKeys
      const n=prepared.notification;
      // Only an opted-in itinerary carries details. Business notices stay generic.
      const title=n.kind==='test'?'Sculpy 推送测试':n.kind==='marketing_mention'?'有新的社媒任务留言':n.kind==='agenda_mention'?'有人在日程留言中 @ 你':n.kind==='overdue'?'有询盘等待跟进':n.title==='收到新的婚礼询盘'?'收到新的婚礼询盘':'收到新的官网询盘';
-     const message=n.kind==='itinerary'?itineraryPayload(n):{payload:{id:n.id,kind:n.kind,title,body:'请打开 Sculpy 查看。'}};
-     if (!message) outcome={result:'failed',code:'itinerary_unavailable'};
+     // Older installed workers display full text for itinerary payloads.
+     const systemNotice=n.kind==='system_notice' && UUID.test(n.id) && Number.isInteger(n.ttl) && n.ttl>0 && n.ttl<=43200;
+     const message=n.kind==='system_notice'
+      ? systemNotice && {ttl:n.ttl,payload:{id:n.id,kind:'itinerary',systemNotice:true,title:n.title,body:n.body,expiresAt:n.expiresAt}}
+      : n.kind==='itinerary'?itineraryPayload(n):{payload:{id:n.id,kind:n.kind,title,body:'请打开 Sculpy 查看。'}};
+     if (!message) outcome={result:'failed',code:n.kind==='system_notice'?'notice_expired':'itinerary_unavailable'};
      else {
       const response=await sendPush({subscription:prepared.subscription,...message,keys,topic:n.id.replace(/-/g,'')});
       outcome=deliveryOutcome(response.status,response.retryAfter);
