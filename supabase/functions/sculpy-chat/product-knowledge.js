@@ -56,7 +56,7 @@ export const productKnowledge=Object.freeze({
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
  knowledgeRevision:'2026-11-21-production',
- latestReleasedUpdate:{date:'2026-11-22',name:'临时系统通知',revision:'system-notices-20261122',status:'deployed',scope:'指定账号的锁屏与工作台通知',evidence:'docs/CHANGELOG.md#临时系统通知',changes:['有效通知在工作台顶部显示','订阅设备可接收通知正文']},
+ latestReleasedUpdate:{date:'2026-11-23',name:'管理员发送系统推送',revision:'admin-system-push-20261123',status:'deployed',scope:'JZ 管理员的通知设备面板',evidence:'docs/CHANGELOG.md#管理员发送系统推送',changes:['JZ 可向指定账号发送一次性锁屏推送，工作台和历史不展示']},
  includedBackendUpdate:{date:'2026-11-21',name:'正式工作区说明',scope:'成员登录、语音和正式工作区发布范围',changes:['旧演示书签进入团队登录流程','只有已登录且有效的团队账号可使用语音转写，聊天根据当前账号权限读取资料']},
 });
 
