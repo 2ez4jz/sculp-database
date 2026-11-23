@@ -56,7 +56,7 @@ export const productKnowledge=Object.freeze({
  ...v32ReleaseFacts,
  ...personalScheduleReleaseFacts,
  knowledgeRevision:'2026-11-21-production',
- latestReleasedUpdate:{date:'2026-11-21',name:'正式工作区启用',revision:'team-20261121',status:'deployed',scope:'团队成员的登录、聊天语音和工作台快捷操作',evidence:'docs/CHANGELOG.md#正式模式与安全检查',changes:['旧演示书签进入团队登录页面，语音转写要求有效团队账号','工作台新建询盘或订单、沟通中心打开询盘、询盘转订单均可直接进入对应页面']},
+ latestReleasedUpdate:{date:'2026-11-22',name:'每日行程 @ 推送',revision:'agenda-mention-20261122',status:'deployed',scope:'共享的每日行程留言和被提及账号已订阅的设备',evidence:'docs/CHANGELOG.md#每日行程推送',changes:['新的行程 @ 会推给被提及的账号','打开通知进入对应日期和留言，实机送达待验收']},
  includedBackendUpdate:{date:'2026-11-21',name:'正式工作区说明',scope:'成员登录、语音和正式工作区发布范围',changes:['旧演示书签进入团队登录流程','只有已登录且有效的团队账号可使用语音转写，聊天根据当前账号权限读取资料']},
 });
 
@@ -112,7 +112,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
     ...v31PageActions,
     ...v32PageActions,
     personalSchedulePageAction,
-    {task:'在每日行程留言或 @ 对方',where:'Miranda｜个人行程 → 选择日期 → 当日留言',needs:['获准查看个人行程的两个有效账号之一','选择留言所属日期，填写正文，可点选对方的 @ 名称','点发送留言'],completion:'服务器回执确认后在该日可见，对方可在行程页查看提及并标为已读。行程 @ 手机推送需部署验收，设备送达以推送记录及实机检查为准'},
+    {task:'在每日行程留言或 @ 对方',where:'Miranda｜个人行程 → 选择日期 → 当日留言',needs:['获准查看个人行程的两个有效账号之一','选择留言所属日期，填写正文，可点选对方的 @ 名称','点发送留言'],completion:'服务器回执确认后在该日可见，对方可在行程页查看并标为已读。有效订阅设备可接收 @ 通知并打开该条留言，实机送达待验收'},
     {task:'查看或维护 Holiday 社媒完成状态和留言',where:'Marketing｜营销中心→四周日历→对应内容',needs:['当前有效 owner/operations 账户','明确社媒内容','单篇已完成勾选或明确输入留言；@需选择具体有效管理账户'],completion:'云端完成状态或留言保存成功；@排队不代表设备实际送达；不会自动发 Instagram / 小红书'},
     ...(context.actor?.role==='operations'?[v241AccountPageAction,welcomeEditorPageAction]:[]),
     v24PageAction,
