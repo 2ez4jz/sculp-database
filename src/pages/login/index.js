@@ -1,4 +1,4 @@
-import {mountNotificationDevices} from './notification-devices.js?v=device-row-20261121';
+import {mountNotificationDevices} from './notification-devices.js?v=admin-system-push-20261123';
 import {canManagePersonalSchedule} from './personal-schedule.js?v=device-zone-20261121';
 import {mountGmailSettings} from './gmail.js?v=gmail-setup-20261112';
 import { mountCloudWorkspace } from "./workspace.js?v=agenda-mention-20261122";

@@ -8,4 +8,4 @@ if (url.searchParams.has('demo')) {
   history.replaceState(history.state, '', url);
 }
 setupWebApp();
-await import('./pages/login/index.js?v=system-notices-20261122');
+await import('./pages/login/index.js?v=admin-system-push-20261123');

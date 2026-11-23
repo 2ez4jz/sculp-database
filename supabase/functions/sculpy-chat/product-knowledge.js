@@ -112,6 +112,7 @@ export function productKnowledgeInstructions({context={},toolNames=[],canPropose
     ...v31PageActions,
     ...v32PageActions,
     personalSchedulePageAction,
+    {task:'发送一次性系统推送',where:'账户管理 → 通知设备 → 发送系统通知',needs:['JZ 管理员账号','选择收件人并填写标题和正文','点击发送推送'],completion:'页面确认提交到哪些账号的订阅设备，实际锁屏展示由设备决定。聊天不执行发送。'},
     {task:'查看临时系统通知',where:'登录工作台 → 页面顶部',needs:['系统已向当前账号发布仍在有效期内的通知'],completion:'页面显示标题及正文，已订阅设备可接收锁屏通知。聊天不提供发送操作，实机显示待验收'},
     {task:'在每日行程留言或 @ 对方',where:'Miranda｜个人行程 → 选择日期 → 当日留言',needs:['获准查看个人行程的两个有效账号之一','选择留言所属日期，填写正文，可点选对方的 @ 名称','点发送留言'],completion:'服务器回执确认后在该日可见，对方可在行程页查看并标为已读。有效订阅设备可接收 @ 通知并打开该条留言，实机送达待验收'},
     {task:'查看或维护 Holiday 社媒完成状态和留言',where:'Marketing｜营销中心→四周日历→对应内容',needs:['当前有效 owner/operations 账户','明确社媒内容','单篇已完成勾选或明确输入留言；@需选择具体有效管理账户'],completion:'云端完成状态或留言保存成功；@排队不代表设备实际送达；不会自动发 Instagram / 小红书'},

@@ -280,3 +280,25 @@ test('temporary system notices are private, expire, and use the subscribed devic
   assert(notification.ttl>0&&notification.ttl<=43200);
  }finally{await db.close();}
 });
+
+test('one-time admin push is JZ-only, idempotent, targeted and excluded from workspace and history',async()=>{
+ const db=await createDatabase();
+ try{
+  await fixture(db);
+  await role(db,'postgres');
+  await db.query("update profiles set username=case when id=$1 then 'sculp_jz' else 'sculp_miranda' end where id in ($1,$2)",[id(1),id(2)]);
+  await role(db,'authenticated');
+  const actor=n=>db.query("select set_config('request.jwt.claim.sub',$1,false)",[id(n)]);
+  const send=()=>db.query("select sculpy_send_system_push($1,'miranda','Fixture title','Fixture body') result",[id(700)]);
+  await actor(2);
+  await assert.rejects(send,e=>e.code==='42501');
+  await actor(1);
+  for(let i=0;i<2;i++)assert.deepEqual((await send()).rows[0].result,{sculp_miranda:1});
+  await actor(2);
+  assert.equal((await db.query('select * from sculpy_active_system_notices()')).rows.length,0);
+  assert.equal((await api(db,2,'history')).items.length,0);
+  const {items}=await server(db,'claim');
+  assert.equal(items.length,1);
+  assert.equal((await server(db,'prepare',items[0])).notification.body,'Fixture body');
+ }finally{await db.close();}
+});
